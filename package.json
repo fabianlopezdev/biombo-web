@@ -11,6 +11,8 @@
     "lint:fix": "eslint . --ext .js,.ts,.astro,.json --fix",
     "format": "prettier --write . --plugin=prettier-plugin-astro",
     "check-format": "prettier --check . --plugin=prettier-plugin-astro",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepare": "husky",
     "i18n:extract": "astro-i18n extract",
     "i18n:generate:pages": "astro-i18n generate:pages --purge",
@@ -33,7 +35,8 @@
     "lint-staged": "^16.0.0",
     "prettier": "^3.5.3",
     "prettier-plugin-astro": "^0.14.1",
-    "typescript-eslint": "^8.32.1"
+    "typescript-eslint": "^8.32.1",
+    "vitest": "^3.1.4"
   },
   "lint-staged": {
     "*.{js,ts,astro,json}": [
