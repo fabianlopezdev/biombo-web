@@ -2,5 +2,6 @@
   "site": {
     "title": "Biombo"
   },
-  "greeting": "Hello {# name #}!"
+  "greeting": "Hello, {# name #}!",
+  "simple_key_test": "This is a simple test."
 }

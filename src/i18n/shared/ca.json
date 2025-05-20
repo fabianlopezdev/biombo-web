@@ -2,5 +2,7 @@
   "site": {
     "title": "Biombo"
   },
-  "greeting": "Hola {# name #}!"
+  "greeting": "Hola, {# name #}!",
+  "simple_key_test": "Això és una prova simple.",
+  "only_in_default_lang": "Aquest text només està en Català."
 }
