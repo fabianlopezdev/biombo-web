@@ -11,10 +11,15 @@
     "lint:fix": "eslint . --ext .js,.ts,.astro,.json --fix",
     "format": "prettier --write . --plugin=prettier-plugin-astro",
     "check-format": "prettier --check . --plugin=prettier-plugin-astro",
-    "prepare": "husky"
+    "prepare": "husky",
+    "i18n:extract": "astro-i18n extract",
+    "i18n:generate:pages": "astro-i18n generate:pages --purge",
+    "i18n:generate:types": "astro-i18n generate:types",
+    "i18n:sync": "npm run i18n:generate:pages && npm run i18n:generate:types"
   },
   "dependencies": {
-    "astro": "^5.7.5"
+    "astro": "^5.7.5",
+    "astro-i18n": "^2.2.4"
   },
   "devDependencies": {
     "@typescript-eslint/parser": "^8.32.1",

@@ -11,6 +11,9 @@ importers:
       astro:
         specifier: ^5.7.5
         version: 5.7.13(@types/node@22.15.19)(rollup@4.41.0)(typescript@5.8.3)(yaml@2.8.0)
+      astro-i18n:
+        specifier: ^2.2.4
+        version: 2.2.4(esbuild@0.25.4)
     devDependencies:
       '@typescript-eslint/parser':
         specifier: ^8.32.1
@@ -715,6 +718,12 @@ packages:
   astro-eslint-parser@1.2.2:
     resolution: {integrity: sha512-JepyLROIad6f44uyqMF6HKE2QbunNzp3mYKRcPoDGt0QkxXmH222FAFC64WTyQu2Kg8NNEXHTN/sWuUId9sSxw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  astro-i18n@2.2.4:
+    resolution: {integrity: sha512-vhvxBtStNLLghtl63aGhBEtU1DqlYz0D3ggz5Nh2QZok36s9Ss3v9b4txN3mH/OZ90JUwkII13CYQL9wozjXBQ==}
+    hasBin: true
+    peerDependencies:
+      esbuild: 0.x
 
   astro@5.7.13:
     resolution: {integrity: sha512-cRGq2llKOhV3XMcYwQpfBIUcssN6HEK5CRbcMxAfd9OcFhvWE7KUy50zLioAZVVl3AqgUTJoNTlmZfD2eG0G1w==}
@@ -3112,6 +3121,10 @@ snapshots:
       semver: 7.7.2
     transitivePeerDependencies:
       - supports-color
+
+  astro-i18n@2.2.4(esbuild@0.25.4):
+    dependencies:
+      esbuild: 0.25.4
 
   astro@5.7.13(@types/node@22.15.19)(rollup@4.41.0)(typescript@5.8.3)(yaml@2.8.0):
     dependencies:

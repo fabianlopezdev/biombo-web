@@ -1,0 +1,6 @@
+{
+  "site": {
+    "title": "Biombo"
+  },
+  "greeting": "Hello {# name #}!"
+}

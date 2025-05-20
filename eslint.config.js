@@ -26,7 +26,7 @@ export default tseslint.config(
 
   {
     // Global ignores for ESLint
-    ignores: ['dist/', '.astro/', 'node_modules/', 'public/'], // Added public/
+    ignores: ['dist/', '.astro/', 'node_modules/', 'public/', 'src/env.d.ts'], // Added public/ and src/env.d.ts
   },
   {
     // Configuration specifically for Astro files

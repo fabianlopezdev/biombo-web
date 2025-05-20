@@ -1,16 +1,29 @@
 ---
-
+import { t, astroI18n } from 'astro-i18n'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title={t('site.title') ?? 'Fallback Title'}>
+  <main>
+    <h1>{t('site.title')}</h1>
+    <p>{t('greeting', { name: 'Món' })}</p>
+    <p>Current language: {astroI18n.locale}</p>
+    <p>
+      Switch to:
+      {
+        astroI18n.locales
+          .filter((lang) => lang !== astroI18n.locale)
+          .map((lang) => (
+            <a href={astroI18n.l('/', {}, { targetLocale: lang })} style="margin-left: 8px;">
+              {lang.toUpperCase()}
+            </a>
+          ))
+      }
+    </p>
+    <p>
+      <a href={astroI18n.l('/about', {}, { targetLocale: astroI18n.locale })}>
+        Go to About page (localized)
+      </a>
+    </p>
+  </main>
+</BaseLayout>

@@ -22,6 +22,7 @@
     "src/**/*.astro",
     "*.config.js", // For eslint.config.js
     "*.config.mjs", // For astro.config.mjs, prettierrc.mjs
+    "*.config.ts",
     ".astro/types.d.ts" // Astro generated types
   ],
   "exclude": [
