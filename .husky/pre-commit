@@ -1,1 +1,11 @@
-pnpm exec lint-staged
+#!/bin/sh
+# Husky can work with sh, bash, zsh, etc. Using sh for broad compatibility.
+
+echo "Running tests..."
+if pnpm test; then
+  echo "Tests passed. Running lint-staged..."
+  pnpm exec lint-staged
+else
+  echo "Tests failed. Commit aborted."
+  exit 1
+fi
