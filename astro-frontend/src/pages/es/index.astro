@@ -1,6 +1,117 @@
 ---
-import Page from '../index.astro'
-const { props } = Astro
+import { t } from 'astro-i18n' // Only importing t, astroI18n not used
+import { fetchSanityQuery } from '@/shared/lib/sanity/client'
+import { pageSchema, type Page } from '@/shared/schemas/sanity/pageSchema'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+// Hard-coded to Spanish for the /es/ route
+const currentLocale = 'es' as keyof Page['title']
+
+// GROQ query
+const landingPageQuery = `*[_type == "page" && slug.current == "biombo-web"][0]`
+
+let landingPageData: Page | null = null
+let fetchError: string | null = null
+
+try {
+  const result = (await fetchSanityQuery({
+    query: landingPageQuery,
+    schema: pageSchema,
+  })) as Page
+  landingPageData = result
+} catch (error) {
+  console.error(`Failed to fetch landing page data from Sanity for Spanish locale:`, error)
+  fetchError = `Could not load landing page content for Spanish. Please try again later.`
+}
+
+const pageTitle = landingPageData?.title?.[currentLocale] || 'Biombo App - Español' // Fallback title
+
+const mainContentForLocale = landingPageData?.mainContent?.[currentLocale] || []
 ---
 
-<Page {...props} />
+<BaseLayout title={pageTitle}>
+  <main class="page-container">
+    <h1 class="page-title">{pageTitle} (Locale: {currentLocale})</h1>
+
+    {
+      fetchError && (
+        <div class="error-message" role="alert">
+          <p>
+            <strong>{t('shared.error_loading_content', { locale: currentLocale })}</strong>
+          </p>
+          <p>{fetchError}</p>
+        </div>
+      )
+    }
+
+    {
+      landingPageData && !fetchError && (
+        <article class="page-content">
+          <p>{t('shared.current_locale_debug', { locale: currentLocale, code: currentLocale })}</p>
+          <p>
+            {t('shared.primary_locale_debug', {
+              locale: currentLocale,
+              code: import.meta.env.PUBLIC_ASTRO_I18N_PRIMARY_LOCALE,
+            })}
+          </p>
+
+          <h2 class="section-title">{t('shared.raw_data_title', { locale: currentLocale })}</h2>
+          <pre class="code-block">{JSON.stringify(landingPageData, null, 2)}</pre>
+
+          <h2 class="section-title">
+            {t('shared.localized_main_content_title', { locale: currentLocale })}
+          </h2>
+          {mainContentForLocale.map((block) => {
+            if (block._type === 'block' && block.children) {
+              return block.children.map((child) => <p class="content-paragraph">{child.text}</p>)
+            }
+            return null
+          })}
+        </article>
+      )
+    }
+
+    {
+      !landingPageData && !fetchError && (
+        <p class="loading-message">{t('shared.loading_content', { locale: currentLocale })}</p>
+      )
+    }
+  </main>
+</BaseLayout>
+
+<style>
+  .page-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  .page-title {
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .error-message {
+    border: 1px solid #cc0000;
+    background-color: #ffeeee;
+    color: #cc0000;
+    padding: 1em;
+    margin-bottom: 1em;
+  }
+  .section-title {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  .content-paragraph {
+    margin-bottom: 1rem;
+  }
+  .code-block {
+    background-color: #f4f4f4;
+    padding: 1em;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+  .loading-message {
+    font-style: italic;
+    color: #666;
+  }
+</style>
