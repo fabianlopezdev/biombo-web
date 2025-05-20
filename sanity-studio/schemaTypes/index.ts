@@ -1,6 +1,10 @@
-import { page } from './page' // Import the page schema
+import { page } from './page'
+import { localeString } from './localeString'
+import { localePortableText } from './localePortableText'
 
 export const schemaTypes = [
-  page, // Add the page schema to the array
+  page,
+  localeString,
+  localePortableText,
   // Add other schema types here in the future
 ]
