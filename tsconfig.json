@@ -1,5 +1,26 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "compilerOptions": {
+    // It's good practice to define outDir if you haven't,
+    // though "astro build" handles this.
+    // "outDir": "dist", // Example, if needed
+    "baseUrl": ".", // Recommended for path aliases if you use them
+    "paths": {
+      // Example for path aliases, adjust as per your project
+      "@/*": ["src/*"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.astro",
+    "*.config.js", // For eslint.config.js
+    "*.config.mjs", // For astro.config.mjs, prettierrc.mjs
+    ".astro/types.d.ts" // Astro generated types
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".astro", // Astro's build cache and output
+    "public"
+  ]
 }
