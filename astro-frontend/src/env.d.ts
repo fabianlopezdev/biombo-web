@@ -1,3 +1,6 @@
+import 'astro/client'
+import type { PaginateFunction, RSSFunction } from 'astro/client'
+
 // ###> astro-i18n/type-generation ###
 type PrimaryLocale = 'ca'
 type SecondaryLocale = 'es' | 'en'
@@ -8,7 +11,7 @@ type TranslationVariables = { 'site.title': object | undefined; greeting: object
 type Translation = keyof TranslationVariables
 type Environment = 'none' | 'node' | 'browser'
 declare module 'astro-i18n' {
-  type GetStaticPathsProps = { paginate: Function; rss: Function }
+  type GetStaticPathsProps = { paginate: PaginateFunction; rss: RSSFunction }
   type GetStaticPathsItem = {
     params: Record<string, number | string | undefined>
     props?: Record<string, unknown>
@@ -40,6 +43,7 @@ declare module 'astro-i18n' {
   export function useAstroI18n(
     config?: Partial<AstroI18nConfig> | string,
     formatters?: TranslationFormatters,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): (...args: any[]) => any
   /** Workaround function to make astroI18n work inside getStaticPaths. This is because Astro's getStaticPaths runs before everything which doesn't allows astroI18n to update its state automatically. */
   function createGetStaticPaths(
@@ -221,3 +225,14 @@ declare module 'astro-i18n' {
   export const astroI18n: AstroI18n
 }
 // ###< astro-i18n/type-generation ###
+
+interface ImportMetaEnv {
+  readonly PUBLIC_SANITY_PROJECT_ID: string
+  readonly PUBLIC_SANITY_DATASET: string
+  readonly PUBLIC_SANITY_API_VERSION: string
+  // Add other environment variables here if/when needed
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}

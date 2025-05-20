@@ -2,6 +2,9 @@
 import { getViteConfig } from 'astro/config'
 
 export default getViteConfig({
+  vite: {
+    envDir: './', // Load .env files from the project root
+  },
   test: {
     // Enable global test APIs (describe, test, expect, etc.)
     globals: true,
