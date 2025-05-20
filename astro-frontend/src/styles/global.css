@@ -1,0 +1,211 @@
+@layer base, typography, components, utilities;
+
+@layer utilities {
+  /* Visually hide content but keep it accessible to screen readers */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+@layer base {
+  :root {
+
+
+    /* Colors */
+    --color-primary: #8c8373;
+    --color-secondary: #65594c;
+    --color-accent: #65594c;
+
+    /* Spacing */
+    --space-xs: clamp(0.5rem, 0.45rem + 0.25vw, 0.75rem);
+    --space-sm: clamp(0.75rem, 0.65rem + 0.5vw, 1.25rem);
+    --space-md: clamp(1.25rem, 1rem + 1.25vw, 2.5rem);
+    --space-lg: clamp(2rem, 1.75rem + 1.25vw, 3.25rem);
+    --space-xl: clamp(3rem, 2.5rem + 2.5vw, 5.5rem);
+
+    /* Typography */
+    --font-primary: 'Inter', system-ui, sans-serif;
+    --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+    --font-size-base: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+    --font-size-lg: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+    --font-size-xl: clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
+    --font-size-2xl: clamp(1.875rem, 1.65rem + 1.125vw, 2.5rem);
+
+    /* Animation */
+    --transition-fast: 150ms ease;
+    --transition-medium: 300ms ease;
+    --transition-slow: 500ms ease;
+
+    /* Borders & Shadows */
+    --border-radius-sm: 0.25rem;
+    --border-radius-md: 0.5rem;
+    --border-radius-lg: 1rem;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Keyframes for focus animations */
+  @keyframes focus-pulse {
+    0% {
+      outline-width: 3px;
+      outline-offset: 3px;
+    }
+    50% {
+      outline-width: 4px;
+      outline-offset: 5px;
+    }
+    100% {
+      outline-width: 3px;
+      outline-offset: 3px;
+    }
+  }
+
+  @keyframes focus-fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* Improved focus styles with subtle animation for better keyboard navigation */
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+    border-radius: 0.25rem;
+    animation:
+      focus-pulse 0.3s ease-out,
+      focus-fade-in 0.2s ease-out;
+  }
+
+  /* Hide the default focus outline for mouse users, but keep it for keyboard users */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Keyframes for text decoration animation */
+  @keyframes text-decoration-appear {
+    0% {
+      text-decoration-thickness: 0;
+      text-underline-offset: 1px;
+    }
+    100% {
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+  }
+
+  /* Ensure buttons and links have visible focus states with animation */
+  a:focus-visible,
+  button:focus-visible {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+    animation: text-decoration-appear 0.25s ease-out;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-block-size: 100dvh;
+    line-height: 1.6;
+    overflow: hidden;
+    font-family: var(--font-primary);
+    background-color: light-dark(var(--color-bg-light), var(--color-bg-dark));
+    color: light-dark(var(--color-text-dark), var(--color-text-light));
+    transition:
+      background-color var(--transition-medium),
+      color var(--transition-medium);
+    margin: 0;
+  }
+
+  img,
+  picture {
+    max-inline-size: 100%;
+    display: block;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    /* Specifically disable focus animations for users who prefer reduced motion */
+    :focus-visible,
+    a:focus-visible,
+    button:focus-visible {
+      animation: none !important;
+    }
+
+    .hide-at-start {
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer typography {
+  /* Reset margins */
+  body,
+  h1,
+  h2,
+  h3,
+  h4,
+  p {
+    margin: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  button,
+  input,
+  label {
+    line-height: 1.1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  [role='list'] {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+}

@@ -3,6 +3,7 @@ import { t } from 'astro-i18n'
 import { fetchSanityQuery } from '@/shared/lib/sanity/client'
 import { pageSchema, type Page } from '@/shared/schemas/sanity/pageSchema'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import Header from '@/components/ui/Header.astro'
 
 interface Props {
   locale: 'ca' | 'es' | 'en'
@@ -36,6 +37,7 @@ const mainContentForLocale = landingPageData?.mainContent?.[currentLocale] || []
 ---
 
 <BaseLayout title={pageTitle}>
+  <Header locale={locale} />
   <main class="page-container">
     <h1 class="page-title">{pageTitle} (Locale: {currentLocale})</h1>
 
