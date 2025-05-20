@@ -3,5 +3,11 @@
     "title": "Biombo"
   },
   "greeting": "Hola, {# name #}!",
-  "simple_key_test": "Esta es una prueba sencilla."
+  "simple_key_test": "Esta es una prueba sencilla.",
+  "error_loading_content": "Error al Cargar el Contenido",
+  "current_locale_debug": "Localización Actual: {code}",
+  "primary_locale_debug": "Localización Primaria (de env): {code}",
+  "raw_data_title": "Datos Crudos Obtenidos:",
+  "localized_main_content_title": "Contenido Principal Localizado (Vista Previa Básica):",
+  "loading_content": "Cargando contenido..."
 }

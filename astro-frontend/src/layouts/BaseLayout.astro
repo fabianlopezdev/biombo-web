@@ -1,16 +1,17 @@
 ---
 interface Props {
   title: string
+  metaDescription?: string // Optional description prop
 }
 
-const { title } = Astro.props
+const { title, metaDescription } = Astro.props
 ---
 
 <!doctype html>
 <html lang={Astro.currentLocale ?? 'ca'}>
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Astro description" />
+    <meta name="description" content={metaDescription || 'Biombo - Art, Events, Community'} />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />

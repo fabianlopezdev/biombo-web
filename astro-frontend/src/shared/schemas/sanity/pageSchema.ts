@@ -55,6 +55,7 @@ export const pageSchema = z.object({
     })
     .optional(), // Making slug object optional
   mainContent: localePortableTextSchema.optional(),
+  meta_description: localeStringSchema.optional(), // Added for SEO meta descriptions
   // Example: if you fetch the 'language' field from document-internationalization
   // language: z.enum(['ca', 'es', 'en']).optional(),
 })

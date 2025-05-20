@@ -1,5 +1,5 @@
 // src/shared/lib/sanity/client.ts
-import { sanityClient } from '@sanity/astro/client'
+import { sanityClient } from 'sanity:client'
 import type { ZodSchema } from 'zod'
 
 /**
@@ -29,9 +29,9 @@ export async function fetchSanityQuery<S extends ZodSchema>(
   const { query, params = {}, schema } = options
 
   try {
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
     const data = await sanityClient.fetch(query, params)
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment */
 
     if (schema) {
       const validationResult = schema.safeParse(data)

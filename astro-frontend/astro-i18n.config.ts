@@ -1,19 +1,27 @@
+console.log(
+  '[Diagnostic] astro-i18n.config.ts: File is executing (Restored with showPrimaryLocale)',
+)
 import { defineAstroI18nConfig } from 'astro-i18n'
 
-export default defineAstroI18nConfig({
-  primaryLocale: 'ca', // Primary language: Catalan
-  secondaryLocales: ['es', 'en'], // Secondary languages: Spanish, English
-  fallbackLocale: 'ca', // Fallback to Catalan if a translation is missing
-  trailingSlash: 'never', // Options: "never" or "always"
-  run: 'client+server', // Options: "client+server" or "server"
-  showPrimaryLocale: false, // Determines if the primary locale is shown in the URL (e.g., /ca/about vs /about)
+const config = defineAstroI18nConfig({
+  primaryLocale: 'ca',
+  secondaryLocales: ['es', 'en'],
+  fallbackLocale: 'ca',
+  trailingSlash: 'never',
+  run: 'client+server',
+  showPrimaryLocale: false, // IMPORTANT for desired URL structure
   translationLoadingRules: [
     {
       routes: ['.*'], // Apply to all routes (regex)
-      groups: ['shared'], // Load the "shared" translation group
+      groups: ['shared'], // Load the "shared" translation group (assuming you have translations/shared.{locale}.json)
     },
-  ], // Rules for loading translation groups per page
-  translationDirectory: {}, // Custom names for translation directories
-  translations: {}, // Inline translations: { [group]: { [locale]: { [key]: value } } }
-  routes: {}, // For translating URL slugs: { [secondary_locale]: { [original_slug]: "translated_slug" } }
+  ],
+  // translations: {}, // For embedding translations directly
+  // routes: {}, // For translating URL slugs, keep simple for now
 })
+
+console.log(
+  '[Diagnostic] astro-i18n.config.ts: Restored Config object created:',
+  config ? `Type: ${typeof config}, Keys: ${Object.keys(config).join(', ')}` : 'undefined',
+)
+export default config

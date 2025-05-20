@@ -1,3 +1,5 @@
+/// <reference types="@sanity/astro/module" />
+
 import 'astro/client'
 import type { PaginateFunction, RSSFunction } from 'astro/client'
 

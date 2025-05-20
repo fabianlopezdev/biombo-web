@@ -2,9 +2,17 @@
 import { sequence } from 'astro/middleware'
 import { useAstroI18n } from 'astro-i18n'
 
-// Pass your astro-i18n config.
-// If you're using a config file at the root, you can omit this.
-// const astroI18n = useAstroI18n(config, formatters)
-const astroI18n = useAstroI18n()
+console.log('[Diagnostic Middleware] Calling useAstroI18n()...')
+const astroI18nMiddlewareInstance = useAstroI18n()
+console.log(
+  '[Diagnostic Middleware] Type of astroI18nMiddlewareInstance:',
+  typeof astroI18nMiddlewareInstance,
+)
+if (typeof astroI18nMiddlewareInstance === 'function') {
+  console.log(
+    '[Diagnostic Middleware] astroI18nMiddlewareInstance function length (expected args):',
+    astroI18nMiddlewareInstance.length,
+  )
+}
 
-export const onRequest = sequence(astroI18n)
+export const onRequest = sequence(astroI18nMiddlewareInstance)
