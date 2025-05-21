@@ -1,18 +1,11 @@
 // src/middleware.ts
-import { sequence } from 'astro/middleware'
-import { useAstroI18n } from 'astro-i18n'
+import { defineMiddleware } from 'astro/middleware'
 
-console.log('[Diagnostic Middleware] Calling useAstroI18n()...')
-const astroI18nMiddlewareInstance = useAstroI18n()
-console.log(
-  '[Diagnostic Middleware] Type of astroI18nMiddlewareInstance:',
-  typeof astroI18nMiddlewareInstance,
-)
-if (typeof astroI18nMiddlewareInstance === 'function') {
-  console.log(
-    '[Diagnostic Middleware] astroI18nMiddlewareInstance function length (expected args):',
-    astroI18nMiddlewareInstance.length,
-  )
-}
+// Temporarily disable the astro-i18n middleware to isolate if it's causing the Invalid URL error
+console.log('[Diagnostic Middleware] astro-i18n middleware DISABLED for debugging')
 
-export const onRequest = sequence(astroI18nMiddlewareInstance)
+// Create a simple passthrough middleware that does nothing
+export const onRequest = defineMiddleware((context, next) => {
+  console.log('[Diagnostic Middleware] Using simple passthrough middleware')
+  return next()
+})

@@ -1,0 +1,51 @@
+---
+import type { NavigationPage } from '@/shared/schemas/sanity/headerSchema'
+import { getPageName, getPagePath } from '@/utils/shared/headerHelpers'
+
+interface Props {
+  pages: NavigationPage[]
+  locale: string
+}
+
+const { pages, locale } = Astro.props
+---
+
+<nav class="navigation" aria-label="Primary">
+  <ul class="nav-list">
+    {
+      pages.map(function renderPage(page) {
+        const pageName = getPageName(page, locale)
+        const pagePath = getPagePath(page, locale)
+
+        return (
+          <li class="nav-page" role="none">
+            <a
+              href={pagePath}
+              class="nav-link"
+              target={page.isExternal ? '_blank' : undefined}
+              rel={page.isExternal ? 'noopener noreferrer' : undefined}
+              role={page.isExternal ? 'menuitem' : undefined}
+            >
+              {pageName}
+            </a>
+          </li>
+        )
+      })
+    }
+  </ul>
+</nav>
+
+<style>
+  .nav-list {
+    display: flex;
+    gap: 2.625rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-link {
+    text-decoration: none;
+    color: inherit;
+  }
+</style>

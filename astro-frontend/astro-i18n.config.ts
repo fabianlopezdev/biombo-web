@@ -10,13 +10,9 @@ const config = defineAstroI18nConfig({
   trailingSlash: 'never',
   run: 'client+server',
   showPrimaryLocale: false, // IMPORTANT for desired URL structure
-  translationLoadingRules: [
-    {
-      routes: ['.*'], // Apply to all routes (regex)
-      groups: ['shared'], // Load the "shared" translation group (assuming you have translations/shared.{locale}.json)
-    },
-  ],
-  // translations: {}, // For embedding translations directly
+  // TEMPORARILY DISABLED translation loading to fix the Invalid URL error
+  // Will need to be properly configured once the basic site is working
+  translationLoadingRules: [],
   // routes: {}, // For translating URL slugs, keep simple for now
 })
 

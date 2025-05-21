@@ -1,0 +1,72 @@
+---
+import { fetchActiveHeader } from '@/shared/lib/sanity/queries/headerQueries'
+import type { Header, NavigationPage } from '@/shared/schemas/sanity/headerSchema'
+import LanguageSwitcher from '@/components/shared/header/LanguageSwitcher.astro'
+import HeaderLogo from './HeaderLogo.astro'
+import PagesNavigation from './PagesNavigation.astro'
+
+const { locale } = Astro.props
+
+/* language config */
+const languages = [
+  { code: 'ca', short: 'Cat', srSuffix: 'alan', fullName: 'Catalan', path: '/' },
+  { code: 'es', short: 'Esp', srSuffix: 'añol', fullName: 'Spanish', path: '/es' },
+  { code: 'en', short: 'Eng', srSuffix: 'lish', fullName: 'English', path: '/en' },
+] as const
+
+/* fetch navigation */
+let headerData: Header | null = null
+let fetchError: string | null = null
+
+try {
+  headerData = await fetchActiveHeader()
+} catch (error) {
+  console.error('Error fetching headerData:', error)
+  fetchError = `Could not load navigation for ${locale}. Please try again later.`
+}
+
+const pages: NavigationPage[] = fetchError ? [] : (headerData?.navigationPages ?? [])
+---
+
+<header class="site-header">
+  <HeaderLogo />
+
+  {
+    fetchError ? (
+      <div class="error-message" role="alert">
+        <p>{fetchError}</p>
+      </div>
+    ) : (
+      <PagesNavigation pages={pages} locale={locale} />
+    )
+  }
+
+  <LanguageSwitcher locale={locale} languages={languages} />
+</header>
+
+<style>
+  .site-header {
+    inline-size: 100%;
+    block-size: var(--header-height);
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    padding-inline: var(--padding-inline-desktop);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block-start: 1.8rem;
+  }
+
+  @media (width < 768px) {
+    .site-header {
+      gap: 1rem;
+      padding-inline: var(--padding-inline-mobile);
+    }
+  }
+
+  .error-message {
+    color: red;
+    padding: 1rem;
+    border: 1px solid red;
+  }
+</style>

@@ -1,0 +1,20 @@
+---
+// import { t } from 'astro-i18n'
+// import { fetchSanityQuery } from '@/shared/lib/sanity/client'
+// import { pageSchema, type Page } from '@/shared/schemas/sanity/pageSchema'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Header from '@/components/shared/header/Header.astro'
+
+interface Props {
+  locale: 'ca' | 'es' | 'en'
+}
+
+const { locale } = Astro.props
+---
+
+<BaseLayout title={'Something something'}>
+  <Header locale={locale} />
+  <main></main>
+</BaseLayout>
+
+<style></style>

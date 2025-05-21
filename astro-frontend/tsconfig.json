@@ -14,7 +14,9 @@
       "@/layouts/*": ["src/layouts/*"],
       "@/pages/*": ["src/pages/*"],
       "@/shared/*": ["src/shared/*"],
-      "@/styles/*": ["src/styles/*"]
+      "@/utils/*": ["src/utils/*"],
+      "@/styles/*": ["src/styles/*"],
+      "@/scripts/*": ["src/scripts/*"]
     }
   },
   "include": [
