@@ -47,14 +47,18 @@ const pages: NavigationPage[] = fetchError ? [] : (headerData?.navigationPages ?
 <style>
   .site-header {
     inline-size: 100%;
-    block-size: var(--header-height);
+
+    block-size: 4.6875rem;
     background-color: var(--color-secondary);
     color: var(--color-primary);
     padding-inline: var(--padding-inline-desktop);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-block-start: 1.8rem;
+    padding-block-start: 0.7rem;
+
+    /* NEW → serves as containing block for absolutely-centred nav */
+    position: relative;
   }
 
   @media (width < 768px) {
