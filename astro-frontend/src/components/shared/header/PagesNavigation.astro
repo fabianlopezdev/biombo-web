@@ -1,6 +1,7 @@
 ---
 import type { NavigationPage } from '@/shared/schemas/sanity/headerSchema'
 import { getPageName, getPagePath } from '@/utils/shared/headerHelpers'
+import CurrentPageSVG from '@/assets/current-page.svg?raw'
 
 interface Props {
   pages: NavigationPage[]
@@ -25,7 +26,7 @@ const currentPath = Astro.url.pathname
           <li class="nav-page">
             <a
               href={pagePath}
-              class="nav-link sliding-label"
+              class={`nav-link ${!isActive ? 'sliding-label' : ''}`}
               target={page.isExternal ? '_blank' : undefined}
               rel={page.isExternal ? 'noopener noreferrer' : undefined}
               aria-current={isActive ? 'page' : undefined}
@@ -39,11 +40,25 @@ const currentPath = Astro.url.pathname
               </span>
             </a>
 
-            <div class="hover-svg" aria-hidden="true">
-              <svg width="164" height="49" viewBox="0 0 164 49" xmlns="http://www.w3.org/2000/svg">
-                <use href="#nav-hover-graphic" class="nav-hover-path-instance" />
-              </svg>
-            </div>
+            {!isActive && (
+              <div class="hover-svg" aria-hidden="true">
+                <svg
+                  width="164"
+                  height="49"
+                  viewBox="0 0 164 49"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <use href="#nav-hover-graphic" class="nav-hover-path-instance" />
+                </svg>
+              </div>
+            )}
+            {isActive && (
+              <div class="active-indicator" aria-hidden="true">
+                <div class="reveal-mask">
+                  <Fragment set:html={CurrentPageSVG} />
+                </div>
+              </div>
+            )}
           </li>
         )
       })
@@ -110,13 +125,13 @@ const currentPath = Astro.url.pathname
           transform: translateY(100%);
         }
 
-        &:hover .label-main,
-        &:focus-within .label-main {
+        &:not(:has(.nav-link[aria-current='page'])):hover .label-main,
+        &:not(:has(.nav-link[aria-current='page'])):focus-within .label-main {
           transform: translateY(-100%);
         }
 
-        &:hover .label-hover,
-        &:focus-within .label-hover {
+        &:not(:has(.nav-link[aria-current='page'])):hover .label-hover,
+        &:not(:has(.nav-link[aria-current='page'])):focus-within .label-hover {
           transform: translateY(0);
         }
 
@@ -143,14 +158,14 @@ const currentPath = Astro.url.pathname
           }
         }
 
-        &:hover .hover-svg,
-        &:focus-within .hover-svg {
+        &:not(:has(.nav-link[aria-current='page'])):hover .hover-svg,
+        &:not(:has(.nav-link[aria-current='page'])):focus-within .hover-svg {
           opacity: 1;
           visibility: visible;
         }
 
-        &:hover .nav-hover-path-instance,
-        &:focus-within .nav-hover-path-instance {
+        &:not(:has(.nav-link[aria-current='page'])):hover .nav-hover-path-instance,
+        &:not(:has(.nav-link[aria-current='page'])):focus-within .nav-hover-path-instance {
           --symbol-path-dashoffset: 0;
           --symbol-path-fill: var(--color-primary, #f2f2f2);
         }
@@ -204,5 +219,39 @@ const currentPath = Astro.url.pathname
     transition:
       stroke-dashoffset 0.8s cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s,
       fill 0.4s ease 0.1s;
+  }
+
+  /* Active page indicator styling */
+  .active-indicator {
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-start: 38%;
+    transform: translateX(-50%);
+    margin-top: 0.25rem;
+    z-index: 1;
+    pointer-events: none;
+
+    .reveal-mask {
+      position: relative;
+      width: 100%;
+      mask-image: linear-gradient(to right, #000 0%, #000);
+      -webkit-mask-image: linear-gradient(to right, #000 0%, #000);
+      mask-size: 0% 100%;
+      -webkit-mask-size: 0% 100%;
+      mask-repeat: no-repeat;
+      -webkit-mask-repeat: no-repeat;
+      animation: reveal 0.5s cubic-bezier(0.33, 0, 0.67, 1) 0.5s forwards;
+    }
+  }
+
+  @keyframes reveal {
+    0% {
+      mask-size: 0% 100%;
+      -webkit-mask-size: 0% 100%;
+    }
+    100% {
+      mask-size: 100% 100%;
+      -webkit-mask-size: 100% 100%;
+    }
   }
 </style>
