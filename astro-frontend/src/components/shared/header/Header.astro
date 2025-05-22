@@ -28,6 +28,28 @@ try {
 const pages: NavigationPage[] = fetchError ? [] : (headerData?.navigationPages ?? [])
 ---
 
+{/* Localized skip link */}
+{
+  locale === 'ca' && (
+    <a href="#main" class="skip-to-main">
+      Ves al contingut
+    </a>
+  )
+}
+{
+  locale === 'es' && (
+    <a href="#main" class="skip-to-main">
+      Ves al contenido
+    </a>
+  )
+}
+{
+  locale === 'en' && (
+    <a href="#main" class="skip-to-main">
+      Skip to content
+    </a>
+  )
+}
 <header class="site-header">
   <HeaderLogo />
 
@@ -45,6 +67,32 @@ const pages: NavigationPage[] = fetchError ? [] : (headerData?.navigationPages ?
 </header>
 
 <style>
+  /* Skip to main link - only visible when focused */
+  .skip-to-main {
+    position: fixed;
+    top: -9999px;
+    left: 0;
+    z-index: 9999;
+    padding: 0.75rem 1.25rem;
+    background-color: var(--color-primary);
+    color: var(--color-secondary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: none;
+    border-radius: 0 0 0.25rem 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .skip-to-main:focus {
+    top: 0;
+    opacity: 1;
+    pointer-events: auto;
+    outline: 2px solid var(--color-accent, #4d4d4d);
+    outline-offset: 2px;
+  }
+
   .site-header {
     inline-size: 100%;
 
