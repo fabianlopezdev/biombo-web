@@ -37,6 +37,7 @@ if (typeof sanityDataset !== 'string') {
 
 // https://astro.build/config
 export default defineConfig({
+  prefetch: true,
   integrations: [
     sanity({
       projectId: sanityProjectId, // Use validated variable

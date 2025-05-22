@@ -35,7 +35,7 @@ const selectable = languages.filter(function filter(l) {
       selectable.map(function renderLang(lang) {
         return (
           <li role="none">
-            <a href={lang.path} role="menuitem" class="language-option-link">
+            <a href={lang.path} role="menuitem" class="language-option-link" data-astro-prefetch>
               {lang.short}
               <span class="sr-only">{lang.srSuffix}</span>
             </a>

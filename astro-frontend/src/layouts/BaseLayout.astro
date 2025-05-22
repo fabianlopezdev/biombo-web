@@ -1,5 +1,8 @@
 ---
 import '@/styles/global.css'
+import HeaderSVGHover from '@/assets/header-hover-page.svg?raw'
+
+console.log('HeaderSVGHover', HeaderSVGHover)
 
 interface Props {
   title: string
@@ -20,6 +23,7 @@ const { title, metaDescription } = Astro.props
     <title>{title}</title>
   </head>
   <body>
+    <Fragment set:html={HeaderSVGHover} />
     <slot />
   </body>
 </html>

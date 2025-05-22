@@ -7,26 +7,30 @@ interface Props {
   locale: string
 }
 
-const { pages, locale } = Astro.props
+// Cast props for proper typing
+const { pages, locale } = Astro.props as Props
+// Current pathname to determine active link
+const currentPath = Astro.url.pathname
 ---
 
 <nav class="navigation" aria-label="Primary">
   <ul class="nav-list">
     {
-      pages.map((page) => {
+      pages.map(function renderPage(page) {
         const pageName = getPageName(page, locale)
         const pagePath = getPagePath(page, locale)
+        const isActive = pagePath === currentPath
 
         return (
-          <li class="nav-page" role="none">
+          <li class="nav-page">
             <a
               href={pagePath}
               class="nav-link sliding-label"
               target={page.isExternal ? '_blank' : undefined}
               rel={page.isExternal ? 'noopener noreferrer' : undefined}
-              role={page.isExternal ? 'menuitem' : undefined}
+              aria-current={isActive ? 'page' : undefined}
+              data-astro-prefetch
             >
-              {/* wrapper clips just the two labels */}
               <span class="label-wrapper">
                 <span class="label-main">{pageName}</span>
                 <span class="label-hover" aria-hidden="true">
@@ -35,21 +39,9 @@ const { pages, locale } = Astro.props
               </span>
             </a>
 
-            {/* SVG draws on hover */}
-            <div class="hover-svg">
-              <svg
-                width="164"
-                height="49"
-                viewBox="0 0 164 49"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M134.142 1.3283C135.538 1.38516 136.498 1.43556 136.978 1.48095C137.097 1.49223 137.194 1.50337 137.263 1.51602C137.294 1.5218 137.334 1.53085 137.37 1.54482C137.384 1.55038 137.425 1.56629 137.463 1.60141C137.484 1.62037 137.516 1.65632 137.534 1.7118C137.554 1.77449 137.55 1.84057 137.525 1.89614C137.485 1.98405 137.409 2.01903 137.397 2.02485C137.372 2.0373 137.348 2.04428 137.332 2.04857C137.299 2.05759 137.261 2.06431 137.223 2.06957C137.147 2.08039 137.04 2.09044 136.907 2.0997C135.845 2.17367 132.713 2.23475 127.234 2.3019L127.235 2.30291C103.931 2.62749 82.1603 4.01815 72.8941 5.75639C74.5261 5.7317 77.3192 5.61219 81.2771 5.39413L82.0322 5.35646C90.2882 5.00509 112.242 5.92215 119.983 6.97065L119.984 6.97069L122.6 7.34503C135.39 9.23984 143.948 11.4822 151.663 15.0781L151.662 15.0781C156.003 17.0893 159.012 19.029 160.821 21.0652C162.644 23.1152 163.252 25.2651 162.785 27.6545C162.378 29.8277 160.933 32.1089 158.849 34.1647C156.892 36.0959 154.355 37.8445 151.536 39.1369L150.969 39.3894C142.864 42.8834 130.204 45.3502 113.965 46.7235C97.7202 48.0973 77.874 48.3774 55.3863 47.4906L55.3872 47.4916C34.9945 46.7155 28.3056 46.0889 18.463 44.0124L16.4468 43.5774C12.0805 42.6122 8.47584 41.2815 5.88021 39.7204C3.29421 38.1649 1.6629 36.3509 1.34007 34.3994L1.28535 34.015C0.826464 30.0401 3.72363 26.2391 9.44749 22.7822C15.0028 19.4271 23.3024 16.3419 34.0775 13.6832L36.2648 13.1566C38.4924 12.6085 40.4671 12.1087 41.8489 11.7303C42.0469 11.6761 42.2316 11.6219 42.4036 11.5731C41.9975 11.6278 41.5239 11.7026 40.9949 11.7962C39.3867 12.0807 37.2826 12.5298 35.0392 13.0588C30.5491 14.1175 25.5234 15.4932 22.8164 16.5095L22.8134 16.5104C19.4929 17.7106 16.3615 18.9179 15.8329 19.1279L15.822 19.1333L15.8101 19.1357C15.7427 19.1553 15.6706 19.1737 15.6091 19.1764C15.5884 19.1773 15.5126 19.1805 15.4387 19.1363C15.392 19.1082 15.3433 19.0588 15.3217 18.9859C15.3018 18.9185 15.3139 18.8599 15.3253 18.8257C15.3456 18.765 15.384 18.7224 15.3996 18.7056C15.4208 18.6829 15.4447 18.6617 15.4676 18.6429C15.5143 18.6047 15.575 18.5615 15.6448 18.5152C15.9237 18.3302 16.4309 18.0405 17.0859 17.6894C21.7331 15.1271 30.125 12.557 39.936 10.6311L39.937 10.6311L51.8003 8.35224C75.9508 3.72167 76.8958 3.64207 86.1184 2.74521L87.8448 2.56922C96.5613 1.71713 106.589 1.27079 118.477 1.15548L120.34 1.14439C124.896 1.12967 130.737 1.18964 134.142 1.3283ZM114.641 7.83207C98.6388 6.19358 86.4133 6.15972 69.1392 7.72044L69.1401 7.72145C65.0237 8.1053 60.9626 8.6066 58.1749 9.04388C57.4137 9.16329 56.7505 9.27801 56.2083 9.38307C56.533 9.35362 56.9037 9.31919 57.3111 9.27845C58.7026 9.13931 60.5235 8.93777 62.4289 8.69621L62.4308 8.69629L64.6788 8.43306C87.8842 5.82157 110.21 6.55864 127.643 10.5402L127.644 10.5403L128.795 10.8158C134.609 12.2477 141.213 14.458 144.507 16.1843L144.508 16.1843C146.288 17.0875 147.988 18.5614 149.231 20.124C150.465 21.6755 151.289 23.3655 151.235 24.7054C151.166 26.4007 150.28 28.0247 148.697 29.5495C147.114 31.0739 144.816 32.5163 141.88 33.8528C136.374 36.3591 128.575 38.5156 118.897 40.1453L116.936 40.4642C102.925 42.6572 82.2682 43.8503 62.386 43.9923C43.2571 44.1289 24.8215 43.2915 13.699 41.4296C18.283 42.9251 26.1615 44.114 35.8702 44.9686C45.9021 45.8518 57.8643 46.3769 70.1116 46.5236C94.6138 46.817 120.229 45.5936 133.818 42.6971L136.352 42.1444C148.171 39.4981 153.946 37.1718 157.622 33.6642L157.994 33.2962C160.595 30.6373 161.746 28.1547 161.549 25.8761C161.353 23.6006 159.806 21.443 156.811 19.4514L156.809 19.4504C148.55 13.8599 134.052 9.90158 114.641 7.83305L114.641 7.83207ZM113.618 9.53403C95.9428 7.30579 73.775 8.08481 51.6287 11.6537L51.6277 11.6536C40.1871 13.4887 28.6404 17.7678 16.4586 24.739L15.2775 25.422C10.0008 28.4922 6.71602 30.8785 5.21041 32.7928C4.45986 33.7472 4.18214 34.546 4.27258 35.2293C4.36263 35.9084 4.82617 36.5471 5.73036 37.1604L6.18303 37.4447C8.52398 38.84 12.0911 39.8433 18.1045 40.5779C24.5132 41.3609 33.6657 41.8354 47.0097 42.1755L54.1751 42.3364C69.4243 42.6438 75.3376 42.4655 92.1428 41.5743L95.0262 41.4034C109.314 40.4846 121.617 38.6512 130.945 36.1773C135.921 34.8577 140.043 33.358 143.166 31.7217C146.295 30.0822 148.389 28.3212 149.357 26.4967L149.589 26.0331C149.788 25.609 149.886 25.2925 149.911 24.9692C149.945 24.5338 149.848 24.0598 149.619 23.2654L149.619 23.2644C149.118 21.5712 147.991 20.1154 145.919 18.7244C143.84 17.3283 140.823 16.0064 136.569 14.5855L136.567 14.5855C129.521 12.1544 122.671 10.6571 113.619 9.53407L113.618 9.53403ZM31.3465 15.776C31.0695 15.8383 30.7419 15.9184 30.373 16.0159C29.3773 16.2789 28.0884 16.6571 26.6874 17.0933C23.8851 17.9659 20.6427 19.0658 18.4079 19.9306L18.4088 19.9316C12.4948 22.2402 7.99287 24.9597 5.28745 27.6618C2.579 30.3671 1.73514 32.9773 2.90004 35.1412C2.89348 35.0885 2.88781 35.0328 2.88041 34.9752L2.87963 34.9703C2.80627 34.2851 2.88012 33.7372 3.26296 33.0937C3.6323 32.4731 4.28789 31.7658 5.3459 30.7381L5.73844 30.3631C7.82472 28.4387 11.7703 25.83 16.3875 23.1987C21.0634 20.534 26.4515 17.8326 31.3465 15.776ZM43.9234 11.333L43.9254 11.3321L43.9543 11.2707L43.9234 11.333Z"
-                  fill="#F2F2F2"
-                  stroke="#F2F2F2"
-                  stroke-width="0.5"
-                />
+            <div class="hover-svg" aria-hidden="true">
+              <svg width="164" height="49" viewBox="0 0 164 49" xmlns="http://www.w3.org/2000/svg">
+                <use href="#nav-hover-graphic" class="nav-hover-path-instance" />
               </svg>
             </div>
           </li>
@@ -64,53 +56,112 @@ const { pages, locale } = Astro.props
      Layout
   ------------------------------------------------------------------ */
 
-  /* NEW → centre nav absolutely inside header, hence on screen */
   .navigation {
     position: absolute;
     inset-inline-start: 50%;
     transform: translate(-50%);
-  }
 
-  .nav-list {
-    display: flex;
-    gap: 2.625rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
+    .nav-list {
+      display: flex;
+      gap: 2.625rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
 
-  .nav-page {
-    position: relative;
-    padding-block-start: 0.9rem;
+      .nav-page {
+        position: relative;
+        padding-block-start: 0.9rem;
+
+        /* ----------------------------------------------------------------
+           Link & sliding labels
+        ---------------------------------------------------------------- */
+        .nav-link {
+          position: relative;
+          z-index: 1;
+          color: var(--text-secondary);
+          font-size: var(--font-size-base);
+          text-decoration: none;
+          transition: color 0.3s ease;
+        }
+
+        .label-wrapper {
+          display: inline-block;
+          position: relative;
+          overflow: hidden;
+
+          > span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            transition: transform 0.55s var(--spring-ease, ease-out);
+            will-change: transform;
+          }
+        }
+
+        .label-main {
+          z-index: 2;
+        }
+
+        .label-hover {
+          position: absolute;
+          inset-block-start: 0;
+          inset-inline-start: 0;
+          transform: translateY(100%);
+        }
+
+        &:hover .label-main,
+        &:focus-within .label-main {
+          transform: translateY(-100%);
+        }
+
+        &:hover .label-hover,
+        &:focus-within .label-hover {
+          transform: translateY(0);
+        }
+
+        /* ----------------------------------------------------------------
+           SVG stroke-draw effect
+        ---------------------------------------------------------------- */
+        .hover-svg {
+          position: absolute;
+          inset-block-start: 50%;
+          inset-inline-start: 50%;
+          width: 164px;
+          height: 49px;
+          transform: translate(-50%, -50%);
+          z-index: 3;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.3s ease;
+          pointer-events: none;
+
+          svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+          }
+        }
+
+        &:hover .hover-svg,
+        &:focus-within .hover-svg {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        &:hover .nav-hover-path-instance,
+        &:focus-within .nav-hover-path-instance {
+          --symbol-path-dashoffset: 0;
+          --symbol-path-fill: var(--color-primary, #f2f2f2);
+        }
+      }
+    }
   }
 
   /* ------------------------------------------------------------------
-     Link & sliding labels
+     Global reusable classes
+     (kept outside the main nesting scope so they can be reused elsewhere)
   ------------------------------------------------------------------ */
-  .nav-link {
-    position: relative;
-    z-index: 1; /* below SVG */
-    color: var(--text-secondary);
-    font-size: var(--font-size-base);
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-
-  .label-wrapper {
-    display: inline-block;
-    position: relative;
-    overflow: hidden; /* hides off-screen duplicate label */
-  }
-
-  .label-wrapper > span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    /* fallback if custom property missing */
-    transition: transform 0.55s var(--spring-ease, ease-out);
-    will-change: transform;
-  }
 
   .sliding-label {
     --spring-ease: linear(
@@ -139,71 +190,19 @@ const { pages, locale } = Astro.props
     );
   }
 
-  .label-main {
-    z-index: 2;
-  }
-  .label-hover {
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    transform: translateY(100%);
-  }
+  .nav-hover-path-instance {
+    --symbol-path-fill: transparent;
+    --symbol-path-stroke: var(--color-primary, #f2f2f2);
+    --symbol-path-stroke-width: 1.2;
+    --symbol-path-dashoffset: var(--nav-svg-path-length, 1450);
 
-  /* slide on hover/focus */
-  .nav-page:hover .label-main,
-  .nav-page:focus-within .label-main {
-    transform: translateY(-100%);
-  }
-
-  .nav-page:hover .label-hover,
-  .nav-page:focus-within .label-hover {
-    transform: translateY(0);
-  }
-
-  /* ------------------------------------------------------------------
-     SVG stroke-draw effect
-  ------------------------------------------------------------------ */
-  .hover-svg {
-    position: absolute;
-    inset-block-start: 50%;
-    inset-inline-start: 50%;
-    width: 164px;
-    height: 49px;
-    transform: translate(-50%, -50%);
-    z-index: 3; /* above text */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-  }
-
-  /* show SVG when parent li hovered or keyboard-focused */
-  .nav-page:hover .hover-svg,
-  .nav-page:focus-within .hover-svg {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .hover-svg svg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-
-  .hover-svg svg path {
-    fill: transparent;
-    stroke: var(--color-primary);
-    stroke-width: 1.2;
-    stroke-dasharray: 1430.656; /* ⚠️ replace with real length */
-    stroke-dashoffset: 1430.656;
+    fill: var(--symbol-path-fill);
+    stroke: var(--symbol-path-stroke);
+    stroke-width: var(--symbol-path-stroke-width);
+    stroke-dasharray: var(--nav-svg-path-length, 1450);
+    stroke-dashoffset: var(--symbol-path-dashoffset);
     transition:
       stroke-dashoffset 0.8s cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s,
       fill 0.4s ease 0.1s;
-  }
-
-  .nav-page:hover .hover-svg svg path,
-  .nav-page:focus-within .hover-svg svg path {
-    stroke-dashoffset: 0;
-    fill: var(--color-primary);
   }
 </style>
