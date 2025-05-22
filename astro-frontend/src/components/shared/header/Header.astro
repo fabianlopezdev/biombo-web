@@ -1,4 +1,5 @@
 ---
+// Imports ────────────────────────────────────────────────────────────────────
 import { fetchActiveHeader } from '@/shared/lib/sanity/queries/headerQueries'
 import type { Header, NavigationPage } from '@/shared/schemas/sanity/headerSchema'
 import LanguageSwitcher from '@/components/shared/header/LanguageSwitcher.astro'
@@ -7,14 +8,25 @@ import PagesNavigation from './PagesNavigation.astro'
 
 const { locale } = Astro.props
 
-/* language config */
+/* ─ Helper ───────────────────────────────────────────────────────────────────
+   Provides the correct “skip to content” label for the given locale. */
+function getSkipLabel(locale: string): string {
+  const map: Record<string, string> = {
+    ca: 'Ves al contingut',
+    es: 'Ves al contenido',
+    en: 'Skip to content',
+  }
+  return map[locale] ?? map.en
+}
+
+/* ─ Language data ─ */
 const languages = [
   { code: 'ca', short: 'Cat', srSuffix: 'alan', fullName: 'Catalan', path: '/' },
   { code: 'es', short: 'Esp', srSuffix: 'añol', fullName: 'Spanish', path: '/es' },
   { code: 'en', short: 'Eng', srSuffix: 'lish', fullName: 'English', path: '/en' },
 ] as const
 
-/* fetch navigation */
+/* ─ Fetch navigation ─ */
 let headerData: Header | null = null
 let fetchError: string | null = null
 
@@ -28,29 +40,10 @@ try {
 const pages: NavigationPage[] = fetchError ? [] : (headerData?.navigationPages ?? [])
 ---
 
-{/* Localized skip link */}
-{
-  locale === 'ca' && (
-    <a href="#main" class="skip-to-main">
-      Ves al contingut
-    </a>
-  )
-}
-{
-  locale === 'es' && (
-    <a href="#main" class="skip-to-main">
-      Ves al contenido
-    </a>
-  )
-}
-{
-  locale === 'en' && (
-    <a href="#main" class="skip-to-main">
-      Skip to content
-    </a>
-  )
-}
-<header class="site-header">
+<!-- Localised skip link -->
+<a href="#main" class="skip-to-main">{getSkipLabel(locale)}</a>
+
+<header class="site-header" role="banner">
   <HeaderLogo />
 
   {
@@ -67,7 +60,7 @@ const pages: NavigationPage[] = fetchError ? [] : (headerData?.navigationPages ?
 </header>
 
 <style>
-  /* Skip to main link - only visible when focused */
+  /* Skip-link – visible only when focused */
   .skip-to-main {
     position: fixed;
     top: -9999px;
@@ -80,7 +73,7 @@ const pages: NavigationPage[] = fetchError ? [] : (headerData?.navigationPages ?
     text-decoration: none;
     transition: none;
     border-radius: 0 0 0.25rem 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 5px rgb(0 0 0 / 0.2);
     opacity: 0;
     pointer-events: none;
   }
@@ -93,9 +86,9 @@ const pages: NavigationPage[] = fetchError ? [] : (headerData?.navigationPages ?
     outline-offset: 2px;
   }
 
+  /* Header block */
   .site-header {
     inline-size: 100%;
-
     block-size: 4.6875rem;
     background-color: var(--color-secondary);
     color: var(--color-primary);
@@ -104,13 +97,11 @@ const pages: NavigationPage[] = fetchError ? [] : (headerData?.navigationPages ?
     justify-content: space-between;
     align-items: center;
     padding-block-start: 0.7rem;
-
-    /* NEW → serves as containing block for absolutely-centred nav */
+    /* serves as containing block for absolutely-centred nav */
     position: relative;
-  }
 
-  @media (width < 768px) {
-    .site-header {
+    /* Mobile overrides using native nesting */
+    @media (width < 768px) {
       gap: 1rem;
       padding-inline: var(--padding-inline-mobile);
     }
