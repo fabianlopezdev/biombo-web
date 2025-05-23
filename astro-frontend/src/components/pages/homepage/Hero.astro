@@ -1,0 +1,79 @@
+---
+import HighlightScribble from '@/assets/HighlightScribble.astro'
+import ScrollPill from '@/layouts/ScrollPill.astro'
+import { splitBoldSegments } from '@/utils/pages/homepage/parseBoldMarkdown'
+import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
+interface Props {
+  locale: 'ca' | 'es' | 'en'
+  heroData: HomePage['hero'] | Record<string, never>
+}
+
+const { locale, heroData } = Astro.props
+
+// Use type guard to check if heroData has the expected properties
+function isHeroSection(data: any): data is HomePage['hero'] {
+  return data && '_type' in data && data._type === 'heroSection'
+}
+
+// Use the type guard to safely access properties
+const rawHeroText =
+  isHeroSection(heroData) && heroData.heroText?.[locale]
+    ? heroData.heroText[locale]
+    : 'Transformem **idees** en solucions'
+
+const scrollText =
+  isHeroSection(heroData) && heroData.scrollText?.[locale]
+    ? heroData.scrollText[locale]
+    : 'Explora fent scroll'
+
+const {
+  before: beforeHighlight,
+  bold: highlightedWord,
+  after: afterHighlight,
+} = splitBoldSegments(rawHeroText)
+---
+
+<h1>
+  {beforeHighlight}
+  <span class="highlight-wrapper">
+    <span class="highlight-text">{highlightedWord}</span>
+    <HighlightScribble />
+  </span>
+  {afterHighlight}
+</h1>
+<div class="scroll-indicator">
+  <ScrollPill />
+
+  <p>{scrollText}</p>
+</div>
+
+<style>
+  h1 {
+    font-size: 8.65rem;
+    letter-spacing: -0.05em;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.03;
+    padding-block-end: 3rem;
+    gap: 0.4em;
+    width: 100%;
+
+    .highlight-text {
+      position: relative;
+      z-index: 2;
+    }
+  }
+
+  .highlight-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    inset-block-end: 0;
+    display: flex;
+    align-items: center;
+    gap: 1.375rem;
+    padding-block-end: 1.5rem;
+  }
+</style>
