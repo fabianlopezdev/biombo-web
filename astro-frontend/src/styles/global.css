@@ -34,6 +34,9 @@
   --font-weight-bold: 600;  
 
   --padding-inline-desktop: 4.6875rem;
+
+  --header-height: 4.6875rem;
+
 }
 
 /* Basic reset */
