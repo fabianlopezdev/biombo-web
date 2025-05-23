@@ -10,7 +10,20 @@ export async function fetchHomePage(): Promise<HomePage | null> {
   try {
     // Query for the single homePage document
     const query = `*[_type == "homePage"][0]`
+    console.log('Fetching with query:', query)
 
+    // Try fetching without schema validation first to see the raw data
+    const rawData = await fetchSanityQuery({
+      query,
+    })
+    console.log('Raw Sanity data for homePage:', rawData)
+
+    if (!rawData) {
+      console.log('No homePage document found in Sanity')
+      return null
+    }
+
+    // Now try with the schema validation
     const homePage = await fetchSanityQuery({
       query,
       schema: homePageSchema,
