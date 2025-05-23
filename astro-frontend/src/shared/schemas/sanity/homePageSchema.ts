@@ -4,6 +4,7 @@ import { z } from 'zod'
 // Define Zod schema for localized strings (consistent with pageSchema)
 const localeStringSchema = z
   .object({
+    _type: z.literal('localeString'),
     ca: z.string().optional(),
     es: z.string().optional(),
     en: z.string().optional(),
