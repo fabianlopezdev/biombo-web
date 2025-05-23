@@ -24,12 +24,18 @@ export async function fetchHomePage(): Promise<HomePage | null> {
     }
 
     // Now try with the schema validation
-    const homePage = await fetchSanityQuery({
-      query,
-      schema: homePageSchema,
-    })
-
-    return homePage
+    try {
+      console.log('Attempting schema validation with schema:', homePageSchema)
+      const homePage = await fetchSanityQuery({
+        query,
+        schema: homePageSchema,
+      })
+      console.log('Schema validation succeeded, returning homepage data')
+      return homePage
+    } catch (error) {
+      console.error('Schema validation failed:', error)
+      return rawData as HomePage // Return the raw data as a fallback
+    }
   } catch (error) {
     console.error('Failed to fetch home page data:', error)
     return null
