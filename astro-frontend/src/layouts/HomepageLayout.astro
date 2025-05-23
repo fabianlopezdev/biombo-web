@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Header from '@/components/shared/header/Header.astro'
-import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 import Hero from '@/components/pages/homepage/Hero.astro'
+import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 
 interface Props {
   locale: 'ca' | 'es' | 'en'
@@ -10,43 +10,206 @@ interface Props {
 }
 
 const { locale, homePageData } = Astro.props
-
 const { hero = {} } = homePageData ?? {}
-
-// Static title (field removed from schema)
 const pageTitle = 'Biombo - Art, Events, Community'
 ---
 
 <BaseLayout title={pageTitle}>
   <Header locale={locale} />
+
   <main id="main" class="main-content">
-    <div class="horizontal-scroll-container">
+    <div class="horizontal-scroll-container" id="horizontal-container">
       <section class="hero">
         <Hero locale={locale} heroData={hero} />
       </section>
-      <section class="projects"></section>
+
+      <section class="projects">jkdfjgldsfkjglk;dsjg;sdjfg;kdfsjg;lsdkjgl;kdfjg;lsjd</section>
+
+      <!-- more slides… -->
     </div>
-    <section class="about"></section>
-    <section class="services"></section>
+
+    <section class="about">
+      <div class="about-inner">
+        <h2>About Us</h2>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae
+          vestibulum vestibulum. Cras venenatis euismod malesuada.
+        </p>
+        <p>
+          Phasellus sit amet ligula in lectus varius tempor. Donec feugiat convallis nibh, at
+          ultrices magna bibendum non. Proin elementum ultricies dolor, vitae hendrerit augue
+          egestas sit amet.
+        </p>
+        <p>
+          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
+          laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
+          architecto beatae vitae dicta sunt explicabo.
+        </p>
+        <p>
+          Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia
+          consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+        </p>
+        <p>
+          Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci
+          velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam
+          quaerat voluptatem.
+        </p>
+      </div>
+    </section>
+
+    <section class="services">
+      <h2>Our Services</h2>
+      <p>…mockup content here…</p>
+    </section>
   </main>
 
-  <style>
-    .main-content {
-      padding-inline-start: var(--padding-inline-desktop);
-    }
+  <script>
+    const container = document.getElementById('horizontal-container')
 
+    if (container) {
+      let effectiveHeaderHeight = 0
+
+      // Calculate effectiveHeaderHeight once on script load.
+      // This assumes the header height is stable after initial page load.
+      // If your header height can change dynamically (e.g., on window resize),
+      // you might need to recalculate this value (e.g., in a resize event listener).
+      const calculateHeaderHeight = () => {
+        let height = 0
+        // Prioritize the --header-height CSS custom property as it's used in your CSS
+        const headerHeightCSSVar = getComputedStyle(document.documentElement)
+          .getPropertyValue('--header-height')
+          .trim()
+
+        if (headerHeightCSSVar) {
+          if (headerHeightCSSVar.endsWith('px')) {
+            height = parseFloat(headerHeightCSSVar)
+          } else if (headerHeightCSSVar.endsWith('rem')) {
+            // Convert rem to px
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize)
+            height = parseFloat(headerHeightCSSVar) * rootFontSize
+          } else if (headerHeightCSSVar) {
+            // Attempt to parse if unitless or another unit (e.g. '60')
+            height = parseFloat(headerHeightCSSVar)
+          }
+        }
+
+        // Fallback if CSS variable wasn't found, was 0, or resulted in NaN
+        if (isNaN(height) || height <= 0) {
+          const headerElement = document.querySelector('header') // Generic selector for your Header component
+          if (headerElement) {
+            height = headerElement.offsetHeight
+          } else {
+            height = 0 // Default to 0 if no header found and CSS var is not definitive
+          }
+        }
+
+        // Ensure a valid number, default to 0 if calculation failed
+        return isNaN(height) || height < 0 ? 0 : height
+      }
+
+      effectiveHeaderHeight = calculateHeaderHeight()
+
+      container.addEventListener(
+        'wheel',
+        (e) => {
+          const rect = container.getBoundingClientRect()
+
+          // Only proceed if the mouse pointer is vertically within the container's bounds
+          if (!(e.clientY >= rect.top && e.clientY <= rect.bottom)) {
+            return // Mouse is not over the container, allow default scroll
+          }
+
+          // Determine scroll conditions (using a small tolerance for floating point comparisons)
+          const scrollTolerance = 0.5 // px
+          const atLeftEdge = container.scrollLeft <= scrollTolerance
+          const atRightEdge =
+            container.scrollLeft + container.clientWidth >= container.scrollWidth - scrollTolerance
+
+          const wantsToScrollUpOnPageOrLeftInContainer = e.deltaY < 0
+          const wantsToScrollDownOnPageOrRightInContainer = e.deltaY > 0
+
+          // Check if the container is at its "nominal top" position for horizontal scrolling.
+          // This means its top edge is aligned with where it should be (e.g., just below the header).
+          // A small tolerance (e.g., 5px) accounts for subpixel rendering or minor variations.
+          const toleranceForNominalTop = 5 // px
+          const isContainerAtNominalTop =
+            Math.abs(rect.top - effectiveHeaderHeight) < toleranceForNominalTop
+
+          // --- Scrolling Down/Right Logic ---
+          if (wantsToScrollDownOnPageOrRightInContainer) {
+            // If the container is at or above its nominal top position,
+            // and it's not at the rightmost edge, scroll horizontally.
+            // `rect.top <= effectiveHeaderHeight + toleranceForNominalTop` allows this if slightly scrolled past.
+            if (rect.top <= effectiveHeaderHeight + toleranceForNominalTop && !atRightEdge) {
+              e.preventDefault()
+              container.scrollBy({ left: e.deltaY, behavior: 'auto' })
+            }
+            // Otherwise (atRightEdge or container is below its nominal top), allow default vertical scroll.
+          }
+          // --- Scrolling Up/Left Logic (This is the key fix) ---
+          else if (wantsToScrollUpOnPageOrLeftInContainer) {
+            // If the container is SPECIFICALLY at its nominal top position
+            // AND it's not at the leftmost edge, scroll horizontally.
+            if (isContainerAtNominalTop && !atLeftEdge) {
+              e.preventDefault()
+              container.scrollBy({ left: e.deltaY, behavior: 'auto' })
+            }
+            // Otherwise (container is not at its nominal top, OR it's at the left edge),
+            // allow default vertical scroll (which will scroll the page up).
+          }
+        },
+        { passive: false }, // passive: false is necessary for e.preventDefault()
+      )
+    } else {
+      console.warn("Element with id 'horizontal-container' not found.")
+    }
+  </script>
+
+  <style>
     .horizontal-scroll-container {
       block-size: calc(100vh - var(--header-height));
-      overflow-x: scroll;
       display: flex;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      /* scroll-snap-type: x proximity; */
+    }
+
+    .horizontal-scroll-container > section {
+      flex: 0 0 100vw;
+      block-size: inherit;
+      /* scroll-snap-align: start; */
     }
 
     .hero {
-      block-size: inherit;
+      padding-inline: var(--padding-inline-desktop);
       display: flex;
       align-items: center;
       position: relative;
-      min-inline-size: 100vw;
+    }
+
+    .projects {
+      inline-size: calc(100vw * 2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .about .about-inner {
+      max-width: 600px;
+      margin: 3rem auto;
+      line-height: 1.6;
+      padding: 0 var(--padding-inline-desktop);
+    }
+
+    .about h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .services {
+      padding: 3rem var(--padding-inline-desktop);
     }
   </style>
 </BaseLayout>
