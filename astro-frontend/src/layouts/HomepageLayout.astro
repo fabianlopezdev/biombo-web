@@ -10,14 +10,36 @@ interface Props {
 
 const { locale, homePageData } = Astro.props
 
-// Extract hero section data with fallbacks for when data is not available yet
-const titlePrefix = homePageData?.hero?.titlePrefix?.[locale] || 'Transformem'
-const highlightedWord = homePageData?.hero?.highlightedWord?.[locale] || 'idees'
-const titleSuffix = homePageData?.hero?.titleSuffix?.[locale] || 'en solucions'
+// Get hero section data with fallbacks for when data is not available yet
+const rawHeroText = homePageData?.hero?.heroText?.[locale] || 'Transformem **idees** en solucions'
 const scrollText = homePageData?.hero?.scrollText?.[locale] || 'Explora fent scroll'
 
 // Page title with fallback
 const pageTitle = homePageData?.title?.[locale] || 'Biombo - Art, Events, Community'
+
+// Parse the hero text to extract the parts before, during, and after the highlighted word
+// Match text surrounded by ** (markdown bold syntax)
+const boldRegex = /\*\*(.*?)\*\*/
+const match = rawHeroText.match(boldRegex)
+
+// If we find a match, split the text into parts, otherwise use the whole text
+let beforeHighlight = ''
+let highlightedWord = ''
+let afterHighlight = ''
+
+if (match && match[1]) {
+  // Found bold text, extract it and split the text into parts
+  const highlightIndex = rawHeroText.indexOf('**')
+  const highlightEndIndex = rawHeroText.indexOf('**', highlightIndex + 2)
+
+  // Extract text before, during, and after the highlight
+  beforeHighlight = rawHeroText.substring(0, highlightIndex)
+  highlightedWord = match[1] // The text between ** marks
+  afterHighlight = rawHeroText.substring(highlightEndIndex + 2)
+} else {
+  // No bold text found, use the whole text
+  beforeHighlight = rawHeroText
+}
 ---
 
 <BaseLayout title={pageTitle}>
@@ -26,7 +48,7 @@ const pageTitle = homePageData?.title?.[locale] || 'Biombo - Art, Events, Commun
     <div class="horizontal-scroll-container">
       <section class="hero">
         <h1>
-          {titlePrefix}
+          {beforeHighlight}
           <span class="highlight-wrapper">
             <span class="highlight-text">{highlightedWord}</span>
             <svg
@@ -55,7 +77,7 @@ const pageTitle = homePageData?.title?.[locale] || 'Biombo - Art, Events, Commun
               ></path>
             </svg>
           </span>
-          {titleSuffix}
+          {afterHighlight}
         </h1>
         <div class="scroll-text">
           <svg

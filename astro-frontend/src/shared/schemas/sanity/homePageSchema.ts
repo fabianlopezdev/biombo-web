@@ -17,9 +17,7 @@ const localeStringSchema = z
 // Define Zod schema for Hero Section
 const heroSectionSchema = z.object({
   _type: z.literal('heroSection'),
-  titlePrefix: localeStringSchema,
-  highlightedWord: localeStringSchema,
-  titleSuffix: localeStringSchema,
+  heroText: localeStringSchema,
   scrollText: localeStringSchema,
 })
 

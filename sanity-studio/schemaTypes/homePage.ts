@@ -8,21 +8,9 @@ export const heroSection = defineType({
   type: 'object',
   fields: [
     defineField({
-      name: 'titlePrefix',
-      title: 'Title Prefix',
-      description: 'Text before the highlighted word (e.g., "Transformem")',
-      type: 'localeString',
-    }),
-    defineField({
-      name: 'highlightedWord',
-      title: 'Highlighted Word',
-      description: 'Word to be highlighted with the underline effect (e.g., "idees")',
-      type: 'localeString',
-    }),
-    defineField({
-      name: 'titleSuffix',
-      title: 'Title Suffix',
-      description: 'Text after the highlighted word (e.g., "en solucions")',
+      name: 'heroText',
+      title: 'Hero Text',
+      description: 'Main hero heading text. Use **bold** to mark which word should be highlighted with the underline effect (e.g., "Transformem **idees** en solucions")',
       type: 'localeString',
     }),
     defineField({
@@ -34,15 +22,13 @@ export const heroSection = defineType({
   ],
   preview: {
     select: {
-      titlePrefix: baseLanguage ? `titlePrefix.${baseLanguage.id}` : 'titlePrefix.ca',
-      highlightedWord: baseLanguage ? `highlightedWord.${baseLanguage.id}` : 'highlightedWord.ca',
-      titleSuffix: baseLanguage ? `titleSuffix.${baseLanguage.id}` : 'titleSuffix.ca',
+      heroText: baseLanguage ? `heroText.${baseLanguage.id}` : 'heroText.ca',
     },
     prepare(selection) {
-      const { titlePrefix, highlightedWord, titleSuffix } = selection
+      const { heroText } = selection
       return {
         title: 'Hero Section',
-        subtitle: `${titlePrefix || ''} ${highlightedWord || ''} ${titleSuffix || ''}`.trim(),
+        subtitle: heroText || 'No hero text set',
       }
     },
   },
