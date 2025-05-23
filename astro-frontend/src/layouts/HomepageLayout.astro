@@ -1,23 +1,34 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Header from '@/components/shared/header/Header.astro'
+import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 
 interface Props {
   locale: 'ca' | 'es' | 'en'
+  homePageData: HomePage | null
 }
 
-const { locale } = Astro.props
+const { locale, homePageData } = Astro.props
+
+// Extract hero section data with fallbacks for when data is not available yet
+const titlePrefix = homePageData?.hero?.titlePrefix?.[locale] || 'Transformem'
+const highlightedWord = homePageData?.hero?.highlightedWord?.[locale] || 'idees'
+const titleSuffix = homePageData?.hero?.titleSuffix?.[locale] || 'en solucions'
+const scrollText = homePageData?.hero?.scrollText?.[locale] || 'Explora fent scroll'
+
+// Page title with fallback
+const pageTitle = homePageData?.title?.[locale] || 'Biombo - Art, Events, Community'
 ---
 
-<BaseLayout title={'Something something'}>
+<BaseLayout title={pageTitle}>
   <Header locale={locale} />
   <main id="main" class="main-content">
     <div class="horizontal-scroll-container">
       <section class="hero">
         <h1>
-          Transformem
+          {titlePrefix}
           <span class="highlight-wrapper">
-            <span class="highlight-text">idees</span>
+            <span class="highlight-text">{highlightedWord}</span>
             <svg
               class="highlight-svg"
               width="351"
@@ -44,7 +55,7 @@ const { locale } = Astro.props
               ></path>
             </svg>
           </span>
-          en solucions
+          {titleSuffix}
         </h1>
         <div class="scroll-text">
           <svg
@@ -71,7 +82,7 @@ const { locale } = Astro.props
               stroke-linecap="round"></path>
           </svg>
 
-          <p>Explora fent scroll</p>
+          <p>{scrollText}</p>
         </div>
       </section>
       <section class="projects"></section>
