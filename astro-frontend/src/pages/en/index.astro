@@ -1,9 +1,20 @@
 ---
 import Homepage from '@/layouts/HomepageLayout.astro'
+import { fetchHomePageByLocale } from '@/shared/lib/sanity/queries/homePageQueries'
+import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 
 // This is the English index.astro file
+const locale = 'en'
+
+// Fetch homepage data from Sanity
+let homePageData: HomePage | null = null
+
+try {
+  homePageData = await fetchHomePageByLocale(locale)
+  console.log('English homePageData after fetch:', homePageData)
+} catch (error) {
+  console.error('Error fetching English homepage data:', error)
+}
 ---
 
-<Homepage locale="en">
-  <!-- Any English-specific content can be added here -->
-</Homepage>
+<Homepage locale={locale} homePageData={homePageData} />
