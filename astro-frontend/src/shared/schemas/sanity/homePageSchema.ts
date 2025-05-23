@@ -48,13 +48,6 @@ export const homePageSchema = z.object({
   _type: z.literal('homePage'),
   _createdAt: z.string(),
   _updatedAt: z.string(),
-  title: localeStringSchema,
-  slug: z
-    .object({
-      current: z.string(),
-      _type: z.literal('slug').optional(),
-    })
-    .optional(),
   hero: heroSectionSchema,
   projects: projectsSectionSchema.optional(),
   about: aboutSectionSchema.optional(),

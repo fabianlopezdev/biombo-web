@@ -9,9 +9,10 @@ export const heroSection = defineType({
   fields: [
     defineField({
       name: 'heroText',
-      title: 'Hero Text',
-      description: 'Main hero heading text. Use **bold** to mark which word should be highlighted with the underline effect (e.g., "Transformem **idees** en solucions")',
+      title: 'Main Heading',
+      description: 'The large heading text at the top of the page. Use **bold** to mark which word should be highlighted with the underline effect (e.g., "Transformem **idees** en solucions")',
       type: 'localeString',
+      validation: (Rule) => Rule.required().error('The hero heading text is required'),
     }),
     defineField({
       name: 'scrollText',
@@ -86,26 +87,15 @@ export const homePage = defineType({
   type: 'document',
   fields: [
     defineField({
-      name: 'title',
-      title: 'Page Title',
-      description: 'Used for browser tab title and SEO',
-      type: 'localeString',
-    }),
-    defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: baseLanguage ? `title.${baseLanguage.id}` : 'title.ca',
-        maxLength: 96,
-      },
-      validation: (Rule) => Rule.required().error('A slug is required to generate the page URL.'),
-    }),
-    defineField({
       name: 'hero',
       title: 'Hero Section',
       type: 'heroSection',
+      description: 'The main banner section at the top of the homepage',
       validation: (Rule) => Rule.required().error('The hero section is required.'),
+      options: {
+        collapsible: false,  // Don't allow collapsing this section
+        collapsed: false,    // Start expanded
+      },
     }),
     defineField({
       name: 'projects',
@@ -124,13 +114,9 @@ export const homePage = defineType({
     }),
   ],
   preview: {
-    select: {
-      title: baseLanguage ? `title.${baseLanguage.id}` : 'title.ca',
-    },
-    prepare(selection) {
-      const { title } = selection
+    prepare() {
       return {
-        title: title || 'Home Page',
+        title: 'Home Page',
         subtitle: 'Landing page content',
       }
     },

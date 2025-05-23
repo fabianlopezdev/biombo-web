@@ -14,8 +14,8 @@ const { locale, homePageData } = Astro.props
 const rawHeroText = homePageData?.hero?.heroText?.[locale] || 'Transformem **idees** en solucions'
 const scrollText = homePageData?.hero?.scrollText?.[locale] || 'Explora fent scroll'
 
-// Page title with fallback
-const pageTitle = homePageData?.title?.[locale] || 'Biombo - Art, Events, Community'
+// Use a static page title since title field has been removed from schema
+const pageTitle = 'Biombo - Art, Events, Community'
 
 // Parse the hero text to extract the parts before, during, and after the highlighted word
 // Match text surrounded by ** (markdown bold syntax)
