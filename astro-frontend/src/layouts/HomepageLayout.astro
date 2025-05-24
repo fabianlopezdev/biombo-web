@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Header from '@/components/shared/header/Header.astro'
 import Hero from '@/components/pages/homepage/Hero.astro'
+import Projects from '@/components/pages/homepage/Projects.astro'
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 
 interface Props {
@@ -23,7 +24,9 @@ const pageTitle = 'Biombo - Art, Events, Community'
         <Hero locale={locale} heroData={hero} />
       </section>
 
-      <section class="projects">jkdfjgldsfkjglk;dsjg;sdjfg;kdfsjg;lsdkjgl;kdfjg;lsjd</section>
+      <section id="projects" class="projects">
+        <Projects />
+      </section>
 
       <!-- more slides… -->
     </div>
@@ -57,114 +60,10 @@ const pageTitle = 'Biombo - Art, Events, Community'
       </div>
     </section>
 
-    <section class="services">
-      <h2>Our Services</h2>
-      <p>…mockup content here…</p>
-    </section>
+    <section class="services"></section>
   </main>
 
-  <script>
-    const container = document.getElementById('horizontal-container')
-
-    if (container) {
-      let effectiveHeaderHeight = 0
-
-      // Calculate effectiveHeaderHeight once on script load.
-      // This assumes the header height is stable after initial page load.
-      // If your header height can change dynamically (e.g., on window resize),
-      // you might need to recalculate this value (e.g., in a resize event listener).
-      const calculateHeaderHeight = () => {
-        let height = 0
-        // Prioritize the --header-height CSS custom property as it's used in your CSS
-        const headerHeightCSSVar = getComputedStyle(document.documentElement)
-          .getPropertyValue('--header-height')
-          .trim()
-
-        if (headerHeightCSSVar) {
-          if (headerHeightCSSVar.endsWith('px')) {
-            height = parseFloat(headerHeightCSSVar)
-          } else if (headerHeightCSSVar.endsWith('rem')) {
-            // Convert rem to px
-            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize)
-            height = parseFloat(headerHeightCSSVar) * rootFontSize
-          } else if (headerHeightCSSVar) {
-            // Attempt to parse if unitless or another unit (e.g. '60')
-            height = parseFloat(headerHeightCSSVar)
-          }
-        }
-
-        // Fallback if CSS variable wasn't found, was 0, or resulted in NaN
-        if (isNaN(height) || height <= 0) {
-          const headerElement = document.querySelector('header') // Generic selector for your Header component
-          if (headerElement) {
-            height = headerElement.offsetHeight
-          } else {
-            height = 0 // Default to 0 if no header found and CSS var is not definitive
-          }
-        }
-
-        // Ensure a valid number, default to 0 if calculation failed
-        return isNaN(height) || height < 0 ? 0 : height
-      }
-
-      effectiveHeaderHeight = calculateHeaderHeight()
-
-      container.addEventListener(
-        'wheel',
-        (e) => {
-          const rect = container.getBoundingClientRect()
-
-          // Only proceed if the mouse pointer is vertically within the container's bounds
-          if (!(e.clientY >= rect.top && e.clientY <= rect.bottom)) {
-            return // Mouse is not over the container, allow default scroll
-          }
-
-          // Determine scroll conditions (using a small tolerance for floating point comparisons)
-          const scrollTolerance = 0.5 // px
-          const atLeftEdge = container.scrollLeft <= scrollTolerance
-          const atRightEdge =
-            container.scrollLeft + container.clientWidth >= container.scrollWidth - scrollTolerance
-
-          const wantsToScrollUpOnPageOrLeftInContainer = e.deltaY < 0
-          const wantsToScrollDownOnPageOrRightInContainer = e.deltaY > 0
-
-          // Check if the container is at its "nominal top" position for horizontal scrolling.
-          // This means its top edge is aligned with where it should be (e.g., just below the header).
-          // A small tolerance (e.g., 5px) accounts for subpixel rendering or minor variations.
-          const toleranceForNominalTop = 5 // px
-          const isContainerAtNominalTop =
-            Math.abs(rect.top - effectiveHeaderHeight) < toleranceForNominalTop
-
-          // --- Scrolling Down/Right Logic ---
-          if (wantsToScrollDownOnPageOrRightInContainer) {
-            // If the container is at or above its nominal top position,
-            // and it's not at the rightmost edge, scroll horizontally.
-            // `rect.top <= effectiveHeaderHeight + toleranceForNominalTop` allows this if slightly scrolled past.
-            if (rect.top <= effectiveHeaderHeight + toleranceForNominalTop && !atRightEdge) {
-              e.preventDefault()
-              container.scrollBy({ left: e.deltaY, behavior: 'auto' })
-            }
-            // Otherwise (atRightEdge or container is below its nominal top), allow default vertical scroll.
-          }
-          // --- Scrolling Up/Left Logic (This is the key fix) ---
-          else if (wantsToScrollUpOnPageOrLeftInContainer) {
-            // If the container is SPECIFICALLY at its nominal top position
-            // AND it's not at the leftmost edge, scroll horizontally.
-            if (isContainerAtNominalTop && !atLeftEdge) {
-              e.preventDefault()
-              container.scrollBy({ left: e.deltaY, behavior: 'auto' })
-            }
-            // Otherwise (container is not at its nominal top, OR it's at the left edge),
-            // allow default vertical scroll (which will scroll the page up).
-          }
-        },
-        { passive: false }, // passive: false is necessary for e.preventDefault()
-      )
-    } else {
-      console.warn("Element with id 'horizontal-container' not found.")
-    }
-  </script>
-
+  <script src="@/scripts/pages/homepage/horizontalScroll.ts"></script>
   <style>
     .horizontal-scroll-container {
       block-size: calc(100vh - var(--header-height));
@@ -190,17 +89,15 @@ const pageTitle = 'Biombo - Art, Events, Community'
 
     .projects {
       flex: 0 0 200vw !important;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
     }
 
     .about .about-inner {
-      max-width: 600px;
+      /* max-width: 600px; */
       margin: 3rem auto;
       line-height: 1.6;
       padding: 0 var(--padding-inline-desktop);
+      background-color: var(--color-secondary);
+      color: var(--color-primary);
     }
 
     .about h2 {

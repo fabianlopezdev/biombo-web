@@ -1,6 +1,6 @@
 ---
 import HighlightScribble from '@/assets/HighlightScribble.astro'
-import ScrollPill from '@/layouts/ScrollPill.astro'
+import ScrollPill from '@/assets/ScrollPill.astro'
 import { splitBoldSegments } from '@/utils/pages/homepage/parseBoldMarkdown'
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 interface Props {
@@ -33,6 +33,8 @@ const {
 } = splitBoldSegments(rawHeroText)
 ---
 
+<script src="@/scripts/pages/homepage/heroScroll.ts"></script>
+
 <h1>
   {beforeHighlight}
   <span class="highlight-wrapper">
@@ -41,11 +43,14 @@ const {
   </span>
   {afterHighlight}
 </h1>
-<div class="scroll-indicator">
+<button class="scroll-indicator bottom-left">
   <ScrollPill />
 
-  <p>{scrollText}</p>
-</div>
+  <p class="label-wrapper">
+    <span class="label-main">{scrollText}</span>
+    <span aria-hidden="true" class="label-hover">{scrollText}</span>
+  </p>
+</button>
 
 <style>
   h1 {
@@ -60,6 +65,10 @@ const {
       position: relative;
       z-index: 2;
     }
+
+    &:hover .highlight-svg {
+      scale: 1.05;
+    }
   }
 
   .highlight-wrapper {
@@ -68,11 +77,18 @@ const {
   }
 
   .scroll-indicator {
-    position: absolute;
-    inset-block-end: 0;
     display: flex;
     align-items: center;
     gap: 1.375rem;
-    padding-block-end: 1.5rem;
+
+    &:hover .label-main,
+    &:focus-within .label-main {
+      transform: translateY(-100%);
+    }
+
+    &:hover .label-hover,
+    &:focus-within .label-hover {
+      transform: translateY(0);
+    }
   }
 </style>

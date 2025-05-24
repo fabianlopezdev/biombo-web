@@ -45,6 +45,31 @@
   --padding-inline-desktop: 4.6875rem;
 
   --header-height: 5.5rem;
+
+  --spring-ease: linear(
+    0,
+    0.007,
+    0.03 2.1%,
+    0.122 4.6%,
+    0.243 6.9%,
+    0.645 13.7%,
+    0.85 18.1%,
+    0.926,
+    0.987,
+    1.032 24.7%,
+    1.064 27.1%,
+    1.077 28.7%,
+    1.088 32.3%,
+    1.086 34.3%,
+    1.074 37.8%,
+    1.033 45.8%,
+    1.015 50%,
+    1.002 54.7%,
+    0.994 59.6%,
+    0.992 66.4%,
+    0.999 85%,
+    1.001
+  );
 }
 
 /* Basic reset */
@@ -129,6 +154,12 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
+button {
+  all: unset;
+  cursor: pointer;
+}
+
 /* Visually hide content but keep it accessible to screen readers */
 .sr-only {
   position: absolute;
@@ -140,4 +171,37 @@ a {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+.label-wrapper {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+
+  > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    transition: transform 0.55s var(--spring-ease, ease-out);
+    will-change: transform;
+  }
+}
+
+.label-main {
+  z-index: 2;
+}
+
+.label-hover {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  transform: translateY(100%);
+}
+
+
+.bottom-left {
+  position: absolute;
+  inset-block-end: 0;
+  padding-block-end: 1.5rem;
 }
