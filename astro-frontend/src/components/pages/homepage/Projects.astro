@@ -1,13 +1,25 @@
 ---
+import ScrollPill from '@/assets/ScrollPill.astro'
+
 const subtitle = 'Projectes Destacats'
 const title = 'Tria, remena, fes clic!'
 ---
 
+<script src="@/scripts/pages/homepage/projectsScroll.ts"></script>
+
 <div class="projects-container">
   <h2>{title}</h2>
+  <p class="bottom-left">{subtitle.toUpperCase()}</p>
   <article class="project project-1"></article>
   <article class="project project-2"></article>
-  <p class="bottom-left">{subtitle.toUpperCase()}</p>
+  <article class="project project-3"></article>
+  <article class="project project-4"></article>
+  <article class="project project-5"></article>
+  <article class="project project-6"></article>
+  <a href="/projects">Veure tots</a>
+  <button class="scroll-container">
+    <ScrollPill />
+  </button>
 </div>
 
 <style>
@@ -18,6 +30,13 @@ const title = 'Tria, remena, fes clic!'
     --color-porject-4: #9447ff;
     --color-porject-5: #f8931a;
     --color-porject-6: #272727;
+
+    --row-top-limit: 9;
+    --row-bottom-limit: -5;
+    --column-right-limit: -6;
+
+    --margin-bottom: 0.125rem;
+
     position: relative;
     width: inherit;
     height: inherit;
@@ -29,11 +48,11 @@ const title = 'Tria, remena, fes clic!'
   h2 {
     font-weight: var(--font-weight-semibold);
     font-size: 5rem;
-    grid-column: 51 / 103;
+    grid-column: 55 / span 58;
     grid-row: 15 / span 10;
     letter-spacing: -0.05em;
     line-height: 1.03;
-
+    padding-inline-start: 0.3125rem;
     /* margin-block-end: 2rem; */
   }
 
@@ -44,14 +63,54 @@ const title = 'Tria, remena, fes clic!'
 
   .project-1 {
     background-color: var(--color-porject-1);
-    grid-column: span 41;
-    grid-row: 8 / span 45;
+    grid-column: span 45;
+    grid-row: var(--row-top-limit) / span 45;
   }
 
   .project-2 {
     background-color: var(--color-porject-2);
-    grid-column: 23 / span 34;
-    grid-row: span 37 / -5;
-    margin-block-end: 0.125rem;
+    grid-column: 29 / span 37;
+    grid-row: span 37 / var(--row-bottom-limit);
+    margin-block-end: var(--margin-bottom);
+  }
+
+  .project-3 {
+    background-color: var(--color-porject-3);
+    grid-column: 72 / span 37;
+    grid-row: 37 / span 37;
+  }
+
+  .project-4 {
+    background-color: var(--color-porject-4);
+    grid-column: 122 / span 24;
+    grid-row: var(--row-top-limit) / span 41;
+  }
+
+  .project-5 {
+    background-color: var(--color-porject-5);
+    grid-column: 115 / span 37;
+    grid-row: span 37 / var(--row-bottom-limit);
+    margin-block-end: var(--margin-bottom);
+  }
+
+  .project-6 {
+    background-color: var(--color-porject-6);
+    grid-column: 158 / span 37;
+    grid-row: 31 / span 37;
+  }
+
+  a {
+    grid-row: var(--row-top-limit);
+    grid-column: span 9 / var(--column-right-limit);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  .scroll-container {
+    grid-column: span 3 / var(--column-right-limit);
+    grid-row: span 4 / var(--row-bottom-limit);
+    padding-block-start: 0.125rem;
+    padding-left: 0.5rem;
   }
 </style>
