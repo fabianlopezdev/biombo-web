@@ -1,97 +1,155 @@
 ---
 import ScrollPill from '@/assets/ScrollPill.astro'
 import { Image } from 'astro:assets'
-import obertXVacances from '@/assets/pages/homepage/obert-x-vacances.png'
 import projectsCursor from '@/assets/pages/homepage/projects-cursor.webp'
-const subtitle = 'Projectes Destacats'
-const title = 'Tria, remena, fes clic!'
+// We don't need the t function directly since we're using direct string values
+
+// Import Sanity query functions and types
+import {
+  fetchFeaturedProjects,
+  fetchProjectsSection,
+} from '@/shared/lib/sanity/queries/projectQueries'
+import type { Project } from '@/shared/schemas/sanity/projectSchema'
+
+// Get the current locale from Astro
+const currentLang = (Astro.currentLocale as 'ca' | 'es' | 'en') || 'ca'
+
+// Fallback content in case Sanity data is not available
+const fallbackContent = {
+  title: {
+    ca: 'Tria, remena, fes clic!',
+    en: 'Choose, browse, click!',
+    es: '¡Elige, navega, haz clic!',
+  },
+  subtitle: {
+    ca: 'Projectes Destacats',
+    en: 'Featured Projects',
+    es: 'Proyectos Destacados',
+  },
+  viewAllText: {
+    ca: 'Veure tots',
+    en: 'View all',
+    es: 'Ver todos',
+  },
+  viewProjectText: {
+    ca: 'Veure projecte',
+    en: 'View project',
+    es: 'Ver proyecto',
+  },
+}
+
+// Fetch data from Sanity
+const projectsSection = await fetchProjectsSection()
+const featuredProjects = (await fetchFeaturedProjects()) || []
+
+if (featuredProjects.length < 6) {
+  console.warn(`Only ${featuredProjects.length} featured projects found. 6 are required.`)
+}
+
+// Extract content from Sanity data or use fallbacks
+const title = projectsSection?.title?.[currentLang] || fallbackContent.title[currentLang]
+const subtitle = projectsSection?.subtitle?.[currentLang] || fallbackContent.subtitle[currentLang]
+const viewAllText =
+  projectsSection?.viewAllText?.[currentLang] || fallbackContent.viewAllText[currentLang]
+const viewProjectText =
+  projectsSection?.viewProjectText?.[currentLang] || fallbackContent.viewProjectText[currentLang]
+
+// Helper function to get localized image URL from Sanity
+function getSanityImageUrl(imageRef: string): string {
+  return `https://cdn.sanity.io/images/08xgag7z/production/${imageRef.replace('image-', '').replace('-jpg', '.jpg').replace('-png', '.png').replace('-webp', '.webp')}`
+}
+
+// Helper function to transform Sanity project data to the format needed for rendering
+function transformProject(project: Project, index: number) {
+  // Extract image reference from Sanity image object
+  const imageRef = project.mainImage?.asset?._ref
+
+  return {
+    _id: project._id,
+    index,
+    slug: {
+      // Use the locale-specific slug or fall back to Catalan
+      current: project.slug?.[currentLang]?.current || project.slug?.ca?.current,
+    },
+    // For the image, we'll use the Sanity URL if available
+    image: imageRef ? getSanityImageUrl(imageRef) : undefined,
+    // Get the localized alt text or fall back to the title
+    alt: project.mainImage?.alt?.[currentLang] || project.title[currentLang],
+    title: project.title[currentLang] || project.title.ca,
+    viewProjectText,
+  }
+}
 ---
 
 <script src="@/scripts/pages/homepage/projectsScroll.ts"></script>
 <div class="projects-container">
   <h2>{title}</h2>
   <p class="bottom-left">{subtitle.toUpperCase()}</p>
-  <!-- ---------- PROJECT 1 (working example) ---------- -->
-  <figure class="project project-1">
-    <a href="/project/obert-x-vacances" class="project-link">
-      <Image
-        src={obertXVacances}
-        alt="Cartell Obert x Vacances — paret de colors"
-        class="project-image"
-      />
-      <div class="project-caption">
-        <figcaption class="caption-text">Obert x Vacances</figcaption>
-      </div>
-    </a>
-    <!-- Cursor clone for this project -->
-    <div class="project-cursor">
-      <p class="cursor-text">Veure projecte</p>
-      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
-    </div>
-  </figure>
-  <!-- ---------- Empty placeholders for the rest ---------- -->
-  <figure class="project project-2">
-    <a href="/project/placeholder-2" class="project-link">
-      <div class="project-caption">
-        <figcaption class="caption-text">Projecte 2</figcaption>
-      </div>
-    </a>
-    <div class="project-cursor">
-      <p class="cursor-text">Veure projecte</p>
-      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
-    </div>
-  </figure>
-  <figure class="project project-3">
-    <a href="/project/placeholder-3" class="project-link">
-      <div class="project-caption">
-        <figcaption class="caption-text">Projecte 3</figcaption>
-      </div>
-    </a>
-    <div class="project-cursor">
-      <p class="cursor-text">Veure projecte</p>
-      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
-    </div>
-  </figure>
-  <figure class="project project-4">
-    <a href="/project/placeholder-4" class="project-link">
-      <div class="project-caption">
-        <figcaption class="caption-text">Projecte 4</figcaption>
-      </div>
-    </a>
-    <div class="project-cursor">
-      <p class="cursor-text">Veure projecte</p>
-      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
-    </div>
-  </figure>
-  <figure class="project project-5">
-    <a href="/project/placeholder-5" class="project-link">
-      <div class="project-caption">
-        <figcaption class="caption-text">Projecte 5</figcaption>
-      </div>
-    </a>
-    <div class="project-cursor">
-      <p class="cursor-text">Veure projecte</p>
-      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
-    </div>
-  </figure>
-  <figure class="project project-6">
-    <a href="/project/placeholder-6" class="project-link">
-      <div class="project-caption">
-        <figcaption class="caption-text">Projecte 6</figcaption>
-      </div>
-    </a>
-    <div class="project-cursor">
-      <p class="cursor-text">Veure projecte</p>
-      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
-    </div>
-  </figure>
-  <a href="/projects">Veure tots</a>
+
+  {/* Map over featured projects, ensuring we have exactly 6 slots */}
+  {
+    [...Array(6)].map((_, index) => {
+      // Get project for this slot if available
+      const project = featuredProjects[index]
+        ? transformProject(featuredProjects[index], index)
+        : null
+
+      return (
+        <figure class={`project project-${index + 1}`}>
+          {project ? (
+            <a href={`/project/${project.slug.current}`} class="project-link">
+              {project.image ? (
+                <img
+                  src={project.image}
+                  alt={project.alt || project.title}
+                  class="project-image"
+                  loading="lazy"
+                />
+              ) : null}
+              <div class="project-caption">
+                <figcaption class="caption-text">{project.title}</figcaption>
+              </div>
+            </a>
+          ) : (
+            <div class="project-placeholder">
+              <div class="project-caption">
+                <figcaption class="caption-text">Projecte {index + 1}</figcaption>
+              </div>
+            </div>
+          )}
+
+          <div class="project-cursor">
+            <p class="cursor-text">{viewProjectText}</p>
+            <Image
+              src={projectsCursor}
+              alt="Custom cursor for project links"
+              class="cursor-image"
+            />
+          </div>
+        </figure>
+      )
+    })
+  }
+
+  <a href="/projects" class="view-all">{viewAllText}</a>
   <button class="scroll-container">
     <ScrollPill />
   </button>
 </div>
 
 <style>
+  /* Project placeholder styling for when no project is available */
+  .project-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 0.75rem;
+    cursor: default;
+  }
+
   :root {
     /* Assuming these are defined somewhere globally */
   }
