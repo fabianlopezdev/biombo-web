@@ -35,7 +35,7 @@ export const heroSection = defineType({
   },
 })
 
-// Schema for the Projects section (placeholder for now)
+// Schema for the Projects section
 export const projectsSection = defineType({
   name: 'projectsSection',
   title: 'Projects Section',
@@ -44,10 +44,60 @@ export const projectsSection = defineType({
     defineField({
       name: 'title',
       title: 'Section Title',
+      description: 'The main heading for the projects section (e.g. "Tria, remena, fes clic!")',
       type: 'localeString',
+      validation: (Rule) => Rule.required().error('Section title is required'),
     }),
-    // You can add more fields here as needed
+    defineField({
+      name: 'subtitle',
+      title: 'Section Subtitle',
+      description: 'The smaller subtitle for the projects section (e.g. "Projectes Destacats")',
+      type: 'localeString',
+      validation: (Rule) => Rule.required().error('Section subtitle is required'),
+    }),
+    defineField({
+      name: 'viewAllText',
+      title: '"View All" Button Text',
+      description: 'Text for the link to view all projects (e.g. "Veure tots")',
+      type: 'localeString',
+      validation: (Rule) => Rule.required().error('"View All" text is required'),
+    }),
+    defineField({
+      name: 'viewProjectText',
+      title: 'Cursor Project Text',
+      description: 'Text that appears in the custom cursor when hovering over projects (e.g. "Veure projecte")',
+      type: 'localeString',
+      validation: (Rule) => Rule.required().error('Cursor project text is required'),
+    }),
+    defineField({
+      name: 'featuredProjects',
+      title: 'Select Featured Projects',
+      description: 'Choose and arrange the 6 projects to feature on the homepage',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'project'}],
+          options: {
+            disableNew: false,
+          },
+        },
+      ],
+      validation: (Rule) => Rule.required().length(6).error('Exactly 6 featured projects are required'),
+    }),
   ],
+  preview: {
+    select: {
+      title: baseLanguage ? `title.${baseLanguage.id}` : 'title.ca',
+      subtitle: baseLanguage ? `subtitle.${baseLanguage.id}` : 'subtitle.ca',
+    },
+    prepare({ title, subtitle }) {
+      return {
+        title: 'Projects Section',
+        subtitle: title || 'No title set',
+      }
+    },
+  },
 })
 
 // Schema for the About section (placeholder for now)
