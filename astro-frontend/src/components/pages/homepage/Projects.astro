@@ -19,7 +19,9 @@ const title = 'Tria, remena, fes clic!'
         alt="Cartell Obert x Vacances — paret de colors"
         class="project-image"
       />
-      <figcaption class="project-caption">Obert x Vacances</figcaption>
+      <div class="project-caption">
+        <figcaption class="caption-text">Obert x Vacances</figcaption>
+      </div>
     </a>
     <!-- Cursor clone for this project -->
     <div class="project-cursor">
@@ -28,51 +30,61 @@ const title = 'Tria, remena, fes clic!'
     </div>
   </figure>
   <!-- ---------- Empty placeholders for the rest ---------- -->
-  <article class="project project-2">
+  <figure class="project project-2">
     <a href="/project/placeholder-2" class="project-link">
-      <figcaption class="project-caption">Projecte 2</figcaption>
+      <div class="project-caption">
+        <figcaption class="caption-text">Projecte 2</figcaption>
+      </div>
     </a>
     <div class="project-cursor">
       <p class="cursor-text">Veure projecte</p>
       <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
     </div>
-  </article>
-  <article class="project project-3">
+  </figure>
+  <figure class="project project-3">
     <a href="/project/placeholder-3" class="project-link">
-      <figcaption class="project-caption">Projecte 3</figcaption>
+      <div class="project-caption">
+        <figcaption class="caption-text">Projecte 3</figcaption>
+      </div>
     </a>
     <div class="project-cursor">
       <p class="cursor-text">Veure projecte</p>
       <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
     </div>
-  </article>
-  <article class="project project-4">
+  </figure>
+  <figure class="project project-4">
     <a href="/project/placeholder-4" class="project-link">
-      <figcaption class="project-caption">Projecte 4</figcaption>
+      <div class="project-caption">
+        <figcaption class="caption-text">Projecte 4</figcaption>
+      </div>
     </a>
     <div class="project-cursor">
       <p class="cursor-text">Veure projecte</p>
       <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
     </div>
-  </article>
-  <article class="project project-5">
+  </figure>
+  <figure class="project project-5">
     <a href="/project/placeholder-5" class="project-link">
-      <figcaption class="project-caption">Projecte 5</figcaption>
+      <div class="project-caption">
+        <figcaption class="caption-text">Projecte 5</figcaption>
+      </div>
     </a>
     <div class="project-cursor">
       <p class="cursor-text">Veure projecte</p>
       <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
     </div>
-  </article>
-  <article class="project project-6">
+  </figure>
+  <figure class="project project-6">
     <a href="/project/placeholder-6" class="project-link">
-      <figcaption class="project-caption">Projecte 6</figcaption>
+      <div class="project-caption">
+        <figcaption class="caption-text">Projecte 6</figcaption>
+      </div>
     </a>
     <div class="project-cursor">
       <p class="cursor-text">Veure projecte</p>
       <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
     </div>
-  </article>
+  </figure>
   <a href="/projects">Veure tots</a>
   <button class="scroll-container">
     <ScrollPill />
@@ -229,6 +241,15 @@ const title = 'Tria, remena, fes clic!'
     text-align: center;
   }
 
+  .caption-text {
+    transform: translateY(50%);
+    transition: transform 0.5s ease;
+  }
+
+  .project-link:hover .caption-text {
+    transform: translateY(0);
+  }
+
   .project-link:is(:hover, :focus) .project-caption {
     opacity: 1;
     transform: scale(1);
@@ -270,26 +291,29 @@ const title = 'Tria, remena, fes clic!'
     text-align: center;
     pointer-events: none;
     opacity: 0;
-    transform: translate(-50%, -50%) scale(8);
+    transform: translate(-50%, -50%) scale(8); /* Initial off-screen scale */
 
     will-change: transform, opacity;
   }
 
   .project-cursor.visible {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(1); /* Normal visible scale */
 
     transition-property: transform, opacity;
-    transition-duration: 0.45s, 0s;
+    transition-duration: 0.45s, 0.45s; /* Ensure opacity also has a duration */
     transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94), ease;
+    transition-delay: 0s, 0s; /* Ensure no delay for opacity initially */
   }
 
   .project-cursor.collapsed {
-    /* No visual change needed here if .visible sets final transform */
+    /* No direct visual change needed here if .visible sets final transform */
+    /* This class is more for state management in JS for text/image visibility */
   }
 
   .project-cursor.magnetic {
-    transform: translate(-50%, -50%) scale(1.1);
+    transform: translate(-50%, -50%) scale(1.1); /* Magnetic pull scale */
+    /* Transitions for magnetic are handled by the base .visible or by JS potentially overriding */
   }
 
   .cursor-text {
@@ -316,9 +340,14 @@ const title = 'Tria, remena, fes clic!'
     position: absolute;
     bottom: -1rem;
     right: 0.5rem;
+    /* top and left default to 'auto' */
     transition:
       opacity 0.3s ease,
-      transform 0.3s ease;
+      transform 0.3s ease,
+      top 0.3s ease,
+      left 0.3s ease,
+      bottom 0.3s ease,
+      right 0.3s ease;
     opacity: 0;
     transform: scale(0.8);
   }
@@ -331,10 +360,41 @@ const title = 'Tria, remena, fes clic!'
   .project-cursor.magnetic .cursor-image.visible {
     transform: rotate(5deg) scale(1.1);
   }
+
+  /* -------------------------------------------------- */
+  /* 9. Click Animation for Project Cursor              */
+  /* -------------------------------------------------- */
+  .project-cursor.project-cursor-clicked {
+    /* MODIFIED: Main circle remains its original size during click */
+    transform: translate(-50%, -50%) scale(1) !important; /* Keep scale at 1 */
+    transition-property: transform, opacity !important;
+    transition-duration: 0.15s !important;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transition-delay: 0s !important;
+  }
+
+  .project-cursor.project-cursor-clicked .cursor-text.visible {
+    transform: scale(0.7) !important;
+    transition-property: transform, opacity !important;
+    transition-duration: 0.15s !important;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transition-delay: 0s !important;
+  }
+
+  .project-cursor.project-cursor-clicked .cursor-image.visible {
+    /* MODIFIED: Image stays in original position, scales to 2x */
+    transform: scale(2) !important; /* Scale to 200% */
+    /* transform-origin: center center; */ /* Default, usually fine */
+
+    /* MODIFIED: Transition properties no longer include positioning */
+    transition-property: transform, opacity !important;
+    transition-duration: 0.15s !important;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transition-delay: 0s !important;
+  }
 </style>
 
 <script>
-  // JS remains the same as the previously working version
   document.addEventListener('DOMContentLoaded', () => {
     const projects = document.querySelectorAll('.project')
 
@@ -360,6 +420,7 @@ const title = 'Tria, remena, fes clic!'
       let isVisible = false
       let animationId: number
       let collapseTimeout: number
+      let clickAnimationTimeout: number
 
       const getProjectBounds = () => {
         const rect = project.getBoundingClientRect()
@@ -396,8 +457,11 @@ const title = 'Tria, remena, fes clic!'
       }
 
       projectLink.addEventListener('mouseenter', (e) => {
+        // console.log('Project link mouseenter');
         isVisible = true
         projectCursor.classList.add('visible')
+        // Ensure other states that might conflict with transitions are reset initially
+        projectCursor.classList.remove('project-cursor-clicked', 'magnetic')
 
         const linkRect = projectLink.getBoundingClientRect()
         const mouseEvent = e as MouseEvent
@@ -408,14 +472,21 @@ const title = 'Tria, remena, fes clic!'
         projectCursor.style.left = `${cursorX}px`
         projectCursor.style.top = `${cursorY}px`
 
+        // Reset text/image visibility from potential previous states
+        const cursorText = projectCursor.querySelector('.cursor-text') as HTMLElement
+        const cursorImage = projectCursor.querySelector('.cursor-image') as HTMLElement
+        if (cursorText) cursorText.classList.remove('visible')
+        if (cursorImage) cursorImage.classList.remove('visible')
+
         triggerGravityCollapse()
-        animate()
+        requestAnimationFrame(animate) // Start animation loop
       })
 
       projectLink.addEventListener('mouseleave', () => {
+        // console.log('Project link mouseleave');
         isVisible = false
         isInMagneticField = false
-        projectCursor.classList.remove('visible', 'magnetic', 'collapsed')
+        projectCursor.classList.remove('visible', 'magnetic', 'collapsed', 'project-cursor-clicked')
 
         const cursorText = projectCursor.querySelector('.cursor-text') as HTMLElement
         const cursorImage = projectCursor.querySelector('.cursor-image') as HTMLElement
@@ -424,6 +495,7 @@ const title = 'Tria, remena, fes clic!'
 
         if (animationId) cancelAnimationFrame(animationId)
         if (collapseTimeout) clearTimeout(collapseTimeout)
+        if (clickAnimationTimeout) clearTimeout(clickAnimationTimeout)
       })
 
       const triggerGravityCollapse = () => {
@@ -434,10 +506,11 @@ const title = 'Tria, remena, fes clic!'
 
         collapseTimeout = setTimeout(() => {
           if (!isVisible) return
-          projectCursor.classList.add('collapsed')
+          // console.log('Gravity collapse timeout: making text/image visible');
+          projectCursor.classList.add('collapsed') // This class might be for state or minor style
           if (cursorText) cursorText.classList.add('visible')
           if (cursorImage) cursorImage.classList.add('visible')
-        }, 250)
+        }, 250) // Delay for text/image to appear
       }
 
       projectLink.addEventListener('mousemove', (e) => {
@@ -469,10 +542,8 @@ const title = 'Tria, remena, fes clic!'
 
         if (isInMagneticField) {
           const pullStrength = 1 - distanceToCenter / magneticConfig.magnetRadius
-
           const centerPullX = projectBounds.centerX - linkRect.left
           const centerPullY = projectBounds.centerY - linkRect.top
-
           const blendFactor = magneticConfig.centerPull * pullStrength
           targetX = relativeX * (1 - blendFactor) + centerPullX * blendFactor
           targetY = relativeY * (1 - blendFactor) + centerPullY * blendFactor
@@ -483,12 +554,52 @@ const title = 'Tria, remena, fes clic!'
       })
 
       project.addEventListener('mouseenter', (e) => {
+        // This seems like a guard for when mouse enters project but not link
         if (isVisible) return
         const mouseEvent = e as MouseEvent
         if ((mouseEvent.target as HTMLElement)?.closest('.project-link')) {
           return
         }
+        // Potentially handle cases where mouse enters project but not directly the link
       })
+
+      // ---------- MODIFIED: CLICK ANIMATION HANDLING ----------
+      projectLink.addEventListener('mousedown', (e) => {
+        // console.log('mousedown event fired');
+        if (!isVisible) {
+          // console.log('mousedown: cursor not visible, returning');
+          return
+        }
+
+        // Ensure sub-elements are ready for click animation
+        const cursorText = projectCursor.querySelector('.cursor-text') as HTMLElement
+        const cursorImage = projectCursor.querySelector('.cursor-image') as HTMLElement
+
+        if (cursorText && !cursorText.classList.contains('visible')) {
+          // console.log('mousedown: forcing cursorText visible for click animation');
+          cursorText.classList.add('visible')
+        }
+        if (cursorImage && !cursorImage.classList.contains('visible')) {
+          // console.log('mousedown: forcing cursorImage visible for click animation');
+          cursorImage.classList.add('visible')
+        }
+
+        // Add the class to trigger the animation
+        // console.log('mousedown: adding project-cursor-clicked');
+        projectCursor.classList.add('project-cursor-clicked')
+
+        // Clear any existing timeout to prevent multiple rapid calls messing up
+        if (clickAnimationTimeout) {
+          clearTimeout(clickAnimationTimeout)
+        }
+
+        // Set a timeout to remove the class after the animation duration + a bit
+        clickAnimationTimeout = setTimeout(() => {
+          // console.log('clickAnimationTimeout: removing project-cursor-clicked');
+          projectCursor.classList.remove('project-cursor-clicked')
+        }, 300) // CSS transition is 0.15s, 300ms gives time to play and reset
+      })
+      // ---------- END: CLICK ANIMATION HANDLING ----------
     })
   })
 </script>
