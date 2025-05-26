@@ -2,17 +2,15 @@
 import ScrollPill from '@/assets/ScrollPill.astro'
 import { Image } from 'astro:assets'
 import obertXVacances from '@/assets/pages/homepage/obert-x-vacances.png'
-
+import projectsCursor from '@/assets/pages/homepage/projects-cursor.webp'
 const subtitle = 'Projectes Destacats'
 const title = 'Tria, remena, fes clic!'
 ---
 
 <script src="@/scripts/pages/homepage/projectsScroll.ts"></script>
-
 <div class="projects-container">
   <h2>{title}</h2>
   <p class="bottom-left">{subtitle.toUpperCase()}</p>
-
   <!-- ---------- PROJECT 1 (working example) ---------- -->
   <figure class="project project-1">
     <a href="/project/obert-x-vacances" class="project-link">
@@ -21,29 +19,71 @@ const title = 'Tria, remena, fes clic!'
         alt="Cartell Obert x Vacances — paret de colors"
         class="project-image"
       />
-
-      <figcaption class="project-caption">
-        <span class="project-title">Obert x Vacances</span>
-        <span class="project-cta">Veure projecte</span>
-      </figcaption>
+      <figcaption class="project-caption">Obert x Vacances</figcaption>
     </a>
+    <!-- Cursor clone for this project -->
+    <div class="project-cursor">
+      <p class="cursor-text">Veure projecte</p>
+      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
+    </div>
   </figure>
-
   <!-- ---------- Empty placeholders for the rest ---------- -->
-  <article class="project project-2"></article>
-  <article class="project project-3"></article>
-  <article class="project project-4"></article>
-  <article class="project project-5"></article>
-  <article class="project project-6"></article>
-
+  <article class="project project-2">
+    <a href="/project/placeholder-2" class="project-link">
+      <figcaption class="project-caption">Projecte 2</figcaption>
+    </a>
+    <div class="project-cursor">
+      <p class="cursor-text">Veure projecte</p>
+      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
+    </div>
+  </article>
+  <article class="project project-3">
+    <a href="/project/placeholder-3" class="project-link">
+      <figcaption class="project-caption">Projecte 3</figcaption>
+    </a>
+    <div class="project-cursor">
+      <p class="cursor-text">Veure projecte</p>
+      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
+    </div>
+  </article>
+  <article class="project project-4">
+    <a href="/project/placeholder-4" class="project-link">
+      <figcaption class="project-caption">Projecte 4</figcaption>
+    </a>
+    <div class="project-cursor">
+      <p class="cursor-text">Veure projecte</p>
+      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
+    </div>
+  </article>
+  <article class="project project-5">
+    <a href="/project/placeholder-5" class="project-link">
+      <figcaption class="project-caption">Projecte 5</figcaption>
+    </a>
+    <div class="project-cursor">
+      <p class="cursor-text">Veure projecte</p>
+      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
+    </div>
+  </article>
+  <article class="project project-6">
+    <a href="/project/placeholder-6" class="project-link">
+      <figcaption class="project-caption">Projecte 6</figcaption>
+    </a>
+    <div class="project-cursor">
+      <p class="cursor-text">Veure projecte</p>
+      <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
+    </div>
+  </article>
   <a href="/projects">Veure tots</a>
-
   <button class="scroll-container">
     <ScrollPill />
   </button>
 </div>
 
 <style>
+  :root {
+    /* Assuming these are defined somewhere globally */
+  }
+
   /* -------------------------------------------------- */
   /* 1. Container grid – original rules                 */
   /* -------------------------------------------------- */
@@ -55,10 +95,18 @@ const title = 'Tria, remena, fes clic!'
     --color-project-5: #f8931a;
     --color-project-6: #272727;
 
+    --color-primary: #272727;
+    --color-secondary: #f0f0f0;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-light: 300;
+
     --row-top-limit: 9;
     --row-bottom-limit: -5;
     --column-right-limit: -6;
     --margin-bottom: 0.125rem;
+
+    --cursor-size: 8.5625rem;
 
     position: relative;
     width: inherit;
@@ -87,42 +135,47 @@ const title = 'Tria, remena, fes clic!'
   .project {
     background-color: var(--color-secondary);
     border-radius: 0.75rem;
-    position: relative; /* NEW — keeps caption stacking context  */
-    overflow: hidden; /* NEW — clips image to rounded corners  */
+    position: relative;
+    overflow: hidden;
   }
 
-  /* grid placement + fallback colours */
   .project-1 {
     background: var(--color-project-1);
     grid-column: span 45;
     grid-row: var(--row-top-limit) / span 45;
+    --this-project-color: var(--color-project-1);
   }
   .project-2 {
     background: var(--color-project-2);
     grid-column: 29 / span 37;
     grid-row: span 37 / var(--row-bottom-limit);
     margin-block-end: var(--margin-bottom);
+    --this-project-color: var(--color-project-2);
   }
   .project-3 {
     background: var(--color-project-3);
     grid-column: 72 / span 37;
     grid-row: 37 / span 37;
+    --this-project-color: var(--color-project-3);
   }
   .project-4 {
     background: var(--color-project-4);
     grid-column: 122 / span 24;
     grid-row: var(--row-top-limit) / span 41;
+    --this-project-color: var(--color-project-4);
   }
   .project-5 {
     background: var(--color-project-5);
     grid-column: 115 / span 37;
     grid-row: span 37 / var(--row-bottom-limit);
     margin-block-end: var(--margin-bottom);
+    --this-project-color: var(--color-project-5);
   }
   .project-6 {
     background: var(--color-project-6);
     grid-column: 158 / span 37;
     grid-row: 31 / span 37;
+    --this-project-color: var(--color-project-6);
   }
 
   /* -------------------------------------------------- */
@@ -132,68 +185,57 @@ const title = 'Tria, remena, fes clic!'
     display: block;
     width: 100%;
     height: 100%;
-    border-radius: inherit; /* inherits 0.75rem */
-    overflow: hidden; /* ensures img stays clipped */
+    border-radius: inherit;
+    overflow: hidden;
     position: relative;
     text-decoration: none;
     color: inherit;
   }
 
+  .project-link:hover {
+    cursor: none;
+  }
+
   /* -------------------------------------------------- */
   /* 5. Image                                           */
   /* -------------------------------------------------- */
+  .project-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 
   /* -------------------------------------------------- */
-  /* 6. Caption overlay (kept from previous solution)   */
+  /* 6. Caption overlay                                 */
   /* -------------------------------------------------- */
   .project-caption {
     position: absolute;
     inset: 0;
-    background: var(--color-project-1);
+    background: var(--this-project-color, var(--color-project-1));
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     opacity: 0;
     transform: scale(1.05);
+    /* MODIFIED: Increased duration for a smoother fade-out/in */
     transition:
-      opacity 0.3s ease,
-      transform 0.3s ease;
+      opacity 0.5s ease,
+      transform 0.5s ease;
     pointer-events: none;
+    color: #fff;
+    font-size: 2.375rem;
+    text-align: center;
   }
 
   .project-link:is(:hover, :focus) .project-caption {
     opacity: 1;
     transform: scale(1);
-    pointer-events: auto;
-  }
-
-  .project-title {
-    color: var(--color-primary);
-    font-size: 2.375rem;
-  }
-
-  .project-cta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 11rem;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: var(--color-primary, #000);
-    color: #fff;
-    font-weight: var(--font-weight-bold);
-    font-size: 1.125rem;
-    line-height: 1.2;
-    transition: transform 0.2s ease;
-  }
-
-  .project-link:is(:hover, :focus) .project-cta {
-    transform: scale(1.05);
   }
 
   /* -------------------------------------------------- */
-  /* 7. “Veure tots” + ScrollPill (unchanged)           */
+  /* 7. "Veure tots" + ScrollPill                       */
   /* -------------------------------------------------- */
   a[href='/projects'] {
     grid-row: var(--row-top-limit);
@@ -209,4 +251,244 @@ const title = 'Tria, remena, fes clic!'
     padding-block-start: 0.125rem;
     padding-left: 0.5rem;
   }
+
+  /* -------------------------------------------------- */
+  /* 8. Enhanced project-specific cursors               */
+  /* -------------------------------------------------- */
+  .project-cursor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--cursor-size);
+    height: var(--cursor-size);
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: var(--color-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(8);
+
+    will-change: transform, opacity;
+  }
+
+  .project-cursor.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+
+    transition-property: transform, opacity;
+    transition-duration: 0.45s, 0s;
+    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94), ease;
+  }
+
+  .project-cursor.collapsed {
+    /* No visual change needed here if .visible sets final transform */
+  }
+
+  .project-cursor.magnetic {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .cursor-text {
+    letter-spacing: -0.05em;
+    font-weight: var(--font-weight-light);
+    line-height: 1;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  .cursor-text.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .project-cursor.magnetic .cursor-text.visible {
+    transform: scale(1.05);
+  }
+
+  .cursor-image {
+    position: absolute;
+    bottom: -1rem;
+    right: 0.5rem;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  .cursor-image.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .project-cursor.magnetic .cursor-image.visible {
+    transform: rotate(5deg) scale(1.1);
+  }
 </style>
+
+<script>
+  // JS remains the same as the previously working version
+  document.addEventListener('DOMContentLoaded', () => {
+    const projects = document.querySelectorAll('.project')
+
+    const magneticConfig = {
+      strength: 0.15,
+      magnetRadius: 120,
+      dampening: 0.08,
+      centerPull: 0.3,
+      elasticStrength: 0.12,
+    }
+
+    projects.forEach((project) => {
+      const projectLink = project.querySelector('.project-link') as HTMLElement
+      const projectCursor = project.querySelector('.project-cursor') as HTMLElement
+
+      if (!projectLink || !projectCursor) return
+
+      let cursorX = 0
+      let cursorY = 0
+      let targetX = 0
+      let targetY = 0
+      let isInMagneticField = false
+      let isVisible = false
+      let animationId: number
+      let collapseTimeout: number
+
+      const getProjectBounds = () => {
+        const rect = project.getBoundingClientRect()
+        return {
+          centerX: rect.left + rect.width / 2,
+          centerY: rect.top + rect.height / 2,
+          left: rect.left,
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+          width: rect.width,
+          height: rect.height,
+        }
+      }
+
+      const getDistance = (x1: number, y1: number, x2: number, y2: number) => {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+      }
+
+      const animate = () => {
+        const lerpStrength = isInMagneticField
+          ? magneticConfig.dampening * 0.7
+          : magneticConfig.dampening
+
+        cursorX += (targetX - cursorX) * lerpStrength
+        cursorY += (targetY - cursorY) * lerpStrength
+
+        projectCursor.style.left = `${cursorX}px`
+        projectCursor.style.top = `${cursorY}px`
+
+        if (isVisible) {
+          animationId = requestAnimationFrame(animate)
+        }
+      }
+
+      projectLink.addEventListener('mouseenter', (e) => {
+        isVisible = true
+        projectCursor.classList.add('visible')
+
+        const linkRect = projectLink.getBoundingClientRect()
+        const mouseEvent = e as MouseEvent
+        targetX = mouseEvent.clientX - linkRect.left
+        targetY = mouseEvent.clientY - linkRect.top
+        cursorX = targetX
+        cursorY = targetY
+        projectCursor.style.left = `${cursorX}px`
+        projectCursor.style.top = `${cursorY}px`
+
+        triggerGravityCollapse()
+        animate()
+      })
+
+      projectLink.addEventListener('mouseleave', () => {
+        isVisible = false
+        isInMagneticField = false
+        projectCursor.classList.remove('visible', 'magnetic', 'collapsed')
+
+        const cursorText = projectCursor.querySelector('.cursor-text') as HTMLElement
+        const cursorImage = projectCursor.querySelector('.cursor-image') as HTMLElement
+        if (cursorText) cursorText.classList.remove('visible')
+        if (cursorImage) cursorImage.classList.remove('visible')
+
+        if (animationId) cancelAnimationFrame(animationId)
+        if (collapseTimeout) clearTimeout(collapseTimeout)
+      })
+
+      const triggerGravityCollapse = () => {
+        const cursorText = projectCursor.querySelector('.cursor-text') as HTMLElement
+        const cursorImage = projectCursor.querySelector('.cursor-image') as HTMLElement
+
+        if (collapseTimeout) clearTimeout(collapseTimeout)
+
+        collapseTimeout = setTimeout(() => {
+          if (!isVisible) return
+          projectCursor.classList.add('collapsed')
+          if (cursorText) cursorText.classList.add('visible')
+          if (cursorImage) cursorImage.classList.add('visible')
+        }, 250)
+      }
+
+      projectLink.addEventListener('mousemove', (e) => {
+        if (!isVisible) return
+
+        const mouseEvent = e as MouseEvent
+        const projectBounds = getProjectBounds()
+        const linkRect = projectLink.getBoundingClientRect()
+
+        const relativeX = mouseEvent.clientX - linkRect.left
+        const relativeY = mouseEvent.clientY - linkRect.top
+
+        const absoluteMouseX = mouseEvent.clientX
+        const absoluteMouseY = mouseEvent.clientY
+
+        const distanceToCenter = getDistance(
+          absoluteMouseX,
+          absoluteMouseY,
+          projectBounds.centerX,
+          projectBounds.centerY,
+        )
+
+        const inMagneticRange = distanceToCenter < magneticConfig.magnetRadius
+
+        if (inMagneticRange !== isInMagneticField) {
+          isInMagneticField = inMagneticRange
+          projectCursor.classList.toggle('magnetic', isInMagneticField)
+        }
+
+        if (isInMagneticField) {
+          const pullStrength = 1 - distanceToCenter / magneticConfig.magnetRadius
+
+          const centerPullX = projectBounds.centerX - linkRect.left
+          const centerPullY = projectBounds.centerY - linkRect.top
+
+          const blendFactor = magneticConfig.centerPull * pullStrength
+          targetX = relativeX * (1 - blendFactor) + centerPullX * blendFactor
+          targetY = relativeY * (1 - blendFactor) + centerPullY * blendFactor
+        } else {
+          targetX = relativeX
+          targetY = relativeY
+        }
+      })
+
+      project.addEventListener('mouseenter', (e) => {
+        if (isVisible) return
+        const mouseEvent = e as MouseEvent
+        if ((mouseEvent.target as HTMLElement)?.closest('.project-link')) {
+          return
+        }
+      })
+    })
+  })
+</script>
