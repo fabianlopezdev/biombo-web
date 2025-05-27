@@ -4,12 +4,72 @@ interface Props {
 }
 
 const { title } = Astro.props
+
+/** Split "word, word, word!" into three chunks. */
+function splitHeadlineIntoChunks(raw: string): [string, string, string] | null {
+  const match = raw.match(/^([^,]+),\s*([^,]+),\s*([^!]+)!?$/)
+  return match ? [match[1].trim(), match[2].trim(), match[3].trim()] : null
+}
+
+const [firstWord, secondWord, thirdWord] = splitHeadlineIntoChunks(title) ?? [title, '', '']
+
+const chunkOne = `${firstWord},`
+const chunkTwo = `${secondWord},`
+const chunkThree = `${thirdWord}!`
 ---
 
-<h2 id="projects-heading">{title}</h2>
+<script src="@/scripts/pages/homepage/projectsTitleAnimation.ts"></script>
+
+<h2 id="projects-heading" class="projects-heading" data-has-played="false">
+  <!-- ─── Chunk 1 · Slinky Pop-In ───────────────────────────────────── -->
+  <span class="chunk chunk-slinky" aria-label={chunkOne}>
+    {
+      Array.from(chunkOne).map(function (char, index) {
+        return (
+          <span class="character slinky-letter" aria-hidden="true" style={`--char-index:${index}`}>
+            {char === ' ' ? '\u00A0' : char}
+          </span>
+        )
+      })
+    }
+  </span>&nbsp;
+
+  <!-- ─── Chunk 2 · Ping-Pong Wave ──────────────────────────────────── -->
+  <span class="chunk chunk-wave" aria-label={chunkTwo}>
+    {
+      Array.from(chunkTwo).map(function (char, index) {
+        return (
+          <span class="character wave-letter" aria-hidden="true" style={`--char-index:${index}`}>
+            {char === ' ' ? '\u00A0' : char}
+          </span>
+        )
+      })
+    }
+  </span>&nbsp;
+
+  <!-- ─── Chunk 3 · Card-Flip Reveal ────────────────────────────────── -->
+  <span class="chunk chunk-flip" aria-label={chunkThree}>
+    {
+      Array.from(chunkThree).map(function (char, index) {
+        return (
+          <span class="character flip-letter" aria-hidden="true" style={`--char-index:${index}`}>
+            {char === ' ' ? '\u00A0' : char}
+          </span>
+        )
+      })
+    }
+  </span>
+
+  <!-- Screen-reader full sentence -->
+  <span class="sr-only">{title}</span>
+</h2>
 
 <style>
+  /* ──────────── Core Typography / Layout ──────────── */
   h2 {
+    --slinky-letter-duration: 600ms;
+    --wave-letter-duration: 800ms;
+    --flip-letter-duration: 600ms;
     font-weight: var(--font-weight-semibold);
     font-size: 5rem;
     grid-column: 55 / span 58;
@@ -17,5 +77,123 @@ const { title } = Astro.props
     letter-spacing: -0.05em;
     line-height: 1.03;
     padding-inline-start: 0.3125rem;
+  }
+
+  /* ──────────── Structural Wrappers ──────────────── */
+  .projects-heading {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    perspective: 800px;
+
+    & .chunk {
+      display: inline-flex;
+      white-space: nowrap;
+    }
+  }
+
+  /* ──────────── Characters & Variants ────────────── */
+  .character {
+    display: inline-block;
+    animation-play-state: paused;
+
+    &.slinky-letter {
+      animation-name: slinky-pop-in;
+      animation-duration: var(--slinky-letter-duration);
+      animation-timing-function: cubic-bezier(0.25, 0.9, 0.35, 1.15);
+      animation-fill-mode: forwards;
+      animation-delay: calc(var(--char-index) * 45ms);
+      opacity: 0;
+      transform: translateY(-120%) rotateX(35deg);
+    }
+
+    &.wave-letter {
+      animation-name: ping-pong-wave;
+      animation-duration: var(--wave-letter-duration);
+      animation-timing-function: ease-in-out;
+      animation-fill-mode: forwards;
+      animation-delay: calc(var(--char-index) * 40ms);
+      opacity: 0;
+    }
+
+    &.flip-letter {
+      transform-origin: 50% 50%;
+      backface-visibility: hidden;
+      animation-name: card-flip-reveal;
+      animation-duration: var(--flip-letter-duration);
+      animation-timing-function: cubic-bezier(0.4, 0.2, 0.2, 1);
+      animation-fill-mode: forwards;
+      animation-delay: calc(var(--char-index) * 35ms);
+      opacity: 0;
+      transform: rotateY(-90deg);
+    }
+  }
+
+  /* ──────────── Keyframes ────────────────────────── */
+  @keyframes slinky-pop-in {
+    0% {
+      transform: translateY(-120%) rotateX(35deg);
+      opacity: 0;
+    }
+    60% {
+      transform: translateY(10%) rotateX(0deg) scale(1.25);
+      opacity: 1;
+    }
+    80% {
+      transform: translateY(-4%) scale(0.9);
+    }
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes ping-pong-wave {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    20% {
+      transform: translateY(-0.4rem);
+    }
+    40% {
+      transform: translateY(0.4rem);
+    }
+    60% {
+      transform: translateY(-0.25rem);
+    }
+    80% {
+      transform: translateY(0.25rem);
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes card-flip-reveal {
+    0% {
+      transform: rotateY(-90deg);
+      opacity: 0;
+    }
+    50% {
+      transform: rotateY(20deg);
+      opacity: 1;
+    }
+    100% {
+      transform: rotateY(0deg);
+      opacity: 1;
+    }
+  }
+
+  /* ──────────── Reduced-Motion Fallback ─────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .character {
+      animation: none !important;
+      transform: none !important;
+    }
   }
 </style>
