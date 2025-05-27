@@ -58,7 +58,12 @@ const featuredProjects = (projectsData?.featuredProjects as Project[]) || []
     })
   }
 
-  <a href="/projects" class="projects-view-all" aria-label={viewAllTextVal}>{viewAllTextVal}</a>
+  <a href="/projects" class="projects-view-all" aria-label={viewAllTextVal}>
+    <div class="label-wrapper">
+      <span class="label-main">{viewAllTextVal}</span>
+      <span aria-hidden="true" class="label-hover">{viewAllTextVal}</span>
+    </div>
+  </a>
 
   <button class="scroll-container">
     <ScrollPill />
@@ -212,9 +217,23 @@ const featuredProjects = (projectsData?.featuredProjects as Project[]) || []
     .projects-view-all {
       grid-row: var(--row-top-limit);
       grid-column: span 9 / var(--column-right-limit);
-      text-decoration: underline;
-      text-decoration-thickness: 1px;
-      text-underline-offset: 2px;
+
+      .label-main,
+      .label-hover {
+        display: inline-block;
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+      }
+      &:hover .label-main,
+      &:focus-within .label-main {
+        transform: translateY(-100%);
+      }
+
+      &:hover .label-hover,
+      &:focus-within .label-hover {
+        transform: translateY(0);
+      }
     }
 
     .scroll-container {
