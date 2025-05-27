@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', function () {
     headingElement.querySelectorAll('.chunk-flip  .character'),
   ]
 
+  // Animation is now triggered through CSS when data-has-played is set to true
+
   function startAnimationsOnLetters(letters: NodeListOf<Element>) {
     letters.forEach(function (letter) {
       // Check if letter is an HTMLElement before accessing style property
@@ -27,8 +29,14 @@ document.addEventListener('DOMContentLoaded', function () {
     })
   }
 
+  // Highlight animation is now controlled entirely through CSS using the data-has-played attribute
+
   function playChunksSequentially(index = 0) {
-    if (!letterGroups[index]) return
+    if (!letterGroups[index]) {
+      // All animation timing is now controlled by CSS
+      return
+    }
+
     startAnimationsOnLetters(letterGroups[index])
 
     // Get the last element from the current group if available
