@@ -8,29 +8,43 @@ import { homePageSchema, type HomePage } from '@/shared/schemas/sanity/homePageS
  */
 export async function fetchHomePage(): Promise<HomePage | null> {
   try {
-    // Query for the single homePage document
-    const query = `*[_type == "homePage"][0]`
-    console.log('Fetching with query:', query)
-
-    // Try fetching without schema validation first to see the raw data
+    // Query for the single homePage document with explicit field selection and expand featuredProjects references
+    const query = `*[_type == "homePage"][0]{
+      _id,
+      _type,
+      _createdAt,
+      _updatedAt,
+      hero,
+      projects {
+        ...,
+        featuredProjects[] -> {
+          _id,
+          _type,
+          title,
+          slug,
+          mainImage,
+          featured,
+          featuredOrder
+        }
+      },
+      about,
+      services
+    }`
+    // Try fetching without schema validation first
     const rawData = await fetchSanityQuery({
       query,
     })
-    console.log('Raw Sanity data for homePage:', rawData)
 
     if (!rawData) {
-      console.log('No homePage document found in Sanity')
       return null
     }
 
     // Now try with the schema validation
     try {
-      console.log('Attempting schema validation with schema:', homePageSchema)
       const homePage = await fetchSanityQuery({
         query,
         schema: homePageSchema,
       })
-      console.log('Schema validation succeeded, returning homepage data')
       return homePage
     } catch (error) {
       console.error('Schema validation failed:', error)

@@ -1,0 +1,111 @@
+---
+import { Image } from 'astro:assets'
+import projectsCursor from '@/assets/pages/homepage/projects-cursor.webp'
+import type { TransformedProject } from '@/utils/pages/homepage/projectsUtils'
+
+interface Props {
+  project: TransformedProject
+  viewProjectTextVal: string
+}
+
+const { project, viewProjectTextVal } = Astro.props
+---
+
+<div class="project-cursor">
+  <p class="cursor-text">
+    {project.viewProjectText || viewProjectTextVal || 'View project'}
+  </p>
+  <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
+</div>
+
+<style>
+  .project-cursor {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    width: var(--cursor-size);
+    height: var(--cursor-size);
+    border-radius: 50%;
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(8);
+
+    &.visible {
+      will-change: transform, opacity;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      transition-property: transform, opacity;
+      transition-duration: 0.45s;
+      transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    &.magnetic {
+      transform: translate(-50%, -50%) scale(1.1);
+      will-change: transform;
+    }
+
+    &.project-cursor-clicked {
+      transform: translate(-50%, -50%) scale(1) !important;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }
+
+    .cursor-text {
+      letter-spacing: -0.05em;
+      font-weight: var(--font-weight-light);
+      line-height: 1;
+      transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+      opacity: 0;
+      transform: scale(0.8);
+      padding-inline: 0.5rem;
+
+      &.visible {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    &.magnetic .cursor-text.visible {
+      transform: scale(1.05);
+    }
+
+    .cursor-image {
+      position: absolute;
+      bottom: -1rem;
+      right: 0.5rem;
+      transition:
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        bottom 0.3s ease,
+        right 0.3s ease;
+      opacity: 0;
+      transform: scale(0.8);
+
+      &.visible {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    &.magnetic .cursor-image.visible {
+      transform: rotate(5deg) scale(1.1);
+    }
+
+    &.project-cursor-clicked .cursor-text.visible {
+      transform: scale(0.7) !important;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }
+
+    &.project-cursor-clicked .cursor-image.visible {
+      transform: scale(2) !important;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }
+  }
+</style>

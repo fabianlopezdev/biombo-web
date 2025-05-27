@@ -35,7 +35,6 @@ export async function fetchProjectBySlug(
     // Query for a project with the matching slug in the specified locale
     const query = `*[_type == "project" && slug.${locale}.current == $slug][0]`
     const params = { slug }
-    console.log(`Fetching project with slug "${slug}" in locale "${locale}"`, { query, params })
 
     // Try fetching with schema validation
     const project = await fetchSanityQuery({
@@ -57,19 +56,107 @@ export async function fetchProjectBySlug(
  */
 export async function fetchFeaturedProjects(): Promise<Projects | null> {
   try {
-    // Query for projects marked as featured and sort by featuredOrder
-    const query = `*[_type == "project" && featured == true] | order(featuredOrder asc)`
-    console.log('Fetching featured projects', { query })
+    // Get all project documents
+    const allProjectsQuery = `*[_type == "project"]{
+      _createdAt,
+      _id,
+      _rev,
+      _type,
+      _updatedAt,
+      categories,
+      client,
+      description,
+      excerpt,
+      featured,
+      featuredOrder,
+      mainImage,
+      projectDate,
+      slug,
+      title
+    }`
 
-    // Try fetching with schema validation
-    const projects = await fetchSanityQuery({
-      query,
-      schema: projectsSchema,
+    // Fetch without schema validation first
+    const rawProjects = await fetchSanityQuery({
+      query: allProjectsQuery,
     })
 
-    return projects
-  } catch (error) {
-    console.error('Failed to fetch featured projects:', error)
+    // Now try with schema validation
+    let projects
+    try {
+      projects = await fetchSanityQuery({
+        query: allProjectsQuery,
+        schema: projectsSchema,
+      })
+      console.log(
+        'Projects after schema validation:',
+        projects ? projects.length : 0,
+        'projects found',
+      )
+    } catch (error) {
+      console.error('Error fetching projects with schema:', error)
+      console.log('No schema provided, returning raw data')
+      // If schema validation fails, use the raw data
+      projects = rawProjects
+    }
+
+    // No projects found
+    if (!projects || !Array.isArray(projects) || projects.length === 0) {
+      console.warn('No projects found in Sanity')
+      return null
+    }
+
+    // Define a type guard for project objects
+    function isProjectWithFeaturedProps(
+      obj: unknown,
+    ): obj is { featured?: boolean; featuredOrder?: number } {
+      return obj !== null && typeof obj === 'object' && 'featured' in obj
+    }
+
+    // Filter for featured projects if available using the type guard
+    const featuredProjects = projects
+      .filter((project) => isProjectWithFeaturedProps(project) && project.featured === true)
+      .sort((a, b) => {
+        // Get the featured order or use a high number as default
+        const orderA = isProjectWithFeaturedProps(a) ? Number(a.featuredOrder) || 999 : 999
+        const orderB = isProjectWithFeaturedProps(b) ? Number(b.featuredOrder) || 999 : 999
+        return orderA - orderB
+      })
+
+    console.log(
+      `Found ${featuredProjects.length} featured projects out of ${projects.length} total projects`,
+    )
+
+    // If we have featured projects, return those, otherwise return all projects as a fallback
+    // Cast to Projects to satisfy type safety
+    return (featuredProjects.length > 0 ? featuredProjects : projects) as Projects
+  } catch (error: unknown) {
+    console.error(
+      'Error fetching featured projects:',
+      error instanceof Error ? error.message : 'Unknown error',
+    )
+
+    // If validation failed, try fetching without schema validation for debugging
+    console.log('Attempting to fetch without schema validation...')
+    try {
+      // Use the same query string but without schema validation
+      const rawProjectsQuery = `*[_type == "project" && featured == true] | order(featuredOrder asc)`
+      const rawProjects = await fetchSanityQuery({
+        query: rawProjectsQuery,
+        params: {},
+      })
+      console.log('Raw projects data (no validation):', rawProjects)
+
+      // Log the raw project data structure to help with debugging
+      if (Array.isArray(rawProjects) && rawProjects.length > 0) {
+        console.log('First raw project structure:', JSON.stringify(rawProjects[0], null, 2))
+      }
+    } catch (secondError: unknown) {
+      console.error(
+        'Even raw fetch failed:',
+        secondError instanceof Error ? secondError.message : 'Unknown error',
+      )
+    }
+
     return null
   }
 }
@@ -80,8 +167,17 @@ export async function fetchFeaturedProjects(): Promise<Projects | null> {
  */
 export async function fetchProjectsSection(): Promise<ProjectsSection | null> {
   try {
-    // Query for just the projects section of the homepage
-    const query = `*[_type == "homePage"][0].projects`
+    // Query for the complete projects section of the homepage with all its properties
+    const query = `*[_type == "homePage"][0]{
+      "projects": projects{
+        _type,
+        title,
+        subtitle,
+        viewAllText,
+        viewProjectText,
+        featuredProjects
+      }
+    }.projects`
     console.log('Fetching projects section', { query })
 
     // Try fetching with schema validation

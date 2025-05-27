@@ -83,7 +83,7 @@ export const projectsSection = defineType({
           },
         },
       ],
-      validation: (Rule) => Rule.required().length(6).error('Exactly 6 featured projects are required'),
+      validation: (Rule) => Rule.max(6).error('Maximum of 6 featured projects allowed'),
     }),
   ],
   preview: {

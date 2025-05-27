@@ -1,0 +1,21 @@
+---
+interface Props {
+  title: string
+}
+
+const { title } = Astro.props
+---
+
+<h2 id="projects-heading">{title}</h2>
+
+<style>
+  h2 {
+    font-weight: var(--font-weight-semibold);
+    font-size: 5rem;
+    grid-column: 55 / span 58;
+    grid-row: 15 / span 10;
+    letter-spacing: -0.05em;
+    line-height: 1.03;
+    padding-inline-start: 0.3125rem;
+  }
+</style>

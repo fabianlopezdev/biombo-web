@@ -11,7 +11,18 @@ interface Props {
 }
 
 const { locale, homePageData } = Astro.props
-const { hero = {} } = homePageData ?? {}
+
+// Get the hero and projects sections with minimal fallbacks
+const hero = homePageData?.hero || {}
+const projects = homePageData?.projects || {
+  _type: 'projectsSection',
+  title: { ca: '', es: '', en: '' },
+  subtitle: { ca: '', es: '', en: '' },
+  viewProjectText: { ca: 'Veure projecte', es: 'Ver proyecto', en: 'View project' },
+  viewAllText: { ca: 'Veure tots', es: 'Ver todos', en: 'View all' },
+  featuredProjects: [],
+}
+
 const pageTitle = 'Biombo - Art, Events, Community'
 ---
 
@@ -25,10 +36,8 @@ const pageTitle = 'Biombo - Art, Events, Community'
       </section>
 
       <section id="projects" class="projects">
-        <Projects />
+        <Projects projectsData={projects} locale={locale} />
       </section>
-
-      <!-- more slides… -->
     </div>
 
     <section id="about" class="about">

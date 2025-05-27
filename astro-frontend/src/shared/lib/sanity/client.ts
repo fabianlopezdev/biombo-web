@@ -33,22 +33,18 @@ export async function fetchSanityQuery<S extends ZodSchema>(
     const data = await sanityClient.fetch(query, params)
     /* eslint-enable @typescript-eslint/no-unsafe-assignment */
 
-    // Add detailed logging to debug validation issues
-    console.log('Raw Sanity data before validation:', JSON.stringify(data, null, 2))
-
-    if (schema) {
-      console.log('Validating with schema:', schema.description || 'unnamed schema')
-      const validationResult = schema.safeParse(data)
-      if (!validationResult.success) {
-        console.error('Sanity data validation failed:', validationResult.error.flatten())
-        console.log('Problem data structure:', data)
-
-        const formErrors = validationResult.error.flatten().formErrors.join(', ')
-        throw new Error(`Sanity data validation failed: ${formErrors}`)
-      }
-      return validationResult.data
+    // If no schema provided, return raw data
+    if (!schema) {
+      return data
     }
+    const validationResult = schema.safeParse(data)
+    if (!validationResult.success) {
+      const formErrors = validationResult.error.flatten().formErrors.join(', ')
+      throw new Error(`Sanity data validation failed: ${formErrors}`)
+    }
+    return validationResult.data
 
+    // This code is unreachable due to the returns above, but kept for type safety
     return data
   } catch (error) {
     console.error('Error fetching data from Sanity:', error)

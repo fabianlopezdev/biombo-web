@@ -11,6 +11,15 @@ const localeStringSchema = z
   })
   .partial()
 
+// Define schema for localized portable text (rich text)
+const localePortableTextSchema = z.object({
+  _type: z.literal('localePortableText'),
+  // For each language, we expect an array of blocks (rich text)
+  ca: z.array(z.any()).optional(),
+  es: z.array(z.any()).optional(),
+  en: z.array(z.any()).optional(),
+})
+
 // Schema for localized slugs
 const localeSlugSchema = z.object({
   _type: z.literal('localeSlug'),
@@ -58,11 +67,10 @@ export const projectSchema = z.object({
   _updatedAt: z.string(),
   title: localeStringSchema,
   slug: localeSlugSchema,
-  featured: z.boolean().optional().default(false),
-  featuredOrder: z.number().min(1).max(6).optional(),
+  // featured and featuredOrder fields removed - we now manage featured projects through the homepage
   mainImage: imageWithAltSchema,
-  excerpt: localeStringSchema.optional(),
-  description: localeStringSchema.optional(),
+  excerpt: localePortableTextSchema.optional(),
+  description: localePortableTextSchema.optional(),
   client: z.string().optional(),
   categories: z.array(z.string()).optional(),
   projectDate: z.string().optional(), // ISO date string from Sanity
@@ -74,6 +82,7 @@ export const projectsSchema = z.array(projectSchema)
 
 // Export TypeScript types derived from the Zod schemas
 export type LocaleString = z.infer<typeof localeStringSchema>
+export type LocalePortableText = z.infer<typeof localePortableTextSchema>
 export type LocaleSlug = z.infer<typeof localeSlugSchema>
 export type ImageWithAlt = z.infer<typeof imageWithAltSchema>
 export type Project = z.infer<typeof projectSchema>

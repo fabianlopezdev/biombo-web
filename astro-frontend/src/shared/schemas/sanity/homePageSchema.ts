@@ -22,11 +22,14 @@ const heroSectionSchema = z.object({
   scrollText: localeStringSchema,
 })
 
-// Define Zod schema for Projects Section (placeholder for now)
+// Define Zod schema for Projects Section with all required fields
 const projectsSectionSchema = z.object({
   _type: z.literal('projectsSection'),
   title: localeStringSchema,
-  // Add more fields as needed when you expand this section
+  subtitle: localeStringSchema.optional(),
+  viewAllText: localeStringSchema.optional(),
+  viewProjectText: localeStringSchema.optional(),
+  featuredProjects: z.array(z.any()).optional(), // References to project documents
 })
 
 // Define Zod schema for About Section (placeholder for now)

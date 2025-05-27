@@ -19,26 +19,8 @@ export const project = defineType({
       description: 'This defines the project URL. Click Generate to create automatically from title.',
       validation: (Rule) => Rule.required().error('Slug is required for routing'),
     }),
-    defineField({
-      name: 'featured',
-      title: 'Featured on Homepage',
-      type: 'boolean',
-      description: 'Whether this project should be shown in the homepage projects section',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'featuredOrder',
-      title: 'Featured Order',
-      description: 'Order in which this project appears on the homepage (1-6, only relevant if featured is enabled)',
-      type: 'number',
-      hidden: ({ document }) => !document?.featured,
-      initialValue: 1,
-      options: {
-        list: [1, 2, 3, 4, 5, 6],
-      },
-      validation: (Rule) => Rule.required().integer().min(1).max(6)
-        .error('Featured order must be between 1 and 6'),
-    }),
+    // Featured projects are now managed through the homepage schema
+    // instead of on individual projects
     defineField({
       name: 'mainImage',
       title: 'Main Image',

@@ -1,163 +1,73 @@
 ---
 import ScrollPill from '@/assets/ScrollPill.astro'
 import { Image } from 'astro:assets'
-import projectsCursor from '@/assets/pages/homepage/projects-cursor.webp'
-// We don't need the t function directly since we're using direct string values
-
-// Import Sanity query functions and types
-import {
-  fetchFeaturedProjects,
-  fetchProjectsSection,
-} from '@/shared/lib/sanity/queries/projectQueries'
+import type { ProjectsSection } from '@/shared/schemas/sanity/homePageSchema'
 import type { Project } from '@/shared/schemas/sanity/projectSchema'
+import { transformProject } from '@/utils/pages/homepage/projectsUtils'
+import CustomCursor from './CustomCursor.astro'
+import ProjectsTitle from './ProjectsTitle.astro'
 
-// Get the current locale from Astro
-const currentLang = (Astro.currentLocale as 'ca' | 'es' | 'en') || 'ca'
-
-// Fallback content in case Sanity data is not available
-const fallbackContent = {
-  title: {
-    ca: 'Tria, remena, fes clic!',
-    en: 'Choose, browse, click!',
-    es: '¡Elige, navega, haz clic!',
-  },
-  subtitle: {
-    ca: 'Projectes Destacats',
-    en: 'Featured Projects',
-    es: 'Proyectos Destacados',
-  },
-  viewAllText: {
-    ca: 'Veure tots',
-    en: 'View all',
-    es: 'Ver todos',
-  },
-  viewProjectText: {
-    ca: 'Veure projecte',
-    en: 'View project',
-    es: 'Ver proyecto',
-  },
+interface Props {
+  projectsData?: ProjectsSection
+  locale?: 'ca' | 'es' | 'en'
 }
 
-// Fetch data from Sanity
-const projectsSection = await fetchProjectsSection()
-const featuredProjects = (await fetchFeaturedProjects()) || []
+const { projectsData, locale = (Astro.currentLocale as 'ca' | 'es' | 'en') || 'ca' } = Astro.props
+const currentLang = locale
 
-if (featuredProjects.length < 6) {
-  console.warn(`Only ${featuredProjects.length} featured projects found. 6 are required.`)
-}
-
-// Extract content from Sanity data or use fallbacks
-const title = projectsSection?.title?.[currentLang] || fallbackContent.title[currentLang]
-const subtitle = projectsSection?.subtitle?.[currentLang] || fallbackContent.subtitle[currentLang]
-const viewAllText =
-  projectsSection?.viewAllText?.[currentLang] || fallbackContent.viewAllText[currentLang]
-const viewProjectText =
-  projectsSection?.viewProjectText?.[currentLang] || fallbackContent.viewProjectText[currentLang]
-
-// Helper function to get localized image URL from Sanity
-function getSanityImageUrl(imageRef: string): string {
-  return `https://cdn.sanity.io/images/08xgag7z/production/${imageRef.replace('image-', '').replace('-jpg', '.jpg').replace('-png', '.png').replace('-webp', '.webp')}`
-}
-
-// Helper function to transform Sanity project data to the format needed for rendering
-function transformProject(project: Project, index: number) {
-  // Extract image reference from Sanity image object
-  const imageRef = project.mainImage?.asset?._ref
-
-  return {
-    _id: project._id,
-    index,
-    slug: {
-      // Use the locale-specific slug or fall back to Catalan
-      current: project.slug?.[currentLang]?.current || project.slug?.ca?.current,
-    },
-    // For the image, we'll use the Sanity URL if available
-    image: imageRef ? getSanityImageUrl(imageRef) : undefined,
-    // Get the localized alt text or fall back to the title
-    alt: project.mainImage?.alt?.[currentLang] || project.title[currentLang],
-    title: project.title[currentLang] || project.title.ca,
-    viewProjectText,
-  }
-}
+const title = projectsData?.title?.[currentLang] || ''
+const subtitle = projectsData?.subtitle?.[currentLang] || ''
+const viewProjectTextVal = projectsData?.viewProjectText?.[currentLang] || ''
+const viewAllTextVal = projectsData?.viewAllText?.[currentLang] || ''
+const featuredProjects = (projectsData?.featuredProjects as Project[]) || []
 ---
 
 <script src="@/scripts/pages/homepage/projectsScroll.ts"></script>
-<div class="projects-container">
-  <h2>{title}</h2>
+<script src="@/scripts/pages/homepage/customCursor.ts"></script>
+
+<div class="projects-container" aria-labelledby="projects-heading">
+  <ProjectsTitle {title} />
   <p class="bottom-left">{subtitle.toUpperCase()}</p>
 
-  {/* Map over featured projects, ensuring we have exactly 6 slots */}
   {
-    [...Array(6)].map((_, index) => {
-      // Get project for this slot if available
-      const project = featuredProjects[index]
-        ? transformProject(featuredProjects[index], index)
-        : null
+    [...Array(6)].map((_, i) => {
+      const project = featuredProjects[i]
+        ? transformProject(featuredProjects[i], i, currentLang, viewProjectTextVal)
+        : transformProject(null, i, currentLang, viewProjectTextVal)
 
       return (
-        <figure class={`project project-${index + 1}`}>
-          {project ? (
-            <a href={`/project/${project.slug.current}`} class="project-link">
-              {project.image ? (
-                <img
-                  src={project.image}
-                  alt={project.alt || project.title}
-                  class="project-image"
-                  loading="lazy"
-                />
-              ) : null}
+        <figure class={`project project-${i + 1}`}>
+          {project.image && (
+            <a href={project.slug ? `/project/${project.slug}` : '#'} class="project-link">
+              <Image
+                src={project.image}
+                alt={project.alt || project.title || `Project ${i + 1}`}
+                class="project-image"
+                loading={i === 0 || i === 1 ? 'eager' : 'lazy'}
+                inferSize
+              />
               <div class="project-caption">
-                <figcaption class="caption-text">{project.title}</figcaption>
+                <figcaption class="caption-text">{project.title || `Project ${i + 1}`}</figcaption>
               </div>
             </a>
-          ) : (
-            <div class="project-placeholder">
-              <div class="project-caption">
-                <figcaption class="caption-text">Projecte {index + 1}</figcaption>
-              </div>
-            </div>
           )}
 
-          <div class="project-cursor">
-            <p class="cursor-text">{viewProjectText}</p>
-            <Image
-              src={projectsCursor}
-              alt="Custom cursor for project links"
-              class="cursor-image"
-            />
-          </div>
+          <CustomCursor project={project} viewProjectTextVal={viewProjectTextVal} />
         </figure>
       )
     })
   }
 
-  <a href="/projects" class="view-all">{viewAllText}</a>
+  <a href="/projects" class="projects-view-all" aria-label={viewAllTextVal}>{viewAllTextVal}</a>
+
   <button class="scroll-container">
     <ScrollPill />
   </button>
 </div>
 
 <style>
-  /* Project placeholder styling for when no project is available */
-  .project-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 0.75rem;
-    cursor: default;
-  }
-
-  :root {
-    /* Assuming these are defined somewhere globally */
-  }
-
-  /* -------------------------------------------------- */
-  /* 1. Container grid – original rules                 */
-  /* -------------------------------------------------- */
   .projects-container {
+    /* ---------- root custom properties ---------- */
     --color-project-1: #f35c77;
     --color-project-2: #ffc904;
     --color-project-3: #63b2d5;
@@ -165,17 +75,24 @@ function transformProject(project: Project, index: number) {
     --color-project-5: #f8931a;
     --color-project-6: #272727;
 
-    --color-primary: #272727;
-    --color-secondary: #f0f0f0;
-    --font-weight-semibold: 600;
-    --font-weight-bold: 700;
-    --font-weight-light: 300;
-
     --row-top-limit: 9;
     --row-bottom-limit: -5;
     --column-right-limit: -6;
-    --margin-bottom: 0.125rem;
 
+    --column-size-project-1: span 45;
+    --row-size-project-1: var(--row-top-limit) / span 45;
+    --column-size-project-2: 29 / span 37;
+    --row-size-project-2: span 37 / var(--row-bottom-limit);
+    --column-size-project-3: 72 / span 37;
+    --row-size-project-3: 37 / span 37;
+    --column-size-project-4: 122 / span 24;
+    --row-size-project-4: var(--row-top-limit) / span 41;
+    --column-size-project-5: 115 / span 37;
+    --row-size-project-5: span 37 / var(--row-bottom-limit);
+    --column-size-project-6: 158 / span 37;
+    --row-size-project-6: 31 / span 37;
+
+    --margin-bottom: 0.125rem;
     --cursor-size: 8.5625rem;
 
     position: relative;
@@ -184,480 +101,127 @@ function transformProject(project: Project, index: number) {
     display: grid;
     grid-template-columns: repeat(200, 0.5%);
     grid-template-rows: repeat(100, 1%);
-  }
 
-  /* -------------------------------------------------- */
-  /* 2. Heading                                         */
-  /* -------------------------------------------------- */
-  h2 {
-    font-weight: var(--font-weight-semibold);
-    font-size: 5rem;
-    grid-column: 55 / span 58;
-    grid-row: 15 / span 10;
-    letter-spacing: -0.05em;
-    line-height: 1.03;
-    padding-inline-start: 0.3125rem;
-  }
+    .project {
+      border-radius: 0.75rem;
+      position: relative;
+      overflow: hidden;
 
-  /* -------------------------------------------------- */
-  /* 3. Project tiles (figure / article)                */
-  /* -------------------------------------------------- */
-  .project {
-    background-color: var(--color-secondary);
-    border-radius: 0.75rem;
-    position: relative;
-    overflow: hidden;
-  }
+      .project-link {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        overflow: hidden;
+        position: relative;
+        text-decoration: none;
+        color: inherit;
 
-  .project-1 {
-    background: var(--color-project-1);
-    grid-column: span 45;
-    grid-row: var(--row-top-limit) / span 45;
-    --this-project-color: var(--color-project-1);
-  }
-  .project-2 {
-    background: var(--color-project-2);
-    grid-column: 29 / span 37;
-    grid-row: span 37 / var(--row-bottom-limit);
-    margin-block-end: var(--margin-bottom);
-    --this-project-color: var(--color-project-2);
-  }
-  .project-3 {
-    background: var(--color-project-3);
-    grid-column: 72 / span 37;
-    grid-row: 37 / span 37;
-    --this-project-color: var(--color-project-3);
-  }
-  .project-4 {
-    background: var(--color-project-4);
-    grid-column: 122 / span 24;
-    grid-row: var(--row-top-limit) / span 41;
-    --this-project-color: var(--color-project-4);
-  }
-  .project-5 {
-    background: var(--color-project-5);
-    grid-column: 115 / span 37;
-    grid-row: span 37 / var(--row-bottom-limit);
-    margin-block-end: var(--margin-bottom);
-    --this-project-color: var(--color-project-5);
-  }
-  .project-6 {
-    background: var(--color-project-6);
-    grid-column: 158 / span 37;
-    grid-row: 31 / span 37;
-    --this-project-color: var(--color-project-6);
-  }
+        &:focus-visible .project-caption {
+          outline: 0.25rem solid var(--color-secondary);
+          outline-offset: -0.25rem;
+          border-radius: inherit;
+        }
 
-  /* -------------------------------------------------- */
-  /* 4. Link wrapper inside each tile                   */
-  /* -------------------------------------------------- */
-  .project-link {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: inherit;
-    overflow: hidden;
-    position: relative;
-    text-decoration: none;
-    color: inherit;
-  }
+        @media (hover: hover) {
+          &:hover {
+            cursor: none;
+          }
+        }
 
-  .project-link:hover {
-    cursor: none;
-  }
+        .project-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
 
-  /* -------------------------------------------------- */
-  /* 5. Image                                           */
-  /* -------------------------------------------------- */
-  .project-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+        .project-caption {
+          position: absolute;
+          inset: 0;
+          background: var(--color-project-1);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          opacity: 0;
+          transform: scale(1.05);
+          transition:
+            opacity 0.5s ease,
+            transform 0.5s ease;
+          pointer-events: none;
+          color: #fff;
+          font-size: 2.375rem;
+          text-align: center;
 
-  /* -------------------------------------------------- */
-  /* 6. Caption overlay                                 */
-  /* -------------------------------------------------- */
-  .project-caption {
-    position: absolute;
-    inset: 0;
-    background: var(--this-project-color, var(--color-project-1));
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transform: scale(1.05);
-    /* MODIFIED: Increased duration for a smoother fade-out/in */
-    transition:
-      opacity 0.5s ease,
-      transform 0.5s ease;
-    pointer-events: none;
-    color: #fff;
-    font-size: 2.375rem;
-    text-align: center;
-  }
+          .caption-text {
+            transform: translateY(50%);
+            transition: transform 0.5s ease;
+          }
+        }
 
-  .caption-text {
-    transform: translateY(50%);
-    transition: transform 0.5s ease;
-  }
+        &:hover .caption-text {
+          transform: translateY(0);
+        }
 
-  .project-link:hover .caption-text {
-    transform: translateY(0);
-  }
-
-  .project-link:is(:hover, :focus) .project-caption {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  /* -------------------------------------------------- */
-  /* 7. "Veure tots" + ScrollPill                       */
-  /* -------------------------------------------------- */
-  a[href='/projects'] {
-    grid-row: var(--row-top-limit);
-    grid-column: span 9 / var(--column-right-limit);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
-  }
-
-  .scroll-container {
-    grid-column: span 3 / var(--column-right-limit);
-    grid-row: span 4 / var(--row-bottom-limit);
-    padding-block-start: 0.125rem;
-    padding-left: 0.5rem;
-  }
-
-  /* -------------------------------------------------- */
-  /* 8. Enhanced project-specific cursors               */
-  /* -------------------------------------------------- */
-  .project-cursor {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: var(--cursor-size);
-    height: var(--cursor-size);
-    border-radius: 50%;
-    background-color: var(--color-primary);
-    color: var(--color-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    pointer-events: none;
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(8); /* Initial off-screen scale */
-
-    will-change: transform, opacity;
-  }
-
-  .project-cursor.visible {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1); /* Normal visible scale */
-
-    transition-property: transform, opacity;
-    transition-duration: 0.45s, 0.45s; /* Ensure opacity also has a duration */
-    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94), ease;
-    transition-delay: 0s, 0s; /* Ensure no delay for opacity initially */
-  }
-
-  .project-cursor.collapsed {
-    /* No direct visual change needed here if .visible sets final transform */
-    /* This class is more for state management in JS for text/image visibility */
-  }
-
-  .project-cursor.magnetic {
-    transform: translate(-50%, -50%) scale(1.1); /* Magnetic pull scale */
-    /* Transitions for magnetic are handled by the base .visible or by JS potentially overriding */
-  }
-
-  .cursor-text {
-    letter-spacing: -0.05em;
-    font-weight: var(--font-weight-light);
-    line-height: 1;
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s ease;
-    opacity: 0;
-    transform: scale(0.8);
-  }
-
-  .cursor-text.visible {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  .project-cursor.magnetic .cursor-text.visible {
-    transform: scale(1.05);
-  }
-
-  .cursor-image {
-    position: absolute;
-    bottom: -1rem;
-    right: 0.5rem;
-    /* top and left default to 'auto' */
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s ease,
-      top 0.3s ease,
-      left 0.3s ease,
-      bottom 0.3s ease,
-      right 0.3s ease;
-    opacity: 0;
-    transform: scale(0.8);
-  }
-
-  .cursor-image.visible {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  .project-cursor.magnetic .cursor-image.visible {
-    transform: rotate(5deg) scale(1.1);
-  }
-
-  /* -------------------------------------------------- */
-  /* 9. Click Animation for Project Cursor              */
-  /* -------------------------------------------------- */
-  .project-cursor.project-cursor-clicked {
-    /* MODIFIED: Main circle remains its original size during click */
-    transform: translate(-50%, -50%) scale(1) !important; /* Keep scale at 1 */
-    transition-property: transform, opacity !important;
-    transition-duration: 0.15s !important;
-    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    transition-delay: 0s !important;
-  }
-
-  .project-cursor.project-cursor-clicked .cursor-text.visible {
-    transform: scale(0.7) !important;
-    transition-property: transform, opacity !important;
-    transition-duration: 0.15s !important;
-    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    transition-delay: 0s !important;
-  }
-
-  .project-cursor.project-cursor-clicked .cursor-image.visible {
-    /* MODIFIED: Image stays in original position, scales to 2x */
-    transform: scale(2) !important; /* Scale to 200% */
-    /* transform-origin: center center; */ /* Default, usually fine */
-
-    /* MODIFIED: Transition properties no longer include positioning */
-    transition-property: transform, opacity !important;
-    transition-duration: 0.15s !important;
-    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    transition-delay: 0s !important;
-  }
-</style>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const projects = document.querySelectorAll('.project')
-
-    const magneticConfig = {
-      strength: 0.15,
-      magnetRadius: 120,
-      dampening: 0.08,
-      centerPull: 0.3,
-      elasticStrength: 0.12,
+        &:is(:hover, :focus) .project-caption {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
     }
 
-    projects.forEach((project) => {
-      const projectLink = project.querySelector('.project-link') as HTMLElement
-      const projectCursor = project.querySelector('.project-cursor') as HTMLElement
+    .project-1 {
+      background: var(--color-project-1);
+      grid-column: var(--column-size-project-1);
+      grid-row: var(--row-size-project-1);
+    }
 
-      if (!projectLink || !projectCursor) return
+    .project-2 {
+      background: var(--color-project-2);
+      grid-column: var(--column-size-project-2);
+      grid-row: var(--row-size-project-2);
+      margin-block-end: var(--margin-bottom);
+    }
 
-      let cursorX = 0
-      let cursorY = 0
-      let targetX = 0
-      let targetY = 0
-      let isInMagneticField = false
-      let isVisible = false
-      let animationId: number
-      let collapseTimeout: number
-      let clickAnimationTimeout: number
+    .project-3 {
+      background: var(--color-project-3);
+      grid-column: var(--column-size-project-3);
+      grid-row: var(--row-size-project-3);
+    }
 
-      const getProjectBounds = () => {
-        const rect = project.getBoundingClientRect()
-        return {
-          centerX: rect.left + rect.width / 2,
-          centerY: rect.top + rect.height / 2,
-          left: rect.left,
-          top: rect.top,
-          right: rect.right,
-          bottom: rect.bottom,
-          width: rect.width,
-          height: rect.height,
-        }
-      }
+    .project-4 {
+      background: var(--color-project-4);
+      grid-column: var(--column-size-project-4);
+      grid-row: var(--row-size-project-4);
+    }
 
-      const getDistance = (x1: number, y1: number, x2: number, y2: number) => {
-        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
-      }
+    .project-5 {
+      background: var(--color-project-5);
+      grid-column: var(--column-size-project-5);
+      grid-row: var(--row-size-project-5);
+      margin-block-end: var(--margin-bottom);
+    }
 
-      const animate = () => {
-        const lerpStrength = isInMagneticField
-          ? magneticConfig.dampening * 0.7
-          : magneticConfig.dampening
+    .project-6 {
+      background: var(--color-project-6);
+      grid-column: var(--column-size-project-6);
+      grid-row: var(--row-size-project-6);
+    }
 
-        cursorX += (targetX - cursorX) * lerpStrength
-        cursorY += (targetY - cursorY) * lerpStrength
+    .projects-view-all {
+      grid-row: var(--row-top-limit);
+      grid-column: span 9 / var(--column-right-limit);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
 
-        projectCursor.style.left = `${cursorX}px`
-        projectCursor.style.top = `${cursorY}px`
-
-        if (isVisible) {
-          animationId = requestAnimationFrame(animate)
-        }
-      }
-
-      projectLink.addEventListener('mouseenter', (e) => {
-        // console.log('Project link mouseenter');
-        isVisible = true
-        projectCursor.classList.add('visible')
-        // Ensure other states that might conflict with transitions are reset initially
-        projectCursor.classList.remove('project-cursor-clicked', 'magnetic')
-
-        const linkRect = projectLink.getBoundingClientRect()
-        const mouseEvent = e as MouseEvent
-        targetX = mouseEvent.clientX - linkRect.left
-        targetY = mouseEvent.clientY - linkRect.top
-        cursorX = targetX
-        cursorY = targetY
-        projectCursor.style.left = `${cursorX}px`
-        projectCursor.style.top = `${cursorY}px`
-
-        // Reset text/image visibility from potential previous states
-        const cursorText = projectCursor.querySelector('.cursor-text') as HTMLElement
-        const cursorImage = projectCursor.querySelector('.cursor-image') as HTMLElement
-        if (cursorText) cursorText.classList.remove('visible')
-        if (cursorImage) cursorImage.classList.remove('visible')
-
-        triggerGravityCollapse()
-        requestAnimationFrame(animate) // Start animation loop
-      })
-
-      projectLink.addEventListener('mouseleave', () => {
-        // console.log('Project link mouseleave');
-        isVisible = false
-        isInMagneticField = false
-        projectCursor.classList.remove('visible', 'magnetic', 'collapsed', 'project-cursor-clicked')
-
-        const cursorText = projectCursor.querySelector('.cursor-text') as HTMLElement
-        const cursorImage = projectCursor.querySelector('.cursor-image') as HTMLElement
-        if (cursorText) cursorText.classList.remove('visible')
-        if (cursorImage) cursorImage.classList.remove('visible')
-
-        if (animationId) cancelAnimationFrame(animationId)
-        if (collapseTimeout) clearTimeout(collapseTimeout)
-        if (clickAnimationTimeout) clearTimeout(clickAnimationTimeout)
-      })
-
-      const triggerGravityCollapse = () => {
-        const cursorText = projectCursor.querySelector('.cursor-text') as HTMLElement
-        const cursorImage = projectCursor.querySelector('.cursor-image') as HTMLElement
-
-        if (collapseTimeout) clearTimeout(collapseTimeout)
-
-        collapseTimeout = setTimeout(() => {
-          if (!isVisible) return
-          // console.log('Gravity collapse timeout: making text/image visible');
-          projectCursor.classList.add('collapsed') // This class might be for state or minor style
-          if (cursorText) cursorText.classList.add('visible')
-          if (cursorImage) cursorImage.classList.add('visible')
-        }, 250) // Delay for text/image to appear
-      }
-
-      projectLink.addEventListener('mousemove', (e) => {
-        if (!isVisible) return
-
-        const mouseEvent = e as MouseEvent
-        const projectBounds = getProjectBounds()
-        const linkRect = projectLink.getBoundingClientRect()
-
-        const relativeX = mouseEvent.clientX - linkRect.left
-        const relativeY = mouseEvent.clientY - linkRect.top
-
-        const absoluteMouseX = mouseEvent.clientX
-        const absoluteMouseY = mouseEvent.clientY
-
-        const distanceToCenter = getDistance(
-          absoluteMouseX,
-          absoluteMouseY,
-          projectBounds.centerX,
-          projectBounds.centerY,
-        )
-
-        const inMagneticRange = distanceToCenter < magneticConfig.magnetRadius
-
-        if (inMagneticRange !== isInMagneticField) {
-          isInMagneticField = inMagneticRange
-          projectCursor.classList.toggle('magnetic', isInMagneticField)
-        }
-
-        if (isInMagneticField) {
-          const pullStrength = 1 - distanceToCenter / magneticConfig.magnetRadius
-          const centerPullX = projectBounds.centerX - linkRect.left
-          const centerPullY = projectBounds.centerY - linkRect.top
-          const blendFactor = magneticConfig.centerPull * pullStrength
-          targetX = relativeX * (1 - blendFactor) + centerPullX * blendFactor
-          targetY = relativeY * (1 - blendFactor) + centerPullY * blendFactor
-        } else {
-          targetX = relativeX
-          targetY = relativeY
-        }
-      })
-
-      project.addEventListener('mouseenter', (e) => {
-        // This seems like a guard for when mouse enters project but not link
-        if (isVisible) return
-        const mouseEvent = e as MouseEvent
-        if ((mouseEvent.target as HTMLElement)?.closest('.project-link')) {
-          return
-        }
-        // Potentially handle cases where mouse enters project but not directly the link
-      })
-
-      // ---------- MODIFIED: CLICK ANIMATION HANDLING ----------
-      projectLink.addEventListener('mousedown', (e) => {
-        // console.log('mousedown event fired');
-        if (!isVisible) {
-          // console.log('mousedown: cursor not visible, returning');
-          return
-        }
-
-        // Ensure sub-elements are ready for click animation
-        const cursorText = projectCursor.querySelector('.cursor-text') as HTMLElement
-        const cursorImage = projectCursor.querySelector('.cursor-image') as HTMLElement
-
-        if (cursorText && !cursorText.classList.contains('visible')) {
-          // console.log('mousedown: forcing cursorText visible for click animation');
-          cursorText.classList.add('visible')
-        }
-        if (cursorImage && !cursorImage.classList.contains('visible')) {
-          // console.log('mousedown: forcing cursorImage visible for click animation');
-          cursorImage.classList.add('visible')
-        }
-
-        // Add the class to trigger the animation
-        // console.log('mousedown: adding project-cursor-clicked');
-        projectCursor.classList.add('project-cursor-clicked')
-
-        // Clear any existing timeout to prevent multiple rapid calls messing up
-        if (clickAnimationTimeout) {
-          clearTimeout(clickAnimationTimeout)
-        }
-
-        // Set a timeout to remove the class after the animation duration + a bit
-        clickAnimationTimeout = setTimeout(() => {
-          // console.log('clickAnimationTimeout: removing project-cursor-clicked');
-          projectCursor.classList.remove('project-cursor-clicked')
-        }, 300) // CSS transition is 0.15s, 300ms gives time to play and reset
-      })
-      // ---------- END: CLICK ANIMATION HANDLING ----------
-    })
-  })
-</script>
+    .scroll-container {
+      grid-column: span 3 / var(--column-right-limit);
+      grid-row: span 4 / var(--row-bottom-limit);
+      padding-block-start: 0.125rem;
+      padding-inline-start: 0.5rem;
+    }
+  }
+</style>
