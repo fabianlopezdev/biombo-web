@@ -83,40 +83,33 @@ export const header = defineType({
       hidden: false, // Set to true if you don't want editors to see this field
     }),
     defineField({
-      name: 'title',
-      title: 'Title',
-      type: 'string',
-      description: 'Name for this header configuration (for internal use)',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      description: 'A unique identifier for this header (e.g., \'global-header\')',
+      description: 'A unique identifier for this header (e.g., "global-header")',
       options: {
-        source: 'title',
+        source: (doc) => 'header', // Use a static string since we removed the title field
         maxLength: 96,
       },
       validation: (Rule) => Rule.required().error('A slug is required to identify this header'),
     }),
     defineField({
-      name: 'navigationItems',
-      title: 'Navigation Items',
+      name: 'navigationPages',
+      title: 'Navigation Pages',
       type: 'array',
       of: [{ type: 'navigationItem' }],
-      description: 'The navigation items to display in the header',
+      description: 'The navigation pages to display in the header',
     }),
     // The isActive field has been removed as it's no longer needed with the singleton pattern
   ],
   preview: {
     select: {
-      title: 'title',
+      slug: 'slug.current',
     },
     prepare(selection) {
-      const { title } = selection
+      const { slug } = selection
       return {
-        title: title || 'Website Header',
+        title: `Header (${slug || 'no-slug'})`,
         subtitle: 'Global navigation configuration',
       }
     },
