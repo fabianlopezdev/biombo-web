@@ -1,8 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Header from '@/components/shared/header/Header.astro'
-import Hero from '@/components/pages/homepage/Hero.astro'
-import Projects from '@/components/pages/homepage/Projects.astro'
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 import About from '@/components/pages/homepage/About.astro'
 import about1 from '@/assets/pages/homepage/about-1.jpg'
@@ -13,24 +11,15 @@ interface Props {
   homePageData: HomePage | null
 }
 
-const { locale, homePageData } = Astro.props
+const { locale } = Astro.props
 
-// Get the hero and projects sections with minimal fallbacks
-const hero = homePageData?.hero || {}
-const projects = homePageData?.projects || {
-  _type: 'projectsSection',
-  title: { ca: '', es: '', en: '' },
-  subtitle: { ca: '', es: '', en: '' },
-  viewProjectText: { ca: 'Veure projecte', es: 'Ver proyecto', en: 'View project' },
-  viewAllText: { ca: 'Veure tots', es: 'Ver todos', en: 'View all' },
-  featuredProjects: [],
-}
+// Page title for the head element
 
 const pageTitle = 'Biombo - Art, Events, Community'
 ---
 
 <BaseLayout title={pageTitle}>
-  <!-- <Header locale={locale} /> -->
+  <Header locale={locale} />
 
   <main id="main" class="main-content">
     <!-- <div class="horizontal-scroll-container" id="horizontal-container">
@@ -77,8 +66,6 @@ const pageTitle = 'Biombo - Art, Events, Community'
     .projects {
       flex: 0 0 183.3vw !important;
     }
-
-   
 
     .services {
       padding: 3rem var(--padding-inline-desktop);
