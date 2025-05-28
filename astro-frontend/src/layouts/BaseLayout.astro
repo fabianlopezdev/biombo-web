@@ -1,6 +1,7 @@
 ---
 import '@/styles/global.css'
 import HeaderSVGHover from '@/assets/header-hover-page.svg?raw'
+import { fetchSiteSettings, getHexColor } from '@/shared/lib/sanity/queries/siteSettingsQueries'
 
 interface Props {
   title: string
@@ -8,10 +9,18 @@ interface Props {
 }
 
 const { title, metaDescription } = Astro.props
+
+// Fetch site settings colors with fallbacks to maintain the existing color scheme
+const siteSettings = await fetchSiteSettings()
+const primaryColor = getHexColor(siteSettings?.primaryColor, '#f2f2f2') // Default to original light color
+const secondaryColor = getHexColor(siteSettings?.secondaryColor, '#191919') // Default to original dark color
 ---
 
 <!doctype html>
-<html lang={Astro.currentLocale ?? 'ca'}>
+<html
+  lang={Astro.currentLocale ?? 'ca'}
+  style={`--color-primary: ${primaryColor}; --color-secondary: ${secondaryColor};`}
+>
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={metaDescription || 'Biombo - Art, Events, Community'} />
