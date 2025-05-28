@@ -38,25 +38,17 @@ const navigationPageSchema = z.object({
   externalUrl: z.string().url().optional().nullable(),
 })
 
-// Define the header schema with support for both old and new field names during transition
+// Define the header schema matching the updated Sanity schema
 export const headerSchema = z.object({
   _id: z.string(),
   _type: z.literal('header'),
-  title: z.string(),
-  // Support both field names during migration - old field name
-  // Allow null since the API is returning null when the field doesn't exist
-  navigationItems: z.array(navigationPageSchema).optional().nullable(),
-  // New field name - this is the one with data in the current setup
+  // We only use navigationPages now
   navigationPages: z.array(navigationPageSchema).optional(),
-  isActive: z.boolean().optional(),
 })
 
 // Define types based on the schemas
 export type NavigationPage = z.infer<typeof navigationPageSchema>
 export type Header = z.infer<typeof headerSchema> & {
-  // Explicitly type both fields for TypeScript awareness during migration
-  // Include null to match our schema
-  navigationItems?: NavigationPage[] | null
   navigationPages?: NavigationPage[]
 }
 

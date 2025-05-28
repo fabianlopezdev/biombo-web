@@ -31,9 +31,9 @@ export async function fetchHeader(slug = 'global-header'): Promise<Header | null
  */
 export async function fetchActiveHeader(): Promise<Header | null> {
   try {
-    // Use a simplified query approach that doesn't force projection structure
-    // This lets the data come back in its natural form to match our updated schema
-    const query = `*[_type == "header" && isActive == true][0]`
+    // Query for the header by slug instead of isActive
+    // This is more reliable as we're using a singleton pattern now
+    const query = `*[_type == "header" && slug.current == "global-header"][0]`
 
     // Using our corrected schema that matches the Sanity data structure
     const header = await fetchSanityQuery({
