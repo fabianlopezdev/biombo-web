@@ -1,7 +1,7 @@
 // sanity-studio/schemaTypes/header.ts
 import { defineField, defineType } from 'sanity'
 import type { ValidationContext } from 'sanity'
-import { baseLanguage } from './supportedLanguages'
+// No longer need baseLanguage import with document-level internationalization
 
 // Define a schema for a navigation item
 const navigationItem = defineType({
@@ -12,7 +12,7 @@ const navigationItem = defineType({
     defineField({
       name: 'title',
       title: 'Title',
-      type: 'localeString',
+      type: 'string', // Changed from localeString to string
       description: 'The display name for this navigation item in different languages',
     }),
     defineField({
@@ -21,7 +21,7 @@ const navigationItem = defineType({
       type: 'slug',
       description: 'The URL path for this navigation item',
       options: {
-        source: baseLanguage ? `title.${baseLanguage.id}` : 'title.ca',
+        source: 'title', // Updated source reference for slug
         maxLength: 96,
       },
       validation: (Rule) => Rule.required().error('A slug is required for the navigation link'),
@@ -52,7 +52,7 @@ const navigationItem = defineType({
   ],
   preview: {
     select: {
-      title: baseLanguage ? `title.${baseLanguage.id}` : 'title.ca',
+      title: 'title', // Updated reference
       slug: 'slug.current',
       isExternal: 'isExternal',
       externalUrl: 'externalUrl',
@@ -69,12 +69,19 @@ const navigationItem = defineType({
   },
 })
 
-// Define the header schema
+// Define the header schema - This is a singleton document managed by the desk structure
 export const header = defineType({
   name: 'header',
   title: 'Header',
   type: 'document',
   fields: [
+    // Language field required for document internationalization
+    defineField({
+      name: 'language',
+      type: 'string',
+      readOnly: true, // The internationalization plugin handles this field
+      hidden: false, // Set to true if you don't want editors to see this field
+    }),
     defineField({
       name: 'title',
       title: 'Title',
@@ -100,24 +107,17 @@ export const header = defineType({
       of: [{ type: 'navigationItem' }],
       description: 'The navigation items to display in the header',
     }),
-    defineField({
-      name: 'isActive',
-      title: 'Is Active',
-      type: 'boolean',
-      description: 'Only one header should be active at a time',
-      initialValue: true,
-    }),
+    // The isActive field has been removed as it's no longer needed with the singleton pattern
   ],
   preview: {
     select: {
       title: 'title',
-      isActive: 'isActive',
     },
     prepare(selection) {
-      const { title, isActive } = selection
+      const { title } = selection
       return {
-        title,
-        subtitle: isActive ? 'Active' : 'Inactive',
+        title: title || 'Website Header',
+        subtitle: 'Global navigation configuration',
       }
     },
   },
