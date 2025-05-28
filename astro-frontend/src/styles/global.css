@@ -30,9 +30,7 @@
 }
 
 :root {
-  /* Colors */
-  --color-primary: #f2f2f2;
-  --color-secondary: #191919;
+  /* Colors - now dynamically set from Sanity in BaseLayout.astro */
 
   /* Typography */
   --font-family-base: 'Poppins', system-ui, sans-serif;
