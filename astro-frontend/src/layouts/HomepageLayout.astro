@@ -4,6 +4,9 @@ import Header from '@/components/shared/header/Header.astro'
 import Hero from '@/components/pages/homepage/Hero.astro'
 import Projects from '@/components/pages/homepage/Projects.astro'
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
+import About from '@/components/pages/homepage/About.astro'
+import about1 from '@/assets/pages/homepage/about-1.jpg'
+import about2 from '@/assets/pages/homepage/about-2.jpg'
 
 interface Props {
   locale: 'ca' | 'es' | 'en'
@@ -27,10 +30,10 @@ const pageTitle = 'Biombo - Art, Events, Community'
 ---
 
 <BaseLayout title={pageTitle}>
-  <Header locale={locale} />
+  <!-- <Header locale={locale} /> -->
 
   <main id="main" class="main-content">
-    <div class="horizontal-scroll-container" id="horizontal-container">
+    <!-- <div class="horizontal-scroll-container" id="horizontal-container">
       <section class="hero">
         <Hero locale={locale} heroData={hero} />
       </section>
@@ -38,38 +41,13 @@ const pageTitle = 'Biombo - Art, Events, Community'
       <section id="projects" class="projects">
         <Projects projectsData={projects} locale={locale} />
       </section>
-    </div>
+    </div> -->
 
     <section id="about" class="about">
-      <div class="about-inner">
-        <h2>About Us</h2>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae
-          vestibulum vestibulum. Cras venenatis euismod malesuada.
-        </p>
-        <p>
-          Phasellus sit amet ligula in lectus varius tempor. Donec feugiat convallis nibh, at
-          ultrices magna bibendum non. Proin elementum ultricies dolor, vitae hendrerit augue
-          egestas sit amet.
-        </p>
-        <p>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
-          laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
-          architecto beatae vitae dicta sunt explicabo.
-        </p>
-        <p>
-          Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia
-          consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
-        </p>
-        <p>
-          Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci
-          velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam
-          quaerat voluptatem.
-        </p>
-      </div>
+      <About images={[about1, about2]} />
     </section>
 
-    <section class="services"></section>
+    <!-- <section class="services"></section> -->
   </main>
 
   <script src="@/scripts/pages/homepage/horizontalScroll.ts"></script>
@@ -100,19 +78,7 @@ const pageTitle = 'Biombo - Art, Events, Community'
       flex: 0 0 183.3vw !important;
     }
 
-    .about .about-inner {
-      /* max-width: 600px; */
-      margin: 3rem auto;
-      line-height: 1.6;
-      padding: 0 var(--padding-inline-desktop);
-      background-color: var(--color-secondary);
-      color: var(--color-primary);
-    }
-
-    .about h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
+   
 
     .services {
       padding: 3rem var(--padding-inline-desktop);

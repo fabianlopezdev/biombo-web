@@ -37,12 +37,14 @@
   /* Typography */
   --font-family-base: 'Poppins', system-ui, sans-serif;
   --font-size: 1.5rem;
+  --font-size-homepage-sections: 2.375rem;
   --font-weight-light: 400;
   --font-weight-regular: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
   --padding-inline-desktop: 4.6875rem;
+  --padding-block-desktop: 6.625rem;
 
   --header-height: 5.5rem;
 

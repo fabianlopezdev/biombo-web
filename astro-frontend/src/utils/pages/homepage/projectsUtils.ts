@@ -38,6 +38,7 @@ export function transformProject(
   currentLang: string,
   viewProjectTextValue: string,
 ): TransformedProject {
+
   // If we don't have a project (or not enough projects), use placeholder data
   if (!project) {
     console.log(`Creating placeholder for project at index ${index}`)

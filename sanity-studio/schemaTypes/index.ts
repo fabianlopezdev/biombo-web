@@ -13,7 +13,7 @@ export const schemaTypes = [
   homePage,
   projects,
   siteSettings,
-  
+
   // Objects
   localeString,
   localePortableText,

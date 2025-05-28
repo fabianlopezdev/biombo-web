@@ -34,6 +34,8 @@ export async function fetchHomePage(): Promise<HomePage | null> {
     const rawData = await fetchSanityQuery({
       query,
     })
+    
+
 
     if (!rawData) {
       return null

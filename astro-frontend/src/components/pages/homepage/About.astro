@@ -1,0 +1,164 @@
+---
+/*  AboutSection.astro
+    ------------------------------------------------------------
+    Full-screen “About” hero with
+    · text on the left
+    · horizontal gallery on the right
+    · custom progress bar that always renders
+    · extra end-padding so the last slide can align start
+---------------------------------------------------------------- */
+
+import { Image } from 'astro:assets'
+import type { ImageMetadata } from 'astro:assets'
+
+interface Props {
+  title?:  string
+  copy?:   string
+  images?: ImageMetadata[]
+}
+
+const {
+  title = `Més de 10 anys d'experiència`,
+  copy  = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+           Duis elementum quam lorem, nec imperdiet erat volutpat maximus. 
+           Donec sed tempor sem. Pellentesque non dapibus urna. Nam ut ullamcorper odio.`,
+  images = []
+} = Astro.props
+---
+
+<div class="about">
+  <!-- ─── Text column ────────────────────────────────────────── -->
+  <div class="about__text">
+    <h2 class="about__title">{title.toUpperCase()}</h2>
+    <p  class="about__copy">{copy}</p>
+  </div>
+
+  <!-- ─── Gallery + progress bar ─────────────────────────────── -->
+  <div class="about__gallery">
+    <div class="slider" data-slider>
+      {images.map(img => (
+        <Image
+          src={img}
+          alt={img.alt ?? ''}
+          class="slider__img"
+          width={600}
+          height={800}
+          loading="lazy"
+        />
+      ))}
+    </div>
+
+    <progress
+      class="slider__progress"
+      max="100"
+      value="0"
+      aria-label="Galeria: progrés de desplaçament"></progress>
+  </div>
+</div>
+
+<!-- ─── Behaviour ─────────────────────────────────────────────── -->
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const slider   = document.querySelector('[data-slider]')
+    const progress = document.querySelector('.slider__progress')
+
+    if (!slider || !progress) return
+
+    function updateProgress () {
+      const max = slider.scrollWidth - slider.clientWidth
+      const pct = max ? (slider.scrollLeft / max) * 100 : 0
+      progress.style.setProperty('--p', pct + '%')      // drives the CSS fill
+      progress.value = pct                               // keeps native semantics
+    }
+
+    slider .addEventListener('scroll',  updateProgress)
+    window .addEventListener('resize',  updateProgress)
+    window .addEventListener('load',    updateProgress)  // initial paint
+  })
+</script>
+
+<style>
+  /* ---------- Layout --------------------------------------------------- */
+  .about {
+    display: grid;
+    grid-template-columns: clamp(18rem, 35vw, 40rem) 1fr;
+    gap: 4.4375rem;
+    height: 100dvh;
+    padding-block: var(--padding-block-desktop);
+    padding-inline: var(--padding-inline-desktop);
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+  }
+
+  .about__title {
+    font-size: var(--font-size);
+    font-weight: var(--font-weight-light);
+    margin-block-end: 7.8125rem;
+  }
+
+  .about__copy {
+    font-size: var(--font-size-homepage-sections);
+    font-weight: var(--font-weight-light);
+    max-width: 33.1875rem;
+    line-height: 1.184;
+  }
+
+  /* ---------- Gallery -------------------------------------------------- */
+  .about__gallery {
+    --slider-space: 1.981875rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--slider-space);
+  }
+
+  .slider {
+    display: flex;
+    gap: var(--slider-space);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Trailing spacer so the last slide can snap flush left */
+  .slider::after {                              /* NEW */
+    content: '';
+    flex: 0 0 calc(100% - var(--slider-space)); /* fills out to container width */
+  }
+
+  .slider__img {
+    flex: 0 0 auto;
+    width: 29.455625rem;
+    height: 39.81625rem;                        /* explicit height keeps ratio */
+    object-fit: cover;
+    border-radius: 0.621875rem;
+    scroll-snap-align: start;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .slider { scroll-behavior: smooth; }
+  }
+
+  /* ---------- Progress bar -------------------------------------------- */
+  .slider__progress {
+    --p: 0%;                        /* filled amount, set by JS */
+    inline-size: 47.625rem;
+    block-size: 1.6875rem;
+    appearance: none;               /* remove native look */
+    border: 1px solid var(--color-primary);
+    border-radius: 9999px;
+    background-color: var(--color-primary-a10);
+    position: relative;
+    overflow: hidden;               /* clip the fill */
+  }
+
+  .slider__progress::before {       /* the actual “fill” */
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: var(--p);
+    background: var(--color-primary);
+    border-radius: inherit;
+    transition: width .15s ease-out;
+  }
+</style>
