@@ -7,15 +7,11 @@
 import {type StructureResolver, ListItemBuilder} from 'sanity/structure'
 
 // The list of singleton document types
-const singletonTypes = ['homePage', 'header']
+const singletonTypes = ['homePage', 'header', 'siteSettings'] // ✅ added 'siteSettings'
+
 
 // Types to exclude from the regular document list (singletons + removed types)
-// Also exclude any schema types from plugins that we don't want to show
-const excludeTypes = [
-  'page', // Removed document type
-  'media.tag', // Hide media plugin tag type
-  ...singletonTypes, // Hide singleton document types
-]
+const excludeTypes = ['page', 'media.tag', ...singletonTypes]
 
 export const structure: StructureResolver = (S) => {
   return S.list()
@@ -25,14 +21,14 @@ export const structure: StructureResolver = (S) => {
       S.listItem()
         .title('Header')
         .id('header')
-        .icon(() => '🧭') // 🧭 icon
+        .icon(() => '🧭')
         .child(S.document().schemaType('header').documentId('header')),
 
       // HomePage singleton
       S.listItem()
         .title('Home Page')
         .id('homePage')
-        .icon(() => '🏠') // 🏠 icon
+        .icon(() => '🏠')
         .child(S.document().schemaType('homePage').documentId('homePage')),
 
       // Divider
@@ -43,5 +39,15 @@ export const structure: StructureResolver = (S) => {
         const id = listItem.getId()
         return id ? !excludeTypes.includes(id) : true
       }),
+
+      // Divider
+      S.divider(),
+
+      // Site Settings singleton
+      S.listItem()
+        .title('Site Settings')
+        .id('siteSettings')
+        .icon(() => '⚙️')
+        .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
     ])
 }

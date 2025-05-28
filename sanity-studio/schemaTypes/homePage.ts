@@ -1,5 +1,5 @@
 import { defineField, defineType } from 'sanity'
-import { baseLanguage } from './supportedLanguages'
+// No longer need baseLanguage import with document-level internationalization
 
 // Schema for the Hero section
 export const heroSection = defineType({
@@ -11,19 +11,19 @@ export const heroSection = defineType({
       name: 'heroText',
       title: 'Main Heading',
       description: 'The large heading text at the top of the page. Use **bold** to mark which word should be highlighted with the underline effect (e.g., "Transformem **idees** en solucions")',
-      type: 'localeString',
+      type: 'string', // Changed from localeString to string
       validation: (Rule) => Rule.required().error('The hero heading text is required'),
     }),
     defineField({
       name: 'scrollText',
       title: 'Scroll Text',
       description: 'Text that appears next to the scroll icon (e.g., "Explora fent scroll")',
-      type: 'localeString',
+      type: 'string', // Changed from localeString to string
     }),
   ],
   preview: {
     select: {
-      heroText: baseLanguage ? `heroText.${baseLanguage.id}` : 'heroText.ca',
+      heroText: 'heroText',
     },
     prepare(selection) {
       const { heroText } = selection
@@ -45,28 +45,28 @@ export const projectsSection = defineType({
       name: 'title',
       title: 'Section Title',
       description: 'The main heading for the projects section (e.g. "Tria, remena, fes clic!")',
-      type: 'localeString',
+      type: 'string', // Changed from localeString to string
       validation: (Rule) => Rule.required().error('Section title is required'),
     }),
     defineField({
       name: 'subtitle',
       title: 'Section Subtitle',
       description: 'The smaller subtitle for the projects section (e.g. "Projectes Destacats")',
-      type: 'localeString',
+      type: 'string', // Changed from localeString to string
       validation: (Rule) => Rule.required().error('Section subtitle is required'),
     }),
     defineField({
       name: 'viewAllText',
       title: '"View All" Button Text',
       description: 'Text for the link to view all projects (e.g. "Veure tots")',
-      type: 'localeString',
+      type: 'string', // Changed from localeString to string
       validation: (Rule) => Rule.required().error('"View All" text is required'),
     }),
     defineField({
       name: 'viewProjectText',
       title: 'Cursor Project Text',
       description: 'Text that appears in the custom cursor when hovering over projects (e.g. "Veure projecte")',
-      type: 'localeString',
+      type: 'string', // Changed from localeString to string
       validation: (Rule) => Rule.required().error('Cursor project text is required'),
     }),
     defineField({
@@ -88,8 +88,8 @@ export const projectsSection = defineType({
   ],
   preview: {
     select: {
-      title: baseLanguage ? `title.${baseLanguage.id}` : 'title.ca',
-      subtitle: baseLanguage ? `subtitle.${baseLanguage.id}` : 'subtitle.ca',
+      title: 'title',
+      subtitle: 'subtitle',
     },
     prepare({ title, subtitle }) {
       return {
@@ -109,7 +109,7 @@ export const aboutSection = defineType({
     defineField({
       name: 'title',
       title: 'Section Title',
-      type: 'localeString',
+      type: 'string', // Changed from localeString to string
     }),
     // You can add more fields here as needed
   ],
@@ -124,7 +124,7 @@ export const servicesSection = defineType({
     defineField({
       name: 'title',
       title: 'Section Title',
-      type: 'localeString',
+      type: 'string', // Changed from localeString to string
     }),
     // You can add more fields here as needed
   ],
@@ -136,6 +136,13 @@ export const homePage = defineType({
   title: 'Home Page',
   type: 'document',
   fields: [
+    // Language field required for document internationalization
+    defineField({
+      name: 'language',
+      type: 'string',
+      readOnly: true, // The internationalization plugin handles this field
+      hidden: false, // Set to true if you don't want editors to see this field
+    }),
     defineField({
       name: 'hero',
       title: 'Hero Section',

@@ -1,7 +1,7 @@
 // sanity-studio/schemaTypes/header.ts
 import { defineField, defineType } from 'sanity'
 import type { ValidationContext } from 'sanity'
-import { baseLanguage } from './supportedLanguages'
+// No longer need baseLanguage import with document-level internationalization
 
 // Define a schema for a navigation item
 const navigationItem = defineType({
@@ -12,7 +12,7 @@ const navigationItem = defineType({
     defineField({
       name: 'title',
       title: 'Title',
-      type: 'localeString',
+      type: 'string', // Changed from localeString to string
       description: 'The display name for this navigation item in different languages',
     }),
     defineField({
@@ -21,7 +21,7 @@ const navigationItem = defineType({
       type: 'slug',
       description: 'The URL path for this navigation item',
       options: {
-        source: baseLanguage ? `title.${baseLanguage.id}` : 'title.ca',
+        source: 'title', // Updated source reference for slug
         maxLength: 96,
       },
       validation: (Rule) => Rule.required().error('A slug is required for the navigation link'),
@@ -52,7 +52,7 @@ const navigationItem = defineType({
   ],
   preview: {
     select: {
-      title: baseLanguage ? `title.${baseLanguage.id}` : 'title.ca',
+      title: 'title', // Updated reference
       slug: 'slug.current',
       isExternal: 'isExternal',
       externalUrl: 'externalUrl',
@@ -75,6 +75,13 @@ export const header = defineType({
   title: 'Header',
   type: 'document',
   fields: [
+    // Language field required for document internationalization
+    defineField({
+      name: 'language',
+      type: 'string',
+      readOnly: true, // The internationalization plugin handles this field
+      hidden: false, // Set to true if you don't want editors to see this field
+    }),
     defineField({
       name: 'title',
       title: 'Title',
@@ -105,13 +112,12 @@ export const header = defineType({
   preview: {
     select: {
       title: 'title',
-      isActive: 'isActive',
     },
     prepare(selection) {
-      const { title, isActive } = selection
+      const { title } = selection
       return {
-        title,
-        subtitle: isActive ? 'Active' : 'Inactive',
+        title: title || 'Website Header',
+        subtitle: 'Global navigation configuration',
       }
     },
   },
