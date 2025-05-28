@@ -69,7 +69,7 @@ const navigationItem = defineType({
   },
 })
 
-// Define the header schema
+// Define the header schema - This is a singleton document managed by the desk structure
 export const header = defineType({
   name: 'header',
   title: 'Header',
@@ -100,13 +100,7 @@ export const header = defineType({
       of: [{ type: 'navigationItem' }],
       description: 'The navigation items to display in the header',
     }),
-    defineField({
-      name: 'isActive',
-      title: 'Is Active',
-      type: 'boolean',
-      description: 'Only one header should be active at a time',
-      initialValue: true,
-    }),
+    // The isActive field has been removed as it's no longer needed with the singleton pattern
   ],
   preview: {
     select: {

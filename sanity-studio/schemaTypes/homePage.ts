@@ -130,7 +130,7 @@ export const servicesSection = defineType({
   ],
 })
 
-// Main HomePage schema
+// Main HomePage schema - This is a singleton document managed by the desk structure
 export const homePage = defineType({
   name: 'homePage',
   title: 'Home Page',

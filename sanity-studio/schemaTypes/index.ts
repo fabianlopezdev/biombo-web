@@ -1,17 +1,16 @@
-import { page } from './page'
+// Removed page import as this schema has been deleted
 import { localeString } from './localeString'
 import { localePortableText } from './localePortableText'
 import { localeSlug } from './localeSlug'
 import { header, navigationItemType } from './header'
 import { homePage, heroSection, projectsSection, aboutSection, servicesSection } from './homePage'
-import { project } from './project'
+import { projects } from './projects'
 
 export const schemaTypes = [
   // Documents
-  page,
   header,
   homePage,
-  project,
+  projects,
   
   // Objects
   localeString,

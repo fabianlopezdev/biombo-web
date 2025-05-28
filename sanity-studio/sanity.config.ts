@@ -1,7 +1,20 @@
-import {defineConfig} from 'sanity'
+import {defineConfig, definePlugin} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
-import {schemaTypes} from './schemaTypes'
+import { schemaTypes } from './schemaTypes'
+import {media} from 'sanity-plugin-media'
+import {structure} from './deskStructure'
+
+// Define a plugin to remove the media.tag from New Document menu
+const removeMediaTag = definePlugin({
+  name: 'remove-media-tag',
+  document: {
+    // Hide media.tag from new document options
+    newDocumentOptions: (prev) => {
+      return prev.filter(templateItem => templateItem.templateId !== 'media.tag')
+    }
+  }
+})
 
 export default defineConfig({
   name: 'default',
@@ -9,10 +22,20 @@ export default defineConfig({
 
   projectId: '08xgag7z',
   dataset: 'production',
+  
+  // Document options now handled by the removeMediaTag plugin
 
-  plugins: [structureTool(), visionTool()],
+  plugins: [
+    // Use the custom structure from deskStructure.ts
+    structureTool({ structure }),
+    // Add the plugin to remove media.tag from new document options
+    removeMediaTag,
+    visionTool(),
+    // Configure the media plugin
+    media()
+  ],
 
   schema: {
-    types: schemaTypes,
+    types: schemaTypes
   },
 })
