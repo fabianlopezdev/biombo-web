@@ -32,12 +32,17 @@ let fetchError: string | null = null
 
 try {
   headerData = await fetchHeader()
+  console.log('Debug - Header data received:', headerData)
+  console.log('Debug - Navigation pages:', headerData?.navigationPages)
 } catch (error) {
   console.error('Error fetching headerData:', error)
   fetchError = `Could not load navigation for ${locale}. Please try again later.`
 }
 
-const pages: NavigationPage[] = fetchError ? [] : (headerData?.navigationPages ?? [])
+// Try to get navigation items from either field name
+const pages: NavigationPage[] = fetchError
+  ? []
+  : headerData?.navigationPages || headerData?.navigationItems || []
 ---
 
 <!-- Localised skip link -->

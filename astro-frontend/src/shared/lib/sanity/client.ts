@@ -37,10 +37,12 @@ export async function fetchSanityQuery<S extends ZodSchema>(
     if (!schema) {
       return data
     }
+    console.log('Raw data from Sanity:', JSON.stringify(data, null, 2))
     const validationResult = schema.safeParse(data)
     if (!validationResult.success) {
-      const formErrors = validationResult.error.flatten().formErrors.join(', ')
-      throw new Error(`Sanity data validation failed: ${formErrors}`)
+      const formattedErrors = validationResult.error.format()
+      console.error('Validation errors:', JSON.stringify(formattedErrors, null, 2))
+      throw new Error(`Sanity data validation failed: ${JSON.stringify(formattedErrors, null, 2)}`)
     }
     return validationResult.data
 
