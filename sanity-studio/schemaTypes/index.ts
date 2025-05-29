@@ -6,6 +6,9 @@ import { header, navigationItemType } from './header'
 import { homePage, heroSection, projectsSection, aboutSection, servicesSection } from './homePage'
 import { projects } from './projects'
 import { siteSettings } from './siteSettings'
+import { projectsPage } from './projectsPage'
+import { aboutUsPage } from './aboutUsPage'
+import { contactPage } from './contactPage'
 
 export const schemaTypes = [
   // Documents
@@ -13,6 +16,9 @@ export const schemaTypes = [
   homePage,
   projects,
   siteSettings,
+  projectsPage,
+  aboutUsPage,
+  contactPage,
 
   // Objects
   localeString,

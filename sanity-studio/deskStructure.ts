@@ -7,7 +7,7 @@
 import {type StructureResolver, ListItemBuilder} from 'sanity/structure'
 
 // The list of singleton document types
-const singletonTypes = ['homePage', 'header', 'siteSettings'] // ✅ added 'siteSettings'
+const singletonTypes = ['homePage', 'header', 'siteSettings', 'projectsPage', 'aboutUsPage', 'contactPage']
 
 
 // Types to exclude from the regular document list (singletons + removed types)
@@ -31,6 +31,26 @@ export const structure: StructureResolver = (S) => {
         .icon(() => '🏠')
         .child(S.document().schemaType('homePage').documentId('homePage')),
 
+        // Projects Page singleton
+        S.listItem()
+          .title('Projects Page')
+          .id('projectsPage')
+          .icon(() => '📂')
+          .child(S.document().schemaType('projectsPage').documentId('projectsPage')),
+  
+        // About Us Page singleton
+        S.listItem()
+          .title('About Us Page')
+          .id('aboutUsPage')
+          .icon(() => '👥')
+          .child(S.document().schemaType('aboutUsPage').documentId('aboutUsPage')),
+  
+        // Contact Page singleton
+        S.listItem()
+          .title('Contact Page')
+          .id('contactPage')
+          .icon(() => '📞')
+          .child(S.document().schemaType('contactPage').documentId('contactPage')),
       // Divider
       S.divider(),
 
@@ -42,6 +62,7 @@ export const structure: StructureResolver = (S) => {
 
       // Divider
       S.divider(),
+
 
       // Site Settings singleton
       S.listItem()

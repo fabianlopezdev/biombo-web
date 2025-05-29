@@ -16,15 +16,16 @@ const navigationItem = defineType({
       description: 'The display name for this navigation item in different languages',
     }),
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      description: 'The URL path for this navigation item',
-      options: {
-        source: 'title', // Updated source reference for slug
-        maxLength: 96,
-      },
-      validation: (Rule) => Rule.required().error('A slug is required for the navigation link'),
+      name: 'pageReference',
+      title: 'Page',
+      type: 'reference',
+      description: 'Select the page this navigation item should link to. Important: Each page should only be used once in the navigation.',
+      to: [
+        {type: 'projectsPage'},
+        {type: 'aboutUsPage'},
+        {type: 'contactPage'}
+      ],
+      hidden: ({parent}) => parent?.isExternal,
     }),
     defineField({
       name: 'isExternal',
@@ -52,18 +53,32 @@ const navigationItem = defineType({
   ],
   preview: {
     select: {
-      title: 'title', // Updated reference
-      slug: 'slug.current',
+      title: 'title',
       isExternal: 'isExternal',
       externalUrl: 'externalUrl',
+      pageRef: 'pageReference',
+      pageTitle: 'pageReference.title',
     },
     prepare(selection) {
-      const { title, slug, isExternal, externalUrl } = selection
-      const subtitle = isExternal ? externalUrl : `/${slug}`
+      const { title, isExternal, externalUrl, pageRef, pageTitle } = selection
+      
+      if (isExternal) {
+        return {
+          title: title || 'No title set',
+          subtitle: externalUrl || 'External URL not set',
+        }
+      }
+      
+      if (pageRef && pageTitle) {
+        return {
+          title: title || pageTitle,
+          subtitle: `Links to: ${pageTitle}`,
+        }
+      }
       
       return {
         title: title || 'No title set',
-        subtitle: subtitle || 'No link destination set',
+        subtitle: 'Select a page or enable external link',
       }
     },
   },
@@ -86,9 +101,10 @@ export const header = defineType({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      description: 'A unique identifier for this header (e.g., "global-header")',
+      description: 'A unique identifier for this header (e.g., "header")',
+      hidden: true, // Hide from the editor UI
       options: {
-        source: (doc) => 'header', // Use a static string since we removed the title field
+        source: (doc) => 'header', // Use a static string for consistency
         maxLength: 96,
       },
       validation: (Rule) => Rule.required().error('A slug is required to identify this header'),
@@ -106,10 +122,9 @@ export const header = defineType({
     select: {
       slug: 'slug.current',
     },
-    prepare(selection) {
-      const { slug } = selection
+    prepare() {
       return {
-        title: `Header (${slug || 'no-slug'})`,
+        title: 'Header',
         subtitle: 'Global navigation configuration',
       }
     },
