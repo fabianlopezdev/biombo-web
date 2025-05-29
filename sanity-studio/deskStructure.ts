@@ -1,60 +1,62 @@
 /**
- * Sanity Studio V3 Structure Configuration
- *
- * This file configures the desk structure with singleton documents and filters
- * out document types we don't want to show in the regular list.
+ * Sanity Desk Structure with translated singletons and language nesting.
  */
-import {type StructureResolver, ListItemBuilder} from 'sanity/structure'
+import { type StructureResolver, ListItemBuilder } from 'sanity/structure'
+import { LANGUAGES, SINGLETONS } from './constants/i18n'
 
-// The list of singleton document types
-const singletonTypes = ['homePage', 'header', 'siteSettings', 'projectsPage', 'aboutUsPage', 'contactPage']
+// All singleton _types that HAVE translations
+const translatedSingletonTypes = SINGLETONS.map((s) => s._type)
+// Add non-translated singleton types here
+const singletonTypes = [...translatedSingletonTypes, 'siteSettings']
 
-
-// Types to exclude from the regular document list (singletons + removed types)
+// Types to hide from the generic document list
 const excludeTypes = ['page', 'media.tag', ...singletonTypes]
 
-export const structure: StructureResolver = (S) => {
-  return S.list()
+// Simple emoji icon map for sidebar aesthetics
+const singletonIcon = (id: string) => {
+  const map: Record<string, string> = {
+    header: '🧭',
+    homePage: '🏠',
+    projectsPage: '📂',
+    aboutUsPage: '👥',
+    contactPage: '📞',
+  }
+  return () => map[id] ?? '📄'
+}
+
+export const structure: StructureResolver = (S) =>
+  S.list()
     .title('Content')
     .items([
-      // Header singleton
-      S.listItem()
-        .title('Header')
-        .id('header')
-        .icon(() => '🧭')
-        .child(S.document().schemaType('header').documentId('header')),
+      // ——————————— Translated Singletons ———————————
+      ...SINGLETONS.map((singleton) =>
+        S.listItem()
+          .title(singleton.title)
+          .id(singleton.id)
+          .icon(singletonIcon(singleton.id))
+          .child(
+            S.list()
+              .title(singleton.title)
+              .id(`${singleton.id}-languages`)
+              .items(
+                LANGUAGES.map((lang) =>
+                  S.documentListItem()
+                    .schemaType(singleton._type)
+                    .id(`${singleton.id}-${lang.id}`)
+                    .title(`${singleton.title} (${lang.id.toUpperCase()})`),
+                ),
+              )
+              .canHandleIntent(
+                (intentName, params) =>
+                  intentName === 'edit' && params.id.startsWith(singleton.id),
+              ),
+          ),
+      ),
 
-      // HomePage singleton
-      S.listItem()
-        .title('Home Page')
-        .id('homePage')
-        .icon(() => '🏠')
-        .child(S.document().schemaType('homePage').documentId('homePage')),
-
-        // Projects Page singleton
-        S.listItem()
-          .title('Projects Page')
-          .id('projectsPage')
-          .icon(() => '📂')
-          .child(S.document().schemaType('projectsPage').documentId('projectsPage')),
-  
-        // About Us Page singleton
-        S.listItem()
-          .title('About Us Page')
-          .id('aboutUsPage')
-          .icon(() => '👥')
-          .child(S.document().schemaType('aboutUsPage').documentId('aboutUsPage')),
-  
-        // Contact Page singleton
-        S.listItem()
-          .title('Contact Page')
-          .id('contactPage')
-          .icon(() => '📞')
-          .child(S.document().schemaType('contactPage').documentId('contactPage')),
       // Divider
       S.divider(),
 
-      // Filter out singletons and removed types from regular list
+      // ——————————— Regular Collections ———————————
       ...S.documentTypeListItems().filter((listItem: ListItemBuilder) => {
         const id = listItem.getId()
         return id ? !excludeTypes.includes(id) : true
@@ -63,12 +65,10 @@ export const structure: StructureResolver = (S) => {
       // Divider
       S.divider(),
 
-
-      // Site Settings singleton
+      // ——————————— Non-translated singleton (Site Settings) ———————————
       S.listItem()
         .title('Site Settings')
         .id('siteSettings')
         .icon(() => '⚙️')
-        .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
+        .child(S.documentTypeList('siteSettings').title('Site Settings')),
     ])
-}
