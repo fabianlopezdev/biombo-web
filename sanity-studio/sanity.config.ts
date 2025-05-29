@@ -6,15 +6,22 @@ import {media} from 'sanity-plugin-media'
 import {structure} from './deskStructure'
 import {colorInput} from '@sanity/color-input'
 import {documentInternationalization} from '@sanity/document-internationalization'
+import {SINGLETONS} from './constants/i18n'
 
-// Define a plugin to remove the media.tag from New Document menu
-const removeMediaTag = definePlugin({
-  name: 'remove-media-tag',
+// Restrict new-doc options and actions for singleton types
+const restrictDocs = definePlugin({
+  name: 'restrict-docs',
   document: {
-    // Hide media.tag from new document options
-    newDocumentOptions: (prev) => {
-      return prev.filter((templateItem) => templateItem.templateId !== 'media.tag')
-    },
+    newDocumentOptions: (prev) =>
+      prev.filter(
+        (item) =>
+          item.templateId !== 'media.tag' &&
+          !SINGLETONS.some((s) => s._type === item.templateId),
+      ),
+    actions: (prev, {schemaType}) =>
+      SINGLETONS.some((s) => s._type === schemaType)
+        ? prev.filter(({action}) => action !== 'delete' && action !== 'duplicate')
+        : prev,
   },
 })
 
@@ -25,13 +32,13 @@ export default defineConfig({
   projectId: '08xgag7z',
   dataset: 'production',
 
-  // Document options now handled by the removeMediaTag plugin
+  // Document options now handled by the restrictDocs plugin
 
   plugins: [
     // Use the custom structure from deskStructure.ts
     structureTool({structure}),
-    // Add the plugin to remove media.tag from new document options
-    removeMediaTag,
+    // Add the plugin to restrict new-doc options and actions for singleton types
+    restrictDocs,
     visionTool(),
     // Configure the media plugin
     media(),
