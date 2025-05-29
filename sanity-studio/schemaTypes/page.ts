@@ -13,17 +13,6 @@ export const page = defineType({
       // Validation is now handled within localeString for the base language
     }),
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        // Source the slug from the base language title field
-        source: baseLanguage ? `title.${baseLanguage.id}` : 'title.ca', // Fallback just in case
-        maxLength: 96,
-      },
-      validation: (Rule) => Rule.required().error('A slug is required to generate the page URL.'),
-    }),
-    defineField({
       name: 'mainContent', // This will now be an object like { ca: [blocks], es: [blocks], ... }
       title: 'Main Content',
       type: 'localePortableText', // Use our new localized Portable Text type

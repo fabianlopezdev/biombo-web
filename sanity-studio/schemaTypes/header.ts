@@ -14,6 +14,7 @@ const navigationItem = defineType({
       title: 'Title',
       type: 'string', // Changed from localeString to string
       description: 'The display name for this navigation item in different languages',
+      validation: Rule => Rule.custom(() => true), // Make validation pass always
     }),
     defineField({
       name: 'pageReference',
@@ -26,6 +27,7 @@ const navigationItem = defineType({
         {type: 'contactPage'}
       ],
       hidden: ({parent}) => parent?.isExternal,
+      validation: Rule => Rule.custom(() => true), // Make validation always pass for translations
     }),
     defineField({
       name: 'isExternal',
@@ -42,7 +44,14 @@ const navigationItem = defineType({
       hidden: ({ parent }) => !parent?.isExternal,
       validation: (Rule) =>
         Rule.custom((value, context: ValidationContext) => {
-          // Only validate if parent.isExternal is true
+          // Make this more permissive for translations
+          // Check if we're in a translation document
+          const doc = context.document
+          if (doc && doc.language && doc.language !== 'ca') {
+            return true // Allow empty values for translations
+          }
+          
+          // Original validation only for primary language
           const parent = context.parent as { isExternal?: boolean } | undefined
           if (parent?.isExternal && !value) {
             return 'External URL is required for external links'
@@ -98,23 +107,13 @@ export const header = defineType({
       hidden: false, // Set to true if you don't want editors to see this field
     }),
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      description: 'A unique identifier for this header (e.g., "header")',
-      hidden: true, // Hide from the editor UI
-      options: {
-        source: (doc) => 'header', // Use a static string for consistency
-        maxLength: 96,
-      },
-      validation: (Rule) => Rule.required().error('A slug is required to identify this header'),
-    }),
-    defineField({
       name: 'navigationPages',
       title: 'Navigation Pages',
       type: 'array',
       of: [{ type: 'navigationItem' }],
       description: 'The navigation pages to display in the header',
+      // Make the field more flexible for translations by using a custom validation
+      validation: Rule => Rule.custom(() => true),
     }),
     // The isActive field has been removed as it's no longer needed with the singleton pattern
   ],
