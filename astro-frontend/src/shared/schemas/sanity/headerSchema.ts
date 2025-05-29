@@ -27,6 +27,17 @@ const localeSlugSchema = z.object({
   }),
 })
 
+// Define schema for a page reference
+const pageReferenceSchema = z
+  .object({
+    _type: z.string(), // Make this more flexible
+    _ref: z.string().optional(), // Make this optional
+    // Include referenced page data that will be expanded by GROQ
+    title: z.string().optional(),
+    _key: z.string().nullable().optional(), // Allow null or undefined
+  })
+  .passthrough() // Allow additional fields for debugging
+
 // Define schema for a navigation page - updated to match actual Sanity structure
 const navigationPageSchema = z.object({
   _key: z.string(),
@@ -34,14 +45,18 @@ const navigationPageSchema = z.object({
   _type: z.string(),
   // Accept either a string title or a localized object
   title: z.union([z.string(), localeStringSchema]),
-  // Accept a simpler slug structure or our expected localized structure
-  slug: z.union([
-    z.object({
-      _type: z.literal('slug'),
-      current: z.string(),
-    }),
-    localeSlugSchema,
-  ]),
+  // Accept either a page reference or a slug
+  pageReference: pageReferenceSchema.optional(),
+  // Make slug optional since we now use pageReference
+  slug: z
+    .union([
+      z.object({
+        _type: z.literal('slug'),
+        current: z.string(),
+      }),
+      localeSlugSchema,
+    ])
+    .optional(),
   isExternal: z.boolean().optional().default(false),
   // Make externalUrl nullable since Sanity returns null rather than undefined
   externalUrl: z.string().url().optional().nullable(),

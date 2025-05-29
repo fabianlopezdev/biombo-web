@@ -15,6 +15,11 @@ import type { NavigationPage } from '@/shared/schemas/sanity/headerSchema'
  *   4. 'Missing Title' placeholder
  */
 export function getPageName(page: NavigationPage, locale: string): string {
+  // First check if we have a page reference and a title from it
+  if (page.pageReference && typeof page.pageReference === 'object' && page.pageReference?.title) {
+    return page.pageReference.title.trim()
+  }
+
   // Handle string title (non-internationalized)
   if (typeof page.title === 'string') {
     return page.title.trim() || 'Missing Title'
@@ -65,7 +70,25 @@ export function getPagePath(page: NavigationPage, locale: string): string {
     // Internal route construction
     const localePart = locale === 'ca' ? '' : `/${locale}`
 
-    // Get slug for current locale, fallback to default locale (ca)
+    // Handle page references - new approach
+    if (page.pageReference && typeof page.pageReference === 'object') {
+      const pageType = page.pageReference._type
+      if (pageType) {
+        // Map page types to URL paths
+        const pageTypeToPath: Record<string, string> = {
+          projectsPage: 'projects',
+          aboutUsPage: 'about-us',
+          contactPage: 'contact',
+        }
+
+        const pagePath = pageTypeToPath[pageType]
+        if (pagePath) {
+          return `${localePart}/${pagePath}`.replace(/\/{2,}/g, '/')
+        }
+      }
+    }
+
+    // Legacy: Handle slug-based navigation
     let slugValue = ''
 
     // Handle non-internationalized slug (simple structure)
@@ -74,19 +97,16 @@ export function getPagePath(page: NavigationPage, locale: string): string {
       slugValue = page.slug.current || ''
     }
     // Handle internationalized slug structure
-    else {
+    else if (page.slug) {
       // Access the localized slug structure that matches our schema
-      // This has a specific shape with _type and language codes
-      const slugObj = page.slug as
-        | {
-            _type: string
-            ca?: { current: string }
-            en?: { current: string }
-            es?: { current: string }
-          }
-        | undefined
+      const slugObj = page.slug as {
+        _type: string
+        ca?: { current: string }
+        en?: { current: string }
+        es?: { current: string }
+      }
 
-      if (slugObj && typeof slugObj === 'object') {
+      if (typeof slugObj === 'object') {
         // First try to get slug for the specific locale
         const localeKey = locale as 'ca' | 'en' | 'es'
         if (slugObj[localeKey]?.current) {
@@ -110,8 +130,8 @@ export function getPagePath(page: NavigationPage, locale: string): string {
     // Handle root path collapsing (avoid double slash)
     const path = `${localePart}${slugPart}` || '/'
     return path.replace(/\/{2,}/g, '/')
-  } catch {
-    // Fallback on any unexpected shape
+  } catch (error) {
+    console.error('Error generating page path:', error)
     return '#'
   }
 }

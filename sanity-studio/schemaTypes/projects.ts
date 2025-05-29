@@ -22,7 +22,8 @@ export const projects = defineType({
       name: 'slug',
       title: 'Slug',
       description: 'This will be used for the project URL',
-      type: 'slug', // Changed from localeSlug to slug
+      type: 'slug',
+      hidden: true, // Hide from the editor UI
       options: {
         source: 'title',
         maxLength: 96,
