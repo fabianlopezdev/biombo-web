@@ -29,11 +29,12 @@ export const contactPage = defineType({
   preview: {
     select: {
       title: 'title',
+      language: 'language',
     },
     prepare(selection) {
-      const { title } = selection
+      const { title, language } = selection
       return {
-        title: title || 'Contact Page',
+        title: `${title || 'Contact Page'} (${(language || '').toUpperCase()})`,
         subtitle: 'Contact information and form',
       }
     },

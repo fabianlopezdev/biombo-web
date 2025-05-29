@@ -29,11 +29,12 @@ export const aboutUsPage = defineType({
   preview: {
     select: {
       title: 'title',
+      language: 'language',
     },
     prepare(selection) {
-      const { title } = selection
+      const { title, language } = selection
       return {
-        title: title || 'About Us Page',
+        title: `${title || 'About Us Page'} (${(language || '').toUpperCase()})`,
         subtitle: 'Company information and history',
       }
     },

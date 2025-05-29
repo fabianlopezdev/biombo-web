@@ -119,12 +119,13 @@ export const header = defineType({
   ],
   preview: {
     select: {
-      slug: 'slug.current',
+      language: 'language',
     },
-    prepare() {
+    prepare(selection) {
+      const { language } = selection
       return {
-        title: 'Header',
-        subtitle: 'Global navigation configuration',
+        title: `Header (${(language || '').toUpperCase()})`,
+        subtitle: 'Header navigation pages',
       }
     },
   },

@@ -29,11 +29,12 @@ export const projectsPage = defineType({
   preview: {
     select: {
       title: 'title',
+      language: 'language',
     },
     prepare(selection) {
-      const { title } = selection
+      const { title, language } = selection
       return {
-        title: title || 'Projects Page',
+        title: `${title || 'Projects Page'} (${(language || '').toUpperCase()})`,
         subtitle: 'Projects listing and configuration',
       }
     },

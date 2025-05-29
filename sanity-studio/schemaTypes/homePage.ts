@@ -171,9 +171,13 @@ export const homePage = defineType({
     }),
   ],
   preview: {
-    prepare() {
+    select: {
+      language: 'language',
+    },
+    prepare(selection) {
+      const { language } = selection
       return {
-        title: 'Home Page',
+        title: `Home Page (${(language || '').toUpperCase()})`,
         subtitle: 'Landing page content',
       }
     },
