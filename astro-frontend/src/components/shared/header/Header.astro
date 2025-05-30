@@ -31,18 +31,15 @@ let headerData: Header | null = null
 let fetchError: string | null = null
 
 try {
-  headerData = await fetchHeader()
-  console.log('Debug - Header data received:', headerData)
-  console.log('Debug - Navigation pages:', headerData?.navigationPages)
+  // Pass the current locale to fetch the appropriate language version
+  headerData = await fetchHeader(locale)
 } catch (error) {
-  console.error('Error fetching headerData:', error)
+  console.error(`Error fetching headerData for locale ${locale}:`, error)
   fetchError = `Could not load navigation for ${locale}. Please try again later.`
 }
 
-// Try to get navigation items from either field name
-const pages: NavigationPage[] = fetchError
-  ? []
-  : headerData?.navigationPages || headerData?.navigationItems || []
+// Get navigation pages from the header data
+const pages: NavigationPage[] = fetchError ? [] : headerData?.navigationPages || []
 ---
 
 <!-- Localised skip link -->

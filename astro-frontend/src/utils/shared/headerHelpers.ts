@@ -7,17 +7,40 @@
 import type { NavigationPage } from '@/shared/schemas/sanity/headerSchema'
 
 /**
- * Return the best-match title for the given locale.
- * Fallback order:
- *   1. Exact locale key (e.g. 'es')
- *   2. Catalan ('ca') – your default page
- *   3. First non-empty string in the title object
- *   4. 'Missing Title' placeholder
+ * Mapping of page types to their localized URL paths
+ * This is used for generating the correct URLs based on page references
  */
-export function getPageName(page: NavigationPage, locale: string): string {
+const PAGE_ROUTES = {
+  // Projects page - projectes (ca) / proyectos (es) / projects (en)
+  projectsPage: {
+    ca: 'projectes',
+    es: 'proyectos',
+    en: 'projects',
+  },
+  // About Us page - nosaltres (ca) / nosotros (es) / about-us (en)
+  aboutUsPage: {
+    ca: 'nosaltres',
+    es: 'nosotros',
+    en: 'about-us',
+  },
+  // Contact page - contacte (ca) / contacto (es) / contact (en)
+  contactPage: {
+    ca: 'contacte',
+    es: 'contacto',
+    en: 'contact',
+  },
+} as const
+
+/**
+ * Return the title for a navigation page.
+ * Gets the title from the page reference or directly from the page object.
+ * 'Missing Title' is returned as a fallback.
+ */
+export function getPageName(page: NavigationPage): string {
   // First check if we have a page reference and a title from it
   if (page.pageReference && typeof page.pageReference === 'object' && page.pageReference?.title) {
-    return page.pageReference.title.trim()
+    const title = page.pageReference.title
+    return typeof title === 'string' ? title.trim() : 'Missing Title'
   }
 
   // Handle string title (non-internationalized)
@@ -25,111 +48,65 @@ export function getPageName(page: NavigationPage, locale: string): string {
     return page.title.trim() || 'Missing Title'
   }
 
-  // Handle object title (internationalized)
-  if (page.title && typeof page.title === 'object') {
-    // 1. Exact locale
-    // Use type-safe property access with hasOwnProperty check
-    if (Object.prototype.hasOwnProperty.call(page.title, locale)) {
-      const exactPageName = page.title[locale as keyof typeof page.title]
-      if (typeof exactPageName === 'string' && exactPageName.trim()) return exactPageName.trim()
-    }
-
-    // 2. Catalan fallback
-    if (Object.prototype.hasOwnProperty.call(page.title, 'ca')) {
-      const ca = page.title.ca
-      if (typeof ca === 'string' && ca.trim()) return ca.trim()
-    }
-
-    // 3. First non-empty entry
-    // Skip the _type property and only consider actual language values
-    for (const [key, value] of Object.entries(page.title)) {
-      // Skip the _type property
-      if (key === '_type') continue
-      if (typeof value === 'string' && value.trim()) return value.trim()
-    }
-  }
-
-  // 4. Default
+  // Since we've removed localized fields from our schema, we no longer need the object checks
+  // Default fallback
   return 'Missing Title'
 }
 
 /**
  * Build a navigation path for the page according to locale rules.
  *  • External links are returned as-is.
- *  • Internal links honour the 'home' slug special-case and omit redundant
- *    slashes (e.g. '' or '/es' or '/blog').
+ *  • Internal links use the locale-aware mapping to generate the correct path.
  */
 export function getPagePath(page: NavigationPage, locale: string): string {
   try {
-    // External URL – open in new tab
+    // Handle external URLs
     if (page.isExternal) {
-      if (page.externalUrl && typeof page.externalUrl === 'string') return page.externalUrl
+      // Return the URL if it exists and is a string
+      return page.externalUrl && typeof page.externalUrl === 'string' ? page.externalUrl : '#' // Fallback for missing URLs
+    }
+
+    // Determine locale prefix: empty for Catalan, "/es" or "/en" for others
+    const localePart = locale === 'ca' ? '' : `/${locale}`
+
+    // Handle page references based on their type
+    if (page.pageReference && typeof page.pageReference === 'object') {
+      const pageType = page.pageReference._type
+
+      // Validate we have a known page type
+      if (!pageType) {
+        console.warn('Missing page type in reference', { page })
+        return '#'
+      }
+
+      // Check if this is one of our mapped types
+      if (pageType === 'projectsPage' || pageType === 'aboutUsPage' || pageType === 'contactPage') {
+        // We verified this is a valid key with our if statement
+        // Use the page type to access the correct route map
+        const localizedPath = PAGE_ROUTES[pageType][locale as 'ca' | 'es' | 'en'] || ''
+
+        if (localizedPath) {
+          // Build the full path properly
+          if (localePart) {
+            // Non-default locale: /es/ruta or /en/path
+            // Avoid double slashes by checking for them directly
+            const fullPath = `${localePart}/${localizedPath}`
+            return fullPath.includes('//') ? fullPath.replace('//', '/') : fullPath
+          } else {
+            // Default locale (Catalan): /ruta
+            return `/${localizedPath}`
+          }
+        }
+      }
+
+      // Unknown page type
+      console.log(`Unknown page reference type: ${pageType}`)
       return '#'
     }
 
-    // Internal route construction
-    const localePart = locale === 'ca' ? '' : `/${locale}`
-
-    // Handle page references - new approach
-    if (page.pageReference && typeof page.pageReference === 'object') {
-      const pageType = page.pageReference._type
-      if (pageType) {
-        // Map page types to URL paths
-        const pageTypeToPath: Record<string, string> = {
-          projectsPage: 'projects',
-          aboutUsPage: 'about-us',
-          contactPage: 'contact',
-        }
-
-        const pagePath = pageTypeToPath[pageType]
-        if (pagePath) {
-          return `${localePart}/${pagePath}`.replace(/\/{2,}/g, '/')
-        }
-      }
-    }
-
-    // Legacy: Handle slug-based navigation
-    let slugValue = ''
-
-    // Handle non-internationalized slug (simple structure)
-    if (page.slug && '_type' in page.slug && page.slug._type === 'slug' && 'current' in page.slug) {
-      // Simple slug structure: { _type: 'slug', current: string }
-      slugValue = page.slug.current || ''
-    }
-    // Handle internationalized slug structure
-    else if (page.slug) {
-      // Access the localized slug structure that matches our schema
-      const slugObj = page.slug as {
-        _type: string
-        ca?: { current: string }
-        en?: { current: string }
-        es?: { current: string }
-      }
-
-      if (typeof slugObj === 'object') {
-        // First try to get slug for the specific locale
-        const localeKey = locale as 'ca' | 'en' | 'es'
-        if (slugObj[localeKey]?.current) {
-          slugValue = slugObj[localeKey]?.current || ''
-        }
-        // Fallback to Catalan slug if available
-        else if (slugObj.ca?.current) {
-          slugValue = slugObj.ca.current
-        }
-        // Try other languages if needed
-        else if (slugObj.en?.current) {
-          slugValue = slugObj.en.current
-        } else if (slugObj.es?.current) {
-          slugValue = slugObj.es.current
-        }
-      }
-    }
-
-    const slugPart = !slugValue || slugValue === 'home' ? '' : `/${slugValue}`
-
-    // Handle root path collapsing (avoid double slash)
-    const path = `${localePart}${slugPart}` || '/'
-    return path.replace(/\/{2,}/g, '/')
+    // No valid reference found
+    console.warn('Missing page reference', { page })
+    return '#'
   } catch (error) {
     console.error('Error generating page path:', error)
     return '#'

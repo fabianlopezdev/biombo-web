@@ -3,20 +3,25 @@ import { fetchSanityQuery } from '@/shared/lib/sanity/client'
 import { headerSchema, type Header } from '@/shared/schemas/sanity/headerSchema'
 
 /**
- * Fetches the header configuration from Sanity
- * @param slug - The slug of the header to fetch (defaults to 'header')
+ * Fetches the header configuration from Sanity for the specified language
+ * @param locale - The language code to fetch the header for (defaults to 'ca')
  * @returns The header data or null if not found
  */
-export async function fetchHeader(slug = 'header'): Promise<Header | null> {
+export async function fetchHeader(locale: string = 'ca'): Promise<Header | null> {
   try {
-    // First try with the provided slug
-    const query = `*[_type == "header" && slug.current == $slug][0]{
+    // Fetch the header document with the matching language
+    const query = `*[_type == "header" && language == $language][0]{
       ...,
       "navigationPages": navigationPages[]{
-        ...
+        ...,
+        pageReference->{
+          _type,
+          title,
+          language
+        }
       }
     }`
-    const params = { slug }
+    const params = { language: locale }
 
     let header = await fetchSanityQuery({
       query,
@@ -24,34 +29,53 @@ export async function fetchHeader(slug = 'header'): Promise<Header | null> {
       schema: headerSchema,
     })
 
-    // If not found, try to get any header document
-    if (!header) {
-      console.log('No header found with slug:', slug)
-      console.log('Trying to fetch any header document...')
-
-      const fallbackQuery = `*[_type == "header"][0]{
+    // If no header is found with the specified language, try falling back to Catalan
+    if (!header && locale !== 'ca') {
+      console.log(`No header found for language '${locale}', trying to fall back to Catalan`)
+      const fallbackQuery = `*[_type == "header" && language == "ca"][0]{
         ...,
         "navigationPages": navigationPages[]{
-          ...
+          ...,
+          pageReference->{
+            _type,
+            title,
+            language
+          }
         }
       }`
+
       header = await fetchSanityQuery({
         query: fallbackQuery,
         schema: headerSchema,
       })
+    }
 
-      // Log the raw data for debugging
-      if (header) {
-        console.log('Raw header data received:', JSON.stringify(header, null, 2))
-      }
+    // If still no header, try any header as a last resort
+    if (!header) {
+      console.log('No header found for any specified language, trying to find any header document')
+      const lastResortQuery = `*[_type == "header"][0]{
+        ...,
+        "navigationPages": navigationPages[]{
+          ...,
+          pageReference->{
+            _type,
+            title,
+            language
+          }
+        }
+      }`
 
-      if (header) {
-        console.log('Found a header with id:', header?._id)
-        // Since we don't know the exact structure, use a safer log approach
-        console.log('Header data structure:', JSON.stringify(header, null, 2))
-      } else {
-        console.log('No header documents found at all')
-      }
+      header = await fetchSanityQuery({
+        query: lastResortQuery,
+        schema: headerSchema,
+      })
+    }
+
+    // Log debug information
+    if (header) {
+      console.log(`Found header for language: ${header.language}, id: ${header._id}`)
+    } else {
+      console.log('No header documents found at all')
     }
 
     return header
