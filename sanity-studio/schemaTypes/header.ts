@@ -1,6 +1,6 @@
 // sanity-studio/schemaTypes/header.ts
-import { defineField, defineType } from 'sanity'
-import type { ValidationContext } from 'sanity'
+import {defineField, defineType} from 'sanity'
+import type {ValidationContext} from 'sanity'
 // No longer need baseLanguage import with document-level internationalization
 
 // Define a schema for a navigation item
@@ -14,20 +14,20 @@ const navigationItem = defineType({
       title: 'Title',
       type: 'string', // Changed from localeString to string
       description: 'The display name for this navigation item in different languages',
-      validation: Rule => Rule.custom(() => true), // Make validation pass always
+      validation: (Rule) => Rule.custom(() => true), // Make validation pass always
     }),
     defineField({
       name: 'pageReference',
       title: 'Page',
       type: 'reference',
-      description: 'Select the page this navigation item should link to. Important: Each page should only be used once in the navigation.',
-      to: [
-        {type: 'projectsPage'},
-        {type: 'aboutUsPage'},
-        {type: 'contactPage'}
-      ],
+      description:
+        'Select the page this navigation item should link to. Important: Each page should only be used once in the navigation.',
+      to: [{type: 'projectsPage'}, {type: 'aboutUsPage'}, {type: 'contactPage'}],
+      options: {
+        filter: 'defined(_type) && _type in ["projectsPage", "aboutUsPage", "contactPage"]',
+      },
       hidden: ({parent}) => parent?.isExternal,
-      validation: Rule => Rule.custom(() => true), // Make validation always pass for translations
+      validation: (Rule) => Rule.custom(() => true), // Make validation always pass for translations
     }),
     defineField({
       name: 'isExternal',
@@ -41,7 +41,7 @@ const navigationItem = defineType({
       title: 'External URL',
       type: 'url',
       description: 'The full URL if this is an external link',
-      hidden: ({ parent }) => !parent?.isExternal,
+      hidden: ({parent}) => !parent?.isExternal,
       validation: (Rule) =>
         Rule.custom((value, context: ValidationContext) => {
           // Make this more permissive for translations
@@ -50,9 +50,9 @@ const navigationItem = defineType({
           if (doc && doc.language && doc.language !== 'ca') {
             return true // Allow empty values for translations
           }
-          
+
           // Original validation only for primary language
-          const parent = context.parent as { isExternal?: boolean } | undefined
+          const parent = context.parent as {isExternal?: boolean} | undefined
           if (parent?.isExternal && !value) {
             return 'External URL is required for external links'
           }
@@ -69,22 +69,22 @@ const navigationItem = defineType({
       pageTitle: 'pageReference.title',
     },
     prepare(selection) {
-      const { title, isExternal, externalUrl, pageRef, pageTitle } = selection
-      
+      const {title, isExternal, externalUrl, pageRef, pageTitle} = selection
+
       if (isExternal) {
         return {
           title: title || 'No title set',
           subtitle: externalUrl || 'External URL not set',
         }
       }
-      
+
       if (pageRef && pageTitle) {
         return {
           title: title || pageTitle,
           subtitle: `Links to: ${pageTitle}`,
         }
       }
-      
+
       return {
         title: title || 'No title set',
         subtitle: 'Select a page or enable external link',
@@ -110,19 +110,18 @@ export const header = defineType({
       name: 'navigationPages',
       title: 'Navigation Pages',
       type: 'array',
-      of: [{ type: 'navigationItem' }],
+      of: [{type: 'navigationItem'}],
       description: 'The navigation pages to display in the header',
       // Make the field more flexible for translations by using a custom validation
-      validation: Rule => Rule.custom(() => true),
+      validation: (Rule) => Rule.custom(() => true),
     }),
-    // The isActive field has been removed as it's no longer needed with the singleton pattern
   ],
   preview: {
     select: {
       language: 'language',
     },
     prepare(selection) {
-      const { language } = selection
+      const {language} = selection
       return {
         title: `Header (${(language || '').toUpperCase()})`,
         subtitle: 'Header navigation pages',
@@ -131,5 +130,4 @@ export const header = defineType({
   },
 })
 
-// Export the navigation item type so it can be used in the header schema
 export const navigationItemType = navigationItem

@@ -5,8 +5,8 @@ export const LANGUAGES = [
 ]
 
 export const SINGLETONS = [
-  {id: 'homePage', _type: 'homePage', title: 'Home Page'},
   {id: 'header', _type: 'header', title: 'Header'},
+  {id: 'homePage', _type: 'homePage', title: 'Home Page'},
   {id: 'projectsPage', _type: 'projectsPage', title: 'Projects Page'},
   {id: 'aboutUsPage', _type: 'aboutUsPage', title: 'About Us Page'},
   {id: 'contactPage', _type: 'contactPage', title: 'Contact Page'},
