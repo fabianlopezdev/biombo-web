@@ -1,6 +1,6 @@
 // sanity-studio/schemaTypes/header.ts
 import {defineField, defineType} from 'sanity'
-import type {ValidationContext} from 'sanity'
+import type {ValidationContext, ReferenceFilterResolverContext} from 'sanity'
 // No longer need baseLanguage import with document-level internationalization
 
 // Define a schema for a navigation item
@@ -24,7 +24,13 @@ const navigationItem = defineType({
         'Select the page this navigation item should link to. Important: Each page should only be used once in the navigation.',
       to: [{type: 'projectsPage'}, {type: 'aboutUsPage'}, {type: 'contactPage'}],
       options: {
-        filter: 'defined(_type) && _type in ["projectsPage", "aboutUsPage", "contactPage"]',
+        // Show only the allowed page types in the SAME language as this header document
+        filter: ({document}: ReferenceFilterResolverContext) => ({
+          filter:
+            '_type in ["projectsPage", "aboutUsPage", "contactPage"] && language == $lang',
+          params: {lang: (document as {language?: string})?.language},
+        }),
+        disableNew: true,
       },
       hidden: ({parent}) => parent?.isExternal,
       validation: (Rule) => Rule.custom(() => true), // Make validation always pass for translations
