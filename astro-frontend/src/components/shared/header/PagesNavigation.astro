@@ -18,7 +18,7 @@ const currentPath = Astro.url.pathname
   <ul class="nav-list">
     {
       pages.map(function renderPage(page) {
-        const pageName = getPageName(page, locale)
+        const pageName = getPageName(page)
         const pagePath = getPagePath(page, locale)
         const isActive = pagePath === currentPath
 

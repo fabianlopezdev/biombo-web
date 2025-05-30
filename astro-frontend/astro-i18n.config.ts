@@ -10,8 +10,7 @@ const config = defineAstroI18nConfig({
   trailingSlash: 'never',
   run: 'client+server',
   showPrimaryLocale: false, // IMPORTANT for desired URL structure
-  // TEMPORARILY DISABLED translation loading to fix the Invalid URL error
-  // Will need to be properly configured once the basic site is working
+  // Keep translation loading disabled until we have proper files
   translationLoadingRules: [],
   // routes: {}, // For translating URL slugs, keep simple for now
 })
