@@ -76,22 +76,100 @@ export const projectsSection = defineType({
       type: 'array',
       of: [
         {
-          type: 'reference',
-          to: [{type: 'project'}],
-          options: {
-            disableNew: false,
-            filter: ({ document }: ReferenceFilterResolverContext) => {
-              // Get the language from the document
-              const language = document?.language
-              
-              // Filter projects by matching language
-              return {
-                filter: 'language == $language',
-                params: { language },
-                apiVersion: 'v2023-01-01'
-              }
+          name: 'featuredProjectItem',
+          type: 'object',
+          fields: [
+            {
+              name: 'project',
+              title: 'Project',
+              type: 'reference',
+              to: [{ type: 'project' }],
+              options: {
+                disableNew: false, // Keep existing options if relevant
+                filter: ({ document, parent }: ReferenceFilterResolverContext) => {
+                  const homePageDoc = document as any; // Root homePage document
+                  const currentFeaturedItemKey = (parent as any)?._key as string | undefined; // _key of the current featuredProjectItem
+
+                  const language = homePageDoc?.language;
+
+                  let filterClauses = ['_type == "project"'];
+                  const params: { language?: string; selectedProjectIds?: string[] } = {};
+
+                  // Apply language filter
+                  if (language) {
+                    filterClauses.push('language == $language');
+                    params.language = language;
+                  } else {
+                    // Fallback language if not found on homePageDoc, though this should ideally always be present
+                    console.warn('Language not found on HomePage document for project filter, defaulting to "ca".');
+                    filterClauses.push('language == "ca"');
+                  }
+
+                  // Apply filter to exclude already selected projects
+                  // Root cause of duplicate prevention failure: Incorrect path to featuredProjects array.
+                  // Corrected path: homePageDoc.projects is the 'Projects Section' object, which then contains featuredProjects.
+                  const allFeaturedProjects = homePageDoc?.projects?.featuredProjects;
+                  if (Array.isArray(allFeaturedProjects) && currentFeaturedItemKey) {
+                    const selectedProjectIds = allFeaturedProjects
+                      .filter((item: any) => item._key !== currentFeaturedItemKey && item.project?._ref)
+                      .map((item: any) => item.project._ref);
+
+                    if (selectedProjectIds.length > 0) {
+                      filterClauses.push('!(_id in $selectedProjectIds)');
+                      params.selectedProjectIds = selectedProjectIds;
+                    }
+                  } else if (Array.isArray(allFeaturedProjects) && !currentFeaturedItemKey) {
+                    // If it's a new item (no key yet), exclude all already selected projects
+                     const selectedProjectIds = allFeaturedProjects
+                      .filter((item: any) => item.project?._ref)
+                      .map((item: any) => item.project._ref);
+                    if (selectedProjectIds.length > 0) {
+                      filterClauses.push('!(_id in $selectedProjectIds)');
+                      params.selectedProjectIds = selectedProjectIds;
+                    }
+                  }
+
+
+                  return {
+                    filter: filterClauses.join(' && '),
+                    params,
+                  };
+                },
+                noResultsText: 'No projects available for the selected language or no language set on Home Page.'
+              },
+              validation: (Rule) => Rule.required(),
             },
-            noResultsText: 'No projects available for this language'
+            {
+              name: 'hoverColor',
+              title: 'Hover Color',
+              type: 'color',
+              options: {
+                disableAlpha: true,
+              },
+            },
+          ],
+          preview: {
+            select: {
+              // Root cause of previous title issue: 'project.title' is a string, not a localized object.
+              // Similarly, 'project.slug' is a standard slug object.
+              // Corrected paths to select the actual title and slug string.
+              actualProjectTitle: 'project.title',
+              projectSlugString: 'project.slug.current',
+              hoverColorValue: 'hoverColor.hex',
+              media: 'project.mainImage', // This was working correctly
+            },
+            prepare({ actualProjectTitle, projectSlugString, hoverColorValue, media }) {
+              // Rationale for fix: Use the directly selected project title, then slug string, then default text.
+              const title = actualProjectTitle || projectSlugString || 'No project selected';
+              let subtitle = hoverColorValue
+                ? `Hover: ${hoverColorValue}`
+                : 'No hover color';
+              return {
+                title: title,
+                subtitle: subtitle,
+                media: media, // Display project's image in preview
+              };
+            },
           },
         },
       ],
