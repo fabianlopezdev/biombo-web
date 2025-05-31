@@ -4,6 +4,7 @@
 import { type StructureResolver, ListItemBuilder } from 'sanity/structure'
 import { LANGUAGES, SINGLETONS } from './constants/i18n'
 import { orderableDocumentListDeskItem } from '@sanity/orderable-document-list'
+import { getLanguageIconFn } from './components/icons/LanguageFlags'
 
 // All singleton _types that HAVE translations
 const translatedSingletonTypes = SINGLETONS.map((s) => s._type)
@@ -13,7 +14,7 @@ const singletonTypes = [...translatedSingletonTypes, 'siteSettings']
 // Types to hide from the generic document list
 const excludeTypes = ['page', 'media.tag', ...singletonTypes]
 
-// Simple emoji icon map for sidebar aesthetics
+// Icon map for singleton documents
 const singletonIcon = (id: string) => {
   const map: Record<string, string> = {
     header: '🧭',
@@ -44,7 +45,8 @@ export const structure: StructureResolver = (S, context) =>
                   S.documentListItem()
                     .schemaType(singleton._type)
                     .id(`${singleton.id}-${lang.id}`)
-                    .title(`${singleton.title} (${lang.id.toUpperCase()})`),
+                    .title(`${singleton.title} (${lang.id.toUpperCase()})`)
+                    .icon(getLanguageIconFn(lang.id)),
                 ),
               )
               .canHandleIntent(
@@ -82,6 +84,7 @@ export const structure: StructureResolver = (S, context) =>
                   S.documentTypeList('project')
                     .title('Search Projects')
                     .filter('_type == "project"')
+                    .apiVersion('v2023-01-01')
                 )
             ])
         ),
@@ -98,12 +101,13 @@ export const structure: StructureResolver = (S, context) =>
               ...LANGUAGES.map((lang) =>
                 S.listItem()
                   .title(`${lang.title} Service Categories`)
-                  .icon(() => lang.id === 'ca' ? '🇪🇸' : lang.id === 'es' ? '🇪🇸' : '🇬🇧')
+                  .icon(getLanguageIconFn(lang.id))
                   .child(
                     S.documentTypeList('serviceCategory')
                       .title(`${lang.title} Service Categories`)
                       .filter('_type == "serviceCategory" && language == $language')
                       .params({ language: lang.id })
+                      .apiVersion('v2023-01-01')
                   )
               ),
             ])
