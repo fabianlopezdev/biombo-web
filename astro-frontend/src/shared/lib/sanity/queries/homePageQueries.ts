@@ -20,11 +20,23 @@ export async function fetchHomePage(): Promise<HomePage | null> {
         featuredProjects[] -> {
           _id,
           _type,
+          _createdAt,
+          _updatedAt,
           title,
           slug,
-          mainImage,
-          featured,
-          featuredOrder
+          mainImage {
+            ...,
+            asset->
+          },
+          thumbnailImage {
+            ...,
+            asset->
+          },
+          excerpt,
+          description,
+          client,
+          categories,
+          projectDate
         }
       },
       about,
@@ -34,8 +46,6 @@ export async function fetchHomePage(): Promise<HomePage | null> {
     const rawData = await fetchSanityQuery({
       query,
     })
-    
-
 
     if (!rawData) {
       return null

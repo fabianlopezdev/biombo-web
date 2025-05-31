@@ -38,7 +38,6 @@ export function transformProject(
   currentLang: string,
   viewProjectTextValue: string,
 ): TransformedProject {
-
   // If we don't have a project (or not enough projects), use placeholder data
   if (!project) {
     console.log(`Creating placeholder for project at index ${index}`)
@@ -54,8 +53,20 @@ export function transformProject(
 
   console.log(`Processing project at index ${index}:`, project._id, project.title)
 
-  // Extract image reference from Sanity image object
-  const imageRef = project.mainImage?.asset?._ref
+  // Extract image references from Sanity image objects - implement fallback logic
+  // First try to get thumbnailImage, then fall back to mainImage
+  const thumbnailImageRef = project.thumbnailImage?.asset?._ref
+  const mainImageRef = project.mainImage?.asset?._ref
+  // Use thumbnailImage if available, otherwise use mainImage
+  const imageRef = thumbnailImageRef || mainImageRef
+
+  // For alt text, use the alt from whichever image we're displaying
+  const imageAlt =
+    thumbnailImageRef && project.thumbnailImage?.alt
+      ? project.thumbnailImage.alt
+      : project.mainImage?.alt
+        ? project.mainImage.alt
+        : undefined
 
   // Safely get localized string values with fallbacks
   const getLocalizedValue = (field: Record<string, string> | undefined, fallback: string = '') => {
@@ -116,9 +127,7 @@ export function transformProject(
     index,
     slug: getSlug(), // Now a simple string
     image: getImage(),
-    alt: project.mainImage?.alt
-      ? getLocalizedValue(project.mainImage.alt)
-      : getLocalizedValue(project.title),
+    alt: imageAlt ? getLocalizedValue(imageAlt) : getLocalizedValue(project.title),
     title: getLocalizedValue(project.title),
     viewProjectText: viewProjectTextValue,
   }

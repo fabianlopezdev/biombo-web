@@ -69,6 +69,7 @@ export const projectSchema = z.object({
   slug: localeSlugSchema,
   // featured and featuredOrder fields removed - we now manage featured projects through the homepage
   mainImage: imageWithAltSchema,
+  thumbnailImage: imageWithAltSchema.optional(), // Optional thumbnail image for project cards
   excerpt: localePortableTextSchema.optional(),
   description: localePortableTextSchema.optional(),
   client: z.string().optional(),
