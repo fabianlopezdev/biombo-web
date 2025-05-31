@@ -147,6 +147,14 @@ export const projectsSection = defineType({
                 disableAlpha: true,
               },
             },
+            {
+              name: 'textHoverColor',
+              title: 'Text Hover Color',
+              type: 'color',
+              options: {
+                disableAlpha: true,
+              },
+            },
           ],
           preview: {
             select: {
@@ -156,14 +164,16 @@ export const projectsSection = defineType({
               actualProjectTitle: 'project.title',
               projectSlugString: 'project.slug.current',
               hoverColorValue: 'hoverColor.hex',
+              textHoverColorValue: 'textHoverColor.hex',
               media: 'project.mainImage', // This was working correctly
             },
-            prepare({ actualProjectTitle, projectSlugString, hoverColorValue, media }) {
+            prepare({ actualProjectTitle, projectSlugString, hoverColorValue, textHoverColorValue, media }) {
               // Rationale for fix: Use the directly selected project title, then slug string, then default text.
               const title = actualProjectTitle || projectSlugString || 'No project selected';
-              let subtitle = hoverColorValue
-                ? `Hover: ${hoverColorValue}`
-                : 'No hover color';
+              let subtitles = [];
+              if (hoverColorValue) subtitles.push(`Hover: ${hoverColorValue}`);
+              if (textHoverColorValue) subtitles.push(`Text Hover: ${textHoverColorValue}`);
+              const subtitle = subtitles.length > 0 ? subtitles.join(' | ') : 'No colors set';
               return {
                 title: title,
                 subtitle: subtitle,
