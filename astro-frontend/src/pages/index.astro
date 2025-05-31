@@ -1,6 +1,8 @@
 ---
 import Homepage from '@/layouts/HomepageLayout.astro'
 import { fetchHomePageByLocale } from '@/shared/lib/sanity/queries/homePageQueries'
+
+console.log('Astro.site in src/pages/index.astro:', Astro.site)
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 
 // This is the root index.astro file (Catalan)

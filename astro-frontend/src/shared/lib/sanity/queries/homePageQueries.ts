@@ -2,98 +2,112 @@
 import { fetchSanityQuery } from '@/shared/lib/sanity/client'
 import { homePageSchema, type HomePage } from '@/shared/schemas/sanity/homePageSchema'
 
-/**
- * Fetches the homepage data from Sanity
- * @returns The homepage data or null if not found
- */
-export async function fetchHomePage(): Promise<HomePage | null> {
-  try {
-    // Query for the single homePage document with explicit field selection and expand featuredProjects references
-    const query = `*[_type == "homePage"][0]{
-      _id,
-      _type,
-      _createdAt,
-      _updatedAt,
-      hero,
-      projects {
-        ...,
-        featuredProjects[] {
-          _key,
-          hoverColor { hex },
-          textHoverColor { hex },
-          project -> {
-            _id,
-            _type,
-            _createdAt,
-            _updatedAt,
-            title,
-            slug,
-            mainImage {
-              ...,
-              asset->
-            },
-            thumbnailImage {
-              ...,
-              asset->
-            },
-            excerpt,
-            description,
-            client,
-            categories,
-            projectDate
-          }
-        }
-      },
-      about,
-      services
-    }`
-    // Try fetching without schema validation first
-    const rawData = await fetchSanityQuery({
-      query,
-    })
-
-    if (!rawData) {
-      return null
+// Define common fields to select for the homepage to ensure consistency
+const HOME_PAGE_FIELDS = `
+  _id,
+  _type,
+  _createdAt,
+  _updatedAt,
+  hero,
+  projects {
+    ...,
+    featuredProjects[] {
+      _key,
+      hoverColor { hex },
+      textHoverColor { hex },
+      project -> {
+        _id,
+        _type,
+        _createdAt,
+        _updatedAt,
+        title,
+        slug,
+        mainImage {
+          ...,
+          asset->
+        },
+        thumbnailImage {
+          ...,
+          asset->
+        },
+        excerpt,
+        description,
+        client,
+        categories,
+        projectDate
+      }
     }
-
-    // Now try with the schema validation
-    try {
-      const homePage = await fetchSanityQuery({
-        query,
-        schema: homePageSchema,
-      })
-      return homePage
-    } catch (error) {
-      console.error('Schema validation failed:', error)
-      return rawData as HomePage // Return the raw data as a fallback
-    }
-  } catch (error) {
-    console.error('Failed to fetch home page data:', error)
-    return null
-  }
-}
+  },
+  about,
+  services
+`
 
 /**
- * Fetches the homepage data with a specific locale's content prioritized
- * @param locale - The locale to prioritize (defaults to 'ca')
- * @returns The homepage data or null if not found
+ * Fetches the homepage data for a specific locale by targeting its unique document ID.
+ * @param locale - The locale to fetch ('ca', 'es', 'en'). Defaults to 'ca'.
+ * @returns The homepage data or null if not found or on error.
  */
 export async function fetchHomePageByLocale(
   locale: 'ca' | 'es' | 'en' = 'ca',
 ): Promise<HomePage | null> {
+  let documentId: string
+  switch (locale) {
+    case 'es':
+      documentId = 'homePage-es'
+      break
+    case 'en':
+      documentId = 'homePage-en'
+      break
+    case 'ca':
+    default:
+      documentId = 'homePage-ca' // Primary locale uses homePage-ca
+      break
+  }
+
+  const query = `*[_id == $documentId][0]{ ${HOME_PAGE_FIELDS} }`
+  const params = { documentId }
+
   try {
-    const homePage = await fetchHomePage()
-
-    if (!homePage) {
-      return null
-    }
-
-    // Here you could implement additional locale-specific processing if needed
-    // For now, we just return the raw data as the Zod schema already handles the structure
-
+    // Attempt to fetch and validate with Zod schema
+    const homePage = await fetchSanityQuery({
+      query,
+      params,
+      schema: homePageSchema,
+    })
     return homePage
   } catch (error) {
-    console.error(`Failed to fetch home page data for locale ${locale}:`, error)
-    return null
+    // Log schema validation failure and attempt to fetch raw data as a fallback
+    // This can be useful during development if schema and data are temporarily misaligned
+    console.warn(
+      `Schema validation failed for homepage (locale: ${locale}, id: ${documentId}). Attempting to fetch raw data. Error: ${error instanceof Error ? error.message : String(error)}`,
+    )
+    try {
+      const rawData = await fetchSanityQuery({
+        query,
+        params,
+      })
+      if (!rawData) {
+        console.error(
+          `Raw data fetch returned null for homepage (locale: ${locale}, id: ${documentId}) after schema validation failure.`,
+        )
+        return null
+      }
+      return rawData as HomePage // Cast to HomePage, acknowledging potential mismatch
+    } catch (rawDataError) {
+      console.error(
+        `Failed to fetch raw homepage data for locale ${locale} (id: ${documentId}) after schema validation failure:`,
+        rawDataError,
+      )
+      return null
+    }
   }
+}
+
+/**
+ * Fetches the primary (Catalan) homepage data from Sanity.
+ * This is an alias for fetchHomePageByLocale('ca').
+ * @returns The Catalan homepage data or null if not found.
+ */
+export async function fetchHomePage(): Promise<HomePage | null> {
+  return fetchHomePageByLocale('ca')
 }
