@@ -7,6 +7,8 @@ import {structure} from './deskStructure'
 import {colorInput} from '@sanity/color-input'
 import {documentInternationalization} from '@sanity/document-internationalization'
 import {SINGLETONS} from './constants/i18n'
+import {translationOrderSync} from './plugins/translationOrderSync'
+import {BulkDelete} from 'sanity-plugin-bulk-delete'
 
 // Restrict new-doc options and actions for singleton types
 const restrictDocs = definePlugin({
@@ -33,6 +35,8 @@ export default defineConfig({
   dataset: 'production',
 
   // Document options now handled by the restrictDocs plugin
+  
+
 
   plugins: [
     // Use the custom structure from deskStructure.ts
@@ -43,6 +47,12 @@ export default defineConfig({
     // Configure the media plugin
     media(),
     colorInput(),
+    // Sync translation ordering when documents are reordered
+    translationOrderSync(),
+    // Add bulk delete functionality with safety checks
+    BulkDelete({
+      schemaTypes: schemaTypes,
+    }),
     documentInternationalization({
       supportedLanguages: [
         // First language in the array will be the default one
@@ -51,7 +61,15 @@ export default defineConfig({
         {id: 'en', title: 'English'},
       ],
       // Explicitly list document types that should be internationalized
-      schemaTypes: ['project', 'homePage', 'header', 'projectsPage', 'aboutUsPage', 'contactPage'],
+      schemaTypes: [
+        'project', 
+        'serviceCategory', 
+        'homePage', 
+        'header', 
+        'projectsPage', 
+        'aboutUsPage', 
+        'contactPage'
+      ],
       // Field name that will store the language
       languageField: 'language',
     }),

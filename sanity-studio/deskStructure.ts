@@ -3,6 +3,7 @@
  */
 import { type StructureResolver, ListItemBuilder } from 'sanity/structure'
 import { LANGUAGES, SINGLETONS } from './constants/i18n'
+import { orderableDocumentListDeskItem } from '@sanity/orderable-document-list'
 
 // All singleton _types that HAVE translations
 const translatedSingletonTypes = SINGLETONS.map((s) => s._type)
@@ -24,7 +25,7 @@ const singletonIcon = (id: string) => {
   return () => map[id] ?? '📄'
 }
 
-export const structure: StructureResolver = (S) =>
+export const structure: StructureResolver = (S, context) =>
   S.list()
     .title('Content')
     .items([
@@ -57,9 +58,61 @@ export const structure: StructureResolver = (S) =>
       S.divider(),
 
       // ——————————— Regular Collections ———————————
+      // Projects with drag-and-drop ordering
+      S.listItem()
+        .title('Projects')
+        .icon(() => '🎨')
+        .child(
+          S.list()
+            .title('Projects')
+            .items([
+              // Orderable document list for drag-and-drop ordering
+              orderableDocumentListDeskItem({
+                type: 'project',
+                title: 'Projects',
+                S,
+                context,
+              }),
+              // Standard document list with search for finding projects
+              S.divider(),
+              S.listItem()
+                .title('Search Projects')
+                .icon(() => '🔍')
+                .child(
+                  S.documentTypeList('project')
+                    .title('Search Projects')
+                    .filter('_type == "project"')
+                )
+            ])
+        ),
+
+      // Service Categories organized by language
+      S.listItem()
+        .title('Service Categories')
+        .icon(() => '🏷️')
+        .child(
+          S.list()
+            .title('Service Categories')
+            .items([
+              // Create a separate list item for each language
+              ...LANGUAGES.map((lang) =>
+                S.listItem()
+                  .title(`${lang.title} Service Categories`)
+                  .icon(() => lang.id === 'ca' ? '🇪🇸' : lang.id === 'es' ? '🇪🇸' : '🇬🇧')
+                  .child(
+                    S.documentTypeList('serviceCategory')
+                      .title(`${lang.title} Service Categories`)
+                      .filter('_type == "serviceCategory" && language == $language')
+                      .params({ language: lang.id })
+                  )
+              ),
+            ])
+        ),
+        
+      // Other document types
       ...S.documentTypeListItems().filter((listItem: ListItemBuilder) => {
         const id = listItem.getId()
-        return id ? !excludeTypes.includes(id) : true
+        return id ? !excludeTypes.includes(id) && id !== 'project' && id !== 'serviceCategory' : true
       }),
 
       // Divider
