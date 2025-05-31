@@ -2,7 +2,9 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Header from '@/components/shared/header/Header.astro'
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
-import Projects from '@/components/pages/homepage/Projects.astro'
+import Projects, {
+  type ResolvedProjectsSectionData,
+} from '@/components/pages/homepage/Projects.astro'
 // import About from '@/components/pages/homepage/About.astro'
 // import about1 from '@/assets/pages/homepage/about-1.jpg'
 // import about2 from '@/assets/pages/homepage/about-2.jpg'
@@ -17,8 +19,6 @@ const { locale } = Astro.props
 // Page title for the head element
 const { homePageData } = Astro.props
 
-console.log('HOMEPAGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE:', homePageData)
-
 const pageTitle = 'Biombo - Art, Events, Community'
 ---
 
@@ -32,10 +32,10 @@ const pageTitle = 'Biombo - Art, Events, Community'
       </section> -->
 
       <section id="projects" class="projects">
-        {
-          /* Pass projects data and set showPlaceholders to false to avoid showing empty placeholders */
-        }
-        <Projects projectsData={homePageData?.projects} showPlaceholders={false} locale={locale} />
+        <Projects
+          projectsData={homePageData?.projects as ResolvedProjectsSectionData}
+          locale={locale}
+        />
       </section>
     </div>
 
