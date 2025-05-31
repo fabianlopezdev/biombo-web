@@ -31,6 +31,7 @@ if (typeof sanityDataset !== 'string') {
 
 // https://astro.build/config
 export default defineConfig({
+  site: env.ASTRO_SITE || 'http://localhost:4321', // Added to resolve Invalid URL with astro-i18n
   prefetch: true,
   integrations: [
     sanity({

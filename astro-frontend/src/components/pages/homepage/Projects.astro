@@ -272,6 +272,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
       text-align: center;
 
       .caption-text {
+        color: var(--hover-text-color);
         transform: translateY(50%);
         transition: transform 0.5s ease;
       }
@@ -287,12 +288,6 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
       .project-caption {
         opacity: 1;
         transform: scale(1);
-        /* Optionally, make caption background transparent if link's bg should show through */
-        /* background: transparent; */
-
-        .caption-text {
-          color: var(--hover-text-color);
-        }
       }
     }
   }
