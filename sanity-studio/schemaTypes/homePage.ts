@@ -1,4 +1,4 @@
-import { defineField, defineType } from 'sanity'
+import { defineField, defineType, ReferenceFilterResolverContext } from 'sanity'
 // No longer need baseLanguage import with document-level internationalization
 
 // Schema for the Hero section
@@ -80,6 +80,18 @@ export const projectsSection = defineType({
           to: [{type: 'project'}],
           options: {
             disableNew: false,
+            filter: ({ document }: ReferenceFilterResolverContext) => {
+              // Get the language from the document
+              const language = document?.language
+              
+              // Filter projects by matching language
+              return {
+                filter: 'language == $language',
+                params: { language },
+                apiVersion: 'v2023-01-01'
+              }
+            },
+            noResultsText: 'No projects available for this language'
           },
         },
       ],
