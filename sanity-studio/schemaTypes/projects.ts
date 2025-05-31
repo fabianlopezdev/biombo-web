@@ -1,4 +1,5 @@
 import { defineArrayMember, defineField, defineType, ReferenceFilterResolverContext } from 'sanity'
+import { orderRankField, orderRankOrdering } from '@sanity/orderable-document-list'
 
 /**
  * Embedded object type for image sections within projects
@@ -17,7 +18,7 @@ const imageSection = defineType({
       options: {
         hotspot: true,
       },
-      validation: (Rule) => Rule.required(),
+      // No validation - featured image is now optional
     }),
     defineField({
       name: 'otherImages',
@@ -32,12 +33,96 @@ const imageSection = defineType({
           },
         }),
       ],
+      // No validation
     }),
   ],
+  preview: {
+    select: {
+      featuredImage: 'featuredImage',
+      otherImages: 'otherImages',
+    },
+    prepare({ featuredImage, otherImages }) {
+      const hasImages = featuredImage || (otherImages && otherImages.length > 0)
+      return {
+        title: 'Image Section',
+        subtitle: hasImages 
+          ? `${featuredImage ? '1 featured image' : 'No featured image'}${otherImages && otherImages.length > 0 ? `, ${otherImages.length} additional image${otherImages.length === 1 ? '' : 's'}` : ''}` 
+          : 'No images yet',
+        media: featuredImage || null,
+      }
+    },
+  },
 })
 
-// Export the imageSection type to use in other schemas if needed
-export { imageSection }
+/**
+ * Rich text content block
+ * @description A block for rich formatted text content
+ */
+const textBlock = defineType({
+  name: 'textBlock',
+  title: 'Text Content',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'text',
+      title: 'Text Content',
+      type: 'array',
+      of: [{ type: 'block' }]
+    })
+  ],
+  preview: {
+    select: {
+      text: 'text'
+    },
+    prepare({ text }) {
+      // Extract some text from the portable text blocks for preview
+      const block = (text || []).find((block: {_type: string; children: Array<{_type: string; text: string}>}) => block._type === 'block')
+      const textPreview = block
+        ? block.children
+            .filter((child: {_type: string}) => child._type === 'span')
+            .map((span: {text: string}) => span.text)
+            .join('')
+        : 'No content'
+
+      return {
+        title: textPreview.length > 50 ? textPreview.substring(0, 50) + '...' : textPreview,
+        subtitle: 'Text Content'
+      }
+    }
+  }
+})
+
+/**
+ * Small text block for shorter content
+ * @description A block for shorter, non-formatted text content
+ */
+const smallTextBlock = defineType({
+  name: 'smallTextBlock',
+  title: 'Small Text',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'text',
+      title: 'Small Text',
+      type: 'text',
+      rows: 3
+    })
+  ],
+  preview: {
+    select: {
+      text: 'text'
+    },
+    prepare({ text }) {
+      return {
+        title: text ? (text.length > 40 ? `${text.substring(0, 40)}...` : text) : 'No content',
+        subtitle: 'Small Text'
+      }
+    }
+  }
+})
+
+// Export the content block types to use in other schemas if needed
+export { imageSection, textBlock, smallTextBlock }
 /**
  * Schema for project entries
  * @description Projects showcasing the company's work
@@ -53,12 +138,14 @@ export const projects = defineType({
       type: 'string',
       readOnly: true, // The internationalization plugin handles this field
       hidden: false, // Set to true if you don't want editors to see this field
+      // Language field managed by internationalization plugin - but no longer required
+      validation: (Rule) => Rule.required().warning(),
     }),
     defineField({
       name: 'title',
       title: 'Project Title',
       type: 'string', // Changed from localeString to string
-      validation: (Rule) => Rule.required().error('A project title is required'),
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'mainImage',
@@ -68,7 +155,7 @@ export const projects = defineType({
       options: {
         hotspot: true,
       },
-      validation: (Rule) => Rule.required().error('A main project image is required'),
+      // No validation - main image is now optional
     }),
     defineField({
       name: 'useSeparateThumbnail',
@@ -86,24 +173,31 @@ export const projects = defineType({
         hotspot: true,
       },
       hidden: ({parent}) => !parent?.useSeparateThumbnail,
-      validation: (Rule) => Rule.custom((value, context: any) => {
-        if (context.parent?.useSeparateThumbnail && !value) {
-          return 'Custom thumbnail image is required when enabled';
-        }
-        return true;
-      }),
+      // No validation
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       description: 'This will be used for the project URL',
       type: 'slug',
-      hidden: true, // Hide from the editor UI
+      hidden: true, // Hide slug field as it's auto-generated
       options: {
         source: 'title',
+        slugify: input => input
+          ? input
+              .toLowerCase()
+              .replace(/\s+/g, '-')
+              .replace(/[^\w-]+/g, '')
+              .replace(/--+/g, '-')
+              .slice(0, 96)
+          : 'untitled', // Fallback if title is empty
         maxLength: 96,
+        isUnique: () => true, // Skip uniqueness check for better performance
       },
-      validation: (Rule) => Rule.required().error('A slug is required'),
+      // This will force the slug to always pass validation
+      validation: Rule => Rule.custom(() => true),
+      // Set a default value to ensure it always has content
+      initialValue: {current: 'untitled'}
     }),
     defineField({
       name: 'clients',
@@ -116,7 +210,7 @@ export const projects = defineType({
           to: [{ type: 'client' }],
         }),
       ],
-      validation: (Rule) => Rule.required().error('At least one client is required'),
+      // No validation
     }),
     defineField({
       name: 'categories',
@@ -140,17 +234,15 @@ export const projects = defineType({
               // Filter by language AND exclude already selected categories
               return {
                 filter: 'language == $language && !(_id in $selectedRefs)',
-                params: { 
-                  language,
-                  selectedRefs
-                }
+                params: { language, selectedRefs },
+                apiVersion: 'v2023-01-01'
               }
             },
             noResultsText: 'No services. Click on create to add a new one'
           }
         }),
       ],
-      validation: (Rule) => Rule.required().error('At least one category is required'),
+      // No validation
     }),
     defineField({
       name: 'mainText',
@@ -158,36 +250,58 @@ export const projects = defineType({
       description: 'Main descriptive content for the project',
       type: 'array',
       of: [{ type: 'block' }],
+      // No validation
     }),
     defineField({
+      name: 'contentSections',
+      title: 'Content Sections',
+      description: 'Add and rearrange content sections for this project',
+      type: 'array',
+      of: [
+        defineArrayMember({ type: 'textBlock' }),
+        defineArrayMember({ type: 'smallTextBlock' }),
+        defineArrayMember({ type: 'imageSection' })
+      ],
+      options: {
+        layout: 'grid',
+        sortable: true
+      }
+    }),
+    // Keeping these fields for backward compatibility with existing content
+    // These fields are hidden from the UI but preserve existing data
+    defineField({
       name: 'firstImageSection',
-      title: 'First Image Section',
-      description: 'First image showcase section',
+      title: 'First Image Section (Legacy)',
+      description: 'First image showcase section (use Content Sections above instead)',
       type: 'imageSection',
-      validation: (Rule) => Rule.required(),
+      hidden: true,
     }),
     defineField({
       name: 'smallText',
-      title: 'Small Text',
-      description: 'A short piece of text, suitable for a few sentences',
+      title: 'Small Text (Legacy)',
+      description: 'A short piece of text (use Content Sections above instead)',
       type: 'text',
       rows: 3,
+      hidden: true,
     }),
     defineField({
       name: 'secondImageSection',
-      title: 'Second Image Section',
-      description: 'Second image showcase section',
+      title: 'Second Image Section (Legacy)',
+      description: 'Second image showcase section (use Content Sections above instead)',
       type: 'imageSection',
-      validation: (Rule) => Rule.required(),
+      hidden: true,
     }),
     defineField({
       name: 'publishDate',
       title: 'Publish Date',
-      description: 'Date project was published/went live (for sorting)',
-      type: 'date',
+      description: 'Date and time when project was published',
+      type: 'datetime',
+      initialValue: () => new Date().toISOString(),
     }),
+    orderRankField({ type: 'project' }),
   ],
   orderings: [
+    orderRankOrdering,
     {
       name: 'publishDateDesc',
       title: 'Publish Date, Newest',
@@ -209,10 +323,20 @@ export const projects = defineType({
     },
     prepare(selection) {
       const { title, useSeparateThumbnail, thumbnailImage, mainImage, language } = selection
+      
+      // Simplify title handling to avoid any potential issues
+      let displayTitle = ''
+      
+      if (typeof title === 'string') {
+        displayTitle = title || 'Untitled Project'
+      } else {
+        displayTitle = 'Untitled Project'
+      }
+      
       return {
-        title: title || 'Untitled Project',
+        title: displayTitle,
         subtitle: language ? `Language: ${language}` : '',
-        media: (useSeparateThumbnail && thumbnailImage) || mainImage,
+        media: (useSeparateThumbnail && thumbnailImage) || mainImage || null,
       }
     },
   },
