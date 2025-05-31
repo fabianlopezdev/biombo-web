@@ -1,5 +1,6 @@
 // src/shared/schemas/sanity/homePageSchema.ts
 import { z } from 'zod'
+import { projectSchema } from './projectSchema'
 
 // Define Zod schema for localized strings (consistent with pageSchema)
 const localeStringSchema = z
@@ -29,7 +30,8 @@ const projectsSectionSchema = z.object({
   subtitle: localeStringSchema.optional(),
   viewAllText: localeStringSchema.optional(),
   viewProjectText: localeStringSchema.optional(),
-  featuredProjects: z.array(z.any()).optional(), // References to project documents
+  // Properly reference the projectSchema for featured projects
+  featuredProjects: z.array(projectSchema).optional(), // References to project documents
 })
 
 // Define Zod schema for About Section (placeholder for now)
@@ -52,10 +54,10 @@ export const homePageSchema = z.object({
   _type: z.literal('homePage'),
   _createdAt: z.string(),
   _updatedAt: z.string(),
-  hero: heroSectionSchema,
-  projects: projectsSectionSchema.optional(),
-  about: aboutSectionSchema.optional(),
-  services: servicesSectionSchema.optional(),
+  hero: heroSectionSchema.nullable(), // Allow null when not yet populated
+  projects: projectsSectionSchema.nullable().optional(), // Allow null or undefined
+  about: aboutSectionSchema.nullable().optional(), // Allow null or undefined
+  services: servicesSectionSchema.nullable().optional(), // Allow null or undefined
 })
 
 // Export the TypeScript types derived from the Zod schemas
@@ -66,7 +68,17 @@ export type HeroSection = z.infer<typeof heroSectionSchema>
 export type ProjectsSection = z.infer<typeof projectsSectionSchema>
 export type AboutSection = z.infer<typeof aboutSectionSchema>
 export type ServicesSection = z.infer<typeof servicesSectionSchema>
-export type HomePage = z.infer<typeof homePageSchema>
+
+// Define HomePage type to properly handle nullable fields
+export type HomePage = Omit<
+  z.infer<typeof homePageSchema>,
+  'hero' | 'projects' | 'about' | 'services'
+> & {
+  hero: HeroSection | null
+  projects?: ProjectsSection | null
+  about?: AboutSection | null
+  services?: ServicesSection | null
+}
 
 // Schema for an array of home pages (likely won't be needed, but included for consistency)
 export const homePagesSchema = z.array(homePageSchema)

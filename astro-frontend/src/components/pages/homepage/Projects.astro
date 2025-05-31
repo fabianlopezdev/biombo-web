@@ -15,11 +15,22 @@ interface Props {
 const { projectsData, locale = (Astro.currentLocale as 'ca' | 'es' | 'en') || 'ca' } = Astro.props
 const currentLang = locale
 
+console.log('PROJEEEEEEEEEEEEEEEEEEEEEEETS', projectsData)
 const title = projectsData?.title?.[currentLang] || ''
 const subtitle = projectsData?.subtitle?.[currentLang] || ''
 const viewProjectTextVal = projectsData?.viewProjectText?.[currentLang] || ''
 const viewAllTextVal = projectsData?.viewAllText?.[currentLang] || ''
 const featuredProjects = (projectsData?.featuredProjects as Project[]) || []
+console.log(`DEBUG: Number of featuredProjects: ${featuredProjects.length}`)
+
+// Log each project's structure for debugging
+featuredProjects.forEach((project, idx) => {
+  console.log(`DEBUG: Project ${idx} - ID: ${project._id}`)
+  console.log(`  Title:`, project.title)
+  console.log(`  Slug:`, project.slug)
+  console.log(`  Main Image:`, project.mainImage?.asset?._ref)
+  console.log(`  Thumbnail Image:`, project.thumbnailImage?.asset?._ref)
+})
 ---
 
 <script>
@@ -67,9 +78,23 @@ const featuredProjects = (projectsData?.featuredProjects as Project[]) || []
 
   {
     [...Array(6)].map((_, i) => {
+      // Debug log before transformation
+      if (featuredProjects[i]) {
+        console.log(`DEBUG: About to transform project at position ${i}:`, featuredProjects[i]._id)
+      }
+
       const project = featuredProjects[i]
         ? transformProject(featuredProjects[i], i, currentLang, viewProjectTextVal)
         : transformProject(null, i, currentLang, viewProjectTextVal)
+
+      // Debug log after transformation
+      console.log(`DEBUG: Transformed project ${i}:`, {
+        _id: project._id,
+        title: project.title,
+        slug: project.slug,
+        hasImage: !!project.image,
+        imageUrl: project.image,
+      })
 
       // Add a class for odd/even styling if needed, or handle directly in CSS
       const projectNumber = i + 1

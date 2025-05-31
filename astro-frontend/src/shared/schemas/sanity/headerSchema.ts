@@ -13,6 +13,9 @@ const pageReferenceSchema = z
     // Include referenced page data that will be expanded by GROQ
     title: z.string().nullable().optional(), // Allow null or undefined
     _key: z.string().nullable().optional(), // Allow null or undefined
+    // Additional fields that might be expanded from references
+    slug: z.object({ current: z.string() }).nullable().optional(), // Allow null or undefined
+    language: z.string().nullable().optional(), // Allow null or undefined for language
   })
   .passthrough() // Allow additional fields for debugging
 
@@ -26,6 +29,9 @@ const navigationPageSchema = z.object({
   isExternal: z.boolean().optional().default(false),
   // External URL for external links
   externalUrl: z.string().url().optional().nullable(),
+  // Additional fields for ordering and visibility
+  order: z.number().optional(),
+  visible: z.boolean().optional().default(true),
 })
 
 // Define the header schema matching the updated Sanity i18n schema

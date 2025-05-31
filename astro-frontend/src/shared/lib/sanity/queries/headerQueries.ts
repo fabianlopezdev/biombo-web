@@ -12,11 +12,12 @@ export async function fetchHeader(locale: string = 'ca'): Promise<Header | null>
     // Fetch the header document with the matching language
     const query = `*[_type == "header" && language == $language][0]{
       ...,
-      "navigationPages": navigationPages[]{
+      "navigationPages": navigationPages[] | order(order asc) {
         ...,
         pageReference->{
           _type,
           title,
+          slug,
           language
         }
       }
@@ -34,11 +35,12 @@ export async function fetchHeader(locale: string = 'ca'): Promise<Header | null>
       console.log(`No header found for language '${locale}', trying to fall back to Catalan`)
       const fallbackQuery = `*[_type == "header" && language == "ca"][0]{
         ...,
-        "navigationPages": navigationPages[]{
+        "navigationPages": navigationPages[] | order(order asc) {
           ...,
           pageReference->{
             _type,
             title,
+            slug,
             language
           }
         }
@@ -55,11 +57,12 @@ export async function fetchHeader(locale: string = 'ca'): Promise<Header | null>
       console.log('No header found for any specified language, trying to find any header document')
       const lastResortQuery = `*[_type == "header"][0]{
         ...,
-        "navigationPages": navigationPages[]{
+        "navigationPages": navigationPages[] | order(order asc) {
           ...,
           pageReference->{
             _type,
             title,
+            slug,
             language
           }
         }

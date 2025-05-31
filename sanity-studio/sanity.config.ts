@@ -33,6 +33,7 @@ export default defineConfig({
 
   projectId: '08xgag7z',
   dataset: 'production',
+  apiVersion: 'v2023-01-01', // Add consistent API version for all queries
 
   // Document options now handled by the restrictDocs plugin
   
