@@ -12,17 +12,17 @@ import { Image } from 'astro:assets'
 import type { ImageMetadata } from 'astro:assets'
 
 interface Props {
-  title?:  string
-  copy?:   string
+  title?: string
+  copy?: string
   images?: ImageMetadata[]
 }
 
 const {
   title = `Més de 10 anys d'experiència`,
-  copy  = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+  copy = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
            Duis elementum quam lorem, nec imperdiet erat volutpat maximus. 
            Donec sed tempor sem. Pellentesque non dapibus urna. Nam ut ullamcorper odio.`,
-  images = []
+  images = [],
 } = Astro.props
 ---
 
@@ -30,22 +30,24 @@ const {
   <!-- ─── Text column ────────────────────────────────────────── -->
   <div class="about__text">
     <h2 class="about__title">{title.toUpperCase()}</h2>
-    <p  class="about__copy">{copy}</p>
+    <p class="about__copy">{copy}</p>
   </div>
 
   <!-- ─── Gallery + progress bar ─────────────────────────────── -->
   <div class="about__gallery">
     <div class="slider" data-slider>
-      {images.map(img => (
-        <Image
-          src={img}
-          alt={img.alt ?? ''}
-          class="slider__img"
-          width={600}
-          height={800}
-          loading="lazy"
-        />
-      ))}
+      {
+        images.map((img) => (
+          <Image
+            src={img}
+            alt={img.alt ?? ''}
+            class="slider__img"
+            width={600}
+            height={800}
+            loading="lazy"
+          />
+        ))
+      }
     </div>
 
     <progress
@@ -59,21 +61,21 @@ const {
 <!-- ─── Behaviour ─────────────────────────────────────────────── -->
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
-    const slider   = document.querySelector('[data-slider]')
+    const slider = document.querySelector('[data-slider]')
     const progress = document.querySelector('.slider__progress')
 
     if (!slider || !progress) return
 
-    function updateProgress () {
+    function updateProgress() {
       const max = slider.scrollWidth - slider.clientWidth
       const pct = max ? (slider.scrollLeft / max) * 100 : 0
-      progress.style.setProperty('--p', pct + '%')      // drives the CSS fill
-      progress.value = pct                               // keeps native semantics
+      progress.style.setProperty('--p', pct + '%') // drives the CSS fill
+      progress.value = pct // keeps native semantics
     }
 
-    slider .addEventListener('scroll',  updateProgress)
-    window .addEventListener('resize',  updateProgress)
-    window .addEventListener('load',    updateProgress)  // initial paint
+    slider.addEventListener('scroll', updateProgress)
+    window.addEventListener('resize', updateProgress)
+    window.addEventListener('load', updateProgress) // initial paint
   })
 </script>
 
@@ -121,7 +123,8 @@ const {
   }
 
   /* Trailing spacer so the last slide can snap flush left */
-  .slider::after {                              /* NEW */
+  .slider::after {
+    /* NEW */
     content: '';
     flex: 0 0 calc(100% - var(--slider-space)); /* fills out to container width */
   }
@@ -129,36 +132,39 @@ const {
   .slider__img {
     flex: 0 0 auto;
     width: 29.455625rem;
-    height: 39.81625rem;                        /* explicit height keeps ratio */
+    height: 39.81625rem; /* explicit height keeps ratio */
     object-fit: cover;
     border-radius: 0.621875rem;
     scroll-snap-align: start;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .slider { scroll-behavior: smooth; }
+    .slider {
+      scroll-behavior: smooth;
+    }
   }
 
   /* ---------- Progress bar -------------------------------------------- */
   .slider__progress {
-    --p: 0%;                        /* filled amount, set by JS */
+    --p: 0%; /* filled amount, set by JS */
     inline-size: 47.625rem;
     block-size: 1.6875rem;
-    appearance: none;               /* remove native look */
+    appearance: none; /* remove native look */
     border: 1px solid var(--color-primary);
     border-radius: 9999px;
     background-color: var(--color-primary-a10);
     position: relative;
-    overflow: hidden;               /* clip the fill */
+    overflow: hidden; /* clip the fill */
   }
 
-  .slider__progress::before {       /* the actual “fill” */
+  .slider__progress::before {
+    /* the actual “fill” */
     content: '';
     position: absolute;
     inset: 0;
     width: var(--p);
     background: var(--color-primary);
     border-radius: inherit;
-    transition: width .15s ease-out;
+    transition: width 0.15s ease-out;
   }
 </style>

@@ -4,8 +4,8 @@ import sanity from '@sanity/astro'
 import { loadEnv } from 'vite'
 
 // Load environment variables using Vite's loadEnv
-const mode = import.meta.env.MODE || process.env.NODE_ENV || 'development';
-const env = loadEnv(mode, process.cwd(), ''); // Load all env vars, '' for all prefixes
+const mode = import.meta.env.MODE || process.env.NODE_ENV || 'development'
+const env = loadEnv(mode, process.cwd(), '') // Load all env vars, '' for all prefixes
 
 // --- START Sanity Environment Variable Validation ---
 const sanityProjectId = env.PUBLIC_SANITY_PROJECT_ID
@@ -14,24 +14,18 @@ const sanityApiVersion = env.PUBLIC_SANITY_API_VERSION || 'v2024-05-01' // Defau
 
 if (!sanityProjectId) {
   throw new Error(
-    'Missing Sanity Project ID. Please set PUBLIC_SANITY_PROJECT_ID in your .env file.'
+    'Missing Sanity Project ID. Please set PUBLIC_SANITY_PROJECT_ID in your .env file.',
   )
 }
 if (typeof sanityProjectId !== 'string') {
-  throw new Error(
-    'Invalid Sanity Project ID. PUBLIC_SANITY_PROJECT_ID must be a string.'
-  )
+  throw new Error('Invalid Sanity Project ID. PUBLIC_SANITY_PROJECT_ID must be a string.')
 }
 
 if (!sanityDataset) {
-  throw new Error(
-    'Missing Sanity Dataset. Please set PUBLIC_SANITY_DATASET in your .env file.'
-  )
+  throw new Error('Missing Sanity Dataset. Please set PUBLIC_SANITY_DATASET in your .env file.')
 }
 if (typeof sanityDataset !== 'string') {
-  throw new Error(
-    'Invalid Sanity Dataset. PUBLIC_SANITY_DATASET must be a string.'
-  )
+  throw new Error('Invalid Sanity Dataset. PUBLIC_SANITY_DATASET must be a string.')
 }
 // --- END Sanity Environment Variable Validation ---
 

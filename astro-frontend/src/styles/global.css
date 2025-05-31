@@ -163,7 +163,7 @@ button {
 }
 
 figure {
- margin: 0; 
+  margin: 0;
 }
 
 /* Visually hide content but keep it accessible to screen readers */
@@ -204,7 +204,6 @@ figure {
   inset-inline-start: 0;
   transform: translateY(100%);
 }
-
 
 .bottom-left {
   position: absolute;

@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { transformProject } from '@/utils/pages/homepage/projectsUtils'
-import type { Project } from '@/shared/schemas/sanity/projectSchema'
+import type { FeaturedProjectItem } from '@/shared/schemas/sanity/homePageSchema'
+import type { Project } from '@/shared/schemas/sanity/projectSchema' // For typing the nested project in mock data
 
-describe('Projects component utils', () => {
+describe('transformProject utility', () => {
   it('should transform project data correctly with mainImage only', () => {
     const mockProject: Project = {
       _id: 'test-project',
@@ -27,7 +28,14 @@ describe('Projects component utils', () => {
       },
     }
 
-    const result = transformProject(mockProject, 0, 'ca', 'View Project')
+    const mockFeaturedItem: FeaturedProjectItem = {
+      _key: 'key1',
+      project: mockProject,
+      hoverColor: { hex: '#112233' },
+      textHoverColor: { hex: '#AABBCC' },
+    }
+
+    const result = transformProject(mockFeaturedItem, 0, 'ca', 'View Project')
 
     expect(result).toEqual({
       _id: 'test-project',
@@ -37,6 +45,8 @@ describe('Projects component utils', () => {
       alt: 'Test Alt',
       title: 'Test Project',
       viewProjectText: 'View Project',
+      hoverColor: '#112233',
+      textHoverColor: '#AABBCC',
     })
   })
 
@@ -50,6 +60,8 @@ describe('Projects component utils', () => {
       alt: '',
       title: '',
       viewProjectText: 'View Project',
+      hoverColor: undefined,
+      textHoverColor: undefined,
     })
   })
 
@@ -69,7 +81,7 @@ describe('Projects component utils', () => {
         asset: {
           _id: 'image-main-123-id',
           _type: 'sanity.imageAsset',
-          url: 'https://test-image.url/main', // Differentiating URL slightly for clarity, though test expects the general mock URL
+          url: 'https://test-image.url/main',
         },
         alt: { ca: 'Main Image Alt' },
       },
@@ -78,23 +90,31 @@ describe('Projects component utils', () => {
         asset: {
           _id: 'image-thumb-123-id',
           _type: 'sanity.imageAsset',
-          url: 'https://test-image.url', // This URL will be preferred by transformProject
+          url: 'https://test-image.url',
         },
         alt: { ca: 'Thumbnail Alt' },
       },
     }
 
-    const result = transformProject(mockProject, 2, 'ca', 'View Project')
+    const mockFeaturedItem: FeaturedProjectItem = {
+      _key: 'key2',
+      project: mockProject,
+      hoverColor: { hex: '#445566' },
+      textHoverColor: { hex: '#DDEEFF' },
+    }
 
-    // Should use thumbnailImage and its alt text
+    const result = transformProject(mockFeaturedItem, 2, 'ca', 'View Project')
+
     expect(result).toEqual({
       _id: 'test-project-2',
       index: 2,
       slug: 'test-project-2',
-      image: 'https://test-image.url', // Our mocked URL (same for all images)
+      image: 'https://test-image.url',
       alt: 'Thumbnail Alt',
       title: 'Test Project 2',
       viewProjectText: 'View Project',
+      hoverColor: '#445566',
+      textHoverColor: '#DDEEFF',
     })
   })
 
@@ -118,20 +138,27 @@ describe('Projects component utils', () => {
         },
         alt: { ca: 'Main Image Alt' },
       },
-      // No thumbnailImage provided
     }
 
-    const result = transformProject(mockProject, 3, 'ca', 'View Project')
+    const mockFeaturedItem: FeaturedProjectItem = {
+      _key: 'key3',
+      project: mockProject,
+      hoverColor: { hex: '#778899' },
+      textHoverColor: { hex: '#001122' },
+    }
 
-    // Should use mainImage and its alt text
+    const result = transformProject(mockFeaturedItem, 3, 'ca', 'View Project')
+
     expect(result).toEqual({
       _id: 'test-project-3',
       index: 3,
       slug: 'test-project-3',
-      image: 'https://test-image.url', // Our mocked URL
+      image: 'https://test-image.url',
       alt: 'Main Image Alt',
       title: 'Test Project 3',
       viewProjectText: 'View Project',
+      hoverColor: '#778899',
+      textHoverColor: '#001122',
     })
   })
 })

@@ -17,26 +17,31 @@ export async function fetchHomePage(): Promise<HomePage | null> {
       hero,
       projects {
         ...,
-        featuredProjects[] -> {
-          _id,
-          _type,
-          _createdAt,
-          _updatedAt,
-          title,
-          slug,
-          mainImage {
-            ...,
-            asset->
-          },
-          thumbnailImage {
-            ...,
-            asset->
-          },
-          excerpt,
-          description,
-          client,
-          categories,
-          projectDate
+        featuredProjects[] {
+          _key,
+          hoverColor { hex },
+          textHoverColor { hex },
+          project -> {
+            _id,
+            _type,
+            _createdAt,
+            _updatedAt,
+            title,
+            slug,
+            mainImage {
+              ...,
+              asset->
+            },
+            thumbnailImage {
+              ...,
+              asset->
+            },
+            excerpt,
+            description,
+            client,
+            categories,
+            projectDate
+          }
         }
       },
       about,

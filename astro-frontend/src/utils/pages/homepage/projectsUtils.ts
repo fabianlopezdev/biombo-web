@@ -1,4 +1,4 @@
-import type { Project } from '@/shared/schemas/sanity/projectSchema'
+import type { FeaturedProjectItem } from '@/shared/schemas/sanity/homePageSchema'
 
 /**
  * Type definition for a localized slug in Sanity
@@ -21,6 +21,8 @@ export interface TransformedProject {
   alt?: string
   title: string
   viewProjectText: string
+  hoverColor?: string
+  textHoverColor?: string
 }
 
 /**
@@ -32,37 +34,44 @@ export interface TransformedProject {
  * @returns Transformed project data ready for UI rendering
  */
 export function transformProject(
-  project: Project | null,
+  featuredItem: FeaturedProjectItem | null,
   index: number,
   currentLang: string,
   viewProjectTextValue: string,
 ): TransformedProject {
-  // If we don't have a project (or not enough projects), use placeholder data
-  if (!project) {
+  // If we don't have a featured item (or not enough projects), use placeholder data
+  if (!featuredItem || !featuredItem.project) {
     console.log(`Creating placeholder for project at index ${index}`)
     return {
       index,
       slug: ``, // Simple string slug for placeholders
       image: '',
       alt: ``,
-      title: ``,
+      title: ``, // No title for placeholder
       viewProjectText: viewProjectTextValue || 'View project',
+      hoverColor: undefined, // No specific hover color for placeholder
+      textHoverColor: undefined, // No specific text hover color for placeholder
     }
   }
 
-  console.log(`Processing project at index ${index}:`, project._id)
+  const projectDoc = featuredItem.project // Extract the actual project document
+
+  console.log(`Processing project at index ${index}:`, projectDoc._id)
 
   // Enhanced debugging for key project fields
-  console.log(`DEBUG data structure - Project ${index} with ID: ${project._id}:`)
+  console.log(`DEBUG data structure - Project ${index} with ID: ${projectDoc._id}:`)
   console.log(
     `  Title:`,
-    typeof project.title === 'string' ? project.title : JSON.stringify(project.title),
+    typeof projectDoc.title === 'string' ? projectDoc.title : JSON.stringify(projectDoc.title),
   )
-  console.log(`  Slug:`, project.slug ? JSON.stringify(project.slug) : 'undefined')
-  console.log(`  MainImage:`, project.mainImage ? JSON.stringify(project.mainImage) : 'undefined')
+  console.log(`  Slug:`, projectDoc.slug ? JSON.stringify(projectDoc.slug) : 'undefined')
+  console.log(
+    `  MainImage:`,
+    projectDoc.mainImage ? JSON.stringify(projectDoc.mainImage) : 'undefined',
+  )
   console.log(
     `  ThumbnailImage:`,
-    project.thumbnailImage ? JSON.stringify(project.thumbnailImage) : 'undefined',
+    projectDoc.thumbnailImage ? JSON.stringify(projectDoc.thumbnailImage) : 'undefined',
   )
 
   // CRITICAL FIX: Extract image URL directly from asset.url if available
@@ -70,23 +79,23 @@ export function transformProject(
   let mainImageUrl: string | undefined
   let chosenImageSource: 'thumbnail' | 'main' | undefined
 
-  if (project.thumbnailImage?.asset?.url) {
-    thumbnailUrl = project.thumbnailImage.asset.url
+  if (projectDoc.thumbnailImage?.asset?.url) {
+    thumbnailUrl = projectDoc.thumbnailImage.asset.url
     console.log(`DEBUG: Found thumbnailUrl for project ${index}: ${thumbnailUrl}`)
   } else {
     console.log(
       `DEBUG: thumbnailUrl not found or asset.url missing for project ${index}. ThumbnailData:`,
-      project.thumbnailImage,
+      projectDoc.thumbnailImage,
     )
   }
 
-  if (project.mainImage?.asset?.url) {
-    mainImageUrl = project.mainImage.asset.url
+  if (projectDoc.mainImage?.asset?.url) {
+    mainImageUrl = projectDoc.mainImage.asset.url
     console.log(`DEBUG: Found mainImageUrl for project ${index}: ${mainImageUrl}`)
   } else {
     console.log(
       `DEBUG: mainImageUrl not found or asset.url missing for project ${index}. MainImageData:`,
-      project.mainImage,
+      projectDoc.mainImage,
     )
   }
 
@@ -106,13 +115,13 @@ export function transformProject(
   // For alt text, handle both localized and direct string values, prioritizing the chosen image source
   let imageAltText: Record<string, string> | string | undefined
 
-  if (chosenImageSource === 'thumbnail' && project.thumbnailImage?.alt) {
-    imageAltText = project.thumbnailImage.alt
-  } else if (chosenImageSource === 'main' && project.mainImage?.alt) {
-    imageAltText = project.mainImage.alt
-  } else if (project.mainImage?.alt) {
+  if (chosenImageSource === 'thumbnail' && projectDoc.thumbnailImage?.alt) {
+    imageAltText = projectDoc.thumbnailImage.alt
+  } else if (chosenImageSource === 'main' && projectDoc.mainImage?.alt) {
+    imageAltText = projectDoc.mainImage.alt
+  } else if (projectDoc.mainImage?.alt) {
     // Fallback to mainImage alt if thumbnail alt is missing but thumbnail URL was used
-    imageAltText = project.mainImage.alt
+    imageAltText = projectDoc.mainImage.alt
   }
 
   // ENHANCE: Handle both localized and direct string values for alt text and title
@@ -128,7 +137,7 @@ export function transformProject(
   // ENHANCE: Handle both localized slug and simple slug structures
   const getSlug = (): string => {
     try {
-      if (!project.slug) {
+      if (!projectDoc.slug) {
         console.warn(
           `WARN: Slug is undefined for project ${index}, falling back to project-${index}`,
         )
@@ -136,22 +145,22 @@ export function transformProject(
       }
 
       // Case 1: Direct slug with current property (simple structure from logs)
-      if (typeof project.slug === 'object' && 'current' in project.slug) {
-        const simpleSlug = project.slug as { current?: string }
+      if (typeof projectDoc.slug === 'object' && 'current' in projectDoc.slug) {
+        const simpleSlug = projectDoc.slug as { current?: string }
         if (!simpleSlug.current) {
           console.warn(
             `WARN: simpleSlug.current is undefined for project ${index}, slug data:`,
-            project.slug,
+            projectDoc.slug,
           )
         }
         return simpleSlug.current || `project-${index}`
       }
 
       // Case 2: Localized slug structure as defined in our schema
-      if (typeof project.slug === 'object' && '_type' in project.slug) {
-        const typeField = project.slug as { _type?: string }
+      if (typeof projectDoc.slug === 'object' && '_type' in projectDoc.slug) {
+        const typeField = projectDoc.slug as { _type?: string }
         if (typeField._type === 'localeSlug') {
-          const slugObj = project.slug as LocaleSlug
+          const slugObj = projectDoc.slug as LocaleSlug
           const langSlug =
             currentLang === 'ca'
               ? slugObj.ca
@@ -167,21 +176,21 @@ export function transformProject(
           if (slugObj.en?.current) return slugObj.en.current
           console.warn(
             `WARN: No valid slug found in LocaleSlug for project ${index}, slug data:`,
-            project.slug,
+            projectDoc.slug,
           )
         }
       }
 
       console.warn(
         `WARN: Unrecognized slug structure for project ${index}, falling back. Slug data:`,
-        project.slug,
+        projectDoc.slug,
       )
       return `project-${index}`
     } catch (error) {
       console.error(
         `Error getting slug for project ${index}:`,
         error instanceof Error ? error.message : String(error),
-        project.slug,
+        projectDoc.slug,
       )
       return `project-${index}`
     }
@@ -200,8 +209,9 @@ export function transformProject(
 
   // Extract title based on its actual structure
   const getTitle = (): string => {
-    if (typeof project.title === 'string') return project.title
-    return getLocalizedValue(project.title)
+    if (!projectDoc.title) return '' // Handle cases where title might be undefined
+    if (typeof projectDoc.title === 'string') return projectDoc.title
+    return getLocalizedValue(projectDoc.title)
   }
 
   // Create the transformed project with detailed logging
@@ -210,14 +220,16 @@ export function transformProject(
   const image = getImage()
   const alt = imageAltText ? getLocalizedValue(imageAltText) : title // Use title as fallback for alt text
 
-  const result = {
-    _id: project._id,
+  const result: TransformedProject = {
+    _id: projectDoc._id,
     index,
     slug,
     image,
     alt,
     title,
     viewProjectText: viewProjectTextValue,
+    hoverColor: featuredItem.hoverColor?.hex,
+    textHoverColor: featuredItem.textHoverColor?.hex,
   }
 
   console.log(`DEBUG: Final transformed project ${index}:`, {
