@@ -23,6 +23,24 @@ const heroSectionSchema = z.object({
   scrollText: localeStringSchema,
 })
 
+// Define Zod schema for color value (hex)
+const colorValueSchema = z
+  .object({
+    hex: z.string().optional(), // hex might be undefined if color is not set
+  })
+  .optional()
+  .nullable() // The whole color object can be null or undefined
+
+// Define Zod schema for an individual featured project item
+export const featuredProjectItemSchema = z.object({
+  _key: z.string(),
+  hoverColor: colorValueSchema,
+  textHoverColor: colorValueSchema,
+  project: projectSchema, // This is the dereferenced project document
+})
+
+export type FeaturedProjectItem = z.infer<typeof featuredProjectItemSchema>
+
 // Define Zod schema for Projects Section with all required fields
 const projectsSectionSchema = z.object({
   _type: z.literal('projectsSection'),
@@ -31,7 +49,7 @@ const projectsSectionSchema = z.object({
   viewAllText: localeStringSchema.optional(),
   viewProjectText: localeStringSchema.optional(),
   // Properly reference the projectSchema for featured projects
-  featuredProjects: z.array(projectSchema).optional(), // References to project documents
+  featuredProjects: z.array(featuredProjectItemSchema).optional(),
 })
 
 // Define Zod schema for About Section (placeholder for now)

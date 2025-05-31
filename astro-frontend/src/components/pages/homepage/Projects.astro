@@ -2,13 +2,13 @@
 import ScrollPill from '@/assets/ScrollPill.astro'
 import { Image } from 'astro:assets'
 import type { ProjectsSection } from '@/shared/schemas/sanity/homePageSchema'
-import type { Project } from '@/shared/schemas/sanity/projectSchema'
+import type { FeaturedProjectItem } from '@/shared/schemas/sanity/homePageSchema'
 import { transformProject } from '@/utils/pages/homepage/projectsUtils'
 import CustomCursor from './CustomCursor.astro'
 import ProjectsTitle from './ProjectsTitle.astro'
 
 interface Props {
-  projectsData?: ProjectsSection
+  projectsData?: ProjectsSection | null // Allow null to match Sanity schema (projectsSection.nullish())
   locale?: 'ca' | 'es' | 'en'
 }
 
@@ -20,16 +20,16 @@ const title = projectsData?.title?.[currentLang] || ''
 const subtitle = projectsData?.subtitle?.[currentLang] || ''
 const viewProjectTextVal = projectsData?.viewProjectText?.[currentLang] || ''
 const viewAllTextVal = projectsData?.viewAllText?.[currentLang] || ''
-const featuredProjects = (projectsData?.featuredProjects as Project[]) || []
-console.log(`DEBUG: Number of featuredProjects: ${featuredProjects.length}`)
+const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProjects || []
+console.log(`DEBUG: Number of rawFeaturedProjects: ${rawFeaturedProjects.length}`)
 
 // Log each project's structure for debugging
-featuredProjects.forEach((project, idx) => {
-  console.log(`DEBUG: Project ${idx} - ID: ${project._id}`)
-  console.log(`  Title:`, project.title)
-  console.log(`  Slug:`, project.slug)
-  console.log(`  Main Image:`, project.mainImage?.asset?._ref)
-  console.log(`  Thumbnail Image:`, project.thumbnailImage?.asset?._ref)
+rawFeaturedProjects.forEach((item, idx) => {
+  console.log(`DEBUG: FeaturedItem ${idx} - Key: ${item._key}, Project ID: ${item.project?._id}`)
+  console.log(`  Project Title:`, item.project?.title)
+  console.log(`  Project Slug:`, item.project?.slug)
+  console.log(`  Main Image URL:`, item.project?.mainImage?.asset?.url)
+  console.log(`  Thumbnail Image URL:`, item.project?.thumbnailImage?.asset?.url)
 })
 ---
 
@@ -79,13 +79,14 @@ featuredProjects.forEach((project, idx) => {
   {
     [...Array(6)].map((_, i) => {
       // Debug log before transformation
-      if (featuredProjects[i]) {
-        console.log(`DEBUG: About to transform project at position ${i}:`, featuredProjects[i]._id)
+      const rawItem = rawFeaturedProjects[i] // rawItem is now FeaturedProjectItem | undefined
+      if (rawItem) {
+        console.log(
+          `DEBUG: About to transform rawItem at position ${i}: Key: ${rawItem._key}, Project ID: ${rawItem.project?._id}`,
+        )
       }
 
-      const project = featuredProjects[i]
-        ? transformProject(featuredProjects[i], i, currentLang, viewProjectTextVal)
-        : transformProject(null, i, currentLang, viewProjectTextVal)
+      const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
 
       // Debug log after transformation
       console.log(`DEBUG: Transformed project ${i}:`, {
@@ -101,7 +102,10 @@ featuredProjects.forEach((project, idx) => {
       const directionClass = projectNumber % 2 !== 0 ? 'reveal-from-top' : 'reveal-from-bottom'
 
       return (
-        <figure class={`project project-${projectNumber} ${directionClass}`}>
+        <figure
+          class={`project project-${projectNumber} ${directionClass}`}
+          style={`--hover-bg-color: ${project.hoverColor || 'transparent'}; --hover-text-color: ${project.textHoverColor || 'inherit'};`}
+        >
           {project.image && (
             <a href={project.slug ? `/project/${project.slug}` : '#'} class="project-link">
               <Image
@@ -289,9 +293,19 @@ featuredProjects.forEach((project, idx) => {
       transform: translateY(0);
     }
 
-    &:is(:hover, :focus) .project-caption {
-      opacity: 1;
-      transform: scale(1);
+    &:is(:hover, :focus) {
+      background-color: var(--hover-bg-color);
+
+      .project-caption {
+        opacity: 1;
+        transform: scale(1);
+        /* Optionally, make caption background transparent if link's bg should show through */
+        /* background: transparent; */
+
+        .caption-text {
+          color: var(--hover-text-color);
+        }
+      }
     }
   }
 

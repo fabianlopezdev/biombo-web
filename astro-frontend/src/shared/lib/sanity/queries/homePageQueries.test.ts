@@ -118,9 +118,11 @@ describe('homePageQueries', () => {
 
       // Verify the query format includes the necessary fields for featured projects
       const queryCall = vi.mocked(sanityClient.fetchSanityQuery).mock.calls[0][0]
-      expect(queryCall.query).toContain('featuredProjects[] ->')
-      expect(queryCall.query).toContain('mainImage {')
-      expect(queryCall.query).toContain('asset->')
+      expect(queryCall.query).toContain('featuredProjects[] {')
+      expect(queryCall.query).toContain('_key')
+      expect(queryCall.query).toContain('hoverColor { hex }')
+      expect(queryCall.query).toContain('textHoverColor { hex }')
+      expect(queryCall.query).toContain('project ->')
     })
 
     it('should return null when no homepage data is found', async () => {
