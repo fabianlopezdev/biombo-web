@@ -26,7 +26,7 @@ export default tseslint.config(
 
   {
     // Global ignores for ESLint
-    ignores: ['dist/', '.astro/', 'node_modules/', 'public/'], // src/env.d.ts should not be ignored for type info
+    ignores: ['dist/', '.astro/', 'node_modules/', 'public/', '.prettierrc.mjs'], // src/env.d.ts should not be ignored for type info
   },
   {
     // Configuration specifically for Astro files

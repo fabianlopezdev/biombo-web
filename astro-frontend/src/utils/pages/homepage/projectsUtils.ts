@@ -1,5 +1,4 @@
 import type { Project } from '@/shared/schemas/sanity/projectSchema'
-import { getSanityImageUrl } from '@/utils/shared/sanity'
 
 /**
  * Type definition for a localized slug in Sanity
@@ -51,84 +50,183 @@ export function transformProject(
     }
   }
 
-  console.log(`Processing project at index ${index}:`, project._id, project.title)
+  console.log(`Processing project at index ${index}:`, project._id)
 
-  // Extract image references from Sanity image objects - implement fallback logic
-  // First try to get thumbnailImage, then fall back to mainImage
-  const thumbnailImageRef = project.thumbnailImage?.asset?._ref
-  const mainImageRef = project.mainImage?.asset?._ref
-  // Use thumbnailImage if available, otherwise use mainImage
-  const imageRef = thumbnailImageRef || mainImageRef
+  // Enhanced debugging for key project fields
+  console.log(`DEBUG data structure - Project ${index} with ID: ${project._id}:`)
+  console.log(
+    `  Title:`,
+    typeof project.title === 'string' ? project.title : JSON.stringify(project.title),
+  )
+  console.log(`  Slug:`, project.slug ? JSON.stringify(project.slug) : 'undefined')
+  console.log(`  MainImage:`, project.mainImage ? JSON.stringify(project.mainImage) : 'undefined')
+  console.log(
+    `  ThumbnailImage:`,
+    project.thumbnailImage ? JSON.stringify(project.thumbnailImage) : 'undefined',
+  )
 
-  // For alt text, use the alt from whichever image we're displaying
-  const imageAlt =
-    thumbnailImageRef && project.thumbnailImage?.alt
-      ? project.thumbnailImage.alt
-      : project.mainImage?.alt
-        ? project.mainImage.alt
-        : undefined
+  // CRITICAL FIX: Extract image URL directly from asset.url if available
+  let thumbnailUrl: string | undefined
+  let mainImageUrl: string | undefined
+  let chosenImageSource: 'thumbnail' | 'main' | undefined
 
-  // Safely get localized string values with fallbacks
-  const getLocalizedValue = (field: Record<string, string> | undefined, fallback: string = '') => {
-    if (!field) return fallback
-    return field[currentLang] || field.ca || fallback
+  if (project.thumbnailImage?.asset?.url) {
+    thumbnailUrl = project.thumbnailImage.asset.url
+    console.log(`DEBUG: Found thumbnailUrl for project ${index}: ${thumbnailUrl}`)
+  } else {
+    console.log(
+      `DEBUG: thumbnailUrl not found or asset.url missing for project ${index}. ThumbnailData:`,
+      project.thumbnailImage,
+    )
   }
 
-  // Safely get slug as a simple string
+  if (project.mainImage?.asset?.url) {
+    mainImageUrl = project.mainImage.asset.url
+    console.log(`DEBUG: Found mainImageUrl for project ${index}: ${mainImageUrl}`)
+  } else {
+    console.log(
+      `DEBUG: mainImageUrl not found or asset.url missing for project ${index}. MainImageData:`,
+      project.mainImage,
+    )
+  }
+
+  // Use thumbnailImage if available, otherwise use mainImage
+  const imageUrlToUse = thumbnailUrl || mainImageUrl
+  if (thumbnailUrl) {
+    chosenImageSource = 'thumbnail'
+  } else if (mainImageUrl) {
+    chosenImageSource = 'main'
+  }
+  console.log(
+    `DEBUG: Final imageUrlToUse for project ${index}:`,
+    imageUrlToUse || 'undefined',
+    `(Source: ${chosenImageSource || 'none'})`,
+  )
+
+  // For alt text, handle both localized and direct string values, prioritizing the chosen image source
+  let imageAltText: Record<string, string> | string | undefined
+
+  if (chosenImageSource === 'thumbnail' && project.thumbnailImage?.alt) {
+    imageAltText = project.thumbnailImage.alt
+  } else if (chosenImageSource === 'main' && project.mainImage?.alt) {
+    imageAltText = project.mainImage.alt
+  } else if (project.mainImage?.alt) {
+    // Fallback to mainImage alt if thumbnail alt is missing but thumbnail URL was used
+    imageAltText = project.mainImage.alt
+  }
+
+  // ENHANCE: Handle both localized and direct string values for alt text and title
+  const getLocalizedValue = (
+    field: Record<string, string> | string | undefined,
+    fallback: string = '',
+  ) => {
+    if (!field) return fallback
+    if (typeof field === 'string') return field
+    return field[currentLang] || field.ca || Object.values(field)[0] || fallback
+  }
+
+  // ENHANCE: Handle both localized slug and simple slug structures
   const getSlug = (): string => {
     try {
-      // Safely navigate the nested object structure
-      // Check if project has a slug object with expected structure
-      if (project.slug && typeof project.slug === 'object' && '_type' in project.slug) {
-        // Treat the slug as our defined LocaleSlug type for type safety
-        const slugObj = project.slug as LocaleSlug
+      if (!project.slug) {
+        console.warn(
+          `WARN: Slug is undefined for project ${index}, falling back to project-${index}`,
+        )
+        return `project-${index}`
+      }
 
-        // Try the current language first, then fall back to Catalan
-        const slugForLang =
-          currentLang === 'ca'
-            ? slugObj.ca
-            : currentLang === 'es'
-              ? slugObj.es
-              : currentLang === 'en'
-                ? slugObj.en
-                : undefined
-
-        // If we found a slug for the current language, use it
-        if (slugForLang && typeof slugForLang.current === 'string') {
-          return slugForLang.current
+      // Case 1: Direct slug with current property (simple structure from logs)
+      if (typeof project.slug === 'object' && 'current' in project.slug) {
+        const simpleSlug = project.slug as { current?: string }
+        if (!simpleSlug.current) {
+          console.warn(
+            `WARN: simpleSlug.current is undefined for project ${index}, slug data:`,
+            project.slug,
+          )
         }
+        return simpleSlug.current || `project-${index}`
+      }
 
-        // Otherwise fall back to Catalan (which should always exist)
-        if (slugObj.ca && typeof slugObj.ca.current === 'string') {
-          return slugObj.ca.current
+      // Case 2: Localized slug structure as defined in our schema
+      if (typeof project.slug === 'object' && '_type' in project.slug) {
+        const typeField = project.slug as { _type?: string }
+        if (typeField._type === 'localeSlug') {
+          const slugObj = project.slug as LocaleSlug
+          const langSlug =
+            currentLang === 'ca'
+              ? slugObj.ca
+              : currentLang === 'es'
+                ? slugObj.es
+                : currentLang === 'en'
+                  ? slugObj.en
+                  : undefined
+
+          if (langSlug?.current) return langSlug.current
+          if (slugObj.ca?.current) return slugObj.ca.current
+          if (slugObj.es?.current) return slugObj.es.current
+          if (slugObj.en?.current) return slugObj.en.current
+          console.warn(
+            `WARN: No valid slug found in LocaleSlug for project ${index}, slug data:`,
+            project.slug,
+          )
         }
       }
-      // Fallback if no valid slug found
+
+      console.warn(
+        `WARN: Unrecognized slug structure for project ${index}, falling back. Slug data:`,
+        project.slug,
+      )
       return `project-${index}`
     } catch (error) {
-      console.error('Error getting slug:', error instanceof Error ? error.message : String(error))
+      console.error(
+        `Error getting slug for project ${index}:`,
+        error instanceof Error ? error.message : String(error),
+        project.slug,
+      )
       return `project-${index}`
     }
   }
 
-  // Safely get image URL
+  // CRITICAL FIX: Directly use the resolved imageUrlToUse
   const getImage = (): string | undefined => {
-    try {
-      return imageRef ? getSanityImageUrl(imageRef) : undefined
-    } catch (error) {
-      console.error('Error getting image:', error instanceof Error ? error.message : String(error))
+    if (!imageUrlToUse) {
+      console.log(`DEBUG: No imageUrlToUse (from asset.url) found for project ${index}`)
       return undefined
     }
+    // No need to call getSanityImageUrl if we have the direct URL
+    console.log(`DEBUG: Using direct imageUrlToUse for project ${index}:`, imageUrlToUse)
+    return imageUrlToUse
   }
 
-  // Create a properly typed transformed project
-  return {
+  // Extract title based on its actual structure
+  const getTitle = (): string => {
+    if (typeof project.title === 'string') return project.title
+    return getLocalizedValue(project.title)
+  }
+
+  // Create the transformed project with detailed logging
+  const title = getTitle()
+  const slug = getSlug()
+  const image = getImage()
+  const alt = imageAltText ? getLocalizedValue(imageAltText) : title // Use title as fallback for alt text
+
+  const result = {
     _id: project._id,
     index,
-    slug: getSlug(), // Now a simple string
-    image: getImage(),
-    alt: imageAlt ? getLocalizedValue(imageAlt) : getLocalizedValue(project.title),
-    title: getLocalizedValue(project.title),
+    slug,
+    image,
+    alt,
+    title,
     viewProjectText: viewProjectTextValue,
   }
+
+  console.log(`DEBUG: Final transformed project ${index}:`, {
+    _id: result._id,
+    title: result.title,
+    slug: result.slug,
+    hasImage: !!result.image,
+    imageUrl: result.image, // Add imageUrl to final log for clarity
+  })
+
+  return result
 }

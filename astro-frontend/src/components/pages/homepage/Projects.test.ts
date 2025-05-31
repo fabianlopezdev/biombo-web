@@ -1,11 +1,6 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { transformProject } from '@/utils/pages/homepage/projectsUtils'
 import type { Project } from '@/shared/schemas/sanity/projectSchema'
-
-// Mock getSanityImageUrl to return a test URL
-vi.mock('@/utils/shared/sanity', () => ({
-  getSanityImageUrl: () => 'https://test-image.url',
-}))
 
 describe('Projects component utils', () => {
   it('should transform project data correctly with mainImage only', () => {
@@ -23,7 +18,11 @@ describe('Projects component utils', () => {
       },
       mainImage: {
         _type: 'image',
-        asset: { _type: 'reference', _ref: 'image-123' },
+        asset: {
+          _id: 'image-123-id',
+          _type: 'sanity.imageAsset',
+          url: 'https://test-image.url',
+        },
         alt: { ca: 'Test Alt', en: 'Test Alt EN', es: 'Test Alt ES' },
       },
     }
@@ -67,12 +66,20 @@ describe('Projects component utils', () => {
       },
       mainImage: {
         _type: 'image',
-        asset: { _type: 'reference', _ref: 'image-main-123' },
+        asset: {
+          _id: 'image-main-123-id',
+          _type: 'sanity.imageAsset',
+          url: 'https://test-image.url/main', // Differentiating URL slightly for clarity, though test expects the general mock URL
+        },
         alt: { ca: 'Main Image Alt' },
       },
       thumbnailImage: {
         _type: 'image',
-        asset: { _type: 'reference', _ref: 'image-thumb-123' },
+        asset: {
+          _id: 'image-thumb-123-id',
+          _type: 'sanity.imageAsset',
+          url: 'https://test-image.url', // This URL will be preferred by transformProject
+        },
         alt: { ca: 'Thumbnail Alt' },
       },
     }
@@ -104,7 +111,11 @@ describe('Projects component utils', () => {
       },
       mainImage: {
         _type: 'image',
-        asset: { _type: 'reference', _ref: 'image-main-456' },
+        asset: {
+          _id: 'image-main-456-id',
+          _type: 'sanity.imageAsset',
+          url: 'https://test-image.url',
+        },
         alt: { ca: 'Main Image Alt' },
       },
       // No thumbnailImage provided

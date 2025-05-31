@@ -38,17 +38,57 @@ const localeSlugSchema = z.object({
     .optional(),
 })
 
-// Define Zod schema for image with alt text
+// Define Zod schema for an image with an UNRESOLVED asset reference
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const imageWithAltSchema = z.object({
   _type: z.literal('image'),
   asset: z.object({
-    _ref: z.string(),
+    _ref: z.string(), // This is for an unresolved reference
     _type: z.literal('reference'),
   }),
-  // Make alt and caption optional in case some images don't have them yet
   alt: localeStringSchema.optional(),
   caption: localeStringSchema.optional(),
-  // Include hotspot fields if your images use them
+  hotspot: z
+    .object({
+      x: z.number(),
+      y: z.number(),
+      height: z.number(),
+      width: z.number(),
+    })
+    .optional(),
+})
+
+// Define Zod schema for a resolved Sanity image asset (when asset-> is used in GROQ)
+const resolvedSanityAssetSchema = z.object({
+  _id: z.string(),
+  _type: z.string(), // Typically 'sanity.imageAsset'
+  url: z.string().url(),
+  path: z.string().optional(),
+  assetId: z.string().optional(),
+  extension: z.string().optional(),
+  mimeType: z.string().optional(),
+  size: z.number().optional(),
+  // Add other fields from a resolved asset as needed, e.g., metadata, dimensions
+  metadata: z
+    .object({
+      dimensions: z
+        .object({
+          width: z.number(),
+          height: z.number(),
+          aspectRatio: z.number(),
+        })
+        .optional(),
+      // other metadata fields
+    })
+    .optional(),
+})
+
+// Define Zod schema for an image object that contains a RESOLVED asset
+const imageWithResolvedAssetSchema = z.object({
+  _type: z.literal('image'),
+  asset: resolvedSanityAssetSchema, // Use the resolved asset schema here
+  alt: localeStringSchema.optional(),
+  caption: localeStringSchema.optional(),
   hotspot: z
     .object({
       x: z.number(),
@@ -65,17 +105,16 @@ export const projectSchema = z.object({
   _type: z.literal('project'),
   _createdAt: z.string(),
   _updatedAt: z.string(),
-  title: localeStringSchema,
+  title: localeStringSchema, // Assuming title can also be a direct string based on logs
   slug: localeSlugSchema,
-  // featured and featuredOrder fields removed - we now manage featured projects through the homepage
-  mainImage: imageWithAltSchema,
-  thumbnailImage: imageWithAltSchema.optional(), // Optional thumbnail image for project cards
+  mainImage: imageWithResolvedAssetSchema, // Use the schema with resolved asset
+  thumbnailImage: imageWithResolvedAssetSchema.optional(), // Optional thumbnail, also with resolved asset
   excerpt: localePortableTextSchema.optional(),
   description: localePortableTextSchema.optional(),
   client: z.string().optional(),
   categories: z.array(z.string()).optional(),
   projectDate: z.string().optional(), // ISO date string from Sanity
-  gallery: z.array(imageWithAltSchema).optional(),
+  gallery: z.array(imageWithResolvedAssetSchema).optional(), // Gallery images also use resolved assets
 })
 
 // Schema for a list of projects
@@ -85,6 +124,11 @@ export const projectsSchema = z.array(projectSchema)
 export type LocaleString = z.infer<typeof localeStringSchema>
 export type LocalePortableText = z.infer<typeof localePortableTextSchema>
 export type LocaleSlug = z.infer<typeof localeSlugSchema>
-export type ImageWithAlt = z.infer<typeof imageWithAltSchema>
+export type ResolvedSanityAsset = z.infer<typeof resolvedSanityAssetSchema>
+export type ImageWithResolvedAsset = z.infer<typeof imageWithResolvedAssetSchema>
+// Note: ImageWithAlt is no longer directly used by projectSchema if all images are resolved.
+// If you still need ImageWithAlt for other purposes (e.g. unresolved image references), keep it.
+// Otherwise, it could be removed or aliased if imageWithResolvedAssetSchema replaces its use cases.
+export type ImageWithAlt = z.infer<typeof imageWithAltSchema> // Keeping for now, review if needed
 export type Project = z.infer<typeof projectSchema>
 export type Projects = z.infer<typeof projectsSchema>
