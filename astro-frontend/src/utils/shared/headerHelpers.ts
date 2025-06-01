@@ -100,12 +100,12 @@ export function getPagePath(page: NavigationPage, locale: string): string {
       }
 
       // Unknown page type
-      console.log(`Unknown page reference type: ${pageType}`)
+      // console.log(`Unknown page reference type: ${pageType}`)
       return '#'
     }
 
     // No valid reference found
-    console.warn('Missing page reference', { page })
+    // console.warn('Missing page reference', { page })
     return '#'
   } catch (error) {
     console.error('Error generating page path:', error)

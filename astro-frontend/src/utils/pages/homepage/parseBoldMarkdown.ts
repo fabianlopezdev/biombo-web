@@ -10,7 +10,11 @@ export interface BoldSegments {
  *
  * If no bold markers are present, `bold` and `after` will be empty.
  */
-export function splitBoldSegments(str: string): BoldSegments {
+export function splitBoldSegments(str: string | undefined): BoldSegments {
+  if (!str) {
+    return { before: '', bold: '', after: '' }
+  }
+
   const boldRegex = /\*\*(.*?)\*\*/
   const match = boldRegex.exec(str)
 

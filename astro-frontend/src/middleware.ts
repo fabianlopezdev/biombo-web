@@ -2,7 +2,7 @@
 import { defineMiddleware } from 'astro:middleware' // Rely on defineMiddleware for context/next types
 import { useAstroI18n } from 'astro-i18n'
 
-console.log('[Middleware] src/middleware.ts: Module loaded.')
+// console.log('[Middleware] src/middleware.ts: Module loaded.')
 
 const pathsToExclude = [
   '/favicon.svg', // Common static asset
@@ -23,21 +23,21 @@ const i18nFilteringMiddleware = defineMiddleware(async (context, next): Promise<
 
   const isExcluded = pathsToExclude.some((pathToExclude) => {
     if (pathname === pathToExclude || pathname.startsWith(pathToExclude)) {
-      console.log(
-        `[i18nFilteringMiddleware] Path ${pathname} matches exclude rule: ${pathToExclude}. Bypassing i18n.`,
-      )
+      // console.log(
+      //   `[i18nFilteringMiddleware] Path ${pathname} matches exclude rule: ${pathToExclude}. Bypassing i18n.`,
+      // )
       return true
     }
     return false
   })
 
   if (isExcluded) {
-    console.log(`[i18nFilteringMiddleware] Bypassing astro-i18n for ${pathname}`)
+    // console.log(`[i18nFilteringMiddleware] Bypassing astro-i18n for ${pathname}`)
     // next() returns Promise<Response>, so await it.
     return await next()
   }
 
-  console.log(`[i18nFilteringMiddleware] Applying astro-i18n for ${pathname}`)
+  // console.log(`[i18nFilteringMiddleware] Applying astro-i18n for ${pathname}`)
   // If not excluded, apply the astro-i18n middleware
   // Use the pre-initialized handler
   // The type assertion 'as Response' helps ESLint understand the type of the awaited result.
@@ -46,5 +46,3 @@ const i18nFilteringMiddleware = defineMiddleware(async (context, next): Promise<
 })
 
 export const onRequest = i18nFilteringMiddleware
-
-console.log('[Middleware] src/middleware.ts: onRequest handler set to i18nFilteringMiddleware.')

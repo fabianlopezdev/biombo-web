@@ -87,11 +87,11 @@ export async function fetchFeaturedProjects(): Promise<Projects | null> {
         query: allProjectsQuery,
         schema: projectsSchema,
       })
-      console.log(
-        'Projects after schema validation:',
-        projects ? projects.length : 0,
-        'projects found',
-      )
+      // console.log(
+      //   'Projects after schema validation:',
+      //   projects ? projects.length : 0,
+      //   'projects found',
+      // )
     } catch (error) {
       console.error('Error fetching projects with schema:', error)
       console.log('No schema provided, returning raw data')
@@ -122,9 +122,9 @@ export async function fetchFeaturedProjects(): Promise<Projects | null> {
         return orderA - orderB
       })
 
-    console.log(
-      `Found ${featuredProjects.length} featured projects out of ${projects.length} total projects`,
-    )
+    // console.log(
+    //   `Found ${featuredProjects.length} featured projects out of ${projects.length} total projects`,
+    // )
 
     // If we have featured projects, return those, otherwise return all projects as a fallback
     // Cast to Projects to satisfy type safety
@@ -144,11 +144,11 @@ export async function fetchFeaturedProjects(): Promise<Projects | null> {
         query: rawProjectsQuery,
         params: {},
       })
-      console.log('Raw projects data (no validation):', rawProjects)
+      // console.log('Raw projects data (no validation):', rawProjects)
 
       // Log the raw project data structure to help with debugging
       if (Array.isArray(rawProjects) && rawProjects.length > 0) {
-        console.log('First raw project structure:', JSON.stringify(rawProjects[0], null, 2))
+        // console.log('First raw project structure:', JSON.stringify(rawProjects[0], null, 2))
       }
     } catch (secondError: unknown) {
       console.error(
@@ -178,7 +178,7 @@ export async function fetchProjectsSection(): Promise<ProjectsSection | null> {
         featuredProjects
       }
     }.projects`
-    console.log('Fetching projects section', { query })
+    // console.log('Fetching projects section', { query })
 
     // Try fetching with schema validation
     const projectsSection = await fetchSanityQuery({
@@ -201,7 +201,7 @@ export async function fetchAllProjects(): Promise<Projects | null> {
   try {
     // Query for all projects
     const query = `*[_type == "project"] | order(_createdAt desc)`
-    console.log('Fetching all projects', { query })
+    // console.log('Fetching all projects', { query })
 
     // Try fetching with schema validation
     const projects = await fetchSanityQuery({

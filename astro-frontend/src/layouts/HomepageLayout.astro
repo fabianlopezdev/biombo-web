@@ -5,6 +5,7 @@ import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 import Projects, {
   type ResolvedProjectsSectionData,
 } from '@/components/pages/homepage/Projects.astro'
+import Hero from '@/components/pages/homepage/Hero.astro'
 // import About from '@/components/pages/homepage/About.astro'
 // import about1 from '@/assets/pages/homepage/about-1.jpg'
 // import about2 from '@/assets/pages/homepage/about-2.jpg'
@@ -27,9 +28,9 @@ const pageTitle = 'Biombo - Art, Events, Community'
 
   <main id="main" class="main-content">
     <div class="horizontal-scroll-container" id="horizontal-container">
-      <!-- <section class="hero">
-        <Hero locale={locale} heroData={hero} />
-      </section> -->
+      <section class="hero">
+        <Hero locale={locale} heroData={homePageData?.hero} />
+      </section>
 
       <section id="projects" class="projects">
         <Projects

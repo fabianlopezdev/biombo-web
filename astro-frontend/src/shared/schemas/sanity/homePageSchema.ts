@@ -18,9 +18,9 @@ const localeStringSchema = z
 
 // Define Zod schema for Hero Section
 const heroSectionSchema = z.object({
-  _type: z.literal('heroSection'),
-  heroText: localeStringSchema,
-  scrollText: localeStringSchema,
+  _type: z.literal('heroSection').optional(),
+  heroText: z.string().optional(),
+  scrollText: z.string().optional(),
 })
 
 // Define Zod schema for color value (hex)

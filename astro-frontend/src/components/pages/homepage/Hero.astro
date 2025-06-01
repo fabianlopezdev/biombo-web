@@ -3,34 +3,22 @@ import HighlightScribble from '@/assets/HighlightScribble.astro'
 import ScrollPill from '@/assets/ScrollPill.astro'
 import { splitBoldSegments } from '@/utils/pages/homepage/parseBoldMarkdown'
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
+
 interface Props {
-  locale: 'ca' | 'es' | 'en'
-  heroData: HomePage['hero'] | Record<string, never>
+  heroData: HomePage['hero'] | Record<string, never> // HomePage['hero'] is SanityHeroSectionType | null
 }
 
-const { locale, heroData } = Astro.props
+const { heroData } = Astro.props
 
-// Use type guard to check if heroData has the expected properties
-function isHeroSection(data: any): data is HomePage['hero'] {
-  return data && '_type' in data && data._type === 'heroSection'
-}
-
-// Use the type guard to safely access properties
-const rawHeroText =
-  isHeroSection(heroData) && heroData.heroText?.[locale]
-    ? heroData.heroText[locale]
-    : 'Transformem **idees** en solucions'
-
-const scrollText =
-  isHeroSection(heroData) && heroData.scrollText?.[locale]
-    ? heroData.scrollText[locale]
-    : 'Explora fent scroll'
+console.log('heroData', heroData)
 
 const {
   before: beforeHighlight,
   bold: highlightedWord,
   after: afterHighlight,
-} = splitBoldSegments(rawHeroText)
+} = splitBoldSegments(heroData?.heroText)
+
+const scrollText = heroData?.scrollText
 ---
 
 <script src="@/scripts/pages/homepage/heroScroll.ts"></script>

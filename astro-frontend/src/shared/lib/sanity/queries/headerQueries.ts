@@ -32,7 +32,7 @@ export async function fetchHeader(locale: string = 'ca'): Promise<Header | null>
 
     // If no header is found with the specified language, try falling back to Catalan
     if (!header && locale !== 'ca') {
-      console.log(`No header found for language '${locale}', trying to fall back to Catalan`)
+      // console.log(`No header found for language '${locale}', trying to fall back to Catalan`)
       const fallbackQuery = `*[_type == "header" && language == "ca"][0]{
         ...,
         "navigationPages": navigationPages[] | order(order asc) {
@@ -54,7 +54,7 @@ export async function fetchHeader(locale: string = 'ca'): Promise<Header | null>
 
     // If still no header, try any header as a last resort
     if (!header) {
-      console.log('No header found for any specified language, trying to find any header document')
+      // console.log('No header found for any specified language, trying to find any header document')
       const lastResortQuery = `*[_type == "header"][0]{
         ...,
         "navigationPages": navigationPages[] | order(order asc) {
@@ -72,13 +72,6 @@ export async function fetchHeader(locale: string = 'ca'): Promise<Header | null>
         query: lastResortQuery,
         schema: headerSchema,
       })
-    }
-
-    // Log debug information
-    if (header) {
-      console.log(`Found header for language: ${header.language}, id: ${header._id}`)
-    } else {
-      console.log('No header documents found at all')
     }
 
     return header

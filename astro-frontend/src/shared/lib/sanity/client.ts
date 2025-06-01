@@ -38,9 +38,9 @@ export async function fetchSanityQuery<S extends ZodSchema>(
       return data
     }
     // Log the raw data with explicit null checks to aid debugging
-    console.log('Raw data from Sanity:', JSON.stringify(data, null, 2))
+    // console.log('Raw data from Sanity:', JSON.stringify(data, null, 2))
     if (data === null) {
-      console.log('Warning: Received null data from Sanity')
+      // console.log('Warning: Received null data from Sanity')
     } else if (typeof data === 'object' && data !== null) {
       // Check for null fields in top-level properties that might cause validation issues
       Object.entries(data as Record<string, unknown>).forEach(([key, value]) => {

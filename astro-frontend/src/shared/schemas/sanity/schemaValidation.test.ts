@@ -98,18 +98,8 @@ describe('Sanity Schema Validation', () => {
         _updatedAt: '2023-01-02T00:00:00Z',
         hero: {
           _type: 'heroSection',
-          heroText: {
-            _type: 'localeString',
-            ca: "Text de l'heroi",
-            es: 'Texto del héroe',
-            en: 'Hero text',
-          },
-          scrollText: {
-            _type: 'localeString',
-            ca: "Desplaça't",
-            es: 'Desplázate',
-            en: 'Scroll',
-          },
+          heroText: "Text de l'heroi",
+          scrollText: "Desplaça't",
         },
         projects: {
           _type: 'projectsSection',
