@@ -1,4 +1,4 @@
-import { defineField, defineType, ReferenceFilterResolverContext } from 'sanity'
+import {defineField, defineType, ReferenceFilterResolverContext} from 'sanity'
 // No longer need baseLanguage import with document-level internationalization
 
 // Schema for the Hero section
@@ -10,7 +10,8 @@ export const heroSection = defineType({
     defineField({
       name: 'heroText',
       title: 'Main Heading',
-      description: 'The large heading text at the top of the page. Use **bold** to mark which word should be highlighted with the underline effect (e.g., "Transformem **idees** en solucions")',
+      description:
+        'The large heading text at the top of the page. Use **bold** to mark which word should be highlighted with the underline effect (e.g., "Transformem **idees** en solucions")',
       type: 'string', // Changed from localeString to string
       validation: (Rule) => Rule.required().error('The hero heading text is required'),
     }),
@@ -26,7 +27,7 @@ export const heroSection = defineType({
       heroText: 'heroText',
     },
     prepare(selection) {
-      const { heroText } = selection
+      const {heroText} = selection
       return {
         title: 'Hero Section',
         subtitle: heroText || 'No hero text set',
@@ -65,7 +66,8 @@ export const projectsSection = defineType({
     defineField({
       name: 'viewProjectText',
       title: 'Cursor Project Text',
-      description: 'Text that appears in the custom cursor when hovering over projects (e.g. "Veure projecte")',
+      description:
+        'Text that appears in the custom cursor when hovering over projects (e.g. "Veure projecte")',
       type: 'string', // Changed from localeString to string
       validation: (Rule) => Rule.required().error('Cursor project text is required'),
     }),
@@ -83,59 +85,63 @@ export const projectsSection = defineType({
               name: 'project',
               title: 'Project',
               type: 'reference',
-              to: [{ type: 'project' }],
+              to: [{type: 'project'}],
               options: {
                 disableNew: false, // Keep existing options if relevant
-                filter: ({ document, parent }: ReferenceFilterResolverContext) => {
-                  const homePageDoc = document as any; // Root homePage document
-                  const currentFeaturedItemKey = (parent as any)?._key as string | undefined; // _key of the current featuredProjectItem
+                filter: ({document, parent}: ReferenceFilterResolverContext) => {
+                  const homePageDoc = document as any // Root homePage document
+                  const currentFeaturedItemKey = (parent as any)?._key as string | undefined // _key of the current featuredProjectItem
 
-                  const language = homePageDoc?.language;
+                  const language = homePageDoc?.language
 
-                  let filterClauses = ['_type == "project"'];
-                  const params: { language?: string; selectedProjectIds?: string[] } = {};
+                  let filterClauses = ['_type == "project"']
+                  const params: {language?: string; selectedProjectIds?: string[]} = {}
 
                   // Apply language filter
                   if (language) {
-                    filterClauses.push('language == $language');
-                    params.language = language;
+                    filterClauses.push('language == $language')
+                    params.language = language
                   } else {
                     // Fallback language if not found on homePageDoc, though this should ideally always be present
-                    console.warn('Language not found on HomePage document for project filter, defaulting to "ca".');
-                    filterClauses.push('language == "ca"');
+                    console.warn(
+                      'Language not found on HomePage document for project filter, defaulting to "ca".',
+                    )
+                    filterClauses.push('language == "ca"')
                   }
 
                   // Apply filter to exclude already selected projects
                   // Root cause of duplicate prevention failure: Incorrect path to featuredProjects array.
                   // Corrected path: homePageDoc.projects is the 'Projects Section' object, which then contains featuredProjects.
-                  const allFeaturedProjects = homePageDoc?.projects?.featuredProjects;
+                  const allFeaturedProjects = homePageDoc?.projects?.featuredProjects
                   if (Array.isArray(allFeaturedProjects) && currentFeaturedItemKey) {
                     const selectedProjectIds = allFeaturedProjects
-                      .filter((item: any) => item._key !== currentFeaturedItemKey && item.project?._ref)
-                      .map((item: any) => item.project._ref);
+                      .filter(
+                        (item: any) => item._key !== currentFeaturedItemKey && item.project?._ref,
+                      )
+                      .map((item: any) => item.project._ref)
 
                     if (selectedProjectIds.length > 0) {
-                      filterClauses.push('!(_id in $selectedProjectIds)');
-                      params.selectedProjectIds = selectedProjectIds;
+                      filterClauses.push('!(_id in $selectedProjectIds)')
+                      params.selectedProjectIds = selectedProjectIds
                     }
                   } else if (Array.isArray(allFeaturedProjects) && !currentFeaturedItemKey) {
                     // If it's a new item (no key yet), exclude all already selected projects
-                     const selectedProjectIds = allFeaturedProjects
+                    const selectedProjectIds = allFeaturedProjects
                       .filter((item: any) => item.project?._ref)
-                      .map((item: any) => item.project._ref);
+                      .map((item: any) => item.project._ref)
                     if (selectedProjectIds.length > 0) {
-                      filterClauses.push('!(_id in $selectedProjectIds)');
-                      params.selectedProjectIds = selectedProjectIds;
+                      filterClauses.push('!(_id in $selectedProjectIds)')
+                      params.selectedProjectIds = selectedProjectIds
                     }
                   }
-
 
                   return {
                     filter: filterClauses.join(' && '),
                     params,
-                  };
+                  }
                 },
-                noResultsText: 'No projects available for the selected language or no language set on Home Page.'
+                noResultsText:
+                  'No projects available for the selected language or no language set on Home Page.',
               },
               validation: (Rule) => Rule.required(),
             },
@@ -167,18 +173,24 @@ export const projectsSection = defineType({
               textHoverColorValue: 'textHoverColor.hex',
               media: 'project.mainImage', // This was working correctly
             },
-            prepare({ actualProjectTitle, projectSlugString, hoverColorValue, textHoverColorValue, media }) {
+            prepare({
+              actualProjectTitle,
+              projectSlugString,
+              hoverColorValue,
+              textHoverColorValue,
+              media,
+            }) {
               // Rationale for fix: Use the directly selected project title, then slug string, then default text.
-              const title = actualProjectTitle || projectSlugString || 'No project selected';
-              let subtitles = [];
-              if (hoverColorValue) subtitles.push(`Hover: ${hoverColorValue}`);
-              if (textHoverColorValue) subtitles.push(`Text Hover: ${textHoverColorValue}`);
-              const subtitle = subtitles.length > 0 ? subtitles.join(' | ') : 'No colors set';
+              const title = actualProjectTitle || projectSlugString || 'No project selected'
+              let subtitles = []
+              if (hoverColorValue) subtitles.push(`Hover: ${hoverColorValue}`)
+              if (textHoverColorValue) subtitles.push(`Text Hover: ${textHoverColorValue}`)
+              const subtitle = subtitles.length > 0 ? subtitles.join(' | ') : 'No colors set'
               return {
                 title: title,
                 subtitle: subtitle,
                 media: media, // Display project's image in preview
-              };
+              }
             },
           },
         },
@@ -191,7 +203,7 @@ export const projectsSection = defineType({
       title: 'title',
       subtitle: 'subtitle',
     },
-    prepare({ title, subtitle }) {
+    prepare({title, subtitle}) {
       return {
         title: 'Projects Section',
         subtitle: title || 'No title set',
@@ -200,7 +212,7 @@ export const projectsSection = defineType({
   },
 })
 
-// Schema for the About section (placeholder for now)
+// Schema for the About section (MODIFIED)
 export const aboutSection = defineType({
   name: 'aboutSection',
   title: 'About Section',
@@ -209,10 +221,56 @@ export const aboutSection = defineType({
     defineField({
       name: 'title',
       title: 'Section Title',
-      type: 'string', // Changed from localeString to string
+      type: 'string', // Stays as string for document-level i18n
+      validation: (Rule) => Rule.required().error('The about section title is required.'),
     }),
-    // You can add more fields here as needed
+    defineField({
+      name: 'description',
+      title: 'Descriptive Paragraph',
+      type: 'array', // For Sanity's Portable Text/Block Content
+      of: [
+        {
+          type: 'block',
+          // You can customize styles and marks here if needed,
+          // e.g., styles: [{title: 'Normal', value: 'normal'}],
+          // lists: [{title: 'Bullet', value: 'bullet'}],
+          // marks: {decorators: [{title: 'Strong', value: 'strong'}, {title: 'Emphasis', value: 'em'}]}
+        },
+      ],
+      validation: (Rule) => Rule.required().error('The descriptive paragraph is required.'),
+    }),
+    defineField({
+      name: 'images',
+      title: 'Image Slider/Carousel',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: {
+            hotspot: true, // Enables image hotspot for better cropping
+          },
+          // No custom fields needed for image meta-information as Sanity Media Plugin is in use.
+        },
+      ],
+      validation: (Rule) =>
+        Rule.required()
+          .min(1)
+          .error('At least one image is required for the about section slider/carousel.'),
+    }),
   ],
+  preview: {
+    select: {
+      title: 'title',
+      media: 'images.0.asset', // Show the first image as media preview
+    },
+    prepare({title, media}) {
+      return {
+        title: title || 'About Section',
+        subtitle: title ? 'About Section Content' : 'No title set',
+        media: media,
+      }
+    },
+  },
 })
 
 // Schema for the Services section (placeholder for now)
@@ -250,8 +308,8 @@ export const homePage = defineType({
       description: 'The main banner section at the top of the homepage',
       validation: (Rule) => Rule.required().error('The hero section is required.'),
       options: {
-        collapsible: false,  // Don't allow collapsing this section
-        collapsed: false,    // Start expanded
+        collapsible: false, // Don't allow collapsing this section
+        collapsed: false, // Start expanded
       },
     }),
     defineField({
@@ -275,7 +333,7 @@ export const homePage = defineType({
       language: 'language',
     },
     prepare(selection) {
-      const { language } = selection
+      const {language} = selection
       return {
         title: `Home Page (${(language || '').toUpperCase()})`,
         subtitle: 'Landing page content',
