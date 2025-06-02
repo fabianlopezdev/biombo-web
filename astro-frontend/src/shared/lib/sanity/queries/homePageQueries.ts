@@ -38,7 +38,38 @@ const HOME_PAGE_FIELDS = `
       }
     }
   },
-  about,
+  about {
+    _type,
+    title,
+    description[]{
+      ...,
+      markDefs[]{
+        ...,
+        _type == 'link' => {
+          "href": @.href,
+          "blank": @.blank
+        }
+      }
+    },
+    images[]{
+      _key,
+      _type,
+      hotspot { x, y, height, width },
+      crop { top, bottom, left, right },
+      asset->{
+        _id,
+        url,
+        metadata {
+          dimensions {
+            width,
+            height,
+            aspectRatio
+          },
+          lqip
+        }
+      }
+    }
+  },
   services
 `
 

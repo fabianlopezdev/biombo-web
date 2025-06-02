@@ -103,15 +103,11 @@ describe('Sanity Schema Validation', () => {
         },
         projects: {
           _type: 'projectsSection',
-          title: {
-            _type: 'localeString',
-            ca: 'Projectes',
-            es: 'Proyectos',
-            en: 'Projects',
-          },
+          title: 'Projectes',
           featuredProjects: [], // Empty array of projects
         },
-        // about and services are undefined (not provided)
+        about: null,
+        services: null,
       }
 
       const validationResult = homePageSchema.safeParse(mockHomePageData)
@@ -121,8 +117,8 @@ describe('Sanity Schema Validation', () => {
         const data = validationResult.data
         expect(data.hero).not.toBeNull()
         expect(data.projects).not.toBeNull()
-        expect(data.about).toBeUndefined()
-        expect(data.services).toBeUndefined()
+        expect(data.about).toBeNull()
+        expect(data.services).toBeNull()
       }
     })
   })

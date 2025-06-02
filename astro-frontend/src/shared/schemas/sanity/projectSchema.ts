@@ -11,32 +11,23 @@ const localeStringSchema = z
   })
   .partial()
 
-// Define schema for localized portable text (rich text)
-const localePortableTextSchema = z.object({
-  _type: z.literal('localePortableText'),
-  // For each language, we expect an array of blocks (rich text)
-  ca: z.array(z.any()).optional(),
-  es: z.array(z.any()).optional(),
-  en: z.array(z.any()).optional(),
-})
+// Import PortableTextBlock type from homePageSchema
+import type { PortableTextBlock } from './homePageSchema'
 
-// Schema for localized slugs
-const localeSlugSchema = z.object({
-  _type: z.literal('localeSlug'),
-  ca: z.object({
-    current: z.string(),
-  }),
-  es: z
-    .object({
-      current: z.string(),
-    })
-    .optional(),
-  en: z
-    .object({
-      current: z.string(),
-    })
-    .optional(),
-})
+// Define types for localized portable text and slugs
+export type LocalePortableText = {
+  _type: 'localePortableText'
+  ca?: PortableTextBlock[]
+  es?: PortableTextBlock[]
+  en?: PortableTextBlock[]
+}
+
+export type LocaleSlug = {
+  _type: 'localeSlug'
+  ca: { current: string }
+  es?: { current: string }
+  en?: { current: string }
+}
 
 // Define Zod schema for an image with an UNRESOLVED asset reference
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -96,6 +87,7 @@ const imageWithResolvedAssetSchema = z.object({
       height: z.number(),
       width: z.number(),
     })
+    .nullable()
     .optional(),
 })
 
@@ -105,15 +97,15 @@ export const projectSchema = z.object({
   _type: z.literal('project'),
   _createdAt: z.string(),
   _updatedAt: z.string(),
-  title: localeStringSchema, // Assuming title can also be a direct string based on logs
-  slug: localeSlugSchema,
+  title: z.string(), // Changed from localeStringSchema
+  slug: z.object({ _type: z.literal('slug'), current: z.string() }), // Changed from localeSlugSchema
   mainImage: imageWithResolvedAssetSchema, // Use the schema with resolved asset
-  thumbnailImage: imageWithResolvedAssetSchema.optional(), // Optional thumbnail, also with resolved asset
-  excerpt: localePortableTextSchema.optional(),
-  description: localePortableTextSchema.optional(),
-  client: z.string().optional(),
-  categories: z.array(z.string()).optional(),
-  projectDate: z.string().optional(), // ISO date string from Sanity
+  thumbnailImage: imageWithResolvedAssetSchema.nullable().optional(), // Added nullable
+  excerpt: z.array(z.any()).nullable().optional(), // Added nullable
+  description: z.array(z.any()).nullable().optional(), // Added nullable
+  client: z.string().nullable().optional(),
+  categories: z.array(z.object({ _ref: z.string(), _type: z.literal('reference') })).optional(), // Changed from array of strings
+  projectDate: z.string().nullable().optional(), // Added nullable
   gallery: z.array(imageWithResolvedAssetSchema).optional(), // Gallery images also use resolved assets
 })
 
@@ -122,13 +114,8 @@ export const projectsSchema = z.array(projectSchema)
 
 // Export TypeScript types derived from the Zod schemas
 export type LocaleString = z.infer<typeof localeStringSchema>
-export type LocalePortableText = z.infer<typeof localePortableTextSchema>
-export type LocaleSlug = z.infer<typeof localeSlugSchema>
 export type ResolvedSanityAsset = z.infer<typeof resolvedSanityAssetSchema>
 export type ImageWithResolvedAsset = z.infer<typeof imageWithResolvedAssetSchema>
-// Note: ImageWithAlt is no longer directly used by projectSchema if all images are resolved.
-// If you still need ImageWithAlt for other purposes (e.g. unresolved image references), keep it.
-// Otherwise, it could be removed or aliased if imageWithResolvedAssetSchema replaces its use cases.
 export type ImageWithAlt = z.infer<typeof imageWithAltSchema> // Keeping for now, review if needed
 export type Project = z.infer<typeof projectSchema>
 export type Projects = z.infer<typeof projectsSchema>

@@ -56,22 +56,22 @@ export const translationOrderSync = definePlugin(() => ({
           return
         }
         
-        console.log(`[OrderSync] Project document ${documentId} orderRank changed`)
+        // console.log(`[OrderSync] Project document ${documentId} orderRank changed`)
         
         // Find all translations of this document
         const translations = await findTranslations(client, document)
         
         if (translations.length === 0) {
-          console.log('[OrderSync] No translations found to sync')
+          // console.log('[OrderSync] No translations found to sync')
           return
         }
         
-        console.log(`[OrderSync] Found ${translations.length} translation(s) to update`)
+        // console.log(`[OrderSync] Found ${translations.length} translation(s) to update`)
         
         // Update the orderRank for all translations
         await updateTranslationsOrderRank(client, translations, patch.orderRank, documentId)
         
-        console.log('[OrderSync] Successfully updated translations orderRank')
+        // console.log('[OrderSync] Successfully updated translations orderRank')
       } catch (error) {
         console.error('[OrderSync] Error synchronizing translation order:', error)
       }
@@ -105,7 +105,7 @@ async function findTranslations(client: any, document: DocumentWithLanguage): Pr
     })
     
     if (!metadata || !metadata.translations) {
-      console.log('[OrderSync] No translation metadata found')
+      // console.log('[OrderSync] No translation metadata found')
       return []
     }
     
@@ -147,7 +147,7 @@ async function updateTranslationsOrderRank(
           .set({ orderRank: newOrderRank })
           .commit()
         
-        console.log(`[OrderSync] Updated translation ${translationId}`)
+        // console.log(`[OrderSync] Updated translation ${translationId}`)
       } catch (error) {
         console.error(`[OrderSync] Failed to update translation ${translationId}:`, error)
       }

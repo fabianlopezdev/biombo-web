@@ -6,9 +6,8 @@ import Projects, {
   type ResolvedProjectsSectionData,
 } from '@/components/pages/homepage/Projects.astro'
 import Hero from '@/components/pages/homepage/Hero.astro'
-// import About from '@/components/pages/homepage/About.astro'
-// import about1 from '@/assets/pages/homepage/about-1.jpg'
-// import about2 from '@/assets/pages/homepage/about-2.jpg'
+import About from '@/components/pages/homepage/About.astro'
+// About component fetches its own data based on locale
 
 interface Props {
   locale: 'ca' | 'es' | 'en'
@@ -17,7 +16,6 @@ interface Props {
 
 const { locale } = Astro.props
 
-// Page title for the head element
 const { homePageData } = Astro.props
 
 const pageTitle = 'Biombo - Art, Events, Community'
@@ -40,9 +38,9 @@ const pageTitle = 'Biombo - Art, Events, Community'
       </section>
     </div>
 
-    <!-- <section id="about" class="about">
-      <About images={[about1, about2]} />
-    </section> -->
+    <section id="about" class="about">
+      <About sectionData={homePageData?.about} />
+    </section>
 
     <!-- <section class="services"></section> -->
   </main>

@@ -1,68 +1,117 @@
 ---
-/*  AboutSection.astro
-    ------------------------------------------------------------
-    Full-screen “About” hero with
-    · text on the left
-    · horizontal gallery on the right
-    · custom progress bar that always renders
-    · extra end-padding so the last slide can align start
----------------------------------------------------------------- */
+// Component: src/components/pages/homepage/About.astro
+// Fetches and renders the About section data from Sanity CMS.
 
+// Sanity data fetching and types
+import { fetchHomePageByLocale } from '@/shared/lib/sanity/queries/homePageQueries'
+import type { SanityImage as SanityImageType } from '@/shared/schemas/sanity/homePageSchema'
+import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
+
+// Astro components
 import { Image } from 'astro:assets'
-import type { ImageMetadata } from 'astro:assets'
 
+// Define props interface to accept section data from parent component
 interface Props {
-  title?: string
-  copy?: string
-  images?: ImageMetadata[]
+  sectionData?: any // Using any for flexibility between different sources
 }
 
-const {
-  title = `Més de 10 anys d'experiència`,
-  copy = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-           Duis elementum quam lorem, nec imperdiet erat volutpat maximus. 
-           Donec sed tempor sem. Pellentesque non dapibus urna. Nam ut ullamcorper odio.`,
-  images = [],
-} = Astro.props
+const { sectionData } = Astro.props
+
+// Define locale for both fetching and debugging purposes
+const currentLocale = (Astro.currentLocale || 'ca') as 'ca' | 'es' | 'en'
+
+// If no sectionData is provided, fetch homepage data for the current locale
+let aboutSection = sectionData
+if (!aboutSection) {
+  const homePageData = await fetchHomePageByLocale(currentLocale)
+  aboutSection = homePageData?.about
+}
+
+// Prepare portable text HTML if data is available
+let descriptionHtml = ''
+if (aboutSection?.description) {
+  // Define custom rendering components for Portable Text
+  const customPortableTextComponents: Partial<PortableTextComponents> = {
+    block: {
+      // This targets standard paragraph blocks from Sanity (style: 'normal')
+      normal: ({ children }): string => {
+        // Instead of wrapping children in a <p>, return them directly.
+        // 'children' here will be the string of HTML for the block's content
+        // (e.g., "Some text <strong>bold</strong> and <em>italic</em>.")
+        return children || ''
+      },
+      // If you use other block styles like h1, h2, blockquote in this specific
+      // 'description' field and want to customize them, we can add them here.
+      // Otherwise, they'll use default rendering (e.g. <h1>, <h2>, <blockquote>).
+    },
+    // Default rendering for marks (bold, italic, links) is usually sufficient.
+    // If specific classes or attributes were needed for links, we could add:
+    // marks: {
+    //   link: ({children, value}) => `<a href="${value.href}" class="my-custom-link">${children}</a>`
+    // }
+  }
+  // Ensure description is treated as PortableTextBlock[] for toHTML
+  descriptionHtml = toHTML(aboutSection.description as any, {
+    components: customPortableTextComponents,
+  })
+}
+
+// Define a more specific type for images to be displayed, extending SanityImageType if needed.
+interface DisplayImage extends SanityImageType {}
+const imagesToDisplay: DisplayImage[] = aboutSection?.images
+  ? aboutSection.images.map((img) => img as DisplayImage)
+  : []
 ---
 
-<div class="about">
-  <!-- ─── Text column ────────────────────────────────────────── -->
-  <div class="about__text">
-    <h2 class="about__title">{title.toUpperCase()}</h2>
-    <p class="about__copy">{copy}</p>
-  </div>
+{/* Only render the section if 'aboutSection' data is available */}
+{
+  aboutSection && (
+    <div class="about">
+      {/* Text column */}
+      <div class="about__text">
+        <h2 class="about__title">{aboutSection.title.toUpperCase()}</h2>
+        <p class="about__copy" set:html={descriptionHtml} />
+      </div>
 
-  <!-- ─── Gallery + progress bar ─────────────────────────────── -->
-  <div class="about__gallery">
-    <div class="slider" data-slider>
-      {
-        images.map((img) => (
-          <Image
-            src={img}
-            alt={img.alt ?? ''}
-            class="slider__img"
-            width={600}
-            height={800}
-            loading="lazy"
-          />
-        ))
-      }
+      {/* Gallery + progress bar */}
+      <div class="about__gallery">
+        <div class="slider" data-slider>
+          {imagesToDisplay.map((image: DisplayImage, index: number) => (
+            <Image
+              src={image.asset.url}
+              alt={`Image for ${aboutSection.title} - ${index + 1}`}
+              class="slider__img"
+              width={image.asset.metadata?.dimensions.width ?? 600}
+              height={image.asset.metadata?.dimensions.height ?? 800}
+              densities={[1, 1.5, 2]}
+              format="webp"
+              quality={80}
+              loading="lazy"
+            />
+          ))}
+        </div>
+
+        <progress
+          class="slider__progress"
+          max="100"
+          value="0"
+          aria-label="Galeria: progrés de desplaçament"
+        />
+      </div>
     </div>
+  )
+}
 
-    <progress
-      class="slider__progress"
-      max="100"
-      value="0"
-      aria-label="Galeria: progrés de desplaçament"></progress>
-  </div>
-</div>
-
-<!-- ─── Behaviour ─────────────────────────────────────────────── -->
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
-    const slider = document.querySelector('[data-slider]')
-    const progress = document.querySelector('.slider__progress')
+    // Query for the slider and progress bar within the current component instance
+    // This is important if multiple instances of this component could exist on a page,
+    // though for a homepage 'About' section, it's likely unique.
+    const aboutSectionComponent = document.querySelector('.about') // Assuming .about is unique to this rendered section
+    if (!aboutSectionComponent) return
+
+    const slider = aboutSectionComponent.querySelector('[data-slider]')
+    const progress = aboutSectionComponent.querySelector('.slider__progress')
 
     if (!slider || !progress) return
 
@@ -76,6 +125,10 @@ const {
     slider.addEventListener('scroll', updateProgress)
     window.addEventListener('resize', updateProgress)
     window.addEventListener('load', updateProgress) // initial paint
+
+    // Ensure progress is updated if images load and change scrollWidth
+    // This might require a more robust solution like ResizeObserver on the slider
+    // or listening to load events on images if lazy loading affects initial calculation.
   })
 </script>
 
@@ -124,7 +177,6 @@ const {
 
   /* Trailing spacer so the last slide can snap flush left */
   .slider::after {
-    /* NEW */
     content: '';
     flex: 0 0 calc(100% - var(--slider-space)); /* fills out to container width */
   }

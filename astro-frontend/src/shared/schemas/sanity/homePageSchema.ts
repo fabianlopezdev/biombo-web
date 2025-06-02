@@ -16,6 +16,76 @@ const localeStringSchema = z
 // We don't need portable text for the homepage sections right now, so removing these schemas
 // If needed later, they can be re-added or imported from pageSchema
 
+// Basic Zod schema for a child of a portable text block (span)
+export const portableTextChildSchema = z.object({
+  _key: z.string(),
+  _type: z.literal('span'),
+  marks: z.array(z.string()).optional(),
+  text: z.string(),
+})
+
+// Basic Zod schema for a portable text block
+export const portableTextBlockSchema = z.object({
+  _key: z.string(),
+  _type: z.string(), // Allows for 'block' or custom block types
+  style: z.string().optional(),
+  children: z.array(portableTextChildSchema),
+  listItem: z.string().optional(), // For list items (bullet, number)
+  level: z.number().optional(), // For nested lists
+  markDefs: z
+    .array(
+      z.object({
+        _key: z.string(),
+        _type: z.string(),
+        href: z.string().optional(), // Example for link markDef
+        blank: z.boolean().optional(), // Example for link markDef
+      }),
+    )
+    .optional(),
+})
+
+// Zod schema for image asset metadata
+const imageAssetMetadataSchema = z.object({
+  lqip: z.string().optional(), // Low-Quality Image Placeholder
+  dimensions: z.object({
+    width: z.number(),
+    height: z.number(),
+    aspectRatio: z.number(),
+  }),
+})
+
+// Zod schema for image asset
+const imageAssetSchema = z.object({
+  _id: z.string(),
+  url: z.string().url(),
+  metadata: imageAssetMetadataSchema.optional(), // Making metadata optional as it might not always be present
+})
+
+// Zod schema for image hotspot
+const imageHotspotSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  height: z.number(),
+  width: z.number(),
+})
+
+// Zod schema for image crop
+const imageCropSchema = z.object({
+  top: z.number(),
+  bottom: z.number(),
+  left: z.number(),
+  right: z.number(),
+})
+
+// Zod schema for a Sanity image
+export const sanityImageSchema = z.object({
+  _key: z.string().optional(), // _key might not be present if it's a direct image field, not in an array
+  _type: z.literal('image'),
+  asset: imageAssetSchema, // Reference to the image asset
+  hotspot: imageHotspotSchema.nullable().optional(),
+  crop: imageCropSchema.nullable().optional(),
+})
+
 // Define Zod schema for Hero Section
 const heroSectionSchema = z.object({
   _type: z.literal('heroSection').optional(),
@@ -44,19 +114,20 @@ export type FeaturedProjectItem = z.infer<typeof featuredProjectItemSchema>
 // Define Zod schema for Projects Section with all required fields
 const projectsSectionSchema = z.object({
   _type: z.literal('projectsSection'),
-  title: localeStringSchema,
-  subtitle: localeStringSchema.optional(),
-  viewAllText: localeStringSchema.optional(),
-  viewProjectText: localeStringSchema.optional(),
+  title: z.string(),
+  subtitle: z.string().optional(),
+  viewAllText: z.string().optional(),
+  viewProjectText: z.string().optional(),
   // Properly reference the projectSchema for featured projects
   featuredProjects: z.array(featuredProjectItemSchema).optional(),
 })
 
-// Define Zod schema for About Section (placeholder for now)
+// Define Zod schema for About Section
 const aboutSectionSchema = z.object({
   _type: z.literal('aboutSection'),
-  title: localeStringSchema,
-  // Add more fields as needed when you expand this section
+  title: z.string(), // Title is a direct string, not localized at field level
+  description: z.array(portableTextBlockSchema).min(1), // Portable text, required
+  images: z.array(sanityImageSchema).min(1), // Array of images, at least one required
 })
 
 // Define Zod schema for Services Section (placeholder for now)
@@ -82,6 +153,9 @@ export const homePageSchema = z.object({
 export type LocaleString = z.infer<typeof localeStringSchema>
 // Since we're not using localePortableTextSchema in this schema currently, comment it out
 // export type LocalePortableText = z.infer<typeof localePortableTextSchema>
+export type PortableTextChild = z.infer<typeof portableTextChildSchema>
+export type PortableTextBlock = z.infer<typeof portableTextBlockSchema>
+export type SanityImage = z.infer<typeof sanityImageSchema>
 export type HeroSection = z.infer<typeof heroSectionSchema>
 export type ProjectsSection = z.infer<typeof projectsSectionSchema>
 export type AboutSection = z.infer<typeof aboutSectionSchema>

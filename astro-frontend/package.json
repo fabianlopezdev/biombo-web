@@ -19,6 +19,7 @@
     "i18n:sync": "npm run i18n:generate:pages && npm run i18n:generate:types"
   },
   "dependencies": {
+    "@portabletext/to-html": "^2.0.14",
     "@sanity/astro": "^3.2.6",
     "@sanity/client": "^7.2.2",
     "astro": "^5.7.5",
