@@ -11,8 +11,10 @@ import { Image } from 'astro:assets'
 // Props & Sanity data
 // ----------------------------------------------------------------------
 
+import type { AboutSection } from '@/shared/schemas/sanity/homePageSchema'
+
 interface Props {
-  sectionData?: any
+  sectionData?: AboutSection | null
 }
 
 const { sectionData } = Astro.props
@@ -202,7 +204,7 @@ const imageWidth = 29.495
     /* ===================== ORIGINAL PROGRESS TRACKING (FOR REFERENCE) ===================== */
 
     function updateProgress() {
-      // Only update if we're not in the middle of an animation
+      // Don't update during animations
       if (isAnimating) {
         console.log('Skipping progress update - animation in progress')
         return
@@ -250,74 +252,19 @@ const imageWidth = 29.495
       nextBtn.classList.toggle('disabled', lastSlide)
     }
 
-    /* ===================== DRAG FUNCTIONALITY (INDICATOR ONLY) ===================== */
-
-    let draggingBar = false
+    /* ===================== PROGRESS BAR SETUP ===================== */
 
     // Progress bar click handler - only for progress bar area, not indicator
     progressBar.addEventListener('click', handleProgressBarClick)
 
-    function startIndicatorDrag(clientX) {
-      draggingBar = true
-      document.body.style.userSelect = 'none'
-      indicator.style.transition = 'none'
-      progressBar.style.cursor = 'grabbing'
-      indicator.style.cursor = 'grabbing'
-      indicator.style.backgroundColor = 'rgba(255,255,255,0.9)'
-      indicator.style.transform += ' scale(0.98)'
-      console.log('Started indicator drag')
-    }
+    // Set proper cursor styles
+    // Progress bar should show pointer cursor for clicking
+    progressBar.style.cursor = 'pointer'
 
-    function indicatorDrag(clientX) {
-      if (!draggingBar) return
+    // Indicator should show normal cursor (not clickable)
+    indicator.style.cursor = 'default'
 
-      const rect = progressBar.getBoundingClientRect()
-      const dragPercent = (clientX - rect.left) / rect.width
-      const targetSegment = Math.max(
-        0,
-        Math.min(imageCount - 1, Math.round(dragPercent * (imageCount - 1))),
-      )
-
-      // Clear any ongoing animations before starting drag-based movement
-      if (animationTimeout) {
-        clearTimeout(animationTimeout)
-        animationTimeout = null
-      }
-
-      // No indicator animation during drag for immediate feedback
-      moveToSegment(targetSegment, false)
-      currentSegment = targetSegment
-      console.log(`Dragging to segment: ${targetSegment}`)
-    }
-
-    function endIndicatorDrag() {
-      if (!draggingBar) return
-      draggingBar = false
-      document.body.style.userSelect = ''
-      indicator.style.transition = 'transform 0.1s linear'
-      progressBar.style.cursor = 'pointer'
-      indicator.style.cursor = 'grab'
-      indicator.style.backgroundColor = ''
-      console.log('Ended indicator drag')
-
-      setTimeout(() => {
-        updateProgress()
-      }, 10)
-    }
-
-    // ONLY indicator can be dragged
-    indicator.addEventListener('mousedown', (e) => {
-      e.preventDefault()
-      e.stopPropagation() // Prevent progress bar click from firing
-      startIndicatorDrag(e.clientX)
-    })
-
-    // Global mouse events for dragging
-    document.addEventListener('mousemove', (e) => {
-      if (draggingBar) indicatorDrag(e.clientX)
-    })
-
-    document.addEventListener('mouseup', endIndicatorDrag)
+    console.log('Progress bar setup complete - click to navigate, no dragging')
 
     /* ===================== HOVER BEHAVIOR (SIMPLIFIED) ===================== */
 
@@ -519,13 +466,6 @@ const imageWidth = 29.495
     </div>
   )
 }
-
-<!-- ------------------------------------------------------------------- -->
-<!-- Styles (unchanged)                                                  -->
-<!-- ------------------------------------------------------------------- -->
-<style>
-  /* entire style block exactly as before */
-</style>
 
 <!-- ------------------------------------------------------------------- -->
 <!-- Styles                                                              -->
@@ -749,7 +689,6 @@ const imageWidth = 29.495
     transform: translateX(0%);
     transition: transform 0.1s linear;
     display: block;
-    cursor: grab;
   }
 
   .slider__indicator:hover {
