@@ -6,7 +6,7 @@ import Projects, {
   type ResolvedProjectsSectionData,
 } from '@/components/pages/homepage/Projects.astro'
 import Hero from '@/components/pages/homepage/Hero.astro'
-import About from '@/components/pages/homepage/About.astro'
+import About from '@/components/pages/homepage/about-section/About.astro'
 // About component fetches its own data based on locale
 
 interface Props {
@@ -38,11 +38,9 @@ const pageTitle = 'Biombo - Art, Events, Community'
       </section>
     </div>
 
-    <section id="about" class="about">
+    <section id="about">
       <About sectionData={homePageData?.about} />
     </section>
-
-    <!-- <section class="services"></section> -->
   </main>
 
   <script src="@/scripts/pages/homepage/horizontalScroll.ts"></script>

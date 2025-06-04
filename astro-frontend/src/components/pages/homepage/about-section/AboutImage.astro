@@ -1,0 +1,18 @@
+---
+import { Image } from 'astro:assets'
+
+const { image } = Astro.props
+---
+
+<Image
+  src={image.asset.url}
+  alt={`Image for   `}
+  style="border-start-start-radius: 0.621875rem; border-end-start-radius: 0.621875rem;"
+  class="slider__img"
+  width={image.asset.metadata?.dimensions.width ?? 600}
+  height={image.asset.metadata?.dimensions.height ?? 800}
+  densities={[1, 1.5, 2]}
+  format="webp"
+  quality={80}
+  loading="lazy"
+/>

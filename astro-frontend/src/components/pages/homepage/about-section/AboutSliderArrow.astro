@@ -1,0 +1,73 @@
+---
+interface Props {
+  direction: 'prev' | 'next'
+}
+
+const { direction } = Astro.props
+---
+
+<button
+  class={`slider__arrow slider__arrow--${direction}`}
+  aria-label={direction === 'prev' ? 'Previous image' : 'Next image'}
+>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path
+      d={direction === 'prev' ? 'M15 18L9 12L15 6' : 'M9 18L15 12L9 6'}
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"></path>
+  </svg>
+</button>
+
+<style>
+  .slider__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--color-primary);
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .slider__arrow:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .slider__arrow:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  .slider__arrow[disabled] {
+    pointer-events: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  .slider__arrow--prev {
+    left: 1rem;
+  }
+  .slider__arrow--next {
+    right: 1rem;
+  }
+
+  .slider__arrow svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+</style>

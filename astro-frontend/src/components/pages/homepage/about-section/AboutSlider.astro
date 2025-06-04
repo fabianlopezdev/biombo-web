@@ -1,0 +1,208 @@
+---
+import type { SanityImage as SanityImageType } from '@/shared/schemas/sanity/homePageSchema'
+import AboutImage from '@/components/pages/homepage/about-section/AboutImage.astro'
+import AboutSliderArrow from '@/components/pages/homepage/about-section/AboutSliderArrow.astro'
+
+const { imagesToDisplay, imageCount } = Astro.props
+console.log('imageCount', imageCount)
+
+interface DisplayImage extends SanityImageType {}
+const indicatorWidthPercent = imageCount > 0 ? 100 / imageCount : 100
+const imageWidth = 29.495
+---
+
+<script src="@/scripts/pages/homepage/about-section/aboutSlider.ts"></script>
+
+{
+  imageCount === 2 && (
+    <div class="slider-container">
+      <div class="slider" data-slider>
+        {imagesToDisplay.map((image: DisplayImage, i: number) => (
+          <div class={`slider__img-container img-${i}`} style={`--image-width: 50%`}>
+            <AboutImage image={image} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+{
+  imageCount > 2 && (
+    <>
+      <div class="slider-container">
+        <div class="slider" data-slider>
+          {imagesToDisplay.map((image: DisplayImage) => (
+            <div class="slider__img-container" style={`--image-width: ${imageWidth}rem`}>
+              <AboutImage image={image} />
+            </div>
+          ))}
+        </div>
+
+        <AboutSliderArrow direction="prev" />
+        <AboutSliderArrow direction="next" />
+      </div>
+      <div
+        class="slider__progress"
+        role="progressbar"
+        aria-label="Galeria: progrés de desplaçament"
+        aria-valuemin="0"
+        aria-valuemax="100"
+      >
+        <div class="slider__indicator" style={`--indicator-width: ${indicatorWidthPercent}%`} />
+      </div>
+    </>
+  )
+}
+
+<style>
+  .is-dragging {
+    cursor: grabbing !important;
+  }
+  [data-slider] {
+    cursor: grab;
+  }
+  .slider-container {
+    position: relative;
+    overflow: hidden;
+    border-start-start-radius: 0.621875rem;
+    border-end-start-radius: 0.621875rem;
+    height: 39.81625rem;
+  }
+
+  .slider {
+    height: 100%;
+    display: flex;
+    gap: var(--slider-space);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .slider.active-drag {
+    cursor: grabbing;
+  }
+
+  .slider::after {
+    content: '';
+    flex: 0 0 0.1px;
+  }
+
+  .slider__img-container {
+    scroll-snap-align: start;
+    user-select: none;
+    flex: 0 0 auto;
+    width: var(--image-width);
+    height: 100%;
+    border-radius: 0.621875rem;
+    overflow: hidden;
+    position: relative;
+    transition:
+      width 0.4s ease,
+      transform 0.4s ease;
+    transform-origin: center;
+  }
+
+  /* Only allow hover on visible images */
+  .slider__img-container.can-hover {
+    cursor: pointer;
+  }
+
+  .slider__img-container.hover-active {
+    width: 100%;
+    z-index: 10;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Grow from left edge (expands to the right) */
+  .slider__img-container.hover-active.grow-right {
+    transform: translateX(0);
+    transform-origin: left center;
+  }
+
+  /* Grow from right edge (expands to the left) */
+  .slider__img-container.hover-active.grow-left {
+    transform: translateX(calc(-100% + 20.7rem));
+    transform-origin: right center;
+  }
+
+  /* Ensure smooth transitions on hover end */
+  .slider__img-container:not(.hover-active) {
+    transform: translateX(0);
+  }
+
+  .img-0:hover {
+    width: 100%;
+  }
+
+  .img-1:hover {
+    width: 100%;
+    transform: translateX(calc(-50% - var(--slider-space)));
+    object-position: left top !important;
+  }
+
+  .img-1 img {
+    transition: object-position 0.4s ease;
+  }
+
+  .img-1:hover img {
+    object-position: top;
+  }
+
+  /* ------------------ Progress bar --------------------------------- */
+  .slider__progress {
+    width: 47.625rem;
+    max-width: 100%;
+    min-height: 1.75rem;
+    border: 1px solid var(--color-primary);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    padding-inline: 0.5rem;
+    padding-block: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: block;
+  }
+
+  .slider__progress:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .slider__indicator {
+    --indicator-width: 100%;
+    width: var(--indicator-width);
+    height: 0.9375rem;
+    background-color: var(--color-primary);
+    border-radius: 1.25rem;
+    transform: translateX(0%);
+    transition: transform 0.1s linear;
+    display: block;
+  }
+
+  .slider__indicator:hover {
+    transform: translateX(var(--current-position, 0%));
+  }
+
+  .slider__indicator:active {
+    cursor: grabbing;
+    transform: translateX(var(--current-position, 0%)) scale(0.9);
+  }
+
+  .no-scroll-on-hover.hover-active.grow-left {
+    transform: scale(1.1) !important;
+  }
+</style>
+
+<style is:global>
+  .slider-container:hover .slider__arrow {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+  }
+</style>
