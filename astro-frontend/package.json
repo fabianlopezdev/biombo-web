@@ -23,7 +23,7 @@
     "@portabletext/types": "^2.0.13",
     "@sanity/astro": "^3.2.6",
     "@sanity/client": "^7.2.2",
-    "astro": "^5.7.5",
+    "astro": "^5.13.3",
     "astro-i18n": "^2.2.4",
     "zod": "^3.25.7"
   },
