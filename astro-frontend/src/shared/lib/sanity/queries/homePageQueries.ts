@@ -71,7 +71,19 @@ const HOME_PAGE_FIELDS = `
       }
     }
   },
-  services,
+  services {
+    _type,
+    title,
+    subtitle,
+    text,
+    selectedCategories[] -> {
+      _id,
+      _type,
+      language,
+      title,
+      description
+    }
+  },
   // Fetch service categories by the same language as the homepage document
   // Use manual order set in Studio (orderRank)
   "serviceCategories": *[_type == "serviceCategory" && language == ^.language] | order(orderRank) {

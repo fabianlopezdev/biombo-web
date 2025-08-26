@@ -4,6 +4,7 @@ import { projectSchema } from './projectSchema'
 import { serviceCategorySchema } from './serviceCategorySchema'
 
 // Define Zod schema for localized strings (consistent with pageSchema)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const localeStringSchema = z
   .object({
     _type: z.literal('localeString'),
@@ -135,7 +136,9 @@ const aboutSectionSchema = z.object({
 const servicesSectionSchema = z.object({
   _type: z.literal('servicesSection'),
   title: z.string(),
-  // Add more fields as needed when you expand this section
+  subtitle: z.string().optional(),
+  text: z.string().optional(),
+  selectedCategories: z.array(serviceCategorySchema).optional(),
 })
 
 // Define Zod schema for the entire HomePage

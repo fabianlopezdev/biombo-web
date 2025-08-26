@@ -1,28 +1,29 @@
 ---
-import type { ServiceCategory } from '@/shared/schemas/sanity/serviceCategorySchema'
 import type { ServicesSection } from '@/shared/schemas/sanity/homePageSchema'
+import type { ServiceCategory } from '@/shared/schemas/sanity/serviceCategorySchema'
 
 interface Props {
-  sectionData?: ServicesSection | null
-  categories?: ServiceCategory[]
+  servicesData?: ServicesSection | null
 }
 
-const { sectionData, categories = [] } = Astro.props as Props
+const { servicesData } = Astro.props as Props
 ---
 <section id="services">
   <div class="services-hero">
-    {sectionData?.title && <h2 class="services__title">{sectionData.title.toUpperCase()}</h2>}
+    {servicesData?.title && <h2 class="services__title">{servicesData.title.toUpperCase()}</h2>}
+    {servicesData?.subtitle && <h3 class="services__subtitle">{servicesData.subtitle}</h3>}
+    {servicesData?.text && <p class="text services__text">{servicesData.text}</p>}
   </div>
 
   <div class="services-list">
     {
-      categories.map((cat) => (
+      (servicesData?.selectedCategories ?? []).map((service: ServiceCategory) => (
         <details>
           <summary>
-            <h3 class="text">{cat.title}</h3>
+            <h3 class="text">{service.title}</h3>
             <p class="text services-toggle" aria-hidden="true"></p>
           </summary>
-          {cat.description && <p>{cat.description}</p>}
+          {service.description && <p>{service.description}</p>}
         </details>
       ))
     }

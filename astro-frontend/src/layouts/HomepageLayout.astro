@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Header from '@/components/shared/header/Header.astro'
-import Footer from "@/components/shared/Footer.astro"
+import Footer from '@/components/shared/Footer.astro'
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 import Projects, {
   type ResolvedProjectsSectionData,
@@ -22,6 +22,7 @@ const { homePageData } = Astro.props
 
 const pageTitle = 'Biombo - Art, Events, Community'
 ---
+
 <script src="@/scripts/pages/homepage/horizontalScroll.ts"></script>
 
 <BaseLayout title={pageTitle}>
@@ -39,16 +40,11 @@ const pageTitle = 'Biombo - Art, Events, Community'
           locale={locale}
         />
       </section>
-
-      
     </div>
 
-
-      <About sectionData={homePageData?.about} />
-      <Services sectionData={homePageData?.services} categories={homePageData?.serviceCategories} />
-    <Footer/>
+    <About sectionData={homePageData?.about} />
+    <Services servicesData={homePageData?.services} />
   </main>
-
   <style>
     .horizontal-scroll-container {
       block-size: calc(100vh - var(--header-height));
@@ -75,7 +71,5 @@ const pageTitle = 'Biombo - Art, Events, Community'
     .projects {
       flex: 0 0 183.3vw !important;
     }
-
-
   </style>
 </BaseLayout>

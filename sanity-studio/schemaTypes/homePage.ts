@@ -284,7 +284,61 @@ export const servicesSection = defineType({
       title: 'Section Title',
       type: 'string', // Changed from localeString to string
     }),
-    // You can add more fields here as needed
+    defineField({
+      name: 'subtitle',
+      title: 'Section Subtitle',
+      type: 'string',
+    }),
+    defineField({
+      name: 'text',
+      title: 'Text',
+      description: 'Short descriptive text for the services section',
+      type: 'text',
+      rows: 3,
+    }),
+    defineField({
+      name: 'selectedCategories',
+      title: 'Select Service Categories',
+      description: 'Pick and order the service categories to display on the homepage',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'serviceCategory'}],
+          options: {
+            // Filter by the language of the Home Page document
+            // and exclude already selected categories to avoid duplicates
+            filter: ({document, parent}: ReferenceFilterResolverContext) => {
+              const homePageDoc = document as any
+              const language = homePageDoc?.language
+              const alreadySelected = Array.isArray(parent)
+                ? parent.map((item: any) => item?._ref).filter(Boolean)
+                : []
+
+              const filterParts = ['_type == "serviceCategory"']
+              const params: {language?: string; selected?: string[]} = {}
+
+              if (language) {
+                filterParts.push('language == $language')
+                params.language = language
+              }
+
+              if (alreadySelected.length > 0) {
+                filterParts.push('!(_id in $selected)')
+                params.selected = alreadySelected
+              }
+
+              return {
+                filter: filterParts.join(' && '),
+                params,
+              }
+            },
+            noResultsText:
+              'No categories for this language. Create new service categories or change the language.',
+          },
+        },
+      ],
+    }),
   ],
 })
 
