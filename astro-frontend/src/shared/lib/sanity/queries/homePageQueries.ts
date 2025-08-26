@@ -8,6 +8,7 @@ const HOME_PAGE_FIELDS = `
   _type,
   _createdAt,
   _updatedAt,
+  language,
   hero,
   projects {
     ...,
@@ -70,7 +71,16 @@ const HOME_PAGE_FIELDS = `
       }
     }
   },
-  services
+  services,
+  // Fetch service categories by the same language as the homepage document
+  // Use manual order set in Studio (orderRank)
+  "serviceCategories": *[_type == "serviceCategory" && language == ^.language] | order(orderRank) {
+    _id,
+    _type,
+    language,
+    title,
+    description
+  }
 `
 
 /**

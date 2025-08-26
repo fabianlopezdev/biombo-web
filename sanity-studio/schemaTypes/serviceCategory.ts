@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { orderRankField, orderRankOrdering } from '@sanity/orderable-document-list'
 
 /**
  * Predefined service categories with translations
@@ -149,7 +150,11 @@ export const serviceCategory = defineType({
       description: 'Brief description of this service category',
       rows: 2,
     }),
+    // Enable manual drag-and-drop ordering in Desk via order rank field
+    orderRankField({ type: 'serviceCategory' }),
   ],
+  // Expose ordering by the manual rank
+  orderings: [orderRankOrdering],
   preview: {
     select: {
       title: 'title',

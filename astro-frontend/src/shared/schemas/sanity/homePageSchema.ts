@@ -1,6 +1,7 @@
 // src/shared/schemas/sanity/homePageSchema.ts
 import { z } from 'zod'
 import { projectSchema } from './projectSchema'
+import { serviceCategorySchema } from './serviceCategorySchema'
 
 // Define Zod schema for localized strings (consistent with pageSchema)
 const localeStringSchema = z
@@ -130,10 +131,10 @@ const aboutSectionSchema = z.object({
   images: z.array(sanityImageSchema).min(1), // Array of images, at least one required
 })
 
-// Define Zod schema for Services Section (placeholder for now)
+// Define Zod schema for Services Section
 const servicesSectionSchema = z.object({
   _type: z.literal('servicesSection'),
-  title: localeStringSchema,
+  title: z.string(),
   // Add more fields as needed when you expand this section
 })
 
@@ -143,10 +144,12 @@ export const homePageSchema = z.object({
   _type: z.literal('homePage'),
   _createdAt: z.string(),
   _updatedAt: z.string(),
+  language: z.union([z.literal('ca'), z.literal('es'), z.literal('en')]).optional(),
   hero: heroSectionSchema.nullable(), // Allow null when not yet populated
   projects: projectsSectionSchema.nullable().optional(), // Allow null or undefined
   about: aboutSectionSchema.nullable().optional(), // Allow null or undefined
   services: servicesSectionSchema.nullable().optional(), // Allow null or undefined
+  serviceCategories: z.array(serviceCategorySchema).optional(),
 })
 
 // Export the TypeScript types derived from the Zod schemas
@@ -170,6 +173,7 @@ export type HomePage = Omit<
   projects?: ProjectsSection | null
   about?: AboutSection | null
   services?: ServicesSection | null
+  serviceCategories?: z.infer<typeof serviceCategorySchema>[] | undefined
 }
 
 // Schema for an array of home pages (likely won't be needed, but included for consistency)

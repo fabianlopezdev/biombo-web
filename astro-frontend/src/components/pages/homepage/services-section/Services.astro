@@ -1,55 +1,28 @@
 ---
-const servicesSection = {
-  title: 'Els nostres serveis',
-  subtitle:
-    "Treballem amb l'objectiu de trobar el millor camí creatiu per al teu projecte, marca o empresa.",
-  text: 'Comptem amb una xarxa de col·laboradors, experts en diverses disciplines creatives, que aporten el seu coneixement per garantir resultats de primer nivell',
-  list: [
-    {
-      title: 'Disseny gràfic',
-      description:
-        'Cartells/ flyers i materials promocionals / Maquetació editorial / Disseny per xarxes socials i entorns digitals / Packaging i etiquetatge / Adaptació gràfica a diversos formats',
-    },
-    {
-      title: 'Brànding i identitat corporativa',
-      description:
-        'Cartells/ flyers i materials promocionals / Maquetació editorial / Disseny per xarxes socials i entorns digitals / Packaging i etiquetatge / Adaptació gràfica a diversos formats',
-    },
-    {
-      title: 'Disseny i desenvolupament web',
-      description:
-        'Cartells/ flyers i materials promocionals / Maquetació editorial / Disseny per xarxes socials i entorns digitals / Packaging i etiquetatge / Adaptació gràfica a diversos formats',
-    },
-    {
-      title: 'Il·lustració',
-      description:
-        'Cartells/ flyers i materials promocionals / Maquetació editorial / Disseny per xarxes socials i entorns digitals / Packaging i etiquetatge / Adaptació gràfica a diversos formats',
-    },
-    {
-      title: "Direcció d'art",
-      description:
-        'Cartells/ flyers i materials promocionals / Maquetació editorial / Disseny per xarxes socials i entorns digitals / Packaging i etiquetatge / Adaptació gràfica a diversos formats',
-    },
-  ],
-}
----
+import type { ServiceCategory } from '@/shared/schemas/sanity/serviceCategorySchema'
+import type { ServicesSection } from '@/shared/schemas/sanity/homePageSchema'
 
+interface Props {
+  sectionData?: ServicesSection | null
+  categories?: ServiceCategory[]
+}
+
+const { sectionData, categories = [] } = Astro.props as Props
+---
 <section id="services">
   <div class="services-hero">
-    <h2 class="services__title">{servicesSection?.title.toUpperCase()}</h2>
-    <p class="services__subtitle">{servicesSection?.subtitle}</p>
-    <p class="services__text text">{servicesSection?.text}</p>
+    {sectionData?.title && <h2 class="services__title">{sectionData.title.toUpperCase()}</h2>}
   </div>
 
   <div class="services-list">
     {
-      servicesSection.list.map((service) => (
+      categories.map((cat) => (
         <details>
           <summary>
-            <h3 class="text">{service.title}</h3>
+            <h3 class="text">{cat.title}</h3>
             <p class="text services-toggle" aria-hidden="true"></p>
           </summary>
-          <p>{service.description}</p>
+          {cat.description && <p>{cat.description}</p>}
         </details>
       ))
     }

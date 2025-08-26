@@ -97,18 +97,18 @@ export const structure: StructureResolver = (S, context) =>
           S.list()
             .title('Service Categories')
             .items([
-              // Create a separate list item for each language
+              // Create a separate draggable list for each language
               ...LANGUAGES.map((lang) =>
-                S.listItem()
-                  .title(`${lang.title} Service Categories`)
-                  .icon(getLanguageIconFn(lang.id))
-                  .child(
-                    S.documentTypeList('serviceCategory')
-                      .title(`${lang.title} Service Categories`)
-                      .filter('_type == "serviceCategory" && language == $language')
-                      .params({ language: lang.id })
-                      .apiVersion('v2023-01-01')
-                  )
+                orderableDocumentListDeskItem({
+                  type: 'serviceCategory',
+                  id: `orderable-serviceCategory-${lang.id}`,
+                  title: `${lang.title} Service Categories`,
+                  S,
+                  context,
+                  filter: '_type == "serviceCategory" && language == $language',
+                  params: { language: lang.id },
+                  icon: getLanguageIconFn(lang.id),
+                })
               ),
             ])
         ),
