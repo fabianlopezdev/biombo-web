@@ -1,11 +1,11 @@
 ---
 import type { ServicesSection } from '@/shared/schemas/sanity/homePageSchema'
 import type { ServiceCategory } from '@/shared/schemas/sanity/serviceCategorySchema'
-
+ 
 interface Props {
   servicesData?: ServicesSection | null
 }
-
+ 
 const { servicesData } = Astro.props as Props
 ---
 <section id="services">
@@ -14,7 +14,7 @@ const { servicesData } = Astro.props as Props
     {servicesData?.subtitle && <h3 class="services__subtitle">{servicesData.subtitle}</h3>}
     {servicesData?.text && <p class="text services__text">{servicesData.text}</p>}
   </div>
-
+ 
   <div class="services-list">
     {
       (servicesData?.selectedCategories ?? []).map((service: ServiceCategory) => (
@@ -29,61 +29,80 @@ const { servicesData } = Astro.props as Props
     }
   </div>
 </section>
-
+ 
 <style>
+  /* Enable height auto animations - this is the key modern CSS feature */
+  :root {
+    interpolate-size: allow-keywords;
+  }
+
   .text {
     font-size: var(--font-size-homepage-sections);
     font-weight: var(--font-weight-light);
     max-width: 51rem;
     line-height: 1.184;
   }
+
   .services-hero {
     height: 100dvh;
     padding-block: var(--padding-block-desktop);
     padding-inline-start: var(--padding-inline-desktop);
     padding-inline-end: 7.25rem;
   }
-
+ 
   .services__title {
     font-size: var(--font-size);
     font-weight: var(--font-weight-light);
     margin-block-end: 7.8125rem;
   }
-
+ 
   .services__subtitle {
     font-size: 5rem;
     letter-spacing: -0.05em;
     font-weight: var(--font-weight-semibold);
     line-height: 1.03;
   }
-
+ 
   .services__text {
     margin-block: 8.0625rem;
     margin-inline-start: auto;
     margin-inline-end: 2rem;
   }
-  /* Decorative toggle symbol: plus when closed, minus when open. Kept as a <p> with class "text" to preserve layout/typography */
-  summary .services-toggle {
-    display: inline-block;
-    min-inline-size: 1ch; /* reserve space so it doesn't collapse */
-    text-align: end;
-    max-inline-size: none; /* override .text max width */
-    flex: 0 0 auto; /* prevent stretching */
-  }
-  summary .services-toggle::before {
-    content: '+';
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: 1;
-    color: inherit;
-  }
-  details[open] summary .services-toggle::before,
-  details:open summary .services-toggle::before {
-    content: '-';
-  }
+
+  /* Details animation styles */
   details {
     --internal-padding-block: 3.5rem;
+    --animation-duration: 0.35s;
+    --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden; /* Important for hiding content during animation */
   }
+
+  /* Target the pseudo-element that contains the collapsible content */
+  details::details-content {
+    /* Initial state - closed */
+    block-size: 0;
+    overflow: hidden;
+    /* Transition both properties for smooth animation */
+    transition: 
+      block-size var(--animation-duration) var(--animation-easing),
+      content-visibility var(--animation-duration) var(--animation-easing);
+    /* Allow discrete properties to animate */
+    transition-behavior: allow-discrete;
+  }
+
+  /* Open state - animate to auto height */
+  details[open]::details-content {
+    block-size: auto;
+  }
+
+  /* Add spacing to the actual content elements, not the details-content */
+  details > p {
+    padding-block: var(--internal-padding-block);
+    padding-inline: var(--padding-inline-desktop);
+    margin: 0; /* Reset margin to avoid spacing issues */
+  }
+
+  /* Summary styling */
   details > summary {
     list-style: none;
     cursor: pointer;
@@ -91,28 +110,95 @@ const { servicesData } = Astro.props as Props
     justify-content: space-between;
     align-items: center;
     padding-inline: var(--padding-inline-desktop);
-    border-top: 1px solid;
+    border-top: 1px solid var(--color-secondary);
     padding-block: var(--internal-padding-block);
+    /* Smooth background transition */
+    transition: background-color var(--animation-duration) var(--animation-easing);
   }
 
-  details:open > summary {
+  /* Remove default marker and position it outside */
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details > summary::marker {
+    display: none;
+  }
+ 
+  details[open] > summary {
     border-bottom: 1px solid;
     background-color: #DEE1E4;
-  }
-
-  details > p {
-    padding-block: var(--internal-padding-block);
-    padding-inline: var(--padding-inline-desktop);
   }
 
   details:last-child > summary {
     border-bottom: 1px solid;
   }
 
-  details:last-child > p {
+  details:last-child[open] > p {
     border-bottom: 1px solid;
   }
 
+  /* Decorative toggle symbol animation */
+  summary .services-toggle {
+    display: inline-block;
+    min-inline-size: 1ch;
+    text-align: end;
+    max-inline-size: none;
+    flex: 0 0 auto;
+    transition: transform var(--animation-duration) var(--animation-easing);
+  }
 
+  summary .services-toggle::before {
+    content: '+';
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 1;
+    color: inherit;
+    display: inline-block;
+    transition: transform var(--animation-duration) var(--animation-easing);
+  }
 
+  /* Rotate the plus to become a minus */
+  details[open] summary .services-toggle::before {
+    content: '-';
+  }
+
+  /* Optional: Add a subtle rotation animation to the toggle symbol */
+  details[open] summary .services-toggle {
+    transform: rotate(180deg);
+  }
+
+  /* Ensure smooth text appearance */
+  details > p {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: 
+      opacity calc(var(--animation-duration) * 0.8) var(--animation-easing),
+      transform calc(var(--animation-duration) * 0.8) var(--animation-easing);
+  }
+
+  details[open] > p {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: calc(var(--animation-duration) * 0.2);
+  }
+
+  /* Progressive enhancement: Only apply animations if browser supports interpolate-size */
+  @supports (interpolate-size: allow-keywords) {
+    /* All animation styles are already in place above */
+    /* This query ensures graceful degradation for older browsers */
+  }
+
+  /* For browsers that don't support ::details-content, use a fallback */
+  @supports not selector(::details-content) {
+    details > p {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--animation-duration) var(--animation-easing);
+    }
+    
+    details[open] > p {
+      max-height: 100vh; /* Large enough value to accommodate content */
+    }
+  }
 </style>
