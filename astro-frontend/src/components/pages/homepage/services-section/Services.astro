@@ -1,0 +1,51 @@
+---
+const servicesSection = {
+    title: "Els nostres serveis",
+    subtitle: "Treballem amb l'objectiu de trobar el millor camí creatiu per al teu projecte, marca o empresa.",
+    text: "Comptem amb una xarxa de col·laboradors, experts en diverses disciplines creatives, que aporten el seu coneixement per garantir resultats de primer nivell"
+}
+---
+
+<section id="services">
+    <div class="services-hero">
+        <h2 class="services__title">{servicesSection?.title.toUpperCase()}</h2>
+        <p class="services__subtitle">{servicesSection?.subtitle}</p>
+        <p class="services__text">{servicesSection?.text}</p>
+    </div>
+    <div class="services-list">
+        
+    </div>
+    </section>
+
+<style>
+.services-hero {
+    height: 100dvh;
+    padding-block: var(--padding-block-desktop);
+    padding-inline-start: var(--padding-inline-desktop);
+    padding-inline-end: 7.25rem;
+}
+
+.services__title {
+    font-size: var(--font-size);
+    font-weight: var(--font-weight-light);
+    margin-block-end: 7.8125rem;
+}
+
+.services__subtitle {
+    font-size: 5rem;
+    letter-spacing: -0.05em;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.03;
+   
+}
+
+.services__text {
+    font-size: var(--font-size-homepage-sections);
+    font-weight: var(--font-weight-light);
+    max-width: 51rem;
+    line-height: 1.184;
+    margin-block: 8.0625rem;
+    margin-inline-start: auto;
+    margin-inline-end: 2rem;
+}
+</style>

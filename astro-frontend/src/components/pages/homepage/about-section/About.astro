@@ -40,7 +40,7 @@ const imagesToDisplay: DisplayImage[] = aboutSection?.images
 const imageCount = imagesToDisplay.length
 ---
 
-<div class="about" data-image-count={imageCount}>
+<section id="about" class="about" data-image-count={imageCount}>
   <div class="about__text">
     <h2 class="about__title">{aboutSection?.title.toUpperCase()}</h2>
     <p class="about__copy" set:html={copyText} />
@@ -55,7 +55,7 @@ const imageCount = imagesToDisplay.length
       )
     }
   </div>
-</div>
+</section>
 
 <style>
   .about {

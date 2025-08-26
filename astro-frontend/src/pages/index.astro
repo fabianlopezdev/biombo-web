@@ -1,5 +1,5 @@
 ---
-import Homepage from '@/layouts/HomepageLayout.astro'
+import HomepageLayout from '@/layouts/HomepageLayout.astro'
 import { fetchHomePageByLocale } from '@/shared/lib/sanity/queries/homePageQueries'
 
 console.log('Astro.site in src/pages/index.astro:', Astro.site)
@@ -19,4 +19,4 @@ try {
 }
 ---
 
-<Homepage locale={locale} homePageData={homePageData} />
+<HomepageLayout locale={locale} homePageData={homePageData} />

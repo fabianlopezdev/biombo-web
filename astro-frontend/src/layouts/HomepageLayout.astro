@@ -7,6 +7,8 @@ import Projects, {
 } from '@/components/pages/homepage/Projects.astro'
 import Hero from '@/components/pages/homepage/Hero.astro'
 import About from '@/components/pages/homepage/about-section/About.astro'
+import Services from '@/components/pages/homepage/services-section/Services.astro'
+
 // About component fetches its own data based on locale
 
 interface Props {
@@ -20,12 +22,13 @@ const { homePageData } = Astro.props
 
 const pageTitle = 'Biombo - Art, Events, Community'
 ---
+<script src="@/scripts/pages/homepage/horizontalScroll.ts"></script>
 
 <BaseLayout title={pageTitle}>
   <Header locale={locale} />
 
   <main id="main" class="main-content">
-    <div class="horizontal-scroll-container" id="horizontal-container">
+    <!-- <div class="horizontal-scroll-container" id="horizontal-container">
       <section class="hero">
         <Hero locale={locale} heroData={homePageData?.hero} />
       </section>
@@ -36,14 +39,15 @@ const pageTitle = 'Biombo - Art, Events, Community'
           locale={locale}
         />
       </section>
+
+      
     </div>
 
-    <section id="about">
-      <About sectionData={homePageData?.about} />
-    </section>
+
+      <About sectionData={homePageData?.about} /> -->
+    <Services/>
   </main>
 
-  <script src="@/scripts/pages/homepage/horizontalScroll.ts"></script>
   <style>
     .horizontal-scroll-container {
       block-size: calc(100vh - var(--header-height));
@@ -71,8 +75,6 @@ const pageTitle = 'Biombo - Art, Events, Community'
       flex: 0 0 183.3vw !important;
     }
 
-    .services {
-      padding: 3rem var(--padding-inline-desktop);
-    }
+
   </style>
 </BaseLayout>
