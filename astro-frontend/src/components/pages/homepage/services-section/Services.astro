@@ -1,11 +1,13 @@
 ---
 import type { ServicesSection } from '@/shared/schemas/sanity/homePageSchema'
 import type { ServiceCategory } from '@/shared/schemas/sanity/serviceCategorySchema'
- 
+import ServicesCircleSignRaw from '@/assets/services-circle-sign.svg?raw'
+import ServicesPlusSignRaw from '@/assets/services-plus-sign.svg?raw'
+
 interface Props {
   servicesData?: ServicesSection | null
 }
- 
+
 const { servicesData } = Astro.props as Props
 ---
 <section id="services">
@@ -14,14 +16,23 @@ const { servicesData } = Astro.props as Props
     {servicesData?.subtitle && <h3 class="services__subtitle">{servicesData.subtitle}</h3>}
     {servicesData?.text && <p class="text services__text">{servicesData.text}</p>}
   </div>
- 
+
   <div class="services-list">
     {
       (servicesData?.selectedCategories ?? []).map((service: ServiceCategory) => (
         <details>
           <summary>
             <h3 class="text">{service.title}</h3>
-            <p class="text services-toggle" aria-hidden="true"></p>
+            <div class="services-toggle" aria-hidden="true">
+              <span class="services-toggle-plus-text">+</span>
+              <span class="services-toggle-plus-svg">
+                <Fragment set:html={ServicesPlusSignRaw} />
+              </span>
+              <span class="services-toggle-circle">
+                <Fragment set:html={ServicesCircleSignRaw} />
+              </span>
+              <span class="services-toggle-minus">-</span>
+            </div>
           </summary>
           {service.description && <p>{service.description}</p>}
         </details>
@@ -29,7 +40,7 @@ const { servicesData } = Astro.props as Props
     }
   </div>
 </section>
- 
+
 <style>
   /* Enable height auto animations - this is the key modern CSS feature */
   :root {
@@ -49,20 +60,20 @@ const { servicesData } = Astro.props as Props
     padding-inline-start: var(--padding-inline-desktop);
     padding-inline-end: 7.25rem;
   }
- 
+
   .services__title {
     font-size: var(--font-size);
     font-weight: var(--font-weight-light);
     margin-block-end: 7.8125rem;
   }
- 
+
   .services__subtitle {
     font-size: 5rem;
     letter-spacing: -0.05em;
     font-weight: var(--font-weight-semibold);
     line-height: 1.03;
   }
- 
+
   .services__text {
     margin-block: 8.0625rem;
     margin-inline-start: auto;
@@ -72,21 +83,20 @@ const { servicesData } = Astro.props as Props
   /* Details animation styles */
   details {
     --internal-padding-block: 3.5rem;
-    --animation-duration: 0.35s;
+    --animation-duration: 0.35s; /* For general fades */
+    --rotation-duration: 1s;   /* Slower rotation */
     --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden; /* Important for hiding content during animation */
+    --background-color: #dee1e4;
+    overflow: hidden;
   }
 
   /* Target the pseudo-element that contains the collapsible content */
   details::details-content {
-    /* Initial state - closed */
     block-size: 0;
     overflow: hidden;
-    /* Transition both properties for smooth animation */
-    transition: 
+    transition:
       block-size var(--animation-duration) var(--animation-easing),
       content-visibility var(--animation-duration) var(--animation-easing);
-    /* Allow discrete properties to animate */
     transition-behavior: allow-discrete;
   }
 
@@ -99,7 +109,7 @@ const { servicesData } = Astro.props as Props
   details > p {
     padding-block: var(--internal-padding-block);
     padding-inline: var(--padding-inline-desktop);
-    margin: 0; /* Reset margin to avoid spacing issues */
+    margin: 0;
   }
 
   /* Summary styling */
@@ -112,8 +122,11 @@ const { servicesData } = Astro.props as Props
     padding-inline: var(--padding-inline-desktop);
     border-top: 1px solid var(--color-secondary);
     padding-block: var(--internal-padding-block);
-    /* Smooth background transition */
     transition: background-color var(--animation-duration) var(--animation-easing);
+  }
+
+  details:hover > summary {
+    background-color: var(--background-color);
   }
 
   /* Remove default marker and position it outside */
@@ -124,55 +137,110 @@ const { servicesData } = Astro.props as Props
   details > summary::marker {
     display: none;
   }
- 
+
   details[open] > summary {
-    border-bottom: 1px solid;
-    background-color: #DEE1E4;
+    border-bottom: 1px solid var(--color-secondary);
+    background-color: var(--background-color);
   }
 
   details:last-child > summary {
-    border-bottom: 1px solid;
+    border-bottom: 1px solid var(--color-secondary);
   }
 
   details:last-child[open] > p {
-    border-bottom: 1px solid;
+    border-bottom: 1px solid var(--color-secondary);
   }
+  
+  /* --- FINAL TOGGLE STYLES START HERE --- */
 
-  /* Decorative toggle symbol animation */
   summary .services-toggle {
-    display: inline-block;
-    min-inline-size: 1ch;
-    text-align: end;
-    max-inline-size: none;
+    position: relative;
     flex: 0 0 auto;
-    transition: transform var(--animation-duration) var(--animation-easing);
+    width: 52px;
+    height: 47px;
   }
 
-  summary .services-toggle::before {
-    content: '+';
-    font-size: inherit;
-    font-weight: inherit;
+  .services-toggle-plus-text,
+  .services-toggle-plus-svg,
+  .services-toggle-circle,
+  .services-toggle-minus {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .services-toggle-plus-svg {
+    transform-origin: center;
+  }
+
+  .services-toggle-minus {
+    /* Base class has no transition */
+  }
+
+  /* Transitions for hover remain on the base classes */
+  .services-toggle-plus-text,
+  .services-toggle-circle {
+    transition: opacity var(--animation-duration) var(--animation-easing);
+  }
+
+  .services-toggle-plus-text,
+  .services-toggle-minus {
+    font-size: var(--font-size-homepage-sections);
+    font-weight: var(--font-weight-light);
     line-height: 1;
     color: inherit;
-    display: inline-block;
-    transition: transform var(--animation-duration) var(--animation-easing);
   }
 
-  /* Rotate the plus to become a minus */
-  details[open] summary .services-toggle::before {
-    content: '-';
+  .services-toggle svg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
   }
 
-  /* Optional: Add a subtle rotation animation to the toggle symbol */
-  details[open] summary .services-toggle {
-    transform: rotate(180deg);
+  /* Default state */
+  .services-toggle-plus-text { opacity: 1; }
+  .services-toggle-plus-svg,
+  .services-toggle-circle,
+  .services-toggle-minus { opacity: 0; }
+
+  /* This rule fixes the hover transition */
+  details:hover:not([open]) summary .services-toggle-plus-svg,
+  details:hover:not([open]) summary .services-toggle-circle {
+    transition: opacity var(--animation-duration) var(--animation-easing);
   }
 
-  /* Ensure smooth text appearance */
+  /* Hover on closed state */
+  details:hover:not([open]) summary .services-toggle-plus-text { opacity: 0; }
+  details:hover:not([open]) summary .services-toggle-plus-svg { opacity: 1; }
+  details:hover:not([open]) summary .services-toggle-circle { opacity: 1; }
+
+  /* Open state */
+  details[open] summary .services-toggle-plus-text { opacity: 0; }
+  details[open] summary .services-toggle-circle { opacity: 1; }
+
+  details[open] summary .services-toggle-plus-svg {
+    opacity: 0;
+    transform: rotate(360deg) scale(0.8);
+    /* Transition is defined here for one-way animation */
+    transition:
+      transform var(--rotation-duration) var(--animation-easing),
+      opacity 0.1s linear var(--rotation-duration);
+  }
+
+  details[open] summary .services-toggle-minus {
+    opacity: 1;
+    /* Transition is defined here for one-way animation */
+    transition: opacity 0.1s linear var(--rotation-duration);
+  }
+
+  /* --- FINAL TOGGLE STYLES END HERE --- */
+
   details > p {
     opacity: 0;
     transform: translateY(-10px);
-    transition: 
+    transition:
       opacity calc(var(--animation-duration) * 0.8) var(--animation-easing),
       transform calc(var(--animation-duration) * 0.8) var(--animation-easing);
   }
@@ -183,13 +251,10 @@ const { servicesData } = Astro.props as Props
     transition-delay: calc(var(--animation-duration) * 0.2);
   }
 
-  /* Progressive enhancement: Only apply animations if browser supports interpolate-size */
   @supports (interpolate-size: allow-keywords) {
-    /* All animation styles are already in place above */
-    /* This query ensures graceful degradation for older browsers */
+    /* Graceful degradation */
   }
 
-  /* For browsers that don't support ::details-content, use a fallback */
   @supports not selector(::details-content) {
     details > p {
       max-height: 0;
@@ -198,7 +263,7 @@ const { servicesData } = Astro.props as Props
     }
     
     details[open] > p {
-      max-height: 100vh; /* Large enough value to accommodate content */
+      max-height: 100vh;
     }
   }
 </style>
