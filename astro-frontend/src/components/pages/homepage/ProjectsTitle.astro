@@ -21,7 +21,7 @@ const chunkThree = `${thirdWord}!`
 
 <script src="@/scripts/pages/homepage/projects-section/projectsTitleAnimation.ts"></script>
 
-<h2 id="projects-heading" class="projects-heading" data-has-played="false">
+<h2 id="projects-heading" class="hero-big-text projects-heading" data-has-played="false">
   <!-- ─── Chunk 1 · Slinky Pop-In ───────────────────────────────────── -->
   <span class="chunk chunk-slinky" aria-label={chunkOne}>
     {
@@ -87,12 +87,8 @@ const chunkThree = `${thirdWord}!`
     --wave-letter-duration: 800ms;
     --flip-letter-duration: 600ms;
     --highlight-animation-duration: 800ms;
-    font-weight: var(--font-weight-semibold);
-    font-size: 5rem;
     grid-column: 55 / span 59;
     grid-row: 15 / span 10;
-    letter-spacing: -0.05em;
-    line-height: 1.03;
     padding-inline-start: 0.3125rem;
 
     &:hover .chunk-flip {

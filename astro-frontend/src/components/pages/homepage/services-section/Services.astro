@@ -13,7 +13,7 @@ const { servicesData } = Astro.props as Props
 <section id="services">
   <div class="services-hero">
     {servicesData?.title && <h2 class="services__title">{servicesData.title.toUpperCase()}</h2>}
-    {servicesData?.subtitle && <h3 class="services__subtitle">{servicesData.subtitle}</h3>}
+    {servicesData?.subtitle && <h3 class="hero-big-text">{servicesData.subtitle}</h3>}
     {servicesData?.text && <p class="text services__text">{servicesData.text}</p>}
   </div>
 
@@ -42,11 +42,9 @@ const { servicesData } = Astro.props as Props
 </section>
 
 <style>
-  /* Enable height auto animations - this is the key modern CSS feature */
-  :root {
-    interpolate-size: allow-keywords;
+  #services {
+    --internal-padding-block: 7.8125rem;
   }
-
   .text {
     font-size: var(--font-size-homepage-sections);
     font-weight: var(--font-weight-light);
@@ -64,14 +62,7 @@ const { servicesData } = Astro.props as Props
   .services__title {
     font-size: var(--font-size);
     font-weight: var(--font-weight-light);
-    margin-block-end: 7.8125rem;
-  }
-
-  .services__subtitle {
-    font-size: 5rem;
-    letter-spacing: -0.05em;
-    font-weight: var(--font-weight-semibold);
-    line-height: 1.03;
+    margin-block-end: var(--internal-padding-block);
   }
 
   .services__text {
@@ -80,9 +71,13 @@ const { servicesData } = Astro.props as Props
     margin-inline-end: 2rem;
   }
 
+  .services-list {
+   padding-block: var(--internal-padding-block); 
+  }
+
   /* Details animation styles */
   details {
-    --internal-padding-block: 3.5rem;
+    --internal-padding-details-block: 3.5rem;
     --animation-duration: 0.35s; /* For general fades */
     --rotation-duration: 1s;   /* Slower rotation */
     --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
@@ -107,7 +102,7 @@ const { servicesData } = Astro.props as Props
 
   /* Add spacing to the actual content elements, not the details-content */
   details > p {
-    padding-block: var(--internal-padding-block);
+    padding-block: var(--internal-padding-details-block);
     padding-inline: var(--padding-inline-desktop);
     margin: 0;
   }
@@ -121,7 +116,7 @@ const { servicesData } = Astro.props as Props
     align-items: center;
     padding-inline: var(--padding-inline-desktop);
     border-top: 1px solid var(--color-secondary);
-    padding-block: var(--internal-padding-block);
+    padding-block: var(--internal-padding-details-block);
     transition: background-color var(--animation-duration) var(--animation-easing);
   }
 

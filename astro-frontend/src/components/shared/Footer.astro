@@ -1,15 +1,227 @@
 ---
+import HighlightScribble from '@/assets/HighlightScribble.astro'
+import WhiteUpArrow from '@/assets/white-up-arrow.svg?raw'
+
+const currentYear = new Date().getFullYear()
 ---
+<script src="@/scripts/animateOnRevealObserver.ts"></script>
 
-<footer>
+<footer class="picket-fence">
+  <div class="footer-first-row">
+    <h2 class="hero-big-text footer-slogan">
+      Transformem
+      <br />
+      idees junts.
+      <span class="highlight-wrapper">
+        <span class="highlight-text">Parlem?</span>
+        <HighlightScribble color="var(--color-primary)" top="5rem" animateOnReveal={true} />
+      </span>
+    </h2>
+    <a href="#top" id="back-to-top-link" class="back-to-top-link">
+      Tornar a l'inici
+      <div class="arrow-up">
+        <Fragment set:html={WhiteUpArrow} />
+      </div>
+    </a>
+  </div>
 
+  <div class="footer-second-row">
+    <div class="contact-info">
+      <address>
+        <a href="mailto:info@biombostudio.com">
+          <div class="label-wrapper">
+            <span class="label-main">info@biombostudio.com</span>
+            <span aria-hidden="true" class="label-hover">info@biombostudio.com</span>
+          </div>
+        </a>
+        <a href="tel:+34696157318">
+          <div class="label-wrapper">
+            <span class="label-main">+(34) 696 157 318</span>
+            <span aria-hidden="true" class="label-hover">+(34) 696 157 318</span>
+          </div>
+        </a>
+      </address>
+      <ul class="social-links">
+        <li>
+          <a
+            href="https://www.instagram.com/biombostudio/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div class="label-wrapper">
+              <span class="label-main">Instagram</span>
+              <span aria-hidden="true" class="label-hover">Instagram</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://www.linkedin.com/in/biomb%C3%B6-studio-13090b99/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div class="label-wrapper">
+              <span class="label-main">LinkedIn</span>
+              <span aria-hidden="true" class="label-hover">LinkedIn</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <small>
+      © {currentYear} Biombo Studio -
+      <a href="/avis-legal">
+        <div class="label-wrapper">
+          <span class="label-main underline">Avís Legal</span>
+          <span aria-hidden="true" class="label-hover underline">Avís Legal</span>
+        </div>
+      </a>
+    </small>
+  </div>
+
+  <script>
+    // Find the link and the horizontal scrolling container from the main page
+    const backToTopLink = document.getElementById('back-to-top-link')
+    const horizontalContainer = document.getElementById('horizontal-container')
+
+    // Check if both elements exist before adding the listener
+    if (backToTopLink && horizontalContainer) {
+      backToTopLink.addEventListener('click', (event) => {
+        // 1. Stop the link from its default "jump" behavior
+        event.preventDefault()
+
+        // 2. Instantly reset the horizontal container to the beginning
+        horizontalContainer.scrollLeft = 0
+
+        // 3. Smoothly scroll the main page to the very top
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        })
+      })
+    }
+  </script>
 </footer>
 
 <style>
-    footer {
-        background-color: var(--color-secondary);
-        color: var(--color-primary);
-        padding-block-start: 9.0625rem;
-        padding-block-end: 9.0625rem;
-    }
+  /* --- Your Existing Footer Styles --- */
+  footer {
+    --padding-block-footer: 7.8125rem;
+    background-color: var(--color-secondary, #f0f0f0);
+    color: var(--color-primary, #111);
+    padding-block-start: var(--padding-block-footer);
+    padding-block-end: 4.6rem;
+    padding-inline: var(--padding-inline-desktop, 2rem);
+  }
+
+  .picket-fence {
+    mask: conic-gradient(from 117.5deg at top, #0000, #000 1deg 124deg, #0000 125deg) 50%/46.1px
+      100%;
+  }
+
+  .footer-first-row {
+    display: flex;
+    justify-content: space-between;
+    padding-block-end: var(--padding-block-footer);
+  }
+
+  .back-to-top-link {
+    align-self: end;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .arrow-up {
+    transform: translate(0);
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .back-to-top-link:hover .arrow-up {
+    transform: translateY(-0.2rem);
+  }
+
+  .footer-slogan {
+    max-width: 55%;
+  }
+
+  .contact-info,
+  address,
+  .social-links {
+    display: flex;
+    gap: 1.4375rem;
+    align-items: baseline;
+  }
+
+  .footer-second-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  address {
+    font-style: normal;
+  }
+
+  .social-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* The <small> tag is reverted to its original, non-flex state */
+  small {
+    font-size: 1.125rem;
+    height: 36.0461px;
+    transform: translate(0px, -7.24921px);
+  }
+
+  /* --- Styles for the Animation Effect --- */
+  .label-wrapper {
+    display: inline-block;
+    overflow: hidden;
+    position: relative;
+    height: 1.4em;
+    vertical-align: baseline; /* Kept as a good default */
+  }
+
+  .label-main,
+  .label-hover {
+    display: block;
+    transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+  }
+
+  .label-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateY(100%);
+  }
+
+  a:hover .label-main,
+  a:focus-within .label-main {
+    transform: translateY(-100%);
+  }
+
+  a:hover .label-hover,
+  a:focus-within .label-hover {
+    transform: translateY(0);
+  }
+
+  .underline {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  /* --- Targeted Fix for "Avís Legal" Link --- */
+  /* This new rule applies the manual offset ONLY to the link inside the <small> tag. */
+  small .label-wrapper {
+    /* You can adjust this value (e.g., -0.2em, -0.3em) for pixel-perfect alignment. */
+    vertical-align: -0.25em;
+  }
+
+  .highlight-wrapper {
+    position: relative;
+    display: inline-block;
+  }
 </style>

@@ -30,6 +30,7 @@
 }
 
 :root {
+  interpolate-size: allow-keywords;
   /* Colors - now dynamically set from Sanity in BaseLayout.astro */
 
   /* Typography */
@@ -209,4 +210,11 @@ figure {
   position: absolute;
   inset-block-end: 0;
   padding-block-end: 1.5rem;
+}
+
+.hero-big-text {
+  font-size: 5rem;
+  letter-spacing: -0.05em;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.03;
 }

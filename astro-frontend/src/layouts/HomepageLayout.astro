@@ -45,31 +45,33 @@ const pageTitle = 'Biombo - Art, Events, Community'
     <About sectionData={homePageData?.about} />
     <Services servicesData={homePageData?.services} />
   </main>
-  <style>
-    .horizontal-scroll-container {
-      block-size: calc(100vh - var(--header-height));
-      display: flex;
-      overflow-x: auto;
-      overscroll-behavior-x: contain;
-      -webkit-overflow-scrolling: touch;
-      /* scroll-snap-type: x proximity; */
-    }
-
-    .horizontal-scroll-container > section {
-      flex: 0 0 100vw;
-      block-size: inherit;
-      /* scroll-snap-align: start; */
-    }
-
-    .hero {
-      padding-inline: var(--padding-inline-desktop);
-      display: flex;
-      align-items: center;
-      position: relative;
-    }
-
-    .projects {
-      flex: 0 0 183.3vw !important;
-    }
-  </style>
 </BaseLayout>
+<Footer />
+
+<style>
+  .horizontal-scroll-container {
+    block-size: calc(100vh - var(--header-height));
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    /* scroll-snap-type: x proximity; */
+  }
+
+  .horizontal-scroll-container > section {
+    flex: 0 0 100vw;
+    block-size: inherit;
+    /* scroll-snap-align: start; */
+  }
+
+  .hero {
+    padding-inline: var(--padding-inline-desktop);
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .projects {
+    flex: 0 0 183.3vw !important;
+  }
+</style>
