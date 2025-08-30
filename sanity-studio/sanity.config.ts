@@ -66,7 +66,8 @@ export default defineConfig({
         'project', 
         'serviceCategory', 
         'homePage', 
-        'header', 
+        'header',
+        'footer',
         'projectsPage', 
         'aboutUsPage', 
         'contactPage'

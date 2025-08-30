@@ -11,6 +11,7 @@ import { aboutUsPage } from './aboutUsPage'
 import { contactPage } from './contactPage'
 import { serviceCategory } from './serviceCategory'
 import { client } from './client'
+import { footer } from './footer'
 
 export const schemaTypes = [
   // Documents
@@ -19,6 +20,7 @@ export const schemaTypes = [
   projects,
   serviceCategory,
   client,
+  footer,
   siteSettings,
   projectsPage,
   aboutUsPage,

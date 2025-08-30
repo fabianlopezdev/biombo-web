@@ -18,6 +18,7 @@ const excludeTypes = ['page', 'media.tag', ...singletonTypes]
 const singletonIcon = (id: string) => {
   const map: Record<string, string> = {
     header: '🧭',
+    footer: '🦶',
     homePage: '🏠',
     projectsPage: '📂',
     aboutUsPage: '👥',
