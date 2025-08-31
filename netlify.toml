@@ -5,26 +5,8 @@
   # Base directory for the Astro frontend
   base = "astro-frontend"
   
-  # Build command with verbose logging
-  command = """
-    echo '🔍 Build Environment Info:' && \
-    echo 'Current directory:' && pwd && \
-    echo 'Node version:' && node --version && \
-    echo 'PNPM version:' && pnpm --version && \
-    echo 'Environment variables:' && env | grep -E 'PUBLIC_|ASTRO_|NODE_ENV|NETLIFY|URL|DEPLOY' | sort && \
-    echo '📦 Installing dependencies...' && \
-    pnpm install && \
-    echo '🏗️ Building Astro SSR app...' && \
-    pnpm run build && \
-    echo '📂 Build output (dist):' && \
-    ls -la dist/ && \
-    echo '📂 Checking for Netlify functions:' && \
-    ls -la .netlify/functions/ 2>/dev/null || echo 'No .netlify/functions directory yet' && \
-    ls -la netlify/functions/ 2>/dev/null || echo 'No netlify/functions directory yet' && \
-    echo '📂 Checking _redirects file:' && \
-    cat dist/_redirects 2>/dev/null || echo 'No _redirects file' && \
-    echo '✅ Build complete!'
-  """
+  # Build command
+  command = "pnpm install && pnpm run build"
   
   # Publish directory - relative to base
   publish = "dist"
@@ -42,13 +24,8 @@
   # Astro-specific optimizations
   ASTRO_TELEMETRY_DISABLED = "1"
 
-# Function settings for SSR
-[functions]
-  # Directory for Netlify Functions (relative to base directory)
-  directory = "netlify/functions"
-  
-  # Use esbuild for better performance
-  node_bundler = "esbuild"
+# The Astro Netlify adapter automatically handles functions
+# No manual configuration needed here
 
 # Headers for optimal performance and security
 [[headers]]
@@ -106,15 +83,8 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Internationalization redirects
-# [[redirects]]
-#   from = "/"
-#   to = "/ca/"
-#   status = 302
-#   conditions = {Language = ["ca"]}
-
-# Note: SSR handles routing dynamically, so we don't need SPA fallback redirects
-# The Netlify adapter will handle all routes through the SSR function
+# The Netlify adapter handles all routing automatically for SSR
+# No manual redirects needed
 
 # Context-specific environment variables
 [context.production.environment]
