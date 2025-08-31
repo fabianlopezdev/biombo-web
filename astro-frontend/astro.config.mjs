@@ -2,16 +2,12 @@
 import { defineConfig } from 'astro/config'
 import sanity from '@sanity/astro'
 import netlify from '@astrojs/netlify'
-import { loadEnv } from 'vite'
-
-// Load environment variables using Vite's loadEnv
-const mode = import.meta.env.MODE || process.env.NODE_ENV || 'development'
-const env = loadEnv(mode, process.cwd(), '') // Load all env vars, '' for all prefixes
 
 // --- START Sanity Environment Variable Validation ---
-const sanityProjectId = env.PUBLIC_SANITY_PROJECT_ID
-const sanityDataset = env.PUBLIC_SANITY_DATASET
-const sanityApiVersion = env.PUBLIC_SANITY_API_VERSION || 'v2024-05-01' // Default if not set
+// Astro automatically loads .env files, so we can use process.env directly
+const sanityProjectId = process.env.PUBLIC_SANITY_PROJECT_ID
+const sanityDataset = process.env.PUBLIC_SANITY_DATASET
+const sanityApiVersion = process.env.PUBLIC_SANITY_API_VERSION || 'v2024-05-01' // Default if not set
 
 if (!sanityProjectId) {
   throw new Error(
@@ -32,7 +28,7 @@ if (typeof sanityDataset !== 'string') {
 
 // https://astro.build/config
 export default defineConfig({
-  site: env.ASTRO_SITE || 'http://localhost:4321', // Added to resolve Invalid URL with astro-i18n
+  site: process.env.ASTRO_SITE || 'http://localhost:4321', // Added to resolve Invalid URL with astro-i18n
   output: 'server', // Enable SSR
   adapter: netlify({
     // Optional: Enable edge middleware for faster response times
@@ -44,7 +40,7 @@ export default defineConfig({
       projectId: sanityProjectId, // Use validated variable
       dataset: sanityDataset, // Use validated variable
       apiVersion: sanityApiVersion,
-      useCdn: env.PUBLIC_SANITY_USE_CDN === 'true', // Use CDN in production, false for development
+      useCdn: process.env.PUBLIC_SANITY_USE_CDN === 'true', // Use CDN in production, false for development
       // studioBasePath: '/admin' // Add this if you plan to embed Sanity Studio later
     }),
   ],
