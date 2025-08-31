@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets'
 import projectsCursor from '@/assets/pages/homepage/projects-cursor.webp'
 import type { TransformedProject } from '@/utils/pages/homepage/projectsUtils'
 
@@ -15,7 +14,7 @@ const { project, viewProjectTextVal } = Astro.props
   <p class="cursor-text">
     {project.viewProjectText || viewProjectTextVal || 'View project'}
   </p>
-  <Image src={projectsCursor} alt="Custom cursor for project links" class="cursor-image" />
+  <img src={projectsCursor.src} alt="Custom cursor for project links" class="cursor-image" />
 </div>
 
 <style>
