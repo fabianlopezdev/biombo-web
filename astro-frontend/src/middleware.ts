@@ -1,6 +1,7 @@
 // src/middleware.ts
 import { defineMiddleware } from 'astro:middleware' // Rely on defineMiddleware for context/next types
 import { useAstroI18n } from 'astro-i18n'
+import astroI18nConfig from '../astro-i18n.config' // Import config directly for serverless
 
 // console.log('[Middleware] src/middleware.ts: Module loaded.')
 
@@ -13,8 +14,8 @@ const pathsToExclude = [
   // e.g., '/api/' if you have API routes not handled by i18n
 ]
 
-// Call useAstroI18n() ONCE to get the handler
-const i18nHandler = useAstroI18n() // ESLint might perceive this as 'any'
+// Pass config directly for serverless/SSR compatibility
+const i18nHandler = useAstroI18n(astroI18nConfig) // Pass config to avoid filesystem access
 
 // context and next are automatically typed by defineMiddleware
 const i18nFilteringMiddleware = defineMiddleware(async (context, next): Promise<Response> => {
