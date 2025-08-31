@@ -1,6 +1,5 @@
 ---
 import ScrollPill from '@/assets/ScrollPill.astro'
-import { Image } from 'astro:assets'
 import type {
   ProjectsSection as SanityProjectsSectionType,
   FeaturedProjectItem,
@@ -61,12 +60,20 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
         >
           {project.image && (
             <a href={project.slug ? `/project/${project.slug}` : '#'} class="project-link">
+              {/* TODO: Uncomment Image component when switching to SSG
               <Image
                 src={project.image}
                 alt={project.alt || project.title || `Project ${projectNumber}`}
                 class="project-image"
                 loading={i === 0 || i === 1 ? 'eager' : 'lazy'}
                 inferSize
+              /> */}
+              {/* Temporary img tag for SSR - remove when switching to SSG */}
+              <img
+                src={project.image}
+                alt={project.alt || project.title || `Project ${projectNumber}`}
+                class="project-image"
+                loading={i === 0 || i === 1 ? 'eager' : 'lazy'}
               />
               <div class="project-caption">
                 <figcaption class="caption-text">

@@ -1,0 +1,23 @@
+{
+  "_id": "footer-ca",
+  "_type": "footer",
+  "language": "ca",
+  "slogan": "Transformem idees junts. **Parlem?**",
+  "backToTopText": "Tornar a l'inici",
+  "email": "info@biombostudio.com",
+  "phone": "+(34) 696 157 318",
+  "socialLinks": [
+    {
+      "_key": "instagram",
+      "platform": "Instagram",
+      "url": "https://www.instagram.com/biombostudio/"
+    },
+    {
+      "_key": "linkedin",
+      "platform": "LinkedIn",
+      "url": "https://www.linkedin.com/in/biomb%C3%B6-studio-13090b99/"
+    }
+  ],
+  "legalLinkText": "Avís Legal",
+  "legalLinkUrl": "/avis-legal"
+}

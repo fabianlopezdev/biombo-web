@@ -37,6 +37,8 @@ export default defineConfig({
   adapter: netlify({
     // Optional: Enable edge middleware for faster response times
     edgeMiddleware: false,
+    // Disable Netlify Image CDN - we use Sanity for images
+    imageCDN: false,
   }),
   prefetch: true,
   integrations: [

@@ -1,12 +1,12 @@
 ---
-import { Image } from 'astro:assets'
-
 const { image } = Astro.props
 ---
 
+{
+  /* TODO: Uncomment Image component when switching to SSG
 <Image
   src={image.asset.url}
-  alt={`Image for   `}
+  alt=""
   style="border-start-start-radius: 0.621875rem; border-end-start-radius: 0.621875rem;"
   class="slider__img"
   width={image.asset.metadata?.dimensions.width ?? 600}
@@ -14,5 +14,16 @@ const { image } = Astro.props
   densities={[1, 1.5, 2]}
   format="webp"
   quality={80}
+  loading="lazy"
+/> */
+}
+{/* Temporary img tag for SSR - remove when switching to SSG */}
+<img
+  src={image.asset.url}
+  alt=""
+  style="border-start-start-radius: 0.621875rem; border-end-start-radius: 0.621875rem;"
+  class="slider__img"
+  width={image.asset.metadata?.dimensions.width ?? 600}
+  height={image.asset.metadata?.dimensions.height ?? 800}
   loading="lazy"
 />
