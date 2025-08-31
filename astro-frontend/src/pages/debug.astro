@@ -1,0 +1,97 @@
+---
+// Debug page to verify SSR is working
+export const prerender = false // Force SSR for this page
+
+const timestamp = new Date().toISOString()
+const env = {
+  NODE_ENV: process.env.NODE_ENV,
+  PUBLIC_SANITY_PROJECT_ID: process.env.PUBLIC_SANITY_PROJECT_ID,
+  PUBLIC_SANITY_DATASET: process.env.PUBLIC_SANITY_DATASET,
+  PUBLIC_SANITY_USE_CDN: process.env.PUBLIC_SANITY_USE_CDN,
+  ASTRO_SITE: process.env.ASTRO_SITE,
+  NETLIFY: process.env.NETLIFY,
+  DEPLOY_URL: process.env.DEPLOY_URL,
+  URL: process.env.URL,
+}
+
+const headers = Astro.request.headers
+const requestInfo = {
+  url: Astro.url.toString(),
+  pathname: Astro.url.pathname,
+  host: headers.get('host'),
+  userAgent: headers.get('user-agent'),
+}
+
+console.log('[DEBUG PAGE] Request at:', timestamp)
+console.log('[DEBUG PAGE] Environment:', env)
+console.log('[DEBUG PAGE] Request info:', requestInfo)
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SSR Debug Page</title>
+    <style>
+      body {
+        font-family: monospace;
+        padding: 2rem;
+        background: #1a1a1a;
+        color: #0f0;
+      }
+      pre {
+        background: #000;
+        padding: 1rem;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+      h1,
+      h2 {
+        color: #0f0;
+        border-bottom: 1px solid #0f0;
+        padding-bottom: 0.5rem;
+      }
+      .timestamp {
+        color: #ff0;
+      }
+      .success {
+        color: #0f0;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔍 SSR Debug Page</h1>
+
+    <p class="success">✅ If you see this page, SSR is working!</p>
+
+    <h2>Server Timestamp</h2>
+    <p class="timestamp">Generated at: {timestamp}</p>
+    <p>This timestamp is generated server-side on each request.</p>
+
+    <h2>Environment Variables</h2>
+    <pre>{JSON.stringify(env, null, 2)}</pre>
+
+    <h2>Request Information</h2>
+    <pre>{JSON.stringify(requestInfo, null, 2)}</pre>
+
+    <h2>SSR Status</h2>
+    <ul>
+      <li>Rendering Mode: <strong>Server-Side (SSR)</strong></li>
+      <li>Adapter: <strong>@astrojs/netlify</strong></li>
+      <li>
+        Runtime: <strong>{process.env.NETLIFY ? 'Netlify Function' : 'Local Development'}</strong>
+      </li>
+    </ul>
+
+    <h2>Next Steps</h2>
+    <p>Check the following:</p>
+    <ol>
+      <li>Environment variables are correctly loaded</li>
+      <li>Sanity connection is configured (PROJECT_ID and DATASET)</li>
+      <li>This page refreshes with a new timestamp on each load</li>
+      <li>Check browser DevTools Network tab - should NOT be cached</li>
+    </ol>
+  </body>
+</html>

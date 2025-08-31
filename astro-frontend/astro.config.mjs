@@ -2,9 +2,13 @@
 import { defineConfig } from 'astro/config'
 import sanity from '@sanity/astro'
 import netlify from '@astrojs/netlify'
+import dotenv from 'dotenv'
+
+// Load environment variables from .env files
+// This is needed because Astro config runs before Astro loads env files
+dotenv.config()
 
 // --- START Sanity Environment Variable Validation ---
-// Astro automatically loads .env files, so we can use process.env directly
 const sanityProjectId = process.env.PUBLIC_SANITY_PROJECT_ID
 const sanityDataset = process.env.PUBLIC_SANITY_DATASET
 const sanityApiVersion = process.env.PUBLIC_SANITY_API_VERSION || 'v2024-05-01' // Default if not set

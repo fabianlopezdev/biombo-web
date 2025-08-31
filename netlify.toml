@@ -5,8 +5,26 @@
   # Base directory for the Astro frontend
   base = "astro-frontend"
   
-  # Build command - runs from within astro-frontend
-  command = "pnpm run build"
+  # Build command with verbose logging
+  command = """
+    echo '🔍 Build Environment Info:' && \
+    echo 'Current directory:' && pwd && \
+    echo 'Node version:' && node --version && \
+    echo 'PNPM version:' && pnpm --version && \
+    echo 'Environment variables:' && env | grep -E 'PUBLIC_|ASTRO_|NODE_ENV|NETLIFY|URL|DEPLOY' | sort && \
+    echo '📦 Installing dependencies...' && \
+    pnpm install && \
+    echo '🏗️ Building Astro SSR app...' && \
+    pnpm run build && \
+    echo '📂 Build output (dist):' && \
+    ls -la dist/ && \
+    echo '📂 Checking for Netlify functions:' && \
+    ls -la .netlify/functions/ 2>/dev/null || echo 'No .netlify/functions directory yet' && \
+    ls -la netlify/functions/ 2>/dev/null || echo 'No netlify/functions directory yet' && \
+    echo '📂 Checking _redirects file:' && \
+    cat dist/_redirects 2>/dev/null || echo 'No _redirects file' && \
+    echo '✅ Build complete!'
+  """
   
   # Publish directory - relative to base
   publish = "dist"
@@ -26,8 +44,8 @@
 
 # Function settings for SSR
 [functions]
-  # Directory for Netlify Functions (auto-managed by @astrojs/netlify)
-  directory = "astro-frontend/netlify/functions"
+  # Directory for Netlify Functions (relative to base directory)
+  directory = "netlify/functions"
   
   # Use esbuild for better performance
   node_bundler = "esbuild"
@@ -89,17 +107,14 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 # Internationalization redirects
-[[redirects]]
-  from = "/"
-  to = "/ca/"
-  status = 302
-  conditions = {Language = ["ca"]}
+# [[redirects]]
+#   from = "/"
+#   to = "/ca/"
+#   status = 302
+#   conditions = {Language = ["ca"]}
 
-# Fallback for SPA routing
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Note: SSR handles routing dynamically, so we don't need SPA fallback redirects
+# The Netlify adapter will handle all routes through the SSR function
 
 # Context-specific environment variables
 [context.production.environment]
