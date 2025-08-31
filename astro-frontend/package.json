@@ -4,7 +4,9 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "dev:prod-data": "cross-env SANITY_DATASET=production astro dev",
     "build": "astro build",
+    "build:production": "cross-env NODE_ENV=production astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint . --ext .js,.ts,.astro,.json",
@@ -19,6 +21,7 @@
     "i18n:sync": "npm run i18n:generate:pages && npm run i18n:generate:types"
   },
   "dependencies": {
+    "@astrojs/netlify": "^6.5.9",
     "@portabletext/to-html": "^2.0.14",
     "@portabletext/types": "^2.0.13",
     "@sanity/astro": "^3.2.6",
@@ -29,6 +32,7 @@
   },
   "devDependencies": {
     "@typescript-eslint/parser": "^8.32.1",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.5.0",
     "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",

@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config'
 import sanity from '@sanity/astro'
+import netlify from '@astrojs/netlify'
 import { loadEnv } from 'vite'
 
 // Load environment variables using Vite's loadEnv
@@ -32,15 +33,19 @@ if (typeof sanityDataset !== 'string') {
 // https://astro.build/config
 export default defineConfig({
   site: env.ASTRO_SITE || 'http://localhost:4321', // Added to resolve Invalid URL with astro-i18n
+  output: 'server', // Enable SSR
+  adapter: netlify({
+    // Optional: Enable edge middleware for faster response times
+    edgeMiddleware: false,
+  }),
   prefetch: true,
   integrations: [
     sanity({
       projectId: sanityProjectId, // Use validated variable
       dataset: sanityDataset, // Use validated variable
       apiVersion: sanityApiVersion,
-      useCdn: false, // false for static builds, true for live previews/SSR with fresh data
+      useCdn: env.PUBLIC_SANITY_USE_CDN === 'true', // Use CDN in production, false for development
       // studioBasePath: '/admin' // Add this if you plan to embed Sanity Studio later
     }),
   ],
-  // Other Astro configurations might be here
 })

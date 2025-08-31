@@ -5,6 +5,7 @@ export default defineCliConfig({
     projectId: '08xgag7z',
     dataset: 'production'
   },
+  studioHost: 'biombo-studio',
   /**
    * Enable auto-updates for studios.
    * Learn more at https://www.sanity.io/docs/cli#auto-updates

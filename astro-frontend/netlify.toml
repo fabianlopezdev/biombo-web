@@ -1,0 +1,152 @@
+# Netlify deployment configuration for Astro SSR
+# This configuration is optimized for performance and SSR deployment
+
+[build]
+  # Build command - runs the production build
+  command = "npm run build"
+  
+  # Publish directory - where Astro outputs the built site
+  # For SSR: this will be auto-configured by @astrojs/netlify adapter
+  # For static: defaults to dist/
+  publish = "dist"
+  
+  # Base directory for builds in monorepo setup
+  # base = "astro-frontend" # Uncomment only if deploying from monorepo root
+
+[build.environment]
+  # Node.js version for optimal performance and compatibility
+  NODE_VERSION = "20"
+  
+  # Environment variables for production
+  NODE_ENV = "production"
+  
+  # Enable Netlify Image CDN integration
+  NETLIFY_USE_ASTRO = "true"
+  
+  # Astro-specific optimizations
+  ASTRO_TELEMETRY_DISABLED = "1"
+
+# Function settings for SSR (when enabled)
+[functions]
+  # Directory for Netlify Functions (auto-managed by @astrojs/netlify)
+  directory = "netlify/functions"
+  
+  # Timeout for serverless functions (max 10 seconds for Netlify free tier)
+  # Increase to 900 for Pro plans if needed
+  node_bundler = "esbuild"
+
+# Headers for optimal performance and security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Performance headers
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Static asset caching
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# HTML pages - shorter cache for dynamic content
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, s-maxage=31536000"
+
+# API routes and SSR pages (when enabled)
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# Font optimization
+[[headers]]
+  for = "/*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Access-Control-Allow-Origin = "*"
+
+# Image optimization headers
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.avif"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Internationalization redirects (based on your i18n setup)
+# Redirect root to default locale if needed
+[[redirects]]
+  from = "/"
+  to = "/ca/"
+  status = 302
+  conditions = {Language = ["ca"]}
+
+# Fallback for SPA routing and internationalization
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Development settings
+[dev]
+  # Local development command
+  command = "npm run dev"
+  
+  # Port for local development
+  port = 4321
+  
+  # Auto-publish changes during development
+  publish = "dist"
+
+# Edge Functions for middleware (when using SSR with edge middleware)
+# [edge_functions]
+#   This will be auto-configured by @astrojs/netlify when using edgeMiddleware: true
+
+# Build plugins for optimization
+# [[plugins]]
+#   package = "@netlify/plugin-lighthouse" # Example: Add Lighthouse CI if needed
+
+# Context-specific environment variables
+[context.production.environment]
+  NODE_ENV = "production"
+  PUBLIC_ENV_MODE = "production"
+  PUBLIC_SANITY_USE_CDN = "true"
+  ASTRO_SITE = "https://your-domain.netlify.app"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "production"
+  PUBLIC_ENV_MODE = "staging"
+  PUBLIC_SANITY_USE_CDN = "false"
+  
+[context.branch-deploy.environment]
+  NODE_ENV = "production"
+  PUBLIC_ENV_MODE = "staging"
+  PUBLIC_SANITY_USE_CDN = "false"
+
+# Preview settings for branch deploys
+[context.deploy-preview]
+  command = "npm run build"
+
+[context.branch-deploy]
+  command = "npm run build"
