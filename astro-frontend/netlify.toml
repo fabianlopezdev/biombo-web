@@ -2,9 +2,6 @@
 # This configuration deploys the Astro frontend with SSR
 
 [build]
-  # Base directory for the Astro frontend
-  base = "astro-frontend"
-  
   # Build command
   command = "pnpm install && pnpm run build"
   
