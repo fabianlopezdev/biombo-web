@@ -10,10 +10,18 @@ interface Props {
 
 const { servicesData } = Astro.props as Props
 ---
+
+<script src="@/scripts/animations/slideUpTextAnimation.ts"></script>
 <section id="services">
   <div class="services-hero">
     {servicesData?.title && <h2 class="services__title">{servicesData.title.toUpperCase()}</h2>}
-    {servicesData?.subtitle && <h3 class="hero-big-text">{servicesData.subtitle}</h3>}
+    {
+      servicesData?.subtitle && (
+        <h3 class="hero-big-text" data-slide-up-animation>
+          {servicesData.subtitle}
+        </h3>
+      )
+    }
     {servicesData?.text && <p class="text services__text">{servicesData.text}</p>}
   </div>
 
@@ -72,14 +80,14 @@ const { servicesData } = Astro.props as Props
   }
 
   .services-list {
-   padding-block: var(--internal-padding-block); 
+    padding-block: var(--internal-padding-block);
   }
 
   /* Details animation styles */
   details {
     --internal-padding-details-block: 3.5rem;
     --animation-duration: 0.35s; /* For general fades */
-    --rotation-duration: 1s;   /* Slower rotation */
+    --rotation-duration: 1s; /* Slower rotation */
     --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
     --background-color: #dee1e4;
     overflow: hidden;
@@ -145,7 +153,7 @@ const { servicesData } = Astro.props as Props
   details:last-child[open] > p {
     border-bottom: 1px solid var(--color-secondary);
   }
-  
+
   /* --- FINAL TOGGLE STYLES START HERE --- */
 
   summary .services-toggle {
@@ -195,10 +203,14 @@ const { servicesData } = Astro.props as Props
   }
 
   /* Default state */
-  .services-toggle-plus-text { opacity: 1; }
+  .services-toggle-plus-text {
+    opacity: 1;
+  }
   .services-toggle-plus-svg,
   .services-toggle-circle,
-  .services-toggle-minus { opacity: 0; }
+  .services-toggle-minus {
+    opacity: 0;
+  }
 
   /* This rule fixes the hover transition */
   details:hover:not([open]) summary .services-toggle-plus-svg,
@@ -207,13 +219,23 @@ const { servicesData } = Astro.props as Props
   }
 
   /* Hover on closed state */
-  details:hover:not([open]) summary .services-toggle-plus-text { opacity: 0; }
-  details:hover:not([open]) summary .services-toggle-plus-svg { opacity: 1; }
-  details:hover:not([open]) summary .services-toggle-circle { opacity: 1; }
+  details:hover:not([open]) summary .services-toggle-plus-text {
+    opacity: 0;
+  }
+  details:hover:not([open]) summary .services-toggle-plus-svg {
+    opacity: 1;
+  }
+  details:hover:not([open]) summary .services-toggle-circle {
+    opacity: 1;
+  }
 
   /* Open state */
-  details[open] summary .services-toggle-plus-text { opacity: 0; }
-  details[open] summary .services-toggle-circle { opacity: 1; }
+  details[open] summary .services-toggle-plus-text {
+    opacity: 0;
+  }
+  details[open] summary .services-toggle-circle {
+    opacity: 1;
+  }
 
   details[open] summary .services-toggle-plus-svg {
     opacity: 0;
@@ -256,7 +278,7 @@ const { servicesData } = Astro.props as Props
       overflow: hidden;
       transition: max-height var(--animation-duration) var(--animation-easing);
     }
-    
+
     details[open] > p {
       max-height: 100vh;
     }
