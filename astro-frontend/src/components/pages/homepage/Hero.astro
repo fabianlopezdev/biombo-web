@@ -62,8 +62,13 @@ const scrollText = heroData?.scrollText
 
   .slide-up-line-inner {
     display: inline-block !important;
-    transform: translate3d(0, 100%, 0) !important;
+    transform: translate3d(
+      0,
+      105%,
+      0
+    ) !important; /* Slightly more than 100% to ensure full hiding */
     will-change: transform !important;
+    padding-bottom: 0.2em !important; /* Space for descenders on the inner element */
   }
 
   /* Animation triggered state with CSS variables for customization */
