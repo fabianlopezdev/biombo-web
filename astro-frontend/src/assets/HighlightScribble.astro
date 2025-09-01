@@ -1,28 +1,32 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
+import type { HTMLAttributes } from 'astro/types'
 
 interface Props extends HTMLAttributes<'svg'> {
-  color?: string;
-  top?: string | null;
-  animateOnReveal?: boolean; // New prop to control animation trigger
+  color?: string
+  top?: string | null
+  animateOnReveal?: boolean // New prop to control animation trigger
+  animationDelay?: string // Custom animation delay (e.g., '2.5s')
 }
 
-const { 
-  color = 'currentColor', 
-  top = null, 
+const {
+  color = 'currentColor',
+  top = null,
   animateOnReveal = false, // Default to immediate animation
-  ...rest 
-} = Astro.props;
+  animationDelay = '0.3s', // Default delay
+  ...rest
+} = Astro.props
 
-const inlineStyle = top ? `top: ${top};` : '';
+const inlineStyle = [top ? `top: ${top}` : '', `--animation-delay: ${animationDelay}`]
+  .filter(Boolean)
+  .join('; ')
 // Add data attribute and class based on animation type
-const dataAttributes = animateOnReveal ? { 'data-animate-on-reveal': 'true' } : {};
-const animationClass = animateOnReveal ? '' : 'animate-immediate';
+const dataAttributes = animateOnReveal ? { 'data-animate-on-reveal': 'true' } : {}
+const animationClass = animateOnReveal ? '' : 'animate-immediate'
 
 // Generate unique IDs to avoid conflicts when multiple scribbles are on the same page
-const uniqueId = Math.random().toString(36).substring(7);
-const maskId = `scribble-mask-${uniqueId}`;
-const pathId = `mask-path-${uniqueId}`;
+const uniqueId = Math.random().toString(36).substring(7)
+const maskId = `scribble-mask-${uniqueId}`
+const pathId = `mask-path-${uniqueId}`
 ---
 
 <svg
@@ -38,11 +42,12 @@ const pathId = `mask-path-${uniqueId}`;
 >
   <defs>
     <mask id={maskId} maskUnits="userSpaceOnUse">
-      
-      {/* ✅ THE CRITICAL FIX: The mask's background MUST be black for the
-          animated white stroke to have a "reveal" effect. */}
+      {
+        /* ✅ THE CRITICAL FIX: The mask's background MUST be black for the
+          animated white stroke to have a "reveal" effect. */
+      }
       <rect width="100%" height="100%" fill="black"></rect>
-      
+
       <path
         id={pathId}
         class="mask-path"
@@ -59,9 +64,7 @@ const pathId = `mask-path-${uniqueId}`;
 </svg>
 
 <!-- Import the observer script if needed for reveal animation -->
-{animateOnReveal && (
-  <script src="@/scripts/animateOnRevealObserver.ts"></script>
-)}
+{animateOnReveal && <script src="@/scripts/animateOnRevealObserver.ts" />}
 
 <style is:global>
   @keyframes draw {
@@ -82,7 +85,7 @@ const pathId = `mask-path-${uniqueId}`;
     transition: scale 0.3s ease;
     pointer-events: none;
   }
-  
+
   .mask-path {
     stroke: white;
     stroke-width: 16;
@@ -91,29 +94,29 @@ const pathId = `mask-path-${uniqueId}`;
     fill: none;
     stroke-dasharray: 1;
   }
-  
+
   /* Immediate animation for hero section */
   .animate-immediate .mask-path {
     stroke-dashoffset: -1;
-    animation: draw 1s ease-out 0.3s forwards;
+    animation: draw 1s ease-out var(--animation-delay, 0.3s) forwards;
   }
-  
+
   /* Hidden by default for reveal animation */
-  [data-animate-on-reveal="true"] {
+  [data-animate-on-reveal='true'] {
     opacity: 0;
   }
-  
-  [data-animate-on-reveal="true"] .mask-path {
+
+  [data-animate-on-reveal='true'] .mask-path {
     stroke-dashoffset: -1; /* Changed from 1 to -1 to match hero direction */
   }
-  
+
   /* Animation triggered by intersection observer */
   .animate-draw {
     opacity: 1;
     transition: opacity 0.2s ease;
   }
-  
+
   .animate-draw .mask-path {
-    animation: draw 1s ease-out 0.2s forwards;
+    animation: draw 1s ease-out var(--animation-delay, 0.2s) forwards;
   }
 </style>
