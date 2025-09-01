@@ -22,8 +22,9 @@ const scrollText = heroData?.scrollText
 ---
 
 <script src="@/scripts/pages/homepage/heroScroll.ts"></script>
+<script src="@/scripts/pages/homepage/heroAnimation.ts"></script>
 
-<h1>
+<h1 id="hero-title" data-animation="pending">
   {beforeHighlight}
   <span class="highlight-wrapper">
     <span class="highlight-text">{highlightedWord}</span>
@@ -39,6 +40,56 @@ const scrollText = heroData?.scrollText
     <span aria-hidden="true" class="label-hover">{scrollText}</span>
   </p>
 </button>
+
+<style is:global>
+  /* Hero animation styles - global to work with dynamically created elements */
+  #hero-title[data-animation='pending'] {
+    visibility: hidden;
+  }
+
+  #hero-title[data-animation='ready'],
+  #hero-title[data-animation='active'] {
+    visibility: visible;
+  }
+
+  /* Line animation styles */
+  .hero-line {
+    display: block !important;
+    overflow: hidden !important;
+    position: relative !important;
+    line-height: inherit !important;
+  }
+
+  .hero-line-inner {
+    display: inline-block !important;
+    transform: translate3d(0, 100%, 0) !important;
+    will-change: transform !important;
+  }
+
+  /* Animation triggered state */
+  [data-animation='active'] .hero-line-inner {
+    transform: translate3d(0, 0, 0) !important;
+    transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1) !important;
+  }
+
+  [data-animation='active'] .hero-line-inner[style*='--line-index'] {
+    transition-delay: calc(750ms + var(--line-index, 0) * 200ms) !important;
+  }
+
+  /* Ensure highlight wrapper maintains proper sizing within animated lines */
+  .hero-line .highlight-wrapper {
+    display: inline !important;
+    position: relative !important;
+  }
+
+  /* Respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-line-inner {
+      transform: translate3d(0, 0, 0) !important;
+      transition: none !important;
+    }
+  }
+</style>
 
 <style>
   h1 {
