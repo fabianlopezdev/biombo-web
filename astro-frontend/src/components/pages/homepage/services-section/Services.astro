@@ -12,6 +12,7 @@ const { servicesData } = Astro.props as Props
 ---
 
 <script src="@/scripts/animations/slideUpTextAnimation.ts"></script>
+<script src="@/scripts/animations/servicesListAnimation.ts"></script>
 <section id="services">
   <div class="services-hero">
     {servicesData?.title && <h2 class="services__title">{servicesData.title.toUpperCase()}</h2>}
@@ -28,7 +29,7 @@ const { servicesData } = Astro.props as Props
   <div class="services-list">
     {
       (servicesData?.selectedCategories ?? []).map((service: ServiceCategory) => (
-        <details>
+        <details data-service-item>
           <summary>
             <h3 class="text">{service.title}</h3>
             <div class="services-toggle" aria-hidden="true">
@@ -161,6 +162,12 @@ const { servicesData } = Astro.props as Props
     flex: 0 0 auto;
     width: 52px;
     height: 47px;
+    transition: transform 0.2s ease-out;
+  }
+
+  /* Subtle scale on hover */
+  details:hover summary .services-toggle {
+    transform: scale(1.05);
   }
 
   .services-toggle-plus-text,
