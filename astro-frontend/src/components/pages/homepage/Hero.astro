@@ -1,7 +1,10 @@
 ---
 import HighlightScribble from '@/assets/HighlightScribble.astro'
 import ScrollPill from '@/assets/ScrollPill.astro'
-import { splitBoldSegments } from '@/utils/pages/homepage/parseBoldMarkdown'
+import {
+  splitBoldSegments,
+  splitBoldSegmentsByLine,
+} from '@/utils/pages/homepage/parseBoldMarkdown'
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 
 interface Props {
@@ -12,11 +15,18 @@ const { heroData } = Astro.props
 
 console.log('heroData', heroData)
 
+// Check if the text contains line breaks
+const hasLineBreaks = heroData?.heroText?.includes('\n')
+
+// Use the appropriate parsing function
+const parsedText = hasLineBreaks ? splitBoldSegmentsByLine(heroData?.heroText) : null
+
+// Fall back to the original parsing for backward compatibility
 const {
   before: beforeHighlight,
   bold: highlightedWord,
   after: afterHighlight,
-} = splitBoldSegments(heroData?.heroText)
+} = !hasLineBreaks ? splitBoldSegments(heroData?.heroText) : { before: '', bold: '', after: '' }
 
 const scrollText = heroData?.scrollText
 ---
@@ -25,12 +35,34 @@ const scrollText = heroData?.scrollText
 <script src="@/scripts/animations/slideUpTextAnimation.ts"></script>
 
 <h1 data-slide-up-animation data-animate-immediate>
-  {beforeHighlight}
-  <span class="highlight-wrapper">
-    <span class="highlight-text">{highlightedWord}</span>
-    <HighlightScribble top="9.8rem" animationDelay="1.5s" />
-  </span>
-  {afterHighlight}
+  {
+    hasLineBreaks && parsedText ? (
+      parsedText.lines.map((line, index) => (
+        <>
+          {line.before}
+          {line.bold && (
+            <span class="highlight-wrapper">
+              <span class="highlight-text">{line.bold}</span>
+              <HighlightScribble top="9.8rem" animationDelay="1.5s" />
+            </span>
+          )}
+          {line.after}
+          {index < parsedText.lines.length - 1 && <br />}
+        </>
+      ))
+    ) : (
+      <>
+        {beforeHighlight}
+        {highlightedWord && (
+          <span class="highlight-wrapper">
+            <span class="highlight-text">{highlightedWord}</span>
+            <HighlightScribble top="9.8rem" animationDelay="1.5s" />
+          </span>
+        )}
+        {afterHighlight}
+      </>
+    )
+  }
 </h1>
 <button class="scroll-indicator bottom-left">
   <ScrollPill />

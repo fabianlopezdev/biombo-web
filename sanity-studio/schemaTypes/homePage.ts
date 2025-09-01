@@ -11,8 +11,9 @@ export const heroSection = defineType({
       name: 'heroText',
       title: 'Main Heading',
       description:
-        'The large heading text at the top of the page. Use **bold** to mark which word should be highlighted with the underline effect (e.g., "Transformem **idees** en solucions")',
-      type: 'string', // Changed from localeString to string
+        'The large heading text at the top of the page. Use **bold** to mark which word should be highlighted with the underline effect (e.g., "Transformem **idees** en solucions"). Press Enter to create line breaks for multi-line titles.',
+      type: 'text', // Changed from string to text to support multi-line input
+      rows: 3, // Show 3 rows in the editor for better editing experience
       validation: (Rule) => Rule.required().error('The hero heading text is required'),
     }),
     defineField({
