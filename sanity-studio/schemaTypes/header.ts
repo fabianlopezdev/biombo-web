@@ -22,12 +22,12 @@ const navigationItem = defineType({
       type: 'reference',
       description:
         'Select the page this navigation item should link to. Important: Each page should only be used once in the navigation.',
-      to: [{type: 'projectsPage'}, {type: 'aboutUsPage'}, {type: 'contactPage'}],
+      to: [{type: 'projectsPage'}, {type: 'servicesPage'}, {type: 'aboutUsPage'}, {type: 'contactPage'}],
       options: {
         // Show only the allowed page types in the SAME language as this header document
         filter: ({document}: ReferenceFilterResolverContext) => ({
           filter:
-            '_type in ["projectsPage", "aboutUsPage", "contactPage"] && language == $lang',
+            '_type in ["projectsPage", "servicesPage", "aboutUsPage", "contactPage"] && language == $lang',
           params: {lang: (document as {language?: string})?.language},
         }),
         disableNew: true,
