@@ -12,6 +12,13 @@ interface Props {
 const { pages, locale } = Astro.props as Props
 // Current pathname to determine active link
 const currentPath = Astro.url.pathname
+
+console.log('DEBUG PagesNavigation: Received pages count:', pages.length)
+console.log('DEBUG PagesNavigation: Pages detail:', pages.map(p => ({
+  title: p.title,
+  pageType: p.pageReference?._type,
+  isExternal: p.isExternal
+})))
 ---
 
 <nav class="navigation" aria-label="Primary">
@@ -199,6 +206,12 @@ const currentPath = Astro.url.pathname
     100% {
       mask-size: 100% 100%;
       -webkit-mask-size: 100% 100%;
+    }
+  }
+
+  @media (width < 800px) {
+    .navigation {
+      display: none;
     }
   }
 </style>

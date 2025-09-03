@@ -65,6 +65,7 @@ export function getPageName(page: NavigationPage): string {
  *  • Internal links use the locale-aware mapping to generate the correct path.
  */
 export function getPagePath(page: NavigationPage, locale: string): string {
+  console.log('DEBUG: getPagePath called with:', { page, locale })
   try {
     // Handle external URLs
     if (page.isExternal) {
@@ -81,15 +82,19 @@ export function getPagePath(page: NavigationPage, locale: string): string {
 
       // Validate we have a known page type
       if (!pageType) {
-        console.warn('Missing page type in reference', { page })
+        console.warn('DEBUG getPagePath: Missing page type in reference', { page })
         return '#'
       }
 
+      console.log('DEBUG getPagePath: Checking page type:', pageType)
+      
       // Check if this is one of our mapped types
       if (pageType === 'projectsPage' || pageType === 'servicesPage' || pageType === 'aboutUsPage' || pageType === 'contactPage') {
+        console.log('DEBUG getPagePath: Found known page type:', pageType)
         // We verified this is a valid key with our if statement
         // Use the page type to access the correct route map
         const localizedPath = PAGE_ROUTES[pageType][locale as 'ca' | 'es' | 'en'] || ''
+        console.log('DEBUG getPagePath: Localized path for', pageType, 'is:', localizedPath)
 
         if (localizedPath) {
           // Build the full path properly
@@ -103,10 +108,12 @@ export function getPagePath(page: NavigationPage, locale: string): string {
             return `/${localizedPath}`
           }
         }
+      } else {
+        console.log('DEBUG getPagePath: UNKNOWN page type:', pageType, '- not in allowed list')
       }
 
       // Unknown page type
-      // console.log(`Unknown page reference type: ${pageType}`)
+      console.log('DEBUG getPagePath: Returning # for unknown page type:', pageType)
       return '#'
     }
 
