@@ -7,6 +7,7 @@ import { homePage, heroSection, projectsSection, aboutSection, servicesSection }
 import { projects, imageSection, textBlock, smallTextBlock } from './projects'
 import { siteSettings } from './siteSettings'
 import { projectsPage } from './projectsPage'
+import { servicesPage } from './servicesPage'
 import { aboutUsPage } from './aboutUsPage'
 import { contactPage } from './contactPage'
 import { serviceCategory } from './serviceCategory'
@@ -23,6 +24,7 @@ export const schemaTypes = [
   footer,
   siteSettings,
   projectsPage,
+  servicesPage,
   aboutUsPage,
   contactPage,
 

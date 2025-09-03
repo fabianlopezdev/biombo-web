@@ -21,6 +21,7 @@ const singletonIcon = (id: string) => {
     footer: '🦶',
     homePage: '🏠',
     projectsPage: '📂',
+    servicesPage: '🛠️',
     aboutUsPage: '👥',
     contactPage: '📞',
   }

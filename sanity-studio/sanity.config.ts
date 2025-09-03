@@ -68,7 +68,8 @@ export default defineConfig({
         'homePage', 
         'header',
         'footer',
-        'projectsPage', 
+        'projectsPage',
+        'servicesPage', 
         'aboutUsPage', 
         'contactPage'
       ],
