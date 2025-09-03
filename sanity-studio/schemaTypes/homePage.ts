@@ -17,6 +17,21 @@ export const heroSection = defineType({
       validation: (Rule) => Rule.required().error('The hero heading text is required'),
     }),
     defineField({
+      name: 'textAlignment',
+      title: 'Text Alignment',
+      description: 'Choose how the hero text should be aligned on the page',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Left', value: 'left' },
+          { title: 'Center', value: 'center' },
+          { title: 'Right', value: 'right' }
+        ],
+        layout: 'radio' // Display as radio buttons for easy selection
+      },
+      initialValue: 'left', // Default to left alignment for backward compatibility
+    }),
+    defineField({
       name: 'scrollText',
       title: 'Scroll Text',
       description: 'Text that appears next to the scroll icon (e.g., "Explora fent scroll")',
