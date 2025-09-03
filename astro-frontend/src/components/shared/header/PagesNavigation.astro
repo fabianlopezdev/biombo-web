@@ -38,13 +38,8 @@ console.log('DEBUG PagesNavigation: Pages detail:', pages.map(p => ({
               rel={page.isExternal ? 'noopener noreferrer' : undefined}
               aria-current={isActive ? 'page' : undefined}
               data-astro-prefetch
-            >
-              <span class="label-wrapper">
-                <span class="label-main">{pageName}</span>
-                <span class="label-hover" aria-hidden="true">
-                  {pageName}
-                </span>
-              </span>
+              >
+              {pageName}
             </a>
 
             {!isActive && (
@@ -92,7 +87,7 @@ console.log('DEBUG PagesNavigation: Pages detail:', pages.map(p => ({
 
       .nav-page {
         position: relative;
-        padding-block-start: 0.9rem;
+       
 
         /* ----------------------------------------------------------------
            Link & sliding labels
@@ -121,9 +116,9 @@ console.log('DEBUG PagesNavigation: Pages detail:', pages.map(p => ({
         ---------------------------------------------------------------- */
         .hover-svg {
           position: absolute;
-          inset-block-start: 50%;
+          inset-block-start: 44%;
           inset-inline-start: 50%;
-          width: 164px;
+          width: 158px;
           height: 49px;
           transform: translate(-50%, -50%);
           z-index: 3;
