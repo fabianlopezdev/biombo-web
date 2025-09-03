@@ -68,7 +68,7 @@ const textAlignment = heroData?.textAlignment || 'left'
       )
     }
   </h1>
-  <button class="scroll-indicator bottom-left just-desktop">
+  <button class="scroll-indicator bottom-left just-desktop just-no-touch">
     <ScrollPill />
 
     <p class="label-wrapper">
@@ -197,7 +197,7 @@ const textAlignment = heroData?.textAlignment || 'left'
     }
   }
 
-  @media (width < 800px) {
+  @media (width < 768px) {
    h1 {
     width: 100%;
     padding-block: 7.625rem;

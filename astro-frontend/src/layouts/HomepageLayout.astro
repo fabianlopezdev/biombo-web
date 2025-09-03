@@ -6,6 +6,7 @@ import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 import Projects, {
   type ResolvedProjectsSectionData,
 } from '@/components/pages/homepage/Projects.astro'
+import ProjectsMobile from '@/components/pages/homepage/ProjectsMobile.astro'
 import Hero from '@/components/pages/homepage/Hero.astro'
 import About from '@/components/pages/homepage/about-section/About.astro'
 import Services from '@/components/pages/homepage/services-section/Services.astro'
@@ -24,18 +25,41 @@ const pageTitle = 'Biombo - Art, Events, Community'
 ---
 
 <script src="@/scripts/pages/homepage/horizontalScroll.ts"></script>
+<script>
+  import { initTouchDetection } from '@/utils/touchDetection'
+  
+  // Initialize touch detection on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    initTouchDetection()
+  })
+</script>
 
 <BaseLayout title={pageTitle}>
   <Header locale={locale} />
 
   <main id="main" class="main-content">
-    <div class="horizontal-scroll-container" id="horizontal-container">
+    <!-- Desktop layout with horizontal scroll -->
+    <div class="horizontal-scroll-container just-no-touch" id="horizontal-container">
       <section class="hero">
         <Hero locale={locale} heroData={homePageData?.hero} />
       </section>
 
       <section id="projects" class="projects">
         <Projects
+          projectsData={homePageData?.projects as ResolvedProjectsSectionData}
+          locale={locale}
+        />
+      </section>
+    </div>
+
+    <!-- Mobile/Touch layout with vertical scroll -->
+    <div class="vertical-scroll-container just-touch">
+      <section class="hero">
+        <Hero locale={locale} heroData={homePageData?.hero} />
+      </section>
+
+      <section id="projects-mobile" class="projects-mobile">
+        <ProjectsMobile
           projectsData={homePageData?.projects as ResolvedProjectsSectionData}
           locale={locale}
         />
@@ -76,7 +100,25 @@ const pageTitle = 'Biombo - Art, Events, Community'
     flex: 0 0 183.3vw !important;
   }
 
-  @media (width < 800px) {
+  .vertical-scroll-container {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - var(--header-height));
+  }
+
+  .vertical-scroll-container .hero {
+    height: calc(100vh - var(--header-height));
+    padding-inline: var(--padding-inline);
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .projects-mobile {
+    width: 100%;
+  }
+
+  @media (width < 768px) {
     .horizontal-scroll-container {
       block-size: auto;
     }
