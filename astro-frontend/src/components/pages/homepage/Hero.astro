@@ -29,49 +29,54 @@ const {
 } = !hasLineBreaks ? splitBoldSegments(heroData?.heroText) : { before: '', bold: '', after: '' }
 
 const scrollText = heroData?.scrollText
+
+// Get text alignment from Sanity, default to 'left' for backward compatibility
+const textAlignment = heroData?.textAlignment || 'left'
 ---
 
 <script src="@/scripts/pages/homepage/heroScroll.ts"></script>
 <script src="@/scripts/animations/slideUpTextAnimation.ts"></script>
 
-<h1 data-slide-up-animation data-animate-immediate>
-  {
-    hasLineBreaks && parsedText ? (
-      parsedText.lines.map((line, index) => (
+<div class={`hero-wrapper ${textAlignment}-aligned`}>
+  <h1 data-slide-up-animation data-animate-immediate style={`text-align: ${textAlignment};`}>
+    {
+      hasLineBreaks && parsedText ? (
+        parsedText.lines.map((line, index) => (
+          <>
+            {line.before}
+            {line.bold && (
+              <span class="highlight-wrapper">
+                <span class="highlight-text">{line.bold}</span>
+                <HighlightScribble top="9.8rem" animationDelay="1.5s" />
+              </span>
+            )}
+            {line.after}
+            {index < parsedText.lines.length - 1 && <br />}
+          </>
+        ))
+      ) : (
         <>
-          {line.before}
-          {line.bold && (
+          {beforeHighlight}
+          {highlightedWord && (
             <span class="highlight-wrapper">
-              <span class="highlight-text">{line.bold}</span>
+              <span class="highlight-text">{highlightedWord}</span>
               <HighlightScribble top="9.8rem" animationDelay="1.5s" />
             </span>
           )}
-          {line.after}
-          {index < parsedText.lines.length - 1 && <br />}
+          {afterHighlight}
         </>
-      ))
-    ) : (
-      <>
-        {beforeHighlight}
-        {highlightedWord && (
-          <span class="highlight-wrapper">
-            <span class="highlight-text">{highlightedWord}</span>
-            <HighlightScribble top="9.8rem" animationDelay="1.5s" />
-          </span>
-        )}
-        {afterHighlight}
-      </>
-    )
-  }
-</h1>
-<button class="scroll-indicator bottom-left">
-  <ScrollPill />
+      )
+    }
+  </h1>
+  <button class="scroll-indicator bottom-left">
+    <ScrollPill />
 
-  <p class="label-wrapper">
-    <span class="label-main">{scrollText}</span>
-    <span aria-hidden="true" class="label-hover">{scrollText}</span>
-  </p>
-</button>
+    <p class="label-wrapper">
+      <span class="label-main">{scrollText}</span>
+      <span aria-hidden="true" class="label-hover">{scrollText}</span>
+    </p>
+  </button>
+</div>
 
 <style is:global>
   /* Slide-up text animation styles - global to work with dynamically created elements */
@@ -130,6 +135,29 @@ const scrollText = heroData?.scrollText
 </style>
 
 <style>
+  /* Wrapper to maintain consistent layout */
+  .hero-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Alignment variations */
+  .hero-wrapper.left-aligned {
+    align-items: flex-start;
+  }
+
+  .hero-wrapper.center-aligned {
+    align-items: center;
+  }
+
+  .hero-wrapper.right-aligned {
+    align-items: flex-end;
+  }
+
   h1 {
     font-size: 8.65rem;
     letter-spacing: -0.05em;
