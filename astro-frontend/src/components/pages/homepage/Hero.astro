@@ -68,7 +68,7 @@ const textAlignment = heroData?.textAlignment || 'left'
       )
     }
   </h1>
-  <button class="scroll-indicator bottom-left">
+  <button class="scroll-indicator bottom-left just-desktop">
     <ScrollPill />
 
     <p class="label-wrapper">
@@ -159,7 +159,7 @@ const textAlignment = heroData?.textAlignment || 'left'
   }
 
   h1 {
-    font-size: 8.65rem;
+    font-size: clamp(3rem, 1.047rem + 8.014vi, 8.625rem);
     letter-spacing: -0.05em;
     font-weight: var(--font-weight-semibold);
     line-height: 1.03;
@@ -194,6 +194,19 @@ const textAlignment = heroData?.textAlignment || 'left'
     &:hover .label-hover,
     &:focus-within .label-hover {
       transform: translateY(0);
+    }
+  }
+
+  @media (width < 800px) {
+   h1 {
+    width: 100%;
+    padding-block: 7.625rem;
+   }
+  }
+
+  @media (width < 390px) {
+    h1 {
+      font-size: clamp(2.75rem, -0.25rem + 13.333vi, 3rem);
     }
   }
 </style>

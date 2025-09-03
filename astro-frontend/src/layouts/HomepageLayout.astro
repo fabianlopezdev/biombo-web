@@ -26,7 +26,7 @@ const pageTitle = 'Biombo - Art, Events, Community'
 <script src="@/scripts/pages/homepage/horizontalScroll.ts"></script>
 
 <BaseLayout title={pageTitle}>
-  <Header locale={locale} />
+  <!-- <Header locale={locale} /> -->
 
   <main id="main" class="main-content">
     <div class="horizontal-scroll-container" id="horizontal-container">
@@ -34,19 +34,20 @@ const pageTitle = 'Biombo - Art, Events, Community'
         <Hero locale={locale} heroData={homePageData?.hero} />
       </section>
 
-      <section id="projects" class="projects">
+      <!-- <section id="projects" class="projects">
         <Projects
           projectsData={homePageData?.projects as ResolvedProjectsSectionData}
           locale={locale}
         />
-      </section>
+      </section> -->
     </div>
 
-    <About sectionData={homePageData?.about} />
-    <Services servicesData={homePageData?.services} />
+    <!-- <About sectionData={homePageData?.about} /> -->
+    <!-- <Services servicesData={homePageData?.services} /> -->
   </main>
+
+  <!-- <Footer /> -->
 </BaseLayout>
-<Footer />
 
 <style>
   .horizontal-scroll-container {
@@ -65,7 +66,7 @@ const pageTitle = 'Biombo - Art, Events, Community'
   }
 
   .hero {
-    padding-inline: var(--padding-inline-desktop);
+    padding-inline: var(--padding-inline);
     display: flex;
     align-items: center;
     position: relative;
@@ -73,5 +74,11 @@ const pageTitle = 'Biombo - Art, Events, Community'
 
   .projects {
     flex: 0 0 183.3vw !important;
+  }
+
+  @media (width < 800px) {
+    .horizontal-scroll-container {
+      block-size: auto;
+    }
   }
 </style>

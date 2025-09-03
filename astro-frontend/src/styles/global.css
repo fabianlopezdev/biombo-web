@@ -42,7 +42,7 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  --padding-inline-desktop: 4.6875rem;
+  --padding-inline: clamp(2.25rem, 1.403rem + 3.473vi, 4.688rem);
   --padding-block-desktop: 6.625rem;
 
   --header-height: 5.5rem;
@@ -217,4 +217,10 @@ figure {
   letter-spacing: -0.05em;
   font-weight: var(--font-weight-semibold);
   line-height: 1.03;
+}
+
+@media (width < 800px) {
+  .just-desktop {
+    display: none !important;
+  }
 }
