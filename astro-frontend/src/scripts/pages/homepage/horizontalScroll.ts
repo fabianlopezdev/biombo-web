@@ -5,12 +5,6 @@
 
 // Self-executing script for horizontal scroll functionality
 document.addEventListener('DOMContentLoaded', () => {
-  // Skip horizontal scroll initialization on touch devices
-  const isTouch = document.documentElement.classList.contains('touch-device')
-  if (isTouch) {
-    return
-  }
-
   // Type definitions for window
   interface ExtendedWindow extends Window {
     horizontalScrollCleanup?: () => void

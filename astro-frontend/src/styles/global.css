@@ -224,27 +224,3 @@ figure {
     display: none !important;
   }
 }
-
-/* Touch device utility classes */
-.touch-device .just-no-touch {
-  display: none !important;
-}
-
-.no-touch-device .just-touch {
-  display: none !important;
-}
-
-/* Initially hide both to prevent flash of content */
-.just-touch,
-.just-no-touch {
-  visibility: hidden;
-}
-
-/* Show appropriate elements after detection */
-.touch-device .just-touch {
-  visibility: visible;
-}
-
-.no-touch-device .just-no-touch {
-  visibility: visible;
-}
