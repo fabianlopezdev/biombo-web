@@ -3,7 +3,6 @@ import type {
   FeaturedProjectItem,
 } from '@/shared/schemas/sanity/homePageSchema'
 import { transformProject } from '@/utils/pages/homepage/projectsUtils'
-import ProjectsTitle from './ProjectsTitle.astro'
 
 // This interface reflects that Sanity/astro-sanity likely resolves localeStrings to simple strings by the time they reach the component.
 export interface ResolvedProjectsSectionData {
@@ -23,7 +22,6 @@ interface Props {
 const { projectsData, locale = (Astro.currentLocale as 'ca' | 'es' | 'en') || 'ca' } = Astro.props
 const currentLang = locale
 
-const title = projectsData?.title || ''
 const subtitle = projectsData?.subtitle || ''
 const viewProjectTextVal = projectsData?.viewProjectText || ''
 const viewAllTextVal = projectsData?.viewAllText || ''
@@ -31,7 +29,6 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
 ---
 
 <div class="projects-container-mobile" aria-labelledby="projects-heading-mobile">
-  <ProjectsTitle {title} />
   <p class="projects-subtitle">{subtitle.toUpperCase()}</p>
 
   <div class="projects-grid">
@@ -71,25 +68,18 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
 
 <style>
   .projects-container-mobile {
-    padding: 2rem var(--padding-inline);
+    padding-inline: var(--padding-inline);
     width: 100%;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
   }
 
-  .projects-subtitle {
-    font-size: 0.875rem;
-    letter-spacing: 0.1em;
-    opacity: 0.8;
-  }
+
 
   .projects-grid {
+    padding-block-start: 2rem;
     display: grid;
     grid-template-columns: 1fr;
     gap: 2rem;
-    padding: 2rem 0;
   }
 
   .project-mobile {
@@ -106,8 +96,8 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
   }
 
   .project-image-wrapper {
-    width: 100%;
-    aspect-ratio: 16 / 10;
+    width: 72%;
+    aspect-ratio: 282 / 384.9;
     border-radius: 0.75rem;
     overflow: hidden;
     background-color: var(--hover-bg-color);

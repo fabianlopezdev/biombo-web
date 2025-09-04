@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
   updateHeaderHeight()
 
   const handleWheel = (e: WheelEvent) => {
+    // Check if viewport width is less than 992px - if so, disable horizontal scrolling
+    if (window.innerWidth < 992) return
+
     const rect = container.getBoundingClientRect()
 
     // Quick boundary check

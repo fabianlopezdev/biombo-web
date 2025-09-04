@@ -195,10 +195,13 @@ const textAlignment = heroData?.textAlignment || 'left'
     }
   }
 
-  @media (width < 768px) {
+  @media (width < 992px) {
    h1 {
     width: 100%;
     padding-block: 7.625rem;
+   }
+   .scroll-indicator {
+    display: none;
    }
   }
 
