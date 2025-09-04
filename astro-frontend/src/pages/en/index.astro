@@ -11,9 +11,8 @@ let homePageData: HomePage | null = null
 
 try {
   homePageData = await fetchHomePageByLocale(locale)
-  // console.log('English homePageData after fetch:', homePageData)
-} catch (error) {
-  console.error('Error fetching English homepage data:', error)
+} catch {
+  // Error fetching homepage data
 }
 ---
 

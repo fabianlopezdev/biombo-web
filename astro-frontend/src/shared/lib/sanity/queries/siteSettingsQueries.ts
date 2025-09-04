@@ -52,8 +52,7 @@ export async function fetchSiteSettings(): Promise<SiteColors> {
         secondaryColor: getHexColor(siteSettings.secondaryColor, '#191919'),
         rawSettings: siteSettings,
       }
-    } catch (error) {
-      console.error('Schema validation failed for site settings:', error)
+    } catch {
       // Extract colors from raw data as fallback with type assertion
       const typedRawData = rawData as Record<string, unknown>
       return {
@@ -62,8 +61,7 @@ export async function fetchSiteSettings(): Promise<SiteColors> {
         rawSettings: rawData as SiteSettings,
       }
     }
-  } catch (error) {
-    console.error('Failed to fetch site settings data:', error)
+  } catch {
     return {
       primaryColor: '#f2f2f2', // Default light color
       secondaryColor: '#191919', // Default dark color

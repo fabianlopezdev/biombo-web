@@ -4,7 +4,6 @@ import AboutImage from '@/components/pages/homepage/about-section/AboutImage.ast
 import AboutSliderArrow from '@/components/pages/homepage/about-section/AboutSliderArrow.astro'
 
 const { imagesToDisplay, imageCount } = Astro.props
-console.log('imageCount', imageCount)
 
 interface DisplayImage extends SanityImageType {}
 const indicatorWidthPercent = imageCount > 0 ? 100 / imageCount : 100

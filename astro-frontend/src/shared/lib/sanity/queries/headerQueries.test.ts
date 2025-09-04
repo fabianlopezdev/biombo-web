@@ -57,7 +57,7 @@ describe('headerQueries', () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
-    // Reset console.log to prevent test output clutter
+    // Mock console methods to prevent test output clutter
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })

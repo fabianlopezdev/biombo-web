@@ -44,8 +44,7 @@ export async function fetchProjectBySlug(
     })
 
     return project
-  } catch (error) {
-    console.error(`Failed to fetch project with slug "${slug}" in locale "${locale}":`, error)
+  } catch {
     return null
   }
 }
@@ -87,21 +86,13 @@ export async function fetchFeaturedProjects(): Promise<Projects | null> {
         query: allProjectsQuery,
         schema: projectsSchema,
       })
-      // console.log(
-      //   'Projects after schema validation:',
-      //   projects ? projects.length : 0,
-      //   'projects found',
-      // )
-    } catch (error) {
-      console.error('Error fetching projects with schema:', error)
-      console.log('No schema provided, returning raw data')
+    } catch {
       // If schema validation fails, use the raw data
       projects = rawProjects
     }
 
     // No projects found
     if (!projects || !Array.isArray(projects) || projects.length === 0) {
-      console.warn('No projects found in Sanity')
       return null
     }
 
@@ -122,21 +113,11 @@ export async function fetchFeaturedProjects(): Promise<Projects | null> {
         return orderA - orderB
       })
 
-    // console.log(
-    //   `Found ${featuredProjects.length} featured projects out of ${projects.length} total projects`,
-    // )
 
     // If we have featured projects, return those, otherwise return all projects as a fallback
     // Cast to Projects to satisfy type safety
     return (featuredProjects.length > 0 ? featuredProjects : projects) as Projects
-  } catch (error: unknown) {
-    console.error(
-      'Error fetching featured projects:',
-      error instanceof Error ? error.message : 'Unknown error',
-    )
-
-    // If validation failed, try fetching without schema validation for debugging
-    console.log('Attempting to fetch without schema validation...')
+  } catch {
     try {
       // Use the same query string but without schema validation
       const rawProjectsQuery = `*[_type == "project" && featured == true] | order(featuredOrder asc)`
@@ -144,17 +125,13 @@ export async function fetchFeaturedProjects(): Promise<Projects | null> {
         query: rawProjectsQuery,
         params: {},
       })
-      // console.log('Raw projects data (no validation):', rawProjects)
 
       // Log the raw project data structure to help with debugging
       if (Array.isArray(rawProjects) && rawProjects.length > 0) {
-        // console.log('First raw project structure:', JSON.stringify(rawProjects[0], null, 2))
+        // Raw project data available for debugging
       }
-    } catch (secondError: unknown) {
-      console.error(
-        'Even raw fetch failed:',
-        secondError instanceof Error ? secondError.message : 'Unknown error',
-      )
+    } catch {
+      // Even raw fetch failed
     }
 
     return null
@@ -178,7 +155,6 @@ export async function fetchProjectsSection(): Promise<ProjectsSection | null> {
         featuredProjects
       }
     }.projects`
-    // console.log('Fetching projects section', { query })
 
     // Try fetching with schema validation
     const projectsSection = await fetchSanityQuery({
@@ -187,8 +163,7 @@ export async function fetchProjectsSection(): Promise<ProjectsSection | null> {
     })
 
     return projectsSection
-  } catch (error) {
-    console.error('Failed to fetch projects section:', error)
+  } catch {
     return null
   }
 }
@@ -201,7 +176,6 @@ export async function fetchAllProjects(): Promise<Projects | null> {
   try {
     // Query for all projects
     const query = `*[_type == "project"] | order(_createdAt desc)`
-    // console.log('Fetching all projects', { query })
 
     // Try fetching with schema validation
     const projects = await fetchSanityQuery({
@@ -210,8 +184,7 @@ export async function fetchAllProjects(): Promise<Projects | null> {
     })
 
     return projects
-  } catch (error) {
-    console.error('Failed to fetch all projects:', error)
+  } catch {
     return null
   }
 }

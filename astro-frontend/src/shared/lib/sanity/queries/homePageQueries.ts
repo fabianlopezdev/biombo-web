@@ -128,29 +128,19 @@ export async function fetchHomePageByLocale(
       schema: homePageSchema,
     })
     return homePage
-  } catch (error) {
+  } catch {
     // Log schema validation failure and attempt to fetch raw data as a fallback
     // This can be useful during development if schema and data are temporarily misaligned
-    console.warn(
-      `Schema validation failed for homepage (locale: ${locale}, id: ${documentId}). Attempting to fetch raw data. Error: ${error instanceof Error ? error.message : String(error)}`,
-    )
     try {
       const rawData = await fetchSanityQuery({
         query,
         params,
       })
       if (!rawData) {
-        console.error(
-          `Raw data fetch returned null for homepage (locale: ${locale}, id: ${documentId}) after schema validation failure.`,
-        )
         return null
       }
       return rawData as HomePage // Cast to HomePage, acknowledging potential mismatch
-    } catch (rawDataError) {
-      console.error(
-        `Failed to fetch raw homepage data for locale ${locale} (id: ${documentId}) after schema validation failure:`,
-        rawDataError,
-      )
+    } catch {
       return null
     }
   }

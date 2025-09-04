@@ -3,7 +3,6 @@ import { defineMiddleware } from 'astro:middleware' // Rely on defineMiddleware 
 import { useAstroI18n } from 'astro-i18n'
 import astroI18nConfig from '../astro-i18n.config' // Import config directly for serverless
 
-// console.log('[Middleware] src/middleware.ts: Module loaded.')
 
 const pathsToExclude = [
   '/favicon.svg', // Common static asset
@@ -20,25 +19,19 @@ const i18nHandler = useAstroI18n(astroI18nConfig) // Pass config to avoid filesy
 // context and next are automatically typed by defineMiddleware
 const i18nFilteringMiddleware = defineMiddleware(async (context, next): Promise<Response> => {
   const { pathname } = context.url
-  console.log(`[i18nFilteringMiddleware] Request for: ${pathname}`)
 
   const isExcluded = pathsToExclude.some((pathToExclude) => {
     if (pathname === pathToExclude || pathname.startsWith(pathToExclude)) {
-      // console.log(
-      //   `[i18nFilteringMiddleware] Path ${pathname} matches exclude rule: ${pathToExclude}. Bypassing i18n.`,
-      // )
       return true
     }
     return false
   })
 
   if (isExcluded) {
-    // console.log(`[i18nFilteringMiddleware] Bypassing astro-i18n for ${pathname}`)
     // next() returns Promise<Response>, so await it.
     return await next()
   }
 
-  // console.log(`[i18nFilteringMiddleware] Applying astro-i18n for ${pathname}`)
   // If not excluded, apply the astro-i18n middleware
   // Use the pre-initialized handler
   // The type assertion 'as Response' helps ESLint understand the type of the awaited result.

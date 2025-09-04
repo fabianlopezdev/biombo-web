@@ -24,10 +24,7 @@ export async function fetchServiceCategoriesByLocale(
       schema: serviceCategoriesSchema,
     })
     return categories
-  } catch (error) {
-    console.warn(
-      `Validation failed for service categories (locale: ${locale}). Attempting raw fetch. Error: ${error instanceof Error ? error.message : String(error)}`,
-    )
+  } catch {
     const raw = await fetchSanityQuery({ query, params })
     // Best effort: if it isn't an array, coerce to [] to keep rendering stable
     return Array.isArray(raw) ? (raw as ServiceCategories) : []

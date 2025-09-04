@@ -11,10 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Guard clause for missing elements
   if (!scrollButton || !targetSection) {
-    console.warn('Projects: Required elements not found', {
-      scrollButton: !!scrollButton,
-      targetSection: !!targetSection,
-    })
     return
   }
 

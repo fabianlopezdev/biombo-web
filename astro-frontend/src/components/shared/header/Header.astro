@@ -34,15 +34,12 @@ let fetchError: string | null = null
 try {
   // Pass the current locale to fetch the appropriate language version
   headerData = await fetchHeader(locale)
-  console.log('DEBUG: headerData fetched:', JSON.stringify(headerData, null, 2))
-} catch (error) {
-  console.error(`Error fetching headerData for locale ${locale}:`, error)
+} catch {
   fetchError = `Could not load navigation for ${locale}. Please try again later.`
 }
 
 // Get navigation pages from the header data
 const pages: NavigationPage[] = fetchError ? [] : headerData?.navigationPages || []
-console.log('DEBUG: pages array:', JSON.stringify(pages, null, 2))
 ---
 
 <!-- Localised skip link -->
@@ -135,12 +132,7 @@ console.log('DEBUG: pages array:', JSON.stringify(pages, null, 2))
   .mobile-menu {
     display: none;
     background: none;
-    border: 1px solid var(--color-primary);
-    color: var(--color-primary);
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
     cursor: pointer;
-    font-size: 1rem;
     transition: all 0.2s ease;
   }
 

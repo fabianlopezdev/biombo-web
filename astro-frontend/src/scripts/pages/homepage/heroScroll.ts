@@ -4,11 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const target = document.querySelector('#projects') as HTMLElement
 
   if (!scrollButton || !container || !target) {
-    console.warn('Hero: Required elements not found', {
-      scrollButton: !!scrollButton,
-      container: !!container,
-      target: !!target,
-    })
     return
   }
 

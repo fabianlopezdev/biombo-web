@@ -12,8 +12,4 @@ const config = defineAstroI18nConfig({
   // routes: {}, // For translating URL slugs, keep simple for now
 })
 
-// console.log(
-//   '[Diagnostic] astro-i18n.config.ts: Restored Config object created:',
-//   config ? `Type: ${typeof config}, Keys: ${Object.keys(config).join(', ')}` : 'undefined',
-// )
 export default config

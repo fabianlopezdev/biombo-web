@@ -11,17 +11,8 @@ let homePageData: HomePage | null = null
 
 try {
   homePageData = await fetchHomePageByLocale(locale)
-
-  console.log('[src/pages/es/index.astro] Fetched for Spanish locale (es):')
-  console.log('[src/pages/es/index.astro] homePageData._id:', homePageData?._id)
-  console.log(
-    '[src/pages/es/index.astro] homePageData.about:',
-    JSON.stringify(homePageData?.about, null, 2),
-  )
-
-  // console.log('Spanish homePageData after fetch:', homePageData)
-} catch (error) {
-  console.error('Error fetching Spanish homepage data:', error)
+} catch {
+  // Error fetching homepage data
 }
 ---
 

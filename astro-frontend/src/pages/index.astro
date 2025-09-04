@@ -1,8 +1,6 @@
 ---
 import HomepageLayout from '@/layouts/HomepageLayout.astro'
 import { fetchHomePageByLocale } from '@/shared/lib/sanity/queries/homePageQueries'
-
-console.log('Astro.site in src/pages/index.astro:', Astro.site)
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 
 // This is the root index.astro file (Catalan)
@@ -13,9 +11,8 @@ let homePageData: HomePage | null = null
 
 try {
   homePageData = await fetchHomePageByLocale(locale)
-  // console.log('homePageData after fetch:', homePageData)
-} catch (error) {
-  console.error('Error fetching homepage data:', error)
+} catch {
+  // Error fetching homepage data
 }
 ---
 
