@@ -1,7 +1,5 @@
 ---
-import type {
-  FeaturedProjectItem,
-} from '@/shared/schemas/sanity/homePageSchema'
+import type { FeaturedProjectItem } from '@/shared/schemas/sanity/homePageSchema'
 import { transformProject } from '@/utils/pages/homepage/projectsUtils'
 
 // This interface reflects that Sanity/astro-sanity likely resolves localeStrings to simple strings by the time they reach the component.
@@ -29,7 +27,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
 ---
 
 <div class="projects-container-mobile" aria-labelledby="projects-heading-mobile">
-  <p class="projects-subtitle">{subtitle.toUpperCase()}</p>
+  <h2 class="projects-subtitle">{subtitle.toUpperCase()}</h2>
 
   <div class="projects-grid">
     {
@@ -38,8 +36,8 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
         const projectNumber = i + 1
 
         return project.image ? (
-          <a 
-            href={project.slug ? `/project/${project.slug}` : '#'} 
+          <a
+            href={project.slug ? `/project/${project.slug}` : '#'}
             class={`project-mobile project-mobile-${projectNumber}`}
             style={`--hover-bg-color: ${project.hoverColor || 'transparent'}; --hover-text-color: ${project.textHoverColor || 'inherit'};`}
           >
@@ -53,7 +51,6 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
             </div>
             <div class="project-info">
               <h3 class="project-title">{project.title || `Project ${projectNumber}`}</h3>
-              <span class="view-project-text">{viewProjectTextVal}</span>
             </div>
           </a>
         ) : null
@@ -72,8 +69,6 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     width: 100%;
     min-height: 100vh;
   }
-
-
 
   .projects-grid {
     padding-block-start: 2rem;
@@ -119,7 +114,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
 
   .project-title {
     font-size: 1.25rem;
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-regular);
   }
 
   .view-project-text {
@@ -148,22 +143,10 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     background-color: rgba(0, 0, 0, 0.05);
   }
 
-  /* Tablet layout */
-  @media (min-width: 481px) and (max-width: 768px) {
-    .projects-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-    }
-  }
-
-  /* Small tablets / large phones in landscape */
-  @media (min-width: 481px) and (max-width: 600px) and (orientation: landscape) {
-    .projects-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .project-image-wrapper {
-      aspect-ratio: 16 / 12;
+  @media (width < 992px) {
+    .projects-subtitle {
+      font-size: 1.25rem;
+      font-weight: var(--font-weight-light);
     }
   }
 </style>

@@ -210,6 +210,22 @@ figure {
   position: absolute;
   inset-block-end: 0;
   padding-block-end: 1.5rem;
+  inset-inline-start: 0;
+}
+
+.bottom-center {
+  position: absolute;
+  inset-block-end: 0;
+  padding-block-end: 1.5rem;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+}
+
+.bottom-right {
+  position: absolute;
+  inset-block-end: 0;
+  padding-block-end: 1.5rem;
+  inset-inline-end: 0;
 }
 
 .hero-big-text {

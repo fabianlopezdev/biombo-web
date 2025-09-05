@@ -93,7 +93,8 @@ const heroSectionSchema = z.object({
   _type: z.literal('heroSection').optional(),
   heroText: z.string().optional(),
   scrollText: z.string().optional(),
-  textAlignment: z.string().optional(), // Text alignment: 'left' | 'center' | 'right'
+  textAlignment: z.string().optional(), // Desktop text alignment: 'left' | 'center' | 'right'
+  mobileTextAlignment: z.string().optional(), // Mobile text alignment: 'left' | 'center' | 'right'
 })
 
 // Define Zod schema for color value (hex)

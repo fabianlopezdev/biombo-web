@@ -30,13 +30,22 @@ const scrollText = heroData?.scrollText
 
 // Get text alignment from Sanity, default to 'left' for backward compatibility
 const textAlignment = heroData?.textAlignment || 'left'
+const mobileTextAlignment = heroData?.mobileTextAlignment || 'center'
+
+// Determine scroll indicator position class based on desktop alignment
+const scrollPositionClass =
+  textAlignment === 'center'
+    ? 'bottom-center'
+    : textAlignment === 'right'
+      ? 'bottom-right'
+      : 'bottom-left'
 ---
 
 <script src="@/scripts/pages/homepage/heroScroll.ts"></script>
 <script src="@/scripts/animations/slideUpTextAnimation.ts"></script>
 
-<div class={`hero-wrapper ${textAlignment}-aligned`}>
-  <h1 data-slide-up-animation data-animate-immediate style={`text-align: ${textAlignment};`}>
+<div class={`hero-wrapper ${textAlignment}-aligned mobile-${mobileTextAlignment}-aligned`}>
+  <h1 data-slide-up-animation data-animate-immediate class="hero-title">
     {
       hasLineBreaks && parsedText ? (
         parsedText.lines.map((line, index) => (
@@ -66,7 +75,7 @@ const textAlignment = heroData?.textAlignment || 'left'
       )
     }
   </h1>
-  <button class="scroll-indicator bottom-left just-desktop">
+  <button class={`scroll-indicator ${scrollPositionClass} just-desktop`}>
     <ScrollPill />
 
     <p class="label-wrapper">
@@ -143,7 +152,7 @@ const textAlignment = heroData?.textAlignment || 'left'
     position: relative;
   }
 
-  /* Alignment variations */
+  /* Desktop alignment variations */
   .hero-wrapper.left-aligned {
     align-items: flex-start;
   }
@@ -154,6 +163,19 @@ const textAlignment = heroData?.textAlignment || 'left'
 
   .hero-wrapper.right-aligned {
     align-items: flex-end;
+  }
+
+  /* Text alignment for desktop */
+  .hero-wrapper.left-aligned .hero-title {
+    text-align: left;
+  }
+
+  .hero-wrapper.center-aligned .hero-title {
+    text-align: center;
+  }
+
+  .hero-wrapper.right-aligned .hero-title {
+    text-align: right;
   }
 
   h1 {
@@ -196,13 +218,39 @@ const textAlignment = heroData?.textAlignment || 'left'
   }
 
   @media (width < 992px) {
-   h1 {
-    width: 100%;
-    padding-block: 7.625rem;
-   }
-   .scroll-indicator {
-    display: none;
-   }
+    h1 {
+      width: 100%;
+      padding-block: 7.625rem;
+    }
+    .scroll-indicator {
+      display: none;
+    }
+
+    /* Mobile alignment variations */
+    .hero-wrapper.mobile-left-aligned {
+      align-items: flex-start;
+    }
+
+    .hero-wrapper.mobile-center-aligned {
+      align-items: center;
+    }
+
+    .hero-wrapper.mobile-right-aligned {
+      align-items: flex-end;
+    }
+
+    /* Override desktop text alignment on mobile */
+    .hero-wrapper.mobile-left-aligned .hero-title {
+      text-align: left !important;
+    }
+
+    .hero-wrapper.mobile-center-aligned .hero-title {
+      text-align: center !important;
+    }
+
+    .hero-wrapper.mobile-right-aligned .hero-title {
+      text-align: right !important;
+    }
   }
 
   @media (width < 390px) {

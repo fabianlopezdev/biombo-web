@@ -18,8 +18,8 @@ export const heroSection = defineType({
     }),
     defineField({
       name: 'textAlignment',
-      title: 'Text Alignment',
-      description: 'Choose how the hero text should be aligned on the page',
+      title: 'Text Alignment (Desktop)',
+      description: 'Choose how the hero text should be aligned on desktop',
       type: 'string',
       options: {
         list: [
@@ -30,6 +30,21 @@ export const heroSection = defineType({
         layout: 'radio' // Display as radio buttons for easy selection
       },
       initialValue: 'left', // Default to left alignment for backward compatibility
+    }),
+    defineField({
+      name: 'mobileTextAlignment',
+      title: 'Text Alignment (Mobile)',
+      description: 'Choose how the hero text should be aligned on mobile devices',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Left', value: 'left' },
+          { title: 'Center', value: 'center' },
+          { title: 'Right', value: 'right' }
+        ],
+        layout: 'radio' // Display as radio buttons for easy selection
+      },
+      initialValue: 'center', // Default to center alignment for mobile
     }),
     defineField({
       name: 'scrollText',
