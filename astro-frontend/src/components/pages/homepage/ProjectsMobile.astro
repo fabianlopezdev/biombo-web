@@ -2,6 +2,7 @@
 import type { FeaturedProjectItem } from '@/shared/schemas/sanity/homePageSchema'
 import { transformProject } from '@/utils/pages/homepage/projectsUtils'
 import ProjectCard from './ProjectCard.astro'
+import MobileSlider from '@/components/shared/MobileSlider.astro'
 
 // This interface reflects that Sanity/astro-sanity likely resolves localeStrings to simple strings by the time they reach the component.
 export interface ResolvedProjectsSectionData {
@@ -32,7 +33,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
   <h2 class="projects-subtitle">{subtitle.toUpperCase()}</h2>
 
   <div class="projects-slider-container">
-    <div class="projects-slider">
+    <MobileSlider>
       {
         rawFeaturedProjects.slice(0, 6).map((rawItem, i) => {
           const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
@@ -53,7 +54,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
           )
         })
       }
-    </div>
+    </MobileSlider>
   </div>
 
   <a href="/projects" class="projects-view-all-mobile" aria-label={viewAllTextVal}>
@@ -70,33 +71,6 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
 
   .projects-slider-container {
     padding-block-start: 2rem;
-    position: relative;
-    width: calc(100% + 2 * var(--padding-inline));
-  }
-
-  .projects-slider {
-    display: flex;
-    gap: 1.25rem;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    overscroll-behavior-x: contain;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding-inline: var(--padding-inline);
-    padding-bottom: 1rem;
-  }
-
-  .projects-slider::-webkit-scrollbar {
-    display: none;
-  }
-
-  .projects-slider::after {
-    content: '';
-    flex: 0 0 var(--padding-inline);
-    pointer-events: none;
   }
 
   .projects-view-all-mobile {

@@ -1,0 +1,51 @@
+---
+interface Props {
+  gap?: string
+  paddingInline?: string
+  class?: string
+}
+
+const { 
+  gap = '1.25rem', 
+  paddingInline = 'var(--padding-inline)',
+  class: className = ''
+} = Astro.props
+---
+
+<div class={`mobile-slider-container ${className}`}>
+  <div class="mobile-slider" style={`--gap: ${gap}; --padding-inline: ${paddingInline}`}>
+    <slot />
+  </div>
+</div>
+
+<style>
+  .mobile-slider-container {
+    position: relative;
+    width: calc(100% + 2 * var(--padding-inline));
+  }
+
+  .mobile-slider {
+    display: flex;
+    gap: var(--gap);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-inline: var(--padding-inline);
+    padding-bottom: 1rem;
+  }
+
+  .mobile-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-slider::after {
+    content: '';
+    flex: 0 0 var(--padding-inline);
+    pointer-events: none;
+  }
+</style>

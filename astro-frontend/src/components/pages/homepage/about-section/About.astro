@@ -2,6 +2,7 @@
 import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
 import AboutImage from '@/components/pages/homepage/about-section/AboutImage.astro'
 import AboutSlider from '@/components/pages/homepage/about-section/AboutSlider.astro'
+import MobileSlider from '@/components/shared/MobileSlider.astro'
 import type { SanityImage as SanityImageType } from '@/shared/schemas/sanity/homePageSchema'
 import type { AboutSection } from '@/shared/schemas/sanity/homePageSchema'
 import type { PortableTextBlock } from '@portabletext/types'
@@ -47,13 +48,33 @@ const imageCount = imagesToDisplay.length
   </div>
 
   <div class="about__gallery">
-    {
-      imageCount === 1 ? (
-        <AboutImage image={imagesToDisplay[0]} />
-      ) : (
-        <AboutSlider imagesToDisplay={imagesToDisplay} imageCount={imageCount} />
-      )
-    }
+    <!-- Desktop slider -->
+    <div class="about__gallery-desktop">
+      {
+        imageCount === 1 ? (
+          <AboutImage image={imagesToDisplay[0]} />
+        ) : (
+          <AboutSlider imagesToDisplay={imagesToDisplay} imageCount={imageCount} />
+        )
+      }
+    </div>
+    
+    <!-- Mobile slider -->
+    <div class="about__gallery-mobile">
+      {
+        imageCount === 1 ? (
+          <AboutImage image={imagesToDisplay[0]} />
+        ) : (
+          <MobileSlider class="about-mobile-slider">
+            {imagesToDisplay.map((image) => (
+              <div class="about-mobile-slide">
+                <AboutImage image={image} />
+              </div>
+            ))}
+          </MobileSlider>
+        )
+      }
+    </div>
   </div>
 </section>
 
@@ -92,12 +113,40 @@ const imageCount = imagesToDisplay.length
     overflow: hidden; /* keep side clipping */
   }
 
+  /* Show/hide desktop and mobile galleries */
+  .about__gallery-desktop {
+    display: block;
+  }
+
+  .about__gallery-mobile {
+    display: none;
+  }
+
   @media (width < 992px) {
     .about {
       display: block;
       padding-inline-end: var(--padding-inline);
     }
 
-  
+    .about__gallery {
+      overflow: visible;
+    }
+
+    .about__gallery-desktop {
+      display: none;
+    }
+
+    .about__gallery-mobile {
+      display: block;
+    }
+
+    .about-mobile-slide {
+      flex: 0 0 auto;
+      width: min(72.3vw, 19.43rem);
+      aspect-ratio: 282 / 384.9;
+      scroll-snap-align: start;
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
   }
 </style>
