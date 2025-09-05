@@ -1,6 +1,7 @@
 ---
 import type { FeaturedProjectItem } from '@/shared/schemas/sanity/homePageSchema'
 import { transformProject } from '@/utils/pages/homepage/projectsUtils'
+import ProjectCard from './ProjectCard.astro'
 
 // This interface reflects that Sanity/astro-sanity likely resolves localeStrings to simple strings by the time they reach the component.
 export interface ResolvedProjectsSectionData {
@@ -37,26 +38,19 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
           const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
           const projectNumber = i + 1
 
-          return project.image ? (
-            <a
-              href={project.slug ? `/project/${project.slug}` : '#'}
-              class={`project-mobile project-mobile-${projectNumber}`}
-              style={`--hover-bg-color: ${project.hoverColor || 'transparent'}; --hover-text-color: ${project.textHoverColor || 'inherit'};`}
-            >
-              <div class="project-image-wrapper">
-                <img
-                  src={project.image}
-                  alt={project.alt || project.title || `Project ${projectNumber}`}
-                  class="project-image"
-                  loading={i < 2 ? 'eager' : 'lazy'}
-                />
-              </div>
-              <div class="project-info">
-                <h3 class="project-title">{project.title || `Project ${projectNumber}`}</h3>
-                <p class="project-client">{project.clients}</p>
-              </div>
-            </a>
-          ) : null
+          return (
+            <ProjectCard
+              slug={project.slug}
+              projectNumber={projectNumber}
+              hoverColor={project.hoverColor}
+              textHoverColor={project.textHoverColor}
+              image={project.image}
+              alt={project.alt}
+              title={project.title}
+              clients={project.clients}
+              loading={i < 2 ? 'eager' : 'lazy'}
+            />
+          )
         })
       }
     </div>
@@ -103,57 +97,6 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     content: '';
     flex: 0 0 var(--padding-inline);
     pointer-events: none;
-  }
-
-  .project-mobile {
-    display: flex;
-    flex-direction: column;
-    gap: 1.125rem;
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.3s ease;
-    flex: 0 0 auto;
-    scroll-snap-align: start;
-    width: min(72.3vw, 19.43rem);
-  }
-
-  .project-client {
-    font-size: 1rem;
-    font-weight: var(--font-weight-light);
-    line-height: 0;
-  }
-
-  .project-mobile:active {
-    transform: scale(0.98);
-  }
-
-  .project-image-wrapper {
-    width: 100%;
-    aspect-ratio: 282 / 384.9;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    background-color: var(--hover-bg-color);
-  }
-
-  .project-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .project-title {
-    font-size: 1.25rem;
-    font-weight: var(--font-weight-regular);
-    padding-block-end: 0.6875rem;
-  }
-
-  .view-project-text {
-    font-size: 0.875rem;
-    opacity: 0.7;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
   }
 
   .projects-view-all-mobile {

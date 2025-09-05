@@ -1,0 +1,93 @@
+---
+export interface ProjectCardProps {
+  slug?: string
+  projectNumber: number
+  hoverColor?: string
+  textHoverColor?: string
+  image?: string
+  alt?: string
+  title?: string
+  clients?: string
+  loading?: 'eager' | 'lazy'
+}
+
+const {
+  slug,
+  projectNumber,
+  hoverColor = 'transparent',
+  textHoverColor = 'inherit',
+  image,
+  alt,
+  title,
+  clients,
+  loading = 'lazy',
+} = Astro.props as ProjectCardProps
+---
+
+{
+  image ? (
+    <a
+      href={slug ? `/project/${slug}` : '#'}
+      class={`project-mobile project-mobile-${projectNumber}`}
+      style={`--hover-bg-color: ${hoverColor}; --hover-text-color: ${textHoverColor};`}
+    >
+      <div class="project-image-wrapper">
+        <img
+          src={image}
+          alt={alt || title || `Project ${projectNumber}`}
+          class="project-image"
+          loading={loading}
+        />
+      </div>
+      <div class="project-info">
+        <h3 class="project-title">{title || `Project ${projectNumber}`}</h3>
+        <p class="project-client">{clients}</p>
+      </div>
+    </a>
+  ) : null
+}
+
+<style>
+  .project-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    width: min(72.3vw, 19.43rem);
+  }
+
+  .project-client {
+    font-size: 1rem;
+    font-weight: var(--font-weight-light);
+    line-height: 0;
+  }
+
+  .project-mobile:active {
+    transform: scale(0.98);
+  }
+
+  .project-image-wrapper {
+    width: 100%;
+    aspect-ratio: 282 / 384.9;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background-color: var(--hover-bg-color);
+  }
+
+  .project-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .project-title {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-regular);
+    padding-block-end: 0.6875rem;
+  }
+</style>
