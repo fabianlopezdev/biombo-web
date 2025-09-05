@@ -70,11 +70,10 @@ const animationDuration = speedMap[speed]
 <style>
   .client-logos-slider {
     --logo-width: 150px;
-    --logo-gap: 3rem;
+    --logo-gap: clamp(3.875rem, 0.988rem + 11.843vi, 12.188rem);
     position: relative;
     width: 100vw;
     margin-inline: calc(-1 * var(--padding-inline));
-    overflow: hidden;
   }
 
   .slider-track {
@@ -94,7 +93,6 @@ const animationDuration = speedMap[speed]
     display: flex;
     align-items: center;
     justify-content: center;
-    width: var(--logo-width);
     height: 80px;
   }
 
@@ -128,29 +126,7 @@ const animationDuration = speedMap[speed]
     }
   }
 
-  /* Mobile adjustments */
-  @media (max-width: 768px) {
-    .client-logos-slider {
-      --logo-width: 100px;
-      --logo-gap: 2rem;
-    }
 
-    .logo-item {
-      height: 60px;
-    }
-  }
-
-  /* Tablet adjustments */
-  @media (min-width: 769px) and (max-width: 1024px) {
-    .client-logos-slider {
-      --logo-width: 120px;
-      --logo-gap: 2.5rem;
-    }
-
-    .logo-item {
-      height: 70px;
-    }
-  }
 
   /* Reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
