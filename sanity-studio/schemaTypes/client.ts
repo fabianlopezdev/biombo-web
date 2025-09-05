@@ -22,17 +22,36 @@ export const client = defineType({
       type: 'url',
       description: 'Client website URL',
     }),
+    defineField({
+      name: 'logo',
+      title: 'Logo',
+      type: 'image',
+      description: 'Client logo image',
+      options: {
+        hotspot: true,
+      },
+    }),
+    defineField({
+      name: 'isFeatured',
+      title: 'Featured Client',
+      type: 'boolean',
+      description: 'Show this client in the featured clients slider',
+      initialValue: false,
+    }),
   ],
   preview: {
     select: {
       title: 'name',
       subtitle: 'website',
+      media: 'logo',
+      isFeatured: 'isFeatured',
     },
     prepare(selection) {
-      const { title, subtitle } = selection
+      const { title, subtitle, media, isFeatured } = selection
       return {
-        title: title || 'Unnamed Client',
+        title: `${isFeatured ? '⭐ ' : ''}${title || 'Unnamed Client'}`,
         subtitle: subtitle || '',
+        media: media,
       }
     },
   },
