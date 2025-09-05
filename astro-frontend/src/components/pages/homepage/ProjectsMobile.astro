@@ -10,6 +10,7 @@ export interface ResolvedProjectsSectionData {
   viewProjectText?: string
   viewAllText?: string
   featuredProjects?: FeaturedProjectItem[]
+  clients?: string
 }
 
 interface Props {
@@ -51,6 +52,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
             </div>
             <div class="project-info">
               <h3 class="project-title">{project.title || `Project ${projectNumber}`}</h3>
+              <p class="project-client">{project.clients}</p>
             </div>
           </a>
         ) : null
@@ -80,10 +82,17 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
   .project-mobile {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.125rem;
     text-decoration: none;
     color: inherit;
     transition: transform 0.3s ease;
+  }
+
+  .project-client {
+    font-size: 1rem;
+    font-weight: var(--font-weight-light);
+    line-height: 0;
+    
   }
 
   .project-mobile:active {
@@ -105,16 +114,12 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     display: block;
   }
 
-  .project-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 0 0.5rem;
-  }
+ 
 
   .project-title {
     font-size: 1.25rem;
     font-weight: var(--font-weight-regular);
+    padding-block-end: 0.6875rem;
   }
 
   .view-project-text {

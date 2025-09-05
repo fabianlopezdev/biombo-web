@@ -33,7 +33,7 @@ const HOME_PAGE_FIELDS = `
         },
         excerpt,
         description,
-        client,
+        clients[]->{ name },
         categories,
         projectDate
       }
