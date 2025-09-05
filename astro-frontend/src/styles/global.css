@@ -36,14 +36,14 @@
   /* Typography */
   --font-family-base: 'Poppins', system-ui, sans-serif;
   --font-size: clamp(1.25rem, 1.163rem + 0.356vi, 1.5rem);
-  --font-size-homepage-sections: 2.375rem;
+  --font-size-homepage-sections: clamp(1.625rem, 1.365rem + 1.069vi, 2.375rem);
   --font-weight-light: 400;
   --font-weight-regular: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
   --padding-inline: clamp(2.25rem, 1.403rem + 3.473vi, 4.688rem);
-  --padding-block-desktop: 6.625rem;
+  --padding-block: clamp(3.438rem, 2.331rem + 4.541vi, 6.625rem);
 
   --header-height: 5.5rem;
 

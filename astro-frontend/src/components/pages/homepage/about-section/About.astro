@@ -63,7 +63,7 @@ const imageCount = imagesToDisplay.length
     grid-template-columns: clamp(18rem, 35vw, 40rem) 1fr;
     gap: 4.4375rem;
     height: 100dvh;
-    padding-block: var(--padding-block-desktop);
+    padding-block: var(--padding-block);
     padding-inline-start: var(--padding-inline);
     background-color: var(--color-secondary);
     color: var(--color-primary);
@@ -73,7 +73,7 @@ const imageCount = imagesToDisplay.length
   .about__title {
     font-size: var(--font-size);
     font-weight: var(--font-weight-light);
-    margin-block-end: 7.8125rem;
+    /* margin-block-end: clamp(3.125rem, 1.497rem + 6.679vi, 7.813rem); */
   }
 
   .about__copy {
@@ -81,6 +81,7 @@ const imageCount = imagesToDisplay.length
     font-weight: var(--font-weight-light);
     max-width: 33.1875rem;
     line-height: 1.184;
+    padding-block: var(--padding-block);
   }
 
   .about__gallery {
@@ -89,5 +90,14 @@ const imageCount = imagesToDisplay.length
     flex-direction: column;
     gap: var(--slider-space);
     overflow: hidden; /* keep side clipping */
+  }
+
+  @media (width < 992px) {
+    .about {
+      display: block;
+      padding-inline-end: var(--padding-inline);
+    }
+
+  
   }
 </style>

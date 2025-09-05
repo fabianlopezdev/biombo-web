@@ -70,7 +70,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
 <style>
   .projects-container-mobile {
     padding-inline: var(--padding-inline);
-    padding-block-end: 3.75rem;
+    padding-block-end: var(--padding-block);
     width: 100%;
   }
 
@@ -78,7 +78,6 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     padding-block-start: 2rem;
     position: relative;
     width: calc(100% + 2 * var(--padding-inline));
-    
   }
 
   .projects-slider {
@@ -117,12 +116,11 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     scroll-snap-align: start;
     width: min(72.3vw, 19.43rem);
   }
-  
+
   .project-client {
     font-size: 1rem;
     font-weight: var(--font-weight-light);
     line-height: 0;
-    
   }
 
   .project-mobile:active {
@@ -143,8 +141,6 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     object-fit: cover;
     display: block;
   }
-
- 
 
   .project-title {
     font-size: 1.25rem;
