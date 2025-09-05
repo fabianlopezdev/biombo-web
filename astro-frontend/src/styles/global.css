@@ -235,6 +235,14 @@ figure {
   line-height: 1.03;
 }
 
+.hero-big-text-2 {
+  font-size: clamp(2rem, 0.958rem + 4.274vi, 5rem);
+  letter-spacing: -0.05em;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.03;
+
+}
+
 @media (width < 768px) {
   .just-desktop {
     display: none !important;

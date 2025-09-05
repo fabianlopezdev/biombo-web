@@ -1,0 +1,163 @@
+---
+import type { Client } from '@/shared/schemas/sanity/clientSchema'
+
+interface Props {
+  clients: Client[]
+  speed?: 'slow' | 'normal' | 'fast'
+  pauseOnHover?: boolean
+}
+
+const { clients, speed = 'normal', pauseOnHover = true } = Astro.props
+
+// Filter out clients without logos
+const clientsWithLogos = clients.filter((client) => client.logo?.asset?.url)
+
+// Duplicate the array for seamless infinite scroll
+const duplicatedClients = [...clientsWithLogos, ...clientsWithLogos]
+
+// Speed mappings in seconds for one complete scroll
+const speedMap = {
+  slow: 60,
+  normal: 40,
+  fast: 20,
+}
+
+const animationDuration = speedMap[speed]
+---
+
+{
+  clientsWithLogos.length > 0 && (
+    <div class={`client-logos-slider ${pauseOnHover ? 'pause-on-hover' : ''}`}>
+      <div
+        class="slider-track"
+        style={`--animation-duration: ${animationDuration}s; --total-logos: ${clientsWithLogos.length}`}
+      >
+        {duplicatedClients.map((client) => (
+          <div class="logo-item">
+            {client.website ? (
+              <a
+                href={client.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Visit ${client.name} website`}
+              >
+                <img
+                  src={client.logo?.asset?.url}
+                  alt={`${client.name} logo`}
+                  width={client.logo?.asset?.metadata?.dimensions?.width ?? 200}
+                  height={client.logo?.asset?.metadata?.dimensions?.height ?? 100}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </a>
+            ) : (
+              <img
+                src={client.logo?.asset?.url}
+                alt={`${client.name} logo`}
+                width={client.logo?.asset?.metadata?.dimensions?.width ?? 200}
+                height={client.logo?.asset?.metadata?.dimensions?.height ?? 100}
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .client-logos-slider {
+    --logo-width: 150px;
+    --logo-gap: 3rem;
+    position: relative;
+    width: 100vw;
+    margin-inline: calc(-1 * var(--padding-inline));
+    overflow: hidden;
+  }
+
+  .slider-track {
+    display: flex;
+    gap: var(--logo-gap);
+    animation: scroll var(--animation-duration) linear infinite;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .pause-on-hover .slider-track:hover {
+    animation-play-state: paused;
+  }
+
+  .logo-item {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--logo-width);
+    height: 80px;
+  }
+
+  .logo-item img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+
+  .logo-item a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .logo-item:hover img {
+    transform: scale(1.05);
+  }
+
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-1 * (var(--logo-width) + var(--logo-gap)) * var(--total-logos)));
+    }
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .client-logos-slider {
+      --logo-width: 100px;
+      --logo-gap: 2rem;
+    }
+
+    .logo-item {
+      height: 60px;
+    }
+  }
+
+  /* Tablet adjustments */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .client-logos-slider {
+      --logo-width: 120px;
+      --logo-gap: 2.5rem;
+    }
+
+    .logo-item {
+      height: 70px;
+    }
+  }
+
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .slider-track {
+      animation: none;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+</style>

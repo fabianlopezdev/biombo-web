@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { orderRankField, orderRankOrdering } from '@sanity/orderable-document-list'
 
 /**
  * Schema for client information
@@ -38,6 +39,31 @@ export const client = defineType({
       description: 'Show this client in the featured clients slider',
       initialValue: false,
     }),
+    defineField({
+      name: 'featuredOrder',
+      title: 'Featured Order',
+      type: 'number',
+      description: 'Optional: Set a specific order for featured clients (lower numbers appear first)',
+      hidden: ({ document }) => !document?.isFeatured,
+      validation: (Rule) => Rule.min(0).integer(),
+    }),
+    orderRankField({ type: 'client' }),
+  ],
+  orderings: [
+    orderRankOrdering,
+    {
+      name: 'featuredOrder',
+      title: 'Featured Order',
+      by: [
+        { field: 'featuredOrder', direction: 'asc' },
+        { field: 'orderRank', direction: 'asc' }
+      ]
+    },
+    {
+      name: 'nameAsc',
+      title: 'Name A-Z',
+      by: [{ field: 'name', direction: 'asc' }]
+    }
   ],
   preview: {
     select: {

@@ -1,0 +1,26 @@
+---
+import ClientLogosSlider from '@/components/shared/ClientLogosSlider.astro'
+import { fetchFeaturedClients } from '@/shared/lib/sanity/queries/clientQueries'
+
+// Fetch featured clients
+const featuredClients = await fetchFeaturedClients()
+---
+
+<section class="clients">
+  <h2 class="hero-big-text-2" data-slide-up-animation>
+    Clients destacats que han confiat en nosaltres
+  </h2>
+  <ClientLogosSlider clients={featuredClients} speed="normal" pauseOnHover={true} />
+</section>
+
+<style>
+  .clients {
+    padding-block: clamp(4.375rem, 2.639rem + 7.124vi, 9.375rem);
+    padding-inline: var(--padding-inline);
+  }
+
+  .hero-big-text-2 {
+    text-wrap: unset;
+    padding-inline-end: 2rem;
+  }
+</style>

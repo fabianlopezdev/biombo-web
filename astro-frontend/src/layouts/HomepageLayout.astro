@@ -47,7 +47,10 @@ const pageTitle = 'Biombo - Art, Events, Community'
     </div>
 
     <section class="projects-mobile">
-      <ProjectsMobile projectsData={homePageData?.projects as ResolvedProjectsSectionData} locale={locale}/>
+      <ProjectsMobile
+        projectsData={homePageData?.projects as ResolvedProjectsSectionData}
+        locale={locale}
+      />
     </section>
     <About sectionData={homePageData?.about} />
     <Services servicesData={homePageData?.services} />
@@ -84,9 +87,9 @@ const pageTitle = 'Biombo - Art, Events, Community'
     flex: 0 0 183.3vw !important;
   }
 
- .projects-mobile {
-   display: none;
- }
+  .projects-mobile {
+    display: none;
+  }
 
   /* Disable horizontal scrolling on screens smaller than 992px */
   @media (width < 992px) {

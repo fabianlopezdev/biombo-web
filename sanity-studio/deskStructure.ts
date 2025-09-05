@@ -12,7 +12,7 @@ const translatedSingletonTypes = SINGLETONS.map((s) => s._type)
 const singletonTypes = [...translatedSingletonTypes, 'siteSettings']
 
 // Types to hide from the generic document list
-const excludeTypes = ['page', 'media.tag', ...singletonTypes]
+const excludeTypes = ['page', 'media.tag', 'client', ...singletonTypes]
 
 // Icon map for singleton documents
 const singletonIcon = (id: string) => {
@@ -112,6 +112,48 @@ export const structure: StructureResolver = (S, context) =>
                   icon: getLanguageIconFn(lang.id),
                 })
               ),
+            ])
+        ),
+
+      // Clients with separated featured/non-featured sections
+      S.listItem()
+        .title('Clients')
+        .icon(() => '👥')
+        .child(
+          S.list()
+            .title('Clients')
+            .items([
+              // Featured Clients - Draggable
+              orderableDocumentListDeskItem({
+                type: 'client',
+                id: 'featured-clients',
+                title: '⭐ Featured Clients (Draggable)',
+                S,
+                context,
+                filter: '_type == "client" && isFeatured == true',
+              }),
+              
+              // Divider
+              S.divider(),
+              
+              // Non-Featured Clients - Regular list
+              S.listItem()
+                .title('Other Clients')
+                .icon(() => '📋')
+                .child(
+                  S.documentList()
+                    .title('Non-Featured Clients')
+                    .filter('_type == "client" && isFeatured != true')
+                    .apiVersion('v2023-01-01')
+                ),
+              
+              // All Clients - Searchable
+              S.listItem()
+                .title('🔍 Search All Clients')
+                .child(
+                  S.documentTypeList('client')
+                    .title('All Clients')
+                ),
             ])
         ),
         
