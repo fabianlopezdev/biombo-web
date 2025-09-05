@@ -13,6 +13,7 @@ const { servicesData } = Astro.props as Props
 
 <script src="@/scripts/animations/slideUpTextAnimation.ts"></script>
 <script src="@/scripts/animations/servicesListAnimation.ts"></script>
+<script src="@/scripts/animations/servicesMobileAnimation.ts"></script>
 <section id="services">
   <div class="services-hero">
     {servicesData?.title && <h2 class="services__title">{servicesData.title.toUpperCase()}</h2>}
@@ -82,7 +83,7 @@ const { servicesData } = Astro.props as Props
   }
 
   .services-list {
-    padding-block: var(--internal-padding-block);
+    padding-block-start: var(--internal-padding-block);
   }
 
   .hero-big-text {
@@ -170,9 +171,11 @@ const { servicesData } = Astro.props as Props
     transition: transform 0.2s ease-out;
   }
 
-  /* Subtle scale on hover */
-  details:hover summary .services-toggle {
-    transform: scale(1.05);
+  /* Subtle scale on hover - only for non-touch devices */
+  @media (hover: hover) {
+    details:hover summary .services-toggle {
+      transform: scale(1.05);
+    }
   }
 
   .services-toggle-plus-text,
@@ -224,21 +227,23 @@ const { servicesData } = Astro.props as Props
     opacity: 0;
   }
 
-  /* This rule fixes the hover transition */
-  details:hover:not([open]) summary .services-toggle-plus-svg,
-  details:hover:not([open]) summary .services-toggle-circle {
-    transition: opacity var(--animation-duration) var(--animation-easing);
-  }
+  /* This rule fixes the hover transition - only for non-touch devices */
+  @media (hover: hover) {
+    details:hover:not([open]) summary .services-toggle-plus-svg,
+    details:hover:not([open]) summary .services-toggle-circle {
+      transition: opacity var(--animation-duration) var(--animation-easing);
+    }
 
-  /* Hover on closed state */
-  details:hover:not([open]) summary .services-toggle-plus-text {
-    opacity: 0;
-  }
-  details:hover:not([open]) summary .services-toggle-plus-svg {
-    opacity: 1;
-  }
-  details:hover:not([open]) summary .services-toggle-circle {
-    opacity: 1;
+    /* Hover on closed state */
+    details:hover:not([open]) summary .services-toggle-plus-text {
+      opacity: 0;
+    }
+    details:hover:not([open]) summary .services-toggle-plus-svg {
+      opacity: 1;
+    }
+    details:hover:not([open]) summary .services-toggle-circle {
+      opacity: 1;
+    }
   }
 
   /* Open state */
@@ -262,6 +267,46 @@ const { servicesData } = Astro.props as Props
     opacity: 1;
     /* Transition is defined here for one-way animation */
     transition: opacity 0.1s linear var(--rotation-duration);
+  }
+
+  /* Mobile-specific animation classes */
+  /* Never show SVG plus on mobile - it stays hidden */
+  body.touch-device .services-toggle-plus-svg {
+    display: none !important;
+  }
+  
+  /* No transitions for plus/minus text on mobile - instant switch */
+  body.touch-device .services-toggle-plus-text,
+  body.touch-device .services-toggle-minus {
+    transition: none !important;
+  }
+  
+  /* Circle appears with animation on mobile */
+  body.touch-device .services-toggle-circle {
+    transition: opacity 0.2s ease-in;
+  }
+  
+  /* Override hover states on touch devices to prevent sticky hover */
+  body.touch-device details:hover > summary {
+    background-color: transparent;
+  }
+  
+  body.touch-device details[open]:hover > summary {
+    background-color: var(--background-color);
+  }
+  
+  /* Instant show/hide for text elements on mobile */
+  body.touch-device details[open] summary .services-toggle-plus-text {
+    opacity: 0;
+  }
+  
+  body.touch-device details[open] summary .services-toggle-minus {
+    opacity: 1;
+  }
+  
+  /* Keep circle visible when open on mobile */
+  body.touch-device details[open] summary .services-toggle-circle {
+    opacity: 1;
   }
 
   /* --- FINAL TOGGLE STYLES END HERE --- */
