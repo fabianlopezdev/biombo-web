@@ -9,6 +9,7 @@ import Projects, {
 import Hero from '@/components/pages/homepage/Hero.astro'
 import ProjectsMobile from '@/components/pages/homepage/ProjectsMobile.astro'
 import About from '@/components/pages/homepage/about-section/About.astro'
+import Services from '@/components/shared/header/Services.astro'
 // import About from '@/components/pages/homepage/about-section/About.astro' // Uncomment when needed
 // import Services from '@/components/pages/homepage/services-section/Services.astro' // Uncomment when needed
 
@@ -48,7 +49,7 @@ const pageTitle = 'Biombo - Art, Events, Community'
       <ProjectsMobile projectsData={homePageData?.projects as ResolvedProjectsSectionData} locale={locale}/>
     </section>
     <About sectionData={homePageData?.about} />
-    <!-- <Services servicesData={homePageData?.services} /> -->
+    <Services servicesData={homePageData?.services} />
   </main>
 
   <!-- <Footer /> -->
