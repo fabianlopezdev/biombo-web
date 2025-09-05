@@ -30,34 +30,36 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
 <div class="projects-container-mobile" aria-labelledby="projects-heading-mobile">
   <h2 class="projects-subtitle">{subtitle.toUpperCase()}</h2>
 
-  <div class="projects-grid">
-    {
-      rawFeaturedProjects.slice(0, 6).map((rawItem, i) => {
-        const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
-        const projectNumber = i + 1
+  <div class="projects-slider-container">
+    <div class="projects-slider">
+      {
+        rawFeaturedProjects.slice(0, 6).map((rawItem, i) => {
+          const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
+          const projectNumber = i + 1
 
-        return project.image ? (
-          <a
-            href={project.slug ? `/project/${project.slug}` : '#'}
-            class={`project-mobile project-mobile-${projectNumber}`}
-            style={`--hover-bg-color: ${project.hoverColor || 'transparent'}; --hover-text-color: ${project.textHoverColor || 'inherit'};`}
-          >
-            <div class="project-image-wrapper">
-              <img
-                src={project.image}
-                alt={project.alt || project.title || `Project ${projectNumber}`}
-                class="project-image"
-                loading={i < 2 ? 'eager' : 'lazy'}
-              />
-            </div>
-            <div class="project-info">
-              <h3 class="project-title">{project.title || `Project ${projectNumber}`}</h3>
-              <p class="project-client">{project.clients}</p>
-            </div>
-          </a>
-        ) : null
-      })
-    }
+          return project.image ? (
+            <a
+              href={project.slug ? `/project/${project.slug}` : '#'}
+              class={`project-mobile project-mobile-${projectNumber}`}
+              style={`--hover-bg-color: ${project.hoverColor || 'transparent'}; --hover-text-color: ${project.textHoverColor || 'inherit'};`}
+            >
+              <div class="project-image-wrapper">
+                <img
+                  src={project.image}
+                  alt={project.alt || project.title || `Project ${projectNumber}`}
+                  class="project-image"
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                />
+              </div>
+              <div class="project-info">
+                <h3 class="project-title">{project.title || `Project ${projectNumber}`}</h3>
+                <p class="project-client">{project.clients}</p>
+              </div>
+            </a>
+          ) : null
+        })
+      }
+    </div>
   </div>
 
   <a href="/projects" class="projects-view-all-mobile" aria-label={viewAllTextVal}>
@@ -68,15 +70,40 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
 <style>
   .projects-container-mobile {
     padding-inline: var(--padding-inline);
+    padding-block-end: 3.75rem;
     width: 100%;
-    min-height: 100vh;
   }
 
-  .projects-grid {
+  .projects-slider-container {
     padding-block-start: 2rem;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    position: relative;
+    width: calc(100% + 2 * var(--padding-inline));
+    
+  }
+
+  .projects-slider {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-inline: var(--padding-inline);
+    padding-bottom: 1rem;
+  }
+
+  .projects-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .projects-slider::after {
+    content: '';
+    flex: 0 0 var(--padding-inline);
+    pointer-events: none;
   }
 
   .project-mobile {
@@ -86,8 +113,11 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     text-decoration: none;
     color: inherit;
     transition: transform 0.3s ease;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    width: min(72.3vw, 19.43rem);
   }
-
+  
   .project-client {
     font-size: 1rem;
     font-weight: var(--font-weight-light);
@@ -100,7 +130,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
   }
 
   .project-image-wrapper {
-    width: 72%;
+    width: 100%;
     aspect-ratio: 282 / 384.9;
     border-radius: 0.75rem;
     overflow: hidden;
@@ -133,19 +163,12 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
   .projects-view-all-mobile {
     display: inline-block;
     align-self: center;
-    margin-top: 2rem;
-    padding: 1rem 2rem;
-    border: 1px solid currentColor;
-    border-radius: 2rem;
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
     color: inherit;
-    transition: all 0.3s ease;
-    font-weight: var(--font-weight-medium);
-  }
-
-  .projects-view-all-mobile:active {
-    transform: scale(0.95);
-    background-color: rgba(0, 0, 0, 0.05);
+    text-wrap: nowrap;
+    padding-block-start: 3rem;
   }
 
   @media (width < 992px) {
