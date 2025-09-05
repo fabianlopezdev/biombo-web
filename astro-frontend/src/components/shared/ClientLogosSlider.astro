@@ -72,7 +72,8 @@ const animationDuration = speedMap[speed]
     --logo-width: 150px;
     --logo-gap: clamp(3.875rem, 0.988rem + 11.843vi, 12.188rem);
     position: relative;
-    width: 100vw;
+    width: calc(100% + 2 * var(--padding-inline));
+    overflow: hidden;
     margin-inline: calc(-1 * var(--padding-inline));
   }
 
@@ -125,8 +126,6 @@ const animationDuration = speedMap[speed]
       transform: translateX(calc(-1 * (var(--logo-width) + var(--logo-gap)) * var(--total-logos)));
     }
   }
-
-
 
   /* Reduced motion preference */
   @media (prefers-reduced-motion: reduce) {

@@ -5,10 +5,10 @@ interface Props {
   class?: string
 }
 
-const { 
-  gap = '1.25rem', 
+const {
+  gap = '1.25rem',
   paddingInline = 'var(--padding-inline)',
-  class: className = ''
+  class: className = '',
 } = Astro.props
 ---
 
@@ -21,7 +21,9 @@ const {
 <style>
   .mobile-slider-container {
     position: relative;
-    width: calc(100% + 2 * var(--padding-inline));
+    margin-inline: calc(-1 * var(--padding-inline));
+    padding-inline-start: var(--padding-inline);
+    overflow-x: hidden;
   }
 
   .mobile-slider {
