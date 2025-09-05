@@ -32,7 +32,7 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
 
 <footer class="picket-fence">
   <div class="footer-first-row">
-    <h2 class="hero-big-text footer-slogan">
+    <h2 class="footer-slogan">
       {
         parsedSlogan.map((part) => {
           // Handle line breaks in the text
@@ -45,7 +45,7 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
                   <span class="highlight-text">{line}</span>
                   <HighlightScribble
                     color="var(--color-primary)"
-                    top="5rem"
+                    top="clamp(3.188rem, 2.558rem + 2.582vi, 5rem)"
                     animateOnReveal={true}
                   />
                 </span>
@@ -57,7 +57,7 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
         })
       }
     </h2>
-    <a href="#top" id="back-to-top-link" class="back-to-top-link">
+    <a href="#top" class="back-to-top-link desktop-only">
       {backToTopText}
       <div class="arrow-up">
         <Fragment set:html={WhiteUpArrow} />
@@ -98,6 +98,12 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
         }
       </ul>
     </div>
+    <a href="#top" class="back-to-top-link mobile-only">
+      {backToTopText}
+      <div class="arrow-up">
+        <Fragment set:html={WhiteUpArrow} />
+      </div>
+    </a>
     <small>
       © {currentYear} Biombo Studio -
       <a href={legalLinkUrl}>
@@ -110,18 +116,20 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
   </div>
 
   <script>
-    // Find the link and the horizontal scrolling container from the main page
-    const backToTopLink = document.getElementById('back-to-top-link')
+    // Find all back-to-top links and the horizontal scrolling container from the main page
+    const backToTopLinks = document.querySelectorAll('.back-to-top-link')
     const horizontalContainer = document.getElementById('horizontal-container')
 
-    // Check if both elements exist before adding the listener
-    if (backToTopLink && horizontalContainer) {
-      backToTopLink.addEventListener('click', (event) => {
+    // Add listener to all back-to-top links
+    backToTopLinks.forEach(link => {
+      link.addEventListener('click', (event) => {
         // 1. Stop the link from its default "jump" behavior
         event.preventDefault()
 
-        // 2. Instantly reset the horizontal container to the beginning
-        horizontalContainer.scrollLeft = 0
+        // 2. Instantly reset the horizontal container to the beginning if it exists
+        if (horizontalContainer) {
+          horizontalContainer.scrollLeft = 0
+        }
 
         // 3. Smoothly scroll the main page to the very top
         window.scrollTo({
@@ -129,18 +137,18 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
           behavior: 'smooth',
         })
       })
-    }
+    })
   </script>
 </footer>
 
 <style>
   /* --- Your Existing Footer Styles --- */
   footer {
-    --padding-block-footer: 7.8125rem;
+    --padding-block-footer: clamp(5rem, 4.023rem + 4.007vi, 7.813rem);
     background-color: var(--color-secondary, #f0f0f0);
     color: var(--color-primary, #111);
     padding-block-start: var(--padding-block-footer);
-    padding-block-end: 4.6rem;
+    padding-block-end: clamp(3.125rem, 2.604rem + 2.137vi, 4.625rem);
     padding-inline: var(--padding-inline, 2rem);
   }
 
@@ -161,6 +169,15 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
     gap: 1rem;
   }
 
+  /* Desktop/Mobile visibility */
+  .desktop-only {
+    display: flex;
+  }
+  
+  .mobile-only {
+    display: none;
+  }
+
   .arrow-up {
     transform: translate(0);
     transition: transform 0.2s ease-in-out;
@@ -171,6 +188,10 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
   }
 
   .footer-slogan {
+    font-size: clamp(3rem, 2.305rem + 2.85vi, 5rem);
+    letter-spacing: -0.05em;
+    font-weight: var(--font-weight-regular);
+    line-height: 1.03;
     max-width: 55%;
   }
 
@@ -253,5 +274,39 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
   .highlight-wrapper {
     position: relative;
     display: inline-block;
+  }
+
+  @media (width < 992px) {
+    .footer-first-row {
+      display: block;
+      padding-block-end: 4rem;
+    }
+    .footer-slogan {
+      max-width: 100%;
+    }
+
+    .footer-second-row {
+      flex-direction: column;
+      gap: 0rem;
+    }
+
+    .contact-info,
+    address,
+    .social-links {
+      flex-direction: column;
+      gap: 0rem;
+    }
+
+    /* Hide desktop version, show mobile version */
+    .desktop-only {
+      display: none;
+    }
+    
+    .mobile-only {
+      display: flex;
+      align-self: start;
+     padding-block: 2.375rem;
+    }
+
   }
 </style>
