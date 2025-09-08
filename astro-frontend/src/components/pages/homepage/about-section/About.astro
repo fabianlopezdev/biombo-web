@@ -58,7 +58,7 @@ const imageCount = imagesToDisplay.length
         )
       }
     </div>
-    
+
     <!-- Mobile slider -->
     <div class="about__gallery-mobile">
       {
@@ -106,6 +106,11 @@ const imageCount = imagesToDisplay.length
   }
 
   .about__gallery {
+  }
+
+  /* Show/hide desktop and mobile galleries */
+  .about__gallery-desktop {
+    display: block;
     --slider-space: 1.981875rem;
     display: flex;
     flex-direction: column;
@@ -113,16 +118,11 @@ const imageCount = imagesToDisplay.length
     overflow: hidden; /* keep side clipping */
   }
 
-  /* Show/hide desktop and mobile galleries */
-  .about__gallery-desktop {
-    display: block;
-  }
-
   .about__gallery-mobile {
     display: none;
   }
 
-  @media (width < 992px) {
+  @media (width < 1025px) {
     .about {
       display: block;
       height: auto;
