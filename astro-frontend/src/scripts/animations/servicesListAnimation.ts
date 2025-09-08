@@ -10,15 +10,19 @@ class ServicesListAnimation {
   private observer?: IntersectionObserver
 
   constructor() {
-    const container = document.querySelector('.services-list') as HTMLElement
-    if (!container) return
+    // Add a delay to ensure text animations have time to measure properly
+    // This prevents race conditions with slideUpTextAnimation.ts
+    setTimeout(() => {
+      const container = document.querySelector('.services-list') as HTMLElement
+      if (!container) return
 
-    this.container = container
-    this.items = container.querySelectorAll('details[data-service-item]')
+      this.container = container
+      this.items = container.querySelectorAll('details[data-service-item]')
 
-    if (this.items.length === 0) return
+      if (this.items.length === 0) return
 
-    this.init()
+      this.init()
+    }, 500) // Wait 500ms to let text animations complete measurement
   }
 
   private init(): void {

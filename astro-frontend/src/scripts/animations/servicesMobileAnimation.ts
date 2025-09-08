@@ -26,8 +26,7 @@ class ServicesMobileAnimation {
   }
 
   private init(): void {
-    // Add class to body for CSS targeting
-    document.body.classList.add('touch-device')
+    // Removed touch-device class addition to prevent layout issues
     
     // Get all service details elements
     const details = document.querySelectorAll('details[data-service-item]')

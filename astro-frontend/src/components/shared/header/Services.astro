@@ -267,45 +267,6 @@ const { servicesData } = Astro.props as Props
     transition: opacity 0.1s linear var(--rotation-duration);
   }
 
-  /* Mobile-specific animation classes */
-  /* Never show SVG plus on mobile - it stays hidden */
-  body.touch-device .services-toggle-plus-svg {
-    display: none !important;
-  }
-
-  /* No transitions for plus/minus text on mobile - instant switch */
-  body.touch-device .services-toggle-plus-text,
-  body.touch-device .services-toggle-minus {
-    transition: none !important;
-  }
-
-  /* Circle appears with animation on mobile */
-  body.touch-device .services-toggle-circle {
-    transition: opacity 0.2s ease-in;
-  }
-
-  /* Override hover states on touch devices to prevent sticky hover */
-  body.touch-device details:hover > summary {
-    background-color: transparent;
-  }
-
-  body.touch-device details[open]:hover > summary {
-    background-color: var(--background-color);
-  }
-
-  /* Instant show/hide for text elements on mobile */
-  body.touch-device details[open] summary .services-toggle-plus-text {
-    opacity: 0;
-  }
-
-  body.touch-device details[open] summary .services-toggle-minus {
-    opacity: 1;
-  }
-
-  /* Keep circle visible when open on mobile */
-  body.touch-device details[open] summary .services-toggle-circle {
-    opacity: 1;
-  }
 
   /* --- FINAL TOGGLE STYLES END HERE --- */
 
@@ -352,11 +313,6 @@ const { servicesData } = Astro.props as Props
     .hero-big-text-2 {
       font-weight: var(--font-weight-regular);
       padding-block: var(--padding-block);
-      /* Fix text wrapping on mobile Safari */
-      word-break: normal;
-      overflow-wrap: break-word;
-      hyphens: auto;
-      -webkit-hyphens: auto;
     }
     .services__text {
       margin-block: 0;
