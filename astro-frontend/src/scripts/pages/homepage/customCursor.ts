@@ -76,9 +76,15 @@ function stopRAF() {
 function tick() {
   states.forEach((s) => {
     if (!s.active) return
+    /* Smooth following with dampening - COMMENTED OUT for normal speed
     const lerp = s.inMagnetic ? config.dampening * 0.7 : config.dampening
     s.cursorX += (s.targetX - s.cursorX) * lerp
-    s.cursorY += (s.targetY - s.cursorY) * lerp
+    s.cursorY += (s.targetY - s.cursorY) * lerp */
+
+    // Direct positioning - normal speed (no lag)
+    s.cursorX = s.targetX
+    s.cursorY = s.targetY
+
     s.cursor.style.left = `${s.cursorX}px`
     s.cursor.style.top = `${s.cursorY}px`
   })

@@ -45,7 +45,8 @@ const { project, viewProjectTextVal } = Astro.props
     }
 
     &.magnetic {
-      transform: translate(-50%, -50%) scale(1.1);
+      /* Scale effect removed - was scale(1.1) */
+      transform: translate(-50%, -50%);
       will-change: transform;
     }
 
@@ -72,7 +73,8 @@ const { project, viewProjectTextVal } = Astro.props
     }
 
     &.magnetic .cursor-text.visible {
-      transform: scale(1.05);
+      /* Scale effect - COMMENTED OUT
+      transform: scale(1.05); */
     }
 
     .cursor-image {
@@ -94,7 +96,8 @@ const { project, viewProjectTextVal } = Astro.props
     }
 
     &.magnetic .cursor-image.visible {
-      transform: rotate(5deg) scale(1.1);
+      /* Rotation and scale effect - COMMENTED OUT
+      transform: rotate(5deg) scale(1.1); */
     }
 
     &.project-cursor-clicked .cursor-text.visible {
