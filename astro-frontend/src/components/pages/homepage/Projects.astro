@@ -281,20 +281,20 @@ inferSize
     background: var(--color-project-6);
   }
   .projects-view-all {
-    grid-row: var(--row-top-limit) / span 3; /* Give it more height with span */
+    grid-row: var(--row-top-limit) / span 3;
     grid-column: span 9 / var(--column-right-limit);
     text-wrap: nowrap;
     position: relative;
     text-decoration: none;
-    display: flex; /* Use flex for better alignment */
-    align-items: center; /* Center vertically */
-    line-height: 1.2;
+    width: fit-content;
+    display: flex;
+    align-items: center;
 
     /* Animated underline */
     &::after {
       content: '';
       position: absolute;
-      bottom: 0;
+      bottom: -2px;
       left: 0;
       width: 0;
       height: 1px;
