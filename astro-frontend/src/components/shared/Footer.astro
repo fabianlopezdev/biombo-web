@@ -106,11 +106,8 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
     </a>
     <small>
       © {currentYear} Biombo Studio -
-      <a href={legalLinkUrl}>
-        <div class="label-wrapper">
-          <span class="label-main underline">{legalLinkText}</span>
-          <span aria-hidden="true" class="label-hover underline">{legalLinkText}</span>
-        </div>
+      <a href={legalLinkUrl} class="legal-link">
+        {legalLinkText}
       </a>
     </small>
   </div>
@@ -223,11 +220,12 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
     list-style: none;
     padding: 0;
     margin: 0;
+    font-size: clamp(1.25rem, 0.726rem + 0.818vi, 1.5rem);
   }
 
   /* The <small> tag is reverted to its original, non-flex state */
   small {
-    font-size: 1.125rem;
+    font-size: clamp(0.875rem, 0.351rem + 0.818vi, 1.125rem);
     height: 36.0461px;
     transform: translate(0px, -7.24921px);
   }
@@ -268,6 +266,28 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
+  }
+
+  .legal-link {
+    position: relative;
+    text-decoration: none;
+
+    /* Animated underline */
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background-color: currentColor;
+      transition: width 0.3s ease;
+    }
+
+    &:hover::after,
+    &:focus-within::after {
+      width: 100%;
+    }
   }
 
   /* --- Targeted Fix for "Avís Legal" Link --- */
