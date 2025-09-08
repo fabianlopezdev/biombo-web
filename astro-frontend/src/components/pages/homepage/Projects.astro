@@ -78,10 +78,7 @@ inferSize
     })
   }
   <a href="/projects" class="projects-view-all" aria-label={viewAllTextVal}>
-    <div class="label-wrapper">
-      <span class="label-main">{viewAllTextVal}</span>
-      <span aria-hidden="true" class="label-hover">{viewAllTextVal}</span>
-    </div>
+    {viewAllTextVal}
   </a>
   <button class="scroll-container">
     <ScrollPill />
@@ -284,23 +281,30 @@ inferSize
     background: var(--color-project-6);
   }
   .projects-view-all {
-    grid-row: var(--row-top-limit);
+    grid-row: var(--row-top-limit) / span 3; /* Give it more height with span */
     grid-column: span 9 / var(--column-right-limit);
     text-wrap: nowrap;
-    .label-main,
-    .label-hover {
-      display: inline-block;
-      text-decoration: underline;
-      text-decoration-thickness: 1px;
-      text-underline-offset: 2px;
+    position: relative;
+    text-decoration: none;
+    display: flex; /* Use flex for better alignment */
+    align-items: center; /* Center vertically */
+    line-height: 1.2;
+
+    /* Animated underline */
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background-color: currentColor;
+      transition: width 0.3s ease;
     }
-    &:hover .label-main,
-    &:focus-within .label-main {
-      transform: translateY(-100%);
-    }
-    &:hover .label-hover,
-    &:focus-within .label-hover {
-      transform: translateY(0);
+
+    &:hover::after,
+    &:focus-within::after {
+      width: 100%;
     }
   }
   .scroll-container {
