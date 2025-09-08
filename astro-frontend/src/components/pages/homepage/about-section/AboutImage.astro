@@ -27,3 +27,12 @@ const { image } = Astro.props
   height={image.asset.metadata?.dimensions.height ?? 800}
   loading="lazy"
 />
+
+<style>
+  .slider__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+</style>
