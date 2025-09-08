@@ -60,13 +60,13 @@ const pages: NavigationPage[] = fetchError ? [] : headerData?.navigationPages ||
     )
   }
 
-<div class="desktop">
-  <LanguageSwitcher locale={locale} languages={languages} />
-</div>
+  <div class="desktop">
+    <LanguageSwitcher locale={locale} languages={languages} />
+  </div>
 
-<button class="mobile-menu">
-  <p>Menú</p>
-</button>
+  <button class="mobile-menu">
+    <p>Menú</p>
+  </button>
 </header>
 
 <MobileMenu pages={pages} locale={locale} languages={languages} />
@@ -146,18 +146,15 @@ const pages: NavigationPage[] = fetchError ? [] : headerData?.navigationPages ||
     margin: 0;
   }
 
-  @media (width < 1110px) {
+  @media (width < 1024px) {
     .desktop {
       display: none;
     }
 
-   .mobile-menu {
+    .mobile-menu {
       display: block;
     }
-      
   }
-
-
 </style>
 
 <style is:global>

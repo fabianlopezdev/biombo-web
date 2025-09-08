@@ -31,7 +31,7 @@ const currentPath = Astro.url.pathname
               rel={page.isExternal ? 'noopener noreferrer' : undefined}
               aria-current={isActive ? 'page' : undefined}
               data-astro-prefetch
-              >
+            >
               {pageName}
             </a>
 
@@ -80,7 +80,6 @@ const currentPath = Astro.url.pathname
 
       .nav-page {
         position: relative;
-       
 
         /* ----------------------------------------------------------------
            Link & sliding labels
@@ -89,7 +88,7 @@ const currentPath = Astro.url.pathname
           position: relative;
           z-index: 1;
           color: var(--text-secondary);
-          font-size: var(--font-size-base);
+          font-size: clamp(1.25rem, 0.726rem + 0.818vi, 1.5rem);
           text-decoration: none;
           transition: color 0.3s ease;
         }
@@ -197,7 +196,7 @@ const currentPath = Astro.url.pathname
     }
   }
 
-  @media (width < 1110px) {
+  @media (width < 1025px) {
     .navigation {
       display: none;
     }

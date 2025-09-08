@@ -12,14 +12,13 @@ import LogoFontVariantRaw from '@/assets/logo-font-variant.svg?raw'
 <style>
   .logo-link {
     font-weight: var(--font-weight-bold);
-    font-size: clamp(1.563rem, 1.454rem + 0.445vi, 1.875rem);
+    font-size: clamp(1.375rem, 0.328rem + 1.636vi, 1.875rem);
     position: relative;
     block-size: 2rem;
     line-height: 2rem;
     color: var(--color-primary);
     text-decoration: none;
   }
-
 
   .logo-svg-hover {
     position: absolute;
@@ -38,9 +37,15 @@ import LogoFontVariantRaw from '@/assets/logo-font-variant.svg?raw'
   .logo-link:hover .logo-text {
     opacity: 0;
   }
-  
+
   .logo-link:hover .logo-svg-hover {
     opacity: 1;
     pointer-events: auto;
+  }
+
+  @media (width < 1025px) {
+    .logo-link {
+      font-size: clamp(1.563rem, 1.454rem + 0.445vi, 1.875rem);
+    }
   }
 </style>
