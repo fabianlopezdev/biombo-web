@@ -19,8 +19,7 @@ const chunkTwo = `${secondWord},`
 const chunkThree = `${thirdWord}!`
 ---
 
-<script src="@/scripts/pages/homepage/projects-section/projectsTitleAnimation.ts"></script>
-
+<!-- Commented out title animations - uncomment to re-enable --><!-- <script src="@/scripts/pages/homepage/projects-section/projectsTitleAnimation.ts"></script> -->
 <h2 id="projects-heading" class="hero-big-text projects-heading" data-has-played="false">
   <!-- ─── Chunk 1 · Slinky Pop-In ───────────────────────────────────── -->
   <span class="chunk chunk-slinky" aria-label={chunkOne}>
@@ -91,9 +90,10 @@ const chunkThree = `${thirdWord}!`
     grid-row: 15 / span 10;
     padding-inline-start: 0.3125rem;
 
+    /* Hover effect - COMMENTED OUT
     &:hover .chunk-flip {
       transform: scale(1.05);
-    }
+    } */
   }
 
   .hero-big-text {
@@ -119,42 +119,50 @@ const chunkThree = `${thirdWord}!`
 
   .character {
     display: inline-block;
-    animation-play-state: paused;
+    /* animation-play-state: paused; - COMMENTED OUT */
 
     &.slinky-letter {
+      /* Animation properties - COMMENTED OUT
       animation-name: slinky-pop-in;
       animation-duration: var(--slinky-letter-duration);
       animation-timing-function: cubic-bezier(0.25, 0.9, 0.35, 1.15);
       animation-fill-mode: forwards;
       animation-delay: calc(var(--char-index) * 45ms);
       opacity: 0;
-      transform: translateY(-120%) rotateX(35deg);
+      transform: translateY(-120%) rotateX(35deg); */
+      opacity: 1; /* Show immediately */
+      transform: none; /* No transform */
     }
 
     &.wave-letter {
+      /* Animation properties - COMMENTED OUT
       animation-name: ping-pong-wave;
       animation-duration: var(--wave-letter-duration);
       animation-timing-function: ease-in-out;
       animation-fill-mode: forwards;
       animation-delay: calc(var(--char-index) * 40ms);
-      opacity: 0;
+      opacity: 0; */
+      opacity: 1; /* Show immediately */
     }
 
     &.flip-letter {
       transform-origin: 50% 50%;
       backface-visibility: hidden;
+      /* Animation properties - COMMENTED OUT
       animation-name: card-flip-reveal;
       animation-duration: var(--flip-letter-duration);
       animation-timing-function: cubic-bezier(0.4, 0.2, 0.2, 1);
       animation-fill-mode: forwards;
       animation-delay: calc(var(--char-index) * 35ms);
       opacity: 0;
-      transform: rotateY(-90deg);
+      transform: rotateY(-90deg); */
+      opacity: 1; /* Show immediately */
+      transform: none; /* No transform */
     }
   }
 
-  /* ──────────── Keyframes ────────────────────────── */
-  @keyframes slinky-pop-in {
+  /* ──────────── Keyframes - COMMENTED OUT ────────────────────────── */
+  /* @keyframes slinky-pop-in {
     0% {
       transform: translateY(-120%) rotateX(35deg);
       opacity: 0;
@@ -211,7 +219,7 @@ const chunkThree = `${thirdWord}!`
       transform: rotateY(0deg);
       opacity: 1;
     }
-  }
+  } */
 
   .highlight-word {
     position: absolute;
@@ -220,16 +228,16 @@ const chunkThree = `${thirdWord}!`
     width: 203%; /* Significantly wider than the text */
     height: 1.2rem; /* Increased height for more visual impact */
     z-index: 1;
-    opacity: 0; /* Start hidden */
+    /* opacity: 0; - COMMENTED OUT, show immediately */
+    opacity: 1;
     transform: translateY(2px); /* Slight adjustment to position */
   }
 
-  /* Apply animations only when heading has been triggered to play */
-  .projects-heading[data-has-played='true'] .highlight-word {
+  /* Apply animations only when heading has been triggered to play - COMMENTED OUT */
+  /* .projects-heading[data-has-played='true'] .highlight-word {
     animation: indicator-reveal 0.6s ease-out forwards;
-    /* Much more conservative delay that accounts for the staggered letter animations */
     animation-delay: calc(var(--flip-letter-duration) + 2000ms);
-  }
+  } */
 
   /* Style the SVG directly */
   .highlight-svg {
@@ -245,17 +253,17 @@ const chunkThree = `${thirdWord}!`
     /* stroke: var(--color-secondary);
     stroke-width: 1; */
     transform-origin: left center;
-    transform: scaleX(0);
+    /* transform: scaleX(0); - COMMENTED OUT, show immediately */
+    transform: scaleX(1);
   }
 
-  /* Apply animations only when heading has been triggered to play */
-  .projects-heading[data-has-played='true'] .highlight-path {
+  /* Apply animations only when heading has been triggered to play - COMMENTED OUT */
+  /* .projects-heading[data-has-played='true'] .highlight-path {
     animation: svg-path-reveal 0.4s ease-out forwards;
-    /* Much more conservative delay that accounts for the staggered letter animations */
     animation-delay: calc(var(--flip-letter-duration) + 2000ms);
-  }
+  } */
 
-  @keyframes indicator-reveal {
+  /* @keyframes indicator-reveal {
     0% {
       opacity: 0;
     }
@@ -264,7 +272,6 @@ const chunkThree = `${thirdWord}!`
     }
   }
 
-  /* Animation for the SVG path reveal */
   @keyframes svg-path-reveal {
     0% {
       transform: scaleX(0);
@@ -272,7 +279,7 @@ const chunkThree = `${thirdWord}!`
     100% {
       transform: scaleX(1);
     }
-  }
+  } */
 
   /* ──────────── Reduced-Motion Fallback ─────────── */
   @media (prefers-reduced-motion: reduce) {

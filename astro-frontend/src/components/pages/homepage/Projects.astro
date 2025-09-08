@@ -1,6 +1,9 @@
 ---
 import ScrollPill from '@/assets/ScrollPill.astro'
-import type { ProjectsSection as SanityProjectsSectionType, FeaturedProjectItem } from '@/shared/schemas/sanity/homePageSchema'
+import type {
+  ProjectsSection as SanityProjectsSectionType,
+  FeaturedProjectItem,
+} from '@/shared/schemas/sanity/homePageSchema'
 import { transformProject } from '@/utils/pages/homepage/projectsUtils'
 import CustomCursor from './CustomCursor.astro'
 import ProjectsTitle from './ProjectsTitle.astro'
@@ -25,9 +28,10 @@ const viewProjectTextVal = projectsData?.viewProjectText || ''
 const viewAllTextVal = projectsData?.viewAllText || ''
 const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProjects || []
 ---
+
 <script src="@/scripts/pages/homepage/projects-section/projectsScroll.ts"></script>
 <script src="@/scripts/pages/homepage/customCursor.ts"></script>
-<script src="@/scripts/pages/homepage/projects-section/projectReveals.ts"></script>
+<!-- Commented out project reveal animations - uncomment to re-enable --><!-- <script src="@/scripts/pages/homepage/projects-section/projectReveals.ts"></script> -->
 <div class="projects-container" aria-labelledby="projects-heading">
   <ProjectsTitle {title} />
   <p class="bottom-left">{subtitle.toUpperCase()}</p>
@@ -125,33 +129,34 @@ inferSize
     border-radius: 0.75rem;
     position: relative;
     overflow: hidden; /* Important if translated content might peek out before reveal */
-    /* Reveal Animation: Common Initial State */
-    opacity: 0;
+    /* Reveal Animation: Common Initial State - COMMENTED OUT */
+    /* opacity: 0; */
+    opacity: 1; /* Show projects immediately */
     /* Default transition, can be overridden by specific reveal classes if needed */
-    transition:
+    /* transition:
       opacity 0.7s cubic-bezier(0.215, 0.61, 0.355, 1),
-      /* EaseOutCubic */ transform 0.7s cubic-bezier(0.215, 0.61, 0.355, 1);
-    will-change: opacity, transform;
+      transform 0.7s cubic-bezier(0.215, 0.61, 0.355, 1);
+    will-change: opacity, transform; */
   }
-  /* Initial positions for alternating reveals */
-  .project.reveal-from-top {
+  /* Initial positions for alternating reveals - COMMENTED OUT */
+  /* .project.reveal-from-top {
     transform: translateY(calc(-1 * var(--reveal-offset)));
   }
   .project.reveal-from-bottom {
     transform: translateY(var(--reveal-offset));
-  }
-  /* Reveal Animation: Visible State (common for all) */
-  .project.is-visible {
+  } */
+  /* Reveal Animation: Visible State (common for all) - COMMENTED OUT */
+  /* .project.is-visible {
     opacity: 1;
     transform: translateY(0);
-  }
+  } */
   /* Fallback for reduced motion - just show them */
   .project.is-visible-reduced-motion {
     opacity: 1;
     transform: none;
   }
-  /* Staggered Delays for Reveal Animation (applied to .is-visible) */
-  .project-1.is-visible {
+  /* Staggered Delays for Reveal Animation (applied to .is-visible) - COMMENTED OUT */
+  /* .project-1.is-visible {
     transition-delay: 0.05s;
   }
   .project-2.is-visible {
@@ -168,7 +173,7 @@ inferSize
   }
   .project-6.is-visible {
     transition-delay: 0.3s;
-  }
+  } */
   .project .project-link {
     display: block;
     width: 100%;
