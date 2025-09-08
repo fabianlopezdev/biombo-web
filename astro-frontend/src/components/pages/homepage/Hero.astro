@@ -86,6 +86,11 @@ const scrollPositionClass =
 </div>
 
 <style is:global>
+  /* Hide animation elements initially to prevent FOUC */
+  [data-slide-up-animation] {
+    visibility: hidden;
+  }
+
   /* Slide-up text animation styles - global to work with dynamically created elements */
   [data-animation='pending'] {
     visibility: hidden;
@@ -101,7 +106,7 @@ const scrollPositionClass =
     display: block !important;
     overflow: hidden !important;
     position: relative !important;
-    margin-bottom: -0.15em !important;
+    margin-bottom: -0.14em !important;
   }
 
   .slide-up-line-inner {
