@@ -18,10 +18,17 @@ class SlideUpTextAnimation {
   private options: Required<AnimationOptions>
   private resizeTimeout?: number
   private hasAnimated: boolean = false
+  private observer?: IntersectionObserver
 
   constructor(element: HTMLElement, options: AnimationOptions = {}) {
     this.element = element
     this.originalContent = element.innerHTML
+
+    // Check if this element has already been animated
+    if (this.element.hasAttribute('data-animation-complete')) {
+      // Element was already animated, don't re-initialize
+      return
+    }
 
     // Merge with default options
     this.options = {
@@ -180,11 +187,24 @@ class SlideUpTextAnimation {
       requestAnimationFrame(() => {
         this.element.setAttribute('data-animation', 'active')
         this.hasAnimated = true
+        // Mark element as complete to prevent re-animation
+        this.element.setAttribute('data-animation-complete', 'true')
+
+        // Disconnect observer after animation to free up resources
+        if (this.observer) {
+          this.observer.disconnect()
+          this.observer = undefined
+        }
       })
     })
   }
 
   private init(): void {
+    // Double-check animation hasn't already completed
+    if (this.element.hasAttribute('data-animation-complete')) {
+      return
+    }
+
     // Set initial state
     this.element.setAttribute('data-animation', 'pending')
 
@@ -213,12 +233,16 @@ class SlideUpTextAnimation {
 
   private setupIntersectionObserver(): void {
     if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(
+      this.observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting && !this.hasAnimated) {
+            if (
+              entry.isIntersecting &&
+              !this.hasAnimated &&
+              !this.element.hasAttribute('data-animation-complete')
+            ) {
               this.animateLines()
-              observer.unobserve(this.element)
+              this.observer?.unobserve(this.element)
             }
           })
         },
@@ -228,7 +252,7 @@ class SlideUpTextAnimation {
         },
       )
 
-      observer.observe(this.element)
+      this.observer.observe(this.element)
     } else {
       // Fallback for older browsers
       this.animateLines()
@@ -236,6 +260,11 @@ class SlideUpTextAnimation {
   }
 
   public handleResize(): void {
+    // Don't handle resize if animation is complete
+    if (this.element.hasAttribute('data-animation-complete')) {
+      return
+    }
+
     clearTimeout(this.resizeTimeout)
     this.resizeTimeout = window.setTimeout(() => {
       // Reset animation state
@@ -251,7 +280,13 @@ class SlideUpTextAnimation {
     // Restore original content
     this.element.innerHTML = this.originalContent
     this.element.removeAttribute('data-animation')
+    this.element.removeAttribute('data-animation-complete')
     clearTimeout(this.resizeTimeout)
+    // Clean up observer if it exists
+    if (this.observer) {
+      this.observer.disconnect()
+      this.observer = undefined
+    }
   }
 }
 
@@ -267,6 +302,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   elements.forEach((element) => {
     const htmlElement = element as HTMLElement
+
+    // Skip if already animated
+    if (htmlElement.hasAttribute('data-animation-complete')) {
+      return
+    }
 
     // Parse options from data attributes
     const options: AnimationOptions = {}
@@ -285,7 +325,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const animation = new SlideUpTextAnimation(htmlElement, options)
-    animations.push(animation)
+    // Only add to animations array if the animation was actually created
+    if (animation && !htmlElement.hasAttribute('data-animation-complete')) {
+      animations.push(animation)
+    }
   })
 
   // Handle resize for all animations
