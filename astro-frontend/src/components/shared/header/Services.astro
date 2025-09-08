@@ -313,6 +313,9 @@ const { servicesData } = Astro.props as Props
     .hero-big-text-2 {
       font-weight: var(--font-weight-regular);
       padding-block: var(--padding-block);
+      /* Ensure stable width for iOS text measurement */
+      width: 100%;
+      box-sizing: border-box;
     }
     .services__text {
       margin-block: 0;

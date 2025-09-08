@@ -47,13 +47,30 @@ class SlideUpTextAnimation {
     // Reset to original content
     this.element.innerHTML = this.originalContent
 
+    // Force layout calculation on iOS before measuring
+    this.element.getBoundingClientRect()
+    
+    // Use getBoundingClientRect for more accurate width on iOS
+    const elementRect = this.element.getBoundingClientRect()
+    const elementWidth = elementRect.width
+
     // Create a clone to measure text without affecting the original
     const measureClone = this.element.cloneNode(true) as HTMLElement
     measureClone.style.position = 'absolute'
     measureClone.style.visibility = 'hidden'
-    measureClone.style.width = this.element.offsetWidth + 'px'
+    measureClone.style.width = elementWidth + 'px'
     measureClone.style.height = 'auto'
     measureClone.style.whiteSpace = 'normal'
+    
+    // Copy computed styles for accurate measurement on iOS
+    const computedStyle = window.getComputedStyle(this.element)
+    measureClone.style.fontSize = computedStyle.fontSize
+    measureClone.style.fontFamily = computedStyle.fontFamily
+    measureClone.style.fontWeight = computedStyle.fontWeight
+    measureClone.style.lineHeight = computedStyle.lineHeight
+    measureClone.style.letterSpacing = computedStyle.letterSpacing
+    measureClone.style.padding = computedStyle.padding
+    
     document.body.appendChild(measureClone)
 
     // Process all text nodes to wrap words for measurement
@@ -208,26 +225,46 @@ class SlideUpTextAnimation {
     // Set initial state
     this.element.setAttribute('data-animation', 'pending')
 
-    // Split text into lines
-    const lineCount = this.splitIntoAnimatedLines()
+    // Detect iOS for special handling
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
 
-    if (lineCount > 0) {
-      // Mark as ready (shows the text with lines hidden)
-      this.element.setAttribute('data-animation', 'ready')
+    // iOS needs extra time for layout to stabilize
+    const measurementDelay = isIOS ? 200 : 0
 
-      // Check if element should animate immediately (above the fold)
-      // or wait for intersection observer
-      const shouldAnimateImmediately = this.element.hasAttribute('data-animate-immediate')
+    // Use requestAnimationFrame for better timing on iOS
+    const performSplit = () => {
+      // Split text into lines
+      const lineCount = this.splitIntoAnimatedLines()
 
-      if (shouldAnimateImmediately) {
-        // Small delay to ensure everything is rendered
-        setTimeout(() => {
-          this.animateLines()
-        }, 100)
-      } else {
-        // Use intersection observer for scroll-triggered animation
-        this.setupIntersectionObserver()
+      if (lineCount > 0) {
+        // Mark as ready (shows the text with lines hidden)
+        this.element.setAttribute('data-animation', 'ready')
+
+        // Check if element should animate immediately (above the fold)
+        // or wait for intersection observer
+        const shouldAnimateImmediately = this.element.hasAttribute('data-animate-immediate')
+
+        if (shouldAnimateImmediately) {
+          // Small delay to ensure everything is rendered
+          setTimeout(() => {
+            this.animateLines()
+          }, 100)
+        } else {
+          // Use intersection observer for scroll-triggered animation
+          this.setupIntersectionObserver()
+        }
       }
+    }
+
+    if (measurementDelay > 0) {
+      // For iOS, wait and use double RAF for layout stability
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(performSplit)
+        })
+      }, measurementDelay)
+    } else {
+      performSplit()
     }
   }
 
