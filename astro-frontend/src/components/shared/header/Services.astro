@@ -352,6 +352,11 @@ const { servicesData } = Astro.props as Props
     .hero-big-text-2 {
       font-weight: var(--font-weight-regular);
       padding-block: var(--padding-block);
+      /* Fix text wrapping on mobile Safari */
+      word-break: normal;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      -webkit-hyphens: auto;
     }
     .services__text {
       margin-block: 0;

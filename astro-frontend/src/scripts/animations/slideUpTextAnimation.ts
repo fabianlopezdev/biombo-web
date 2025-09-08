@@ -296,50 +296,65 @@ document.addEventListener('DOMContentLoaded', () => {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   if (prefersReducedMotion) return
 
-  // Find all elements with the animation attribute
-  const elements = document.querySelectorAll('[data-slide-up-animation]')
-  const animations: SlideUpTextAnimation[] = []
+  // Wait for fonts to load before measuring text
+  const initializeAnimations = () => {
+    // Find all elements with the animation attribute
+    const elements = document.querySelectorAll('[data-slide-up-animation]')
+    const animations: SlideUpTextAnimation[] = []
 
-  elements.forEach((element) => {
-    const htmlElement = element as HTMLElement
+    elements.forEach((element) => {
+      const htmlElement = element as HTMLElement
 
-    // Skip if already animated
-    if (htmlElement.hasAttribute('data-animation-complete')) {
-      return
-    }
+      // Skip if already animated
+      if (htmlElement.hasAttribute('data-animation-complete')) {
+        return
+      }
 
-    // Parse options from data attributes
-    const options: AnimationOptions = {}
+      // Parse options from data attributes
+      const options: AnimationOptions = {}
 
-    if (htmlElement.dataset.animationDuration) {
-      options.duration = parseInt(htmlElement.dataset.animationDuration, 10)
-    }
-    if (htmlElement.dataset.animationStagger) {
-      options.stagger = parseInt(htmlElement.dataset.animationStagger, 10)
-    }
-    if (htmlElement.dataset.animationDelay) {
-      options.initialDelay = parseInt(htmlElement.dataset.animationDelay, 10)
-    }
-    if (htmlElement.dataset.animationEasing) {
-      options.easing = htmlElement.dataset.animationEasing
-    }
+      if (htmlElement.dataset.animationDuration) {
+        options.duration = parseInt(htmlElement.dataset.animationDuration, 10)
+      }
+      if (htmlElement.dataset.animationStagger) {
+        options.stagger = parseInt(htmlElement.dataset.animationStagger, 10)
+      }
+      if (htmlElement.dataset.animationDelay) {
+        options.initialDelay = parseInt(htmlElement.dataset.animationDelay, 10)
+      }
+      if (htmlElement.dataset.animationEasing) {
+        options.easing = htmlElement.dataset.animationEasing
+      }
 
-    const animation = new SlideUpTextAnimation(htmlElement, options)
-    // Only add to animations array if the animation was actually created
-    if (animation && !htmlElement.hasAttribute('data-animation-complete')) {
-      animations.push(animation)
-    }
-  })
+      const animation = new SlideUpTextAnimation(htmlElement, options)
+      // Only add to animations array if the animation was actually created
+      if (animation && !htmlElement.hasAttribute('data-animation-complete')) {
+        animations.push(animation)
+      }
+    })
 
-  // Handle resize for all animations
-  if (animations.length > 0) {
-    window.addEventListener(
-      'resize',
-      () => {
-        animations.forEach((animation) => animation.handleResize())
-      },
-      { passive: true },
-    )
+    // Handle resize for all animations
+    if (animations.length > 0) {
+      window.addEventListener(
+        'resize',
+        () => {
+          animations.forEach((animation) => animation.handleResize())
+        },
+        { passive: true },
+      )
+    }
+  }
+
+  // Check if fonts are already loaded
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      // Small delay to ensure layout is stable
+      setTimeout(initializeAnimations, 100)
+    })
+  } else {
+    // Fallback for browsers without font loading API
+    // Wait a bit longer to ensure fonts are loaded
+    setTimeout(initializeAnimations, 300)
   }
 })
 

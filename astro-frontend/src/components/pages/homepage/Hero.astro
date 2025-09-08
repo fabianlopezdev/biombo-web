@@ -108,6 +108,9 @@ const scrollPositionClass =
     overflow: hidden !important;
     position: relative !important;
     margin-bottom: -0.14em !important;
+    /* Ensure proper text wrapping on mobile */
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
   }
 
   .slide-up-line-inner {
