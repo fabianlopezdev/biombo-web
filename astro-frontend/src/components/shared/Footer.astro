@@ -121,7 +121,7 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
     const horizontalContainer = document.getElementById('horizontal-container')
 
     // Add listener to all back-to-top links
-    backToTopLinks.forEach(link => {
+    backToTopLinks.forEach((link) => {
       link.addEventListener('click', (event) => {
         // 1. Stop the link from its default "jump" behavior
         event.preventDefault()
@@ -153,8 +153,14 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
   }
 
   .picket-fence {
-    mask: conic-gradient(from 117.5deg at top, #0000, #000 1deg 124deg, #0000 125deg) 50%/46.1px
+    mask: conic-gradient(from 117.5deg at top, #0000, #000 0.5deg 124.5deg, #0000 125deg) 50%/46.1px
       100%;
+    -webkit-mask: conic-gradient(from 117.5deg at top, #0000, #000 0.5deg 124.5deg, #0000 125deg)
+      50%/46.1px 100%;
+    mask-size: 46.1px 100%;
+    -webkit-mask-size: 46.1px 100%;
+    mask-repeat: repeat-x;
+    -webkit-mask-repeat: repeat-x;
   }
 
   .footer-first-row {
@@ -173,7 +179,7 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
   .desktop-only {
     display: flex;
   }
-  
+
   .mobile-only {
     display: none;
   }
@@ -301,12 +307,11 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
     .desktop-only {
       display: none;
     }
-    
+
     .mobile-only {
       display: flex;
       align-self: start;
-     padding-block: 2.375rem;
+      padding-block: 2.375rem;
     }
-
   }
 </style>
