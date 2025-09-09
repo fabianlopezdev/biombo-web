@@ -22,7 +22,15 @@ const speedMap = {
   fast: 20,
 }
 
+// Mobile speeds are faster (roughly 50% of desktop speed)
+const mobileSpeedMap = {
+  slow: 30,
+  normal: 20,
+  fast: 10,
+}
+
 const animationDuration = speedMap[speed]
+const mobileAnimationDuration = mobileSpeedMap[speed]
 ---
 
 {
@@ -30,7 +38,7 @@ const animationDuration = speedMap[speed]
     <div class={`client-logos-slider ${pauseOnHover ? 'pause-on-hover' : ''}`}>
       <div
         class="slider-track"
-        style={`--animation-duration: ${animationDuration}s; --total-logos: ${clientsWithLogos.length}`}
+        style={`--animation-duration: ${animationDuration}s; --mobile-animation-duration: ${mobileAnimationDuration}s; --total-logos: ${clientsWithLogos.length}`}
       >
         {duplicatedClients.map((client) => (
           <div class="logo-item">
@@ -123,6 +131,13 @@ const animationDuration = speedMap[speed]
     }
     100% {
       transform: translateX(-50%);
+    }
+  }
+
+  /* Mobile responsiveness - faster animation on smaller screens */
+  @media (max-width: 768px) {
+    .slider-track {
+      animation-duration: var(--mobile-animation-duration);
     }
   }
 
