@@ -54,34 +54,13 @@ class ServicesMobileAnimation {
   }
 
   private handleToggleAnimation(detail: HTMLDetailsElement, toggle: HTMLElement): void {
-    // Clear any existing animation timeout
-    if (this.animationTimeout) {
-      clearTimeout(this.animationTimeout)
-      this.animationTimeout = null
-    }
+    // No animation needed - CSS handles the instant swap
+    // Just ensure clean state after toggle
     
-    // Check if we're opening or closing
-    const isOpening = !detail.open // It's about to open (hasn't toggled yet)
-    
-    if (isOpening) {
-      // Add mobile animation class - this will handle the direct transition
-      // from plus text to minus text with circle appearing
-      toggle.classList.add('mobile-animating')
-      
-      // Remove the animation class after animation completes
-      this.animationTimeout = window.setTimeout(() => {
-        toggle.classList.remove('mobile-animating')
-      }, 400)
-      
-    } else {
-      // Closing - ensure clean state
-      toggle.classList.remove('mobile-animating')
-      
-      // Clear hover state after animation completes
-      setTimeout(() => {
-        this.clearHoverState(detail)
-      }, 300)
-    }
+    // Clear any hover states that might be stuck
+    setTimeout(() => {
+      this.clearHoverState(detail)
+    }, 100)
   }
 
   private clearHoverState(detail: HTMLDetailsElement): void {
@@ -89,9 +68,6 @@ class ServicesMobileAnimation {
     const toggle = detail.querySelector('.services-toggle')
     
     if (summary && toggle) {
-      // Remove any animation classes
-      toggle.classList.remove('mobile-animating')
-      
       // Force a reflow to clear any stuck states
       void toggle.offsetHeight
     }
