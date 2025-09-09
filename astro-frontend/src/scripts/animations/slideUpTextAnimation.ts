@@ -24,16 +24,6 @@ class SlideUpTextAnimation {
     this.element = element
     this.originalContent = element.innerHTML
 
-    // Debug logging
-    console.log('=== SLIDE UP ANIMATION START ===')
-    console.log('Element:', this.element)
-    console.log('Element classes:', this.element.className)
-    console.log('Parent element classes:', this.element.parentElement?.className)
-    console.log('Raw innerHTML:', this.element.innerHTML)
-    console.log('Raw textContent:', JSON.stringify(this.element.textContent))
-    console.log('Text length:', this.element.textContent?.length)
-    console.log('User Agent:', navigator.userAgent)
-    console.log('Is Safari:', /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent))
 
     // Check if this element has already been animated
     if (this.element.hasAttribute('data-animation-complete')) {
@@ -55,8 +45,6 @@ class SlideUpTextAnimation {
   }
 
   private splitIntoAnimatedLines(): number {
-    console.log('--- Starting splitIntoAnimatedLines ---')
-    
     // Reset to original content
     this.element.innerHTML = this.originalContent
 
@@ -67,12 +55,6 @@ class SlideUpTextAnimation {
     const elementRect = this.element.getBoundingClientRect()
     const elementWidth = elementRect.width
 
-    console.log('Element offsetWidth:', this.element.offsetWidth)
-    console.log('Element getBoundingClientRect:', elementRect)
-    console.log('Element width being used:', elementWidth)
-    console.log('Parent element width:', this.element.parentElement?.offsetWidth)
-    console.log('Computed font-size:', window.getComputedStyle(this.element).fontSize)
-    console.log('Computed line-height:', window.getComputedStyle(this.element).lineHeight)
 
     // Create a clone to measure text without affecting the original
     const measureClone = this.element.cloneNode(true) as HTMLElement
@@ -108,21 +90,12 @@ class SlideUpTextAnimation {
       measureClone.style.top = '0'
     }
     
-    console.log('Appending clone to:', appendTarget === document.body ? 'document.body' : 'parent element')
-    console.log('Clone innerHTML before append:', measureClone.innerHTML)
-    
     appendTarget.appendChild(measureClone)
     
     // Force Safari to calculate layout multiple times
     measureClone.offsetHeight // Force reflow
     void measureClone.offsetWidth // Force another reflow
     
-    // Log clone's actual computed values after append
-    const cloneComputed = window.getComputedStyle(measureClone)
-    console.log('Clone computed width:', cloneComputed.width)
-    console.log('Clone computed display:', cloneComputed.display)
-    console.log('Clone computed white-space:', cloneComputed.whiteSpace)
-    console.log('Clone offsetWidth:', measureClone.offsetWidth)
 
     // Process all text nodes to wrap words for measurement
     const processTextNodes = (element: Element) => {
@@ -162,29 +135,11 @@ class SlideUpTextAnimation {
     const wordSpans = measureClone.querySelectorAll('.word-measure')
     const lines = new Map<number, { elements: Element[]; content: string }>()
 
-    console.log('Number of word spans found:', wordSpans.length)
-    
-    // Log first 3 word spans' computed styles
-    if (wordSpans.length > 0) {
-      for (let i = 0; i < Math.min(3, wordSpans.length); i++) {
-        const span = wordSpans[i] as HTMLElement
-        const computed = window.getComputedStyle(span)
-        console.log(`Word ${i} ("${span.textContent}"): width=${computed.width}, display=${computed.display}`)
-      }
-    }
-    
     const wordPositions: any[] = []
 
     wordSpans.forEach((span, index) => {
       const rect = span.getBoundingClientRect()
       const lineY = Math.round(rect.top / 5) * 5 // Round to nearest 5px to group close elements
-
-      wordPositions.push({
-        word: span.textContent,
-        index: index,
-        top: rect.top,
-        roundedY: lineY
-      })
 
       if (!lines.has(lineY)) {
         lines.set(lineY, { elements: [], content: '' })
@@ -195,18 +150,11 @@ class SlideUpTextAnimation {
       lineData.content += span.textContent + ' '
     })
 
-    console.log('Word positions:', wordPositions)
-
     // Remove measurement clone from where we appended it
     appendTarget.removeChild(measureClone)
 
     // Sort lines by vertical position
     const sortedLines = [...lines.entries()].sort(([a], [b]) => a - b).map(([, data]) => data)
-
-    console.log('Number of lines detected:', sortedLines.length)
-    sortedLines.forEach((line, i) => {
-      console.log(`Line ${i}: "${line.content.trim()}"`)
-    })
 
     // Clear original content
     this.element.innerHTML = ''
