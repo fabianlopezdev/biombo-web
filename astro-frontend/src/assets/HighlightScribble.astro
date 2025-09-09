@@ -68,6 +68,9 @@ const pathId = `mask-path-${uniqueId}`
 
 <style is:global>
   @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
     to {
       stroke-dashoffset: 0;
     }
@@ -93,12 +96,20 @@ const pathId = `mask-path-${uniqueId}`
     stroke-linejoin: round;
     fill: none;
     stroke-dasharray: 1;
+    /* Safari optimization */
+    will-change: stroke-dashoffset;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 
   /* Immediate animation for hero section */
   .animate-immediate .mask-path {
-    stroke-dashoffset: -1;
+    stroke-dashoffset: 1;
     animation: draw 1s ease-out var(--animation-delay, 0.3s) forwards;
+    /* Safari-specific fixes */
+    -webkit-animation: draw 1s ease-out var(--animation-delay, 0.3s) forwards;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
   }
 
   /* Hidden by default for reveal animation */
@@ -107,7 +118,10 @@ const pathId = `mask-path-${uniqueId}`
   }
 
   [data-animate-on-reveal='true'] .mask-path {
-    stroke-dashoffset: -1; /* Changed from 1 to -1 to match hero direction */
+    stroke-dashoffset: 1;
+    /* Safari requires explicit initial state */
+    -webkit-animation-play-state: paused;
+    animation-play-state: paused;
   }
 
   /* Animation triggered by intersection observer */
@@ -118,5 +132,11 @@ const pathId = `mask-path-${uniqueId}`
 
   .animate-draw .mask-path {
     animation: draw 1s ease-out var(--animation-delay, 0.2s) forwards;
+    /* Safari-specific fixes */
+    -webkit-animation: draw 1s ease-out var(--animation-delay, 0.2s) forwards;
+    -webkit-animation-play-state: running;
+    animation-play-state: running;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
   }
 </style>
