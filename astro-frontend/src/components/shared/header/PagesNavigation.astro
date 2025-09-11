@@ -126,6 +126,7 @@ const currentPath = Astro.url.pathname
           }
         }
 
+        /* SVG appears on hover but without animation per client request */
         &:not(:has(.nav-link[aria-current='page'])):hover .hover-svg,
         &:not(:has(.nav-link[aria-current='page'])):focus-within .hover-svg {
           opacity: 1;
@@ -157,9 +158,10 @@ const currentPath = Astro.url.pathname
     stroke-width: var(--symbol-path-stroke-width);
     stroke-dasharray: var(--nav-svg-path-length, 1450);
     stroke-dashoffset: var(--symbol-path-dashoffset);
-    transition:
+    /* Animation transitions commented out per client request - SVG appears instantly */
+    /* transition:
       stroke-dashoffset 0.8s cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s,
-      fill 0.4s ease 0.1s;
+      fill 0.4s ease 0.1s; */
   }
 
   /* Active page indicator styling */
