@@ -3,7 +3,6 @@ import { defineMiddleware } from 'astro:middleware' // Rely on defineMiddleware 
 import { useAstroI18n } from 'astro-i18n'
 import astroI18nConfig from '../astro-i18n.config' // Import config directly for serverless
 
-
 const pathsToExclude = [
   '/favicon.svg', // Common static asset
   '/.well-known/', // For devtools and other services

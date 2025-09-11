@@ -23,19 +23,19 @@ export async function fetchHeader(locale: string = 'ca'): Promise<Header | null>
         }
       }
     }`
-    const params = { 
+    const params = {
       documentId,
       // Add timestamp to bypass any CDN cache
-      _t: Date.now()
+      _t: Date.now(),
     }
 
     // Temporarily bypass schema validation for debugging
     // const rawResult = await fetchSanityQuery({
     //   query,
     //   params,
-    //   schema: null, 
+    //   schema: null,
     // })
-    
+
     let header = await fetchSanityQuery({
       query,
       params,

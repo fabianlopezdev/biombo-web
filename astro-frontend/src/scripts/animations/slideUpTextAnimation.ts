@@ -24,7 +24,6 @@ class SlideUpTextAnimation {
     this.element = element
     this.originalContent = element.innerHTML
 
-
     // Check if this element has already been animated
     if (this.element.hasAttribute('data-animation-complete')) {
       // Element was already animated, don't re-initialize
@@ -50,11 +49,10 @@ class SlideUpTextAnimation {
 
     // Force layout calculation on iOS before measuring
     this.element.getBoundingClientRect()
-    
+
     // Use getBoundingClientRect for more accurate width on iOS
     const elementRect = this.element.getBoundingClientRect()
     const elementWidth = elementRect.width
-
 
     // Create a clone to measure text without affecting the original
     const measureClone = this.element.cloneNode(true) as HTMLElement
@@ -69,7 +67,7 @@ class SlideUpTextAnimation {
     measureClone.style.boxSizing = 'border-box' // Match box model
     measureClone.style.left = '0'
     measureClone.style.top = '0'
-    
+
     // Copy computed styles for accurate measurement on iOS
     const computedStyle = window.getComputedStyle(this.element)
     measureClone.style.fontSize = computedStyle.fontSize
@@ -78,24 +76,23 @@ class SlideUpTextAnimation {
     measureClone.style.lineHeight = computedStyle.lineHeight
     measureClone.style.letterSpacing = computedStyle.letterSpacing
     measureClone.style.padding = computedStyle.padding
-    
+
     // For Safari, append to body to avoid parent layout issues
     const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
-    const appendTarget = isSafari ? document.body : (this.element.parentElement || document.body)
-    
+    const appendTarget = isSafari ? document.body : this.element.parentElement || document.body
+
     // Position off-screen if appending to body
     if (appendTarget === document.body) {
       measureClone.style.position = 'fixed'
       measureClone.style.left = '-9999px'
       measureClone.style.top = '0'
     }
-    
+
     appendTarget.appendChild(measureClone)
-    
+
     // Force Safari to calculate layout multiple times
-    measureClone.offsetHeight // Force reflow
+    void measureClone.offsetHeight // Force reflow
     void measureClone.offsetWidth // Force another reflow
-    
 
     // Process all text nodes to wrap words for measurement
     const processTextNodes = (element: Element) => {
@@ -135,9 +132,7 @@ class SlideUpTextAnimation {
     const wordSpans = measureClone.querySelectorAll('.word-measure')
     const lines = new Map<number, { elements: Element[]; content: string }>()
 
-    const wordPositions: any[] = []
-
-    wordSpans.forEach((span, index) => {
+    wordSpans.forEach((span) => {
       const rect = span.getBoundingClientRect()
       const lineY = Math.round(rect.top / 5) * 5 // Round to nearest 5px to group close elements
 
@@ -254,7 +249,9 @@ class SlideUpTextAnimation {
     this.element.setAttribute('data-animation', 'pending')
 
     // Detect iOS for special handling
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+      !(window as unknown as { MSStream?: unknown }).MSStream
 
     // iOS needs extra time for layout to stabilize
     const measurementDelay = isIOS ? 200 : 0
@@ -411,8 +408,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Check if fonts are already loaded
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => {
+  if ('fonts' in document && document.fonts) {
+    void document.fonts.ready.then(() => {
       // Small delay to ensure layout is stable
       setTimeout(initializeAnimations, 100)
     })

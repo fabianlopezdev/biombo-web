@@ -24,9 +24,15 @@ const currentPath = Astro.url.pathname
   <div class="mobile-menu-content">
     <div class="menu-header">
       <button class="close-button" aria-label="Close menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
         </svg>
       </button>
     </div>
@@ -51,7 +57,7 @@ const currentPath = Astro.url.pathname
                 >
                   {pageName}
                 </a>
-                <div class="separator"></div>
+                <div class="separator" />
               </li>
             )
           })
@@ -65,9 +71,9 @@ const currentPath = Astro.url.pathname
           languages.map(function renderLang(lang) {
             const isActive = lang.code === locale
             return (
-              <a 
-                href={lang.path} 
-                class={`language-btn ${isActive ? 'active' : ''}`} 
+              <a
+                href={lang.path}
+                class={`language-btn ${isActive ? 'active' : ''}`}
                 aria-current={isActive ? 'true' : undefined}
                 data-astro-prefetch
               >
@@ -294,8 +300,6 @@ const currentPath = Astro.url.pathname
     opacity: 0;
   }
 
-
-
   @media (prefers-reduced-motion: reduce) {
     .mobile-menu-content,
     .menu-header,
@@ -303,12 +307,12 @@ const currentPath = Astro.url.pathname
     .mobile-language-section {
       transition: none;
     }
-    
+
     .mobile-menu-overlay.open .menu-header,
     .mobile-menu-overlay.open .mobile-language-section {
       opacity: 1;
     }
-    
+
     .mobile-menu-overlay.open .mobile-nav-link {
       transform: translateY(0);
     }
@@ -344,7 +348,7 @@ const currentPath = Astro.url.pathname
 
     menuButton?.addEventListener('click', openMenu)
     closeButton?.addEventListener('click', closeMenu)
-    
+
     menuOverlay?.addEventListener('click', (e) => {
       if (e.target === menuOverlay) {
         closeMenu()

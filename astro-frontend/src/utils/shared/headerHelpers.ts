@@ -85,7 +85,12 @@ export function getPagePath(page: NavigationPage, locale: string): string {
       }
 
       // Check if this is one of our mapped types
-      if (pageType === 'projectsPage' || pageType === 'servicesPage' || pageType === 'aboutUsPage' || pageType === 'contactPage') {
+      if (
+        pageType === 'projectsPage' ||
+        pageType === 'servicesPage' ||
+        pageType === 'aboutUsPage' ||
+        pageType === 'contactPage'
+      ) {
         // We verified this is a valid key with our if statement
         // Use the page type to access the correct route map
         const localizedPath = PAGE_ROUTES[pageType][locale as 'ca' | 'es' | 'en'] || ''

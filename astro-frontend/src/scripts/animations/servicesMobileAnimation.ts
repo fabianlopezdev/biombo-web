@@ -11,9 +11,9 @@ class ServicesMobileAnimation {
   constructor() {
     // Detect if this is a touch device
     this.isTouchDevice = this.detectTouchDevice()
-    
+
     if (!this.isTouchDevice) return
-    
+
     this.init()
   }
 
@@ -27,22 +27,22 @@ class ServicesMobileAnimation {
 
   private init(): void {
     // Removed touch-device class addition to prevent layout issues
-    
+
     // Get all service details elements
     const details = document.querySelectorAll('details[data-service-item]')
-    
+
     details.forEach((detail) => {
       const summary = detail.querySelector('summary')
       const toggle = detail.querySelector('.services-toggle')
-      
+
       if (!summary || !toggle) return
-      
+
       // Handle the animation sequence on click/tap
-      summary.addEventListener('click', (e) => {
+      summary.addEventListener('click', () => {
         // Don't prevent default - let the details element toggle naturally
-        this.handleToggleAnimation(detail as HTMLDetailsElement, toggle as HTMLElement)
+        this.handleToggleAnimation(detail as HTMLDetailsElement)
       })
-      
+
       // Clear any stuck hover states when tapping elsewhere
       document.addEventListener('touchstart', (e) => {
         const target = e.target as HTMLElement
@@ -53,10 +53,10 @@ class ServicesMobileAnimation {
     })
   }
 
-  private handleToggleAnimation(detail: HTMLDetailsElement, toggle: HTMLElement): void {
+  private handleToggleAnimation(detail: HTMLDetailsElement): void {
     // No animation needed - CSS handles the instant swap
     // Just ensure clean state after toggle
-    
+
     // Clear any hover states that might be stuck
     setTimeout(() => {
       this.clearHoverState(detail)
@@ -66,7 +66,7 @@ class ServicesMobileAnimation {
   private clearHoverState(detail: HTMLDetailsElement): void {
     const summary = detail.querySelector('summary')
     const toggle = detail.querySelector('.services-toggle')
-    
+
     if (summary && toggle) {
       // Force a reflow to clear any stuck states
       void toggle.offsetHeight
@@ -76,7 +76,7 @@ class ServicesMobileAnimation {
   public destroy(): void {
     // Clean up event listeners and classes
     document.body.classList.remove('touch-device')
-    
+
     if (this.animationTimeout) {
       clearTimeout(this.animationTimeout)
     }

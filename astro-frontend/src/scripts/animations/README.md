@@ -10,14 +10,10 @@ Add the `data-slide-up-animation` attribute to any element:
 
 ```html
 <!-- Animates immediately (above the fold) -->
-<h1 data-slide-up-animation data-animate-immediate>
-  Your text here
-</h1>
+<h1 data-slide-up-animation data-animate-immediate>Your text here</h1>
 
 <!-- Animates when scrolled into view -->
-<h2 data-slide-up-animation>
-  This animates on scroll
-</h2>
+<h2 data-slide-up-animation>This animates on scroll</h2>
 ```
 
 ### With Custom Options
@@ -25,7 +21,7 @@ Add the `data-slide-up-animation` attribute to any element:
 Use data attributes to customize the animation:
 
 ```html
-<h3 
+<h3
   data-slide-up-animation
   data-animation-duration="2000"
   data-animation-stagger="300"
@@ -53,7 +49,7 @@ const animation = new SlideUpTextAnimation(element, {
   duration: 2000,
   stagger: 250,
   initialDelay: 1000,
-  easing: 'ease-out'
+  easing: 'ease-out',
 })
 
 // Later, if needed
@@ -76,13 +72,11 @@ animation.destroy() // Restore original content
 <script src="@/scripts/animations/slideUpTextAnimation.ts"></script>
 
 <h2 data-slide-up-animation>
-  This text will animate<br>
+  This text will animate<br />
   line by line when scrolled into view
 </h2>
 
 <p data-slide-up-animation data-animation-stagger="100">
-  Even paragraphs can have
-  this beautiful animation effect
-  with faster stagger timing
+  Even paragraphs can have this beautiful animation effect with faster stagger timing
 </p>
 ```

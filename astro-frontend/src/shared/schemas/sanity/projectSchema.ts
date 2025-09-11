@@ -103,7 +103,10 @@ export const projectSchema = z.object({
   thumbnailImage: imageWithResolvedAssetSchema.nullable().optional(), // Added nullable
   excerpt: z.array(z.any()).nullable().optional(), // Added nullable
   description: z.array(z.any()).nullable().optional(), // Added nullable
-  clients: z.array(z.object({ name: z.string() })).nullable().optional(),
+  clients: z
+    .array(z.object({ name: z.string() }))
+    .nullable()
+    .optional(),
   categories: z.array(z.object({ _ref: z.string(), _type: z.literal('reference') })).optional(), // Changed from array of strings
   projectDate: z.string().nullable().optional(), // Added nullable
   gallery: z.array(imageWithResolvedAssetSchema).optional(), // Gallery images also use resolved assets

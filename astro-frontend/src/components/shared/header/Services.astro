@@ -267,7 +267,6 @@ const { servicesData } = Astro.props as Props
     transition: opacity 0.1s linear var(--rotation-duration);
   }
 
-
   /* --- FINAL TOGGLE STYLES END HERE --- */
 
   details > p {
@@ -307,38 +306,38 @@ const { servicesData } = Astro.props as Props
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
     }
-    
+
     /* Disable hover background change on mobile (but keep open state background) */
     details:not([open]):hover > summary {
       background-color: transparent;
     }
-    
+
     /* Keep background color when open on mobile */
     details[open] > summary {
       background-color: var(--background-color);
     }
-    
+
     /* Disable hover scale effect on mobile */
     details:hover summary .services-toggle {
       transform: none !important;
     }
-    
+
     /* Hide the plus SVG completely on mobile */
     .services-toggle-plus-svg {
       display: none !important;
     }
-    
+
     /* Remove all transitions from text elements for instant swap */
     .services-toggle-plus-text,
     .services-toggle-minus {
       transition: none !important;
     }
-    
+
     /* Keep only circle transition for tap feedback */
     .services-toggle-circle {
       transition: opacity 0.2s ease-out;
     }
-    
+
     /* Ensure hover states don't apply on mobile */
     details:hover:not([open]) summary .services-toggle-plus-text {
       opacity: 1;
@@ -349,7 +348,7 @@ const { servicesData } = Astro.props as Props
     details:hover:not([open]) summary .services-toggle-circle {
       opacity: 0;
     }
-    
+
     /* Open state - instant text swap, circle appears */
     details[open] summary .services-toggle-plus-text {
       opacity: 0;

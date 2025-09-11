@@ -113,7 +113,6 @@ export async function fetchFeaturedProjects(): Promise<Projects | null> {
         return orderA - orderB
       })
 
-
     // If we have featured projects, return those, otherwise return all projects as a fallback
     // Cast to Projects to satisfy type safety
     return (featuredProjects.length > 0 ? featuredProjects : projects) as Projects

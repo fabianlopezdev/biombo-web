@@ -165,7 +165,7 @@ export function transformProject(
   const slug = getSlug()
   const image = getImage()
   const alt = imageAltText ? getLocalizedValue(imageAltText) : title // Use title as fallback for alt text
-  
+
   // Extract client names and join them
   const clients = projectDoc.clients?.map((client: { name: string }) => client.name).join(', ')
 
@@ -181,7 +181,6 @@ export function transformProject(
     hoverColor: featuredItem.hoverColor?.hex,
     textHoverColor: featuredItem.textHoverColor?.hex,
   }
-
 
   return result
 }
