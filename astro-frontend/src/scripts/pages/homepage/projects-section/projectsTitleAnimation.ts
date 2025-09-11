@@ -12,14 +12,16 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ------------------------------------------------------------------
          Animation helpers
       ------------------------------------------------------------------ */
+  /* Letter groups commented out - only SVG animation needed
   const letterGroups: NodeListOf<Element>[] = [
     headingElement.querySelectorAll('.chunk-slinky .character'),
     headingElement.querySelectorAll('.chunk-wave  .character'),
     headingElement.querySelectorAll('.chunk-flip  .character'),
-  ]
+  ] */
 
   // Animation is now triggered through CSS when data-has-played is set to true
 
+  /* Function commented out - only SVG animation needed
   function startAnimationsOnLetters(letters: NodeListOf<Element>) {
     letters.forEach(function (letter) {
       // Check if letter is an HTMLElement before accessing style property
@@ -27,10 +29,11 @@ document.addEventListener('DOMContentLoaded', function () {
         letter.style.animationPlayState = 'running'
       }
     })
-  }
+  } */
 
   // Highlight animation is now controlled entirely through CSS using the data-has-played attribute
 
+  /* Function commented out - only SVG animation needed
   function playChunksSequentially(index = 0) {
     if (!letterGroups[index]) {
       // All animation timing is now controlled by CSS
@@ -54,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
         )
       }
     }
-  }
+  } */
 
   /* ------------------------------------------------------------------
          Robust trigger / cleanup logic
@@ -69,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (hasPlayed) return
     hasPlayed = true
     headingElement.dataset.hasPlayed = 'true'
-    playChunksSequentially()
+    // playChunksSequentially() - commented out, only SVG animation needed
 
     /* Cleanup all listeners/observers */
     abortCtrl.abort()

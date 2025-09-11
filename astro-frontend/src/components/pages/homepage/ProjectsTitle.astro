@@ -19,7 +19,8 @@ const chunkTwo = `${secondWord},`
 const chunkThree = `${thirdWord}!`
 ---
 
-<!-- Commented out title animations - uncomment to re-enable --><!-- <script src="@/scripts/pages/homepage/projects-section/projectsTitleAnimation.ts"></script> -->
+<!-- Re-enabled script for SVG animation only -->
+<script src="@/scripts/pages/homepage/projects-section/projectsTitleAnimation.ts"></script>
 <h2 id="projects-heading" class="hero-big-text projects-heading" data-has-played="false">
   <!-- ─── Chunk 1 · Slinky Pop-In ───────────────────────────────────── -->
   <span class="chunk chunk-slinky" aria-label={chunkOne}>
@@ -228,16 +229,15 @@ const chunkThree = `${thirdWord}!`
     width: 203%; /* Significantly wider than the text */
     height: 1.2rem; /* Increased height for more visual impact */
     z-index: 1;
-    /* opacity: 0; - COMMENTED OUT, show immediately */
-    opacity: 1;
+    opacity: 0; /* Start hidden for animation */
     transform: translateY(2px); /* Slight adjustment to position */
   }
 
-  /* Apply animations only when heading has been triggered to play - COMMENTED OUT */
-  /* .projects-heading[data-has-played='true'] .highlight-word {
+  /* Apply animations only when heading has been triggered to play */
+  .projects-heading[data-has-played='true'] .highlight-word {
     animation: indicator-reveal 0.6s ease-out forwards;
-    animation-delay: calc(var(--flip-letter-duration) + 2000ms);
-  } */
+    animation-delay: 200ms; /* Reduced delay for immediate SVG animation */
+  }
 
   /* Style the SVG directly */
   .highlight-svg {
@@ -253,17 +253,17 @@ const chunkThree = `${thirdWord}!`
     /* stroke: var(--color-secondary);
     stroke-width: 1; */
     transform-origin: left center;
-    /* transform: scaleX(0); - COMMENTED OUT, show immediately */
-    transform: scaleX(1);
+    transform: scaleX(0); /* Start scaled to 0 for left-to-right animation */
   }
 
-  /* Apply animations only when heading has been triggered to play - COMMENTED OUT */
-  /* .projects-heading[data-has-played='true'] .highlight-path {
+  /* Apply animations only when heading has been triggered to play */
+  .projects-heading[data-has-played='true'] .highlight-path {
     animation: svg-path-reveal 0.4s ease-out forwards;
-    animation-delay: calc(var(--flip-letter-duration) + 2000ms);
-  } */
+    animation-delay: 200ms; /* Reduced delay for immediate SVG animation */
+  }
 
-  /* @keyframes indicator-reveal {
+  /* Keyframes for SVG animation */
+  @keyframes indicator-reveal {
     0% {
       opacity: 0;
     }
@@ -279,7 +279,7 @@ const chunkThree = `${thirdWord}!`
     100% {
       transform: scaleX(1);
     }
-  } */
+  }
 
   /* ──────────── Reduced-Motion Fallback ─────────── */
   @media (prefers-reduced-motion: reduce) {
