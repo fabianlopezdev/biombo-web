@@ -22,7 +22,7 @@
 }
 
 @font-face {
-  font-family: 'Poppins';
+  font-family: 'Poppins';  
   src: url('/fonts/Poppins-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;

@@ -1,7 +1,5 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import Header from '@/components/shared/header/Header.astro'
-// import Footer from '@/components/shared/Footer.astro' // Uncomment when needed
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 import Projects, {
   type ResolvedProjectsSectionData,
@@ -11,9 +9,6 @@ import ProjectsMobile from '@/components/pages/homepage/projects-section/Project
 import About from '@/components/pages/homepage/about-section/About.astro'
 import Services from '@/components/shared/header/Services.astro'
 import Clients from '@/components/pages/homepage/clients-section/Clients.astro'
-import Footer from '@/components/shared/Footer.astro'
-// import About from '@/components/pages/homepage/about-section/About.astro' // Uncomment when needed
-// import Services from '@/components/pages/homepage/services-section/Services.astro' // Uncomment when needed
 
 // About component fetches its own data based on locale
 
@@ -31,8 +26,6 @@ const pageTitle = 'Biombo - Art, Events, Community'
 <script src="@/scripts/pages/homepage/horizontalScroll.ts"></script>
 
 <BaseLayout title={pageTitle}>
-  <Header locale={locale} />
-
   <main id="main" class="main-content">
     <div class="horizontal-scroll-container" id="horizontal-container">
       <section class="hero">
@@ -57,8 +50,6 @@ const pageTitle = 'Biombo - Art, Events, Community'
     <Services servicesData={homePageData?.services} />
     <Clients clientsData={homePageData?.clients} />
   </main>
-
-  <Footer />
 </BaseLayout>
 
 <style>
