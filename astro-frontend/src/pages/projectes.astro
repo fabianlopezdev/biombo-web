@@ -25,8 +25,8 @@ const projectsFilters = [
           ))
         }
       </ul>
+      <button class="delete-filters">Borrar filtres</button>
     </nav>
-    <button class="delete-filters">Borrar filtres</button>
   </section>
   <section class="projects-container"></section>
 </ProjectesLayout>
@@ -43,6 +43,12 @@ const projectsFilters = [
     font-size: var(--projects-text-size);
     font-weight: var(--font-weight-light);
   }
+  .projects-nav-filter {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex: 1;
+  }
   .projects-filter-list {
     list-style: none;
     display: flex;
@@ -54,7 +60,6 @@ const projectsFilters = [
   .pill {
     padding-inline: 1.78rem;
     padding-block: 0.3rem;
-
     border: 1px solid var(--color-secondary);
     border-radius: 9999px;
     text-decoration: none;
@@ -63,6 +68,7 @@ const projectsFilters = [
     transition:
       background-color 0.3s,
       color 0.3s;
+    text-wrap: nowrap;
   }
 
   .pill:hover {
@@ -77,4 +83,89 @@ const projectsFilters = [
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
   }
+
+  @media (width < 992px) {
+    .projects-filter-container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.125rem;
+    }
+    .projects-nav-filter {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin-inline: calc(-1 * var(--padding-inline));
+      width: 100vw;
+      display: flex;
+      align-items: center;
+      gap: clamp(0.625rem, 0.582rem + 0.178vi, 0.75rem);
+      padding-block: 4px;
+    }
+    .projects-nav-filter::-webkit-scrollbar {
+      display: none;
+    }
+    .projects-filter-list {
+      flex-wrap: nowrap;
+      padding-inline-start: var(--padding-inline);
+    }
+
+    .projects-filter-list:active {
+      cursor: grabbing;
+    }
+    .delete-filters {
+      margin-inline-start: 0;
+      flex-shrink: 0;
+      padding-inline-start: 1rem;
+      padding-inline-end: var(--padding-inline);
+    }
+  }
 </style>
+
+<script>
+  const filterNav = document.querySelector('.projects-nav-filter') as HTMLElement
+
+  if (filterNav) {
+    let isDown = false
+    let startX: number
+    let scrollLeft: number
+
+    filterNav.addEventListener('mousedown', (e) => {
+      isDown = true
+      filterNav.style.cursor = 'grabbing'
+      startX = e.pageX - filterNav.offsetLeft
+      scrollLeft = filterNav.scrollLeft
+    })
+
+    filterNav.addEventListener('mouseleave', () => {
+      isDown = false
+      filterNav.style.cursor = 'grab'
+    })
+
+    filterNav.addEventListener('mouseup', () => {
+      isDown = false
+      filterNav.style.cursor = 'grab'
+    })
+
+    filterNav.addEventListener('mousemove', (e) => {
+      if (!isDown) return
+      e.preventDefault()
+      const x = e.pageX - filterNav.offsetLeft
+      const walk = (x - startX) * 2 // Scroll speed multiplier
+      filterNav.scrollLeft = scrollLeft - walk
+    })
+
+    // Prevent link clicks when dragging
+    const links = filterNav.querySelectorAll('a')
+    links.forEach((link) => {
+      link.addEventListener('click', (e) => {
+        if (filterNav.scrollLeft !== scrollLeft) {
+          e.preventDefault()
+        }
+      })
+    })
+
+    // Set initial cursor
+    filterNav.style.cursor = 'grab'
+  }
+</script>
