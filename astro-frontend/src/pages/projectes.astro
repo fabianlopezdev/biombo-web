@@ -1,6 +1,80 @@
 ---
 import ProjectesLayout from '@/layouts/ProjectesLayout.astro'
 // This is the root index.astro file (Catalan)
+
+const projectsFilters = [
+  { name: 'Disseny gràfic', link: '#' },
+  { name: 'Disseny i desenvolupament web', link: '#' },
+  { name: 'Brànding i Identitat Corporativa', link: '#' },
+  { name: 'Il·lustració', link: '#' },
+]
 ---
 
-<ProjectesLayout pageTitle="Projectes" />
+<ProjectesLayout pageTitle="Projectes">
+  <section class="projects-filter-container">
+    <h2>Filtrar per:</h2>
+    <nav class="projects-nav-filter">
+      <ul class="projects-filter-list">
+        {
+          projectsFilters.map((filter) => (
+            <li>
+              <a class="pill" href={filter.link}>
+                {filter.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <button class="delete-filters">Borrar filtres</button>
+  </section>
+  <section class="projects-container"></section>
+</ProjectesLayout>
+
+<style>
+  .projects-filter-container {
+    --projects-text-size: clamp(1.125rem, 1.082rem + 0.178vi, 1.25rem);
+    padding-block-start: var(--padding-block);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  h2 {
+    font-size: var(--projects-text-size);
+    font-weight: var(--font-weight-light);
+  }
+  .projects-filter-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(0.625rem, 0.582rem + 0.178vi, 0.75rem);
+    cursor: grab;
+  }
+
+  .pill {
+    padding-inline: 1.78rem;
+    padding-block: 0.3rem;
+
+    border: 1px solid var(--color-secondary);
+    border-radius: 9999px;
+    text-decoration: none;
+    color: var(--color-secondary);
+    font-size: clamp(1rem, 0.913rem + 0.356vi, 1.25rem);
+    transition:
+      background-color 0.3s,
+      color 0.3s;
+  }
+
+  .pill:hover {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+  }
+
+  .delete-filters {
+    margin-inline-start: auto;
+    font-size: var(--projects-text-size);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+</style>
