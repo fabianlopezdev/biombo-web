@@ -18,18 +18,21 @@ const mockProjects = [
     imageUrl: '/projects-mock.jpg',
     slug: 'projecte-1',
     hoverColor: '#f35c77',
+    clients: 'Client A',
   },
   {
     title: 'Projecte 2',
     imageUrl: '/projects-mock.jpg',
     slug: 'projecte-2',
     hoverColor: '#ffc904',
+    clients: 'Client B',
   },
   {
     title: 'Projecte 3',
     imageUrl: '/projects-mock.jpg',
     slug: 'projecte-3',
     hoverColor: '#63b2d5',
+    clients: 'Client C',
   },
 ]
 ---
@@ -64,6 +67,7 @@ const mockProjects = [
               imageUrl={project.imageUrl}
               slug={project.slug}
               hoverColor={project.hoverColor}
+              clients={project.clients}
               viewProjectText="Veure projecte"
             />
           </div>
@@ -80,6 +84,7 @@ const mockProjects = [
     display: flex;
     align-items: center;
     gap: 1.25rem;
+    padding-block-end: clamp(1.625rem, 1.321rem + 1.247vi, 2.5rem);
   }
   h2 {
     font-size: var(--projects-text-size);
@@ -90,7 +95,6 @@ const mockProjects = [
     align-items: center;
     gap: 1.25rem;
     flex: 1;
-    padding-block-end: clamp(1.625rem, 1.321rem + 1.247vi, 2.5rem);
   }
   .projects-filter-list {
     list-style: none;
@@ -126,6 +130,10 @@ const mockProjects = [
       align-items: flex-start;
       gap: 1.125rem;
     }
+
+    .project-item {
+      height: auto; /* Reset height on mobile to prevent overlap */
+    }
     .projects-nav-filter {
       overflow-x: auto;
       overflow-y: hidden;
@@ -149,6 +157,8 @@ const mockProjects = [
     .projects-filter-list:active {
       cursor: grabbing;
     }
+
+   
     .delete-filters {
       margin-inline-start: 0;
       flex-shrink: 0;

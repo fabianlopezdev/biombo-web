@@ -230,15 +230,29 @@ function initProject(project: HTMLElement) {
 /* ------------------------------------------------------------------ */
 /* boot                                                                */
 /* ------------------------------------------------------------------ */
-document.querySelectorAll<HTMLElement>('.project').forEach(initProject)
 
-/* cleanup on page hide (browser back-nav, hot-reload etc.) */
-window.addEventListener(
-  'pagehide',
-  () => {
-    stopRAF()
-    states.forEach((s) => s.removeAll())
-    states.length = 0
-  },
-  { once: true },
-)
+// Check if device supports touch or is mobile
+const isTouchDevice = () => {
+  return (
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0 ||
+    window.matchMedia('(hover: none)').matches ||
+    window.matchMedia('(pointer: coarse)').matches
+  )
+}
+
+// Only initialize custom cursor on non-touch devices
+if (!isTouchDevice()) {
+  document.querySelectorAll<HTMLElement>('.project').forEach(initProject)
+
+  /* cleanup on page hide (browser back-nav, hot-reload etc.) */
+  window.addEventListener(
+    'pagehide',
+    () => {
+      stopRAF()
+      states.forEach((s) => s.removeAll())
+      states.length = 0
+    },
+    { once: true },
+  )
+}

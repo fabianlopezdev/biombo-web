@@ -1,5 +1,6 @@
 ---
 import CustomCursor from '@/components/pages/homepage/CustomCursor.astro'
+import ProjectMobileInfo from '@/components/shared/ProjectMobileInfo.astro'
 
 interface Props {
   title: string
@@ -9,6 +10,7 @@ interface Props {
   hoverColor?: string
   textHoverColor?: string
   viewProjectText?: string
+  clients?: string
   class?: string
 }
 
@@ -20,6 +22,7 @@ const {
   hoverColor = '#272727',
   textHoverColor = '#fff',
   viewProjectText = 'Veure projecte',
+  clients,
   class: className = '',
 } = Astro.props
 
@@ -43,6 +46,7 @@ const project = {
       </figcaption>
     </div>
   </a>
+  <ProjectMobileInfo {title} subtitle={clients} />
   <CustomCursor {project} viewProjectTextVal={viewProjectText} />
 </figure>
 
@@ -71,7 +75,8 @@ const project = {
       border-radius: inherit;
     }
 
-    @media (hover: hover) {
+    /* Only hide cursor on devices that truly support hover (desktop) */
+    @media (hover: hover) and (pointer: fine) {
       &:hover {
         cursor: none;
       }
@@ -124,8 +129,49 @@ const project = {
   }
 
   @media (max-width: 991px) {
+    .project-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1.125rem;
+      height: auto; /* Reset height on mobile */
+    }
+
+    .project-link {
+      height: auto; /* Reset height on mobile */
+    }
+
     .project-caption {
       font-size: 1.5rem;
+    }
+
+    .project-image {
+      height: clamp(24.063rem, 19.678rem + 17.988vi, 36.688rem);
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+
+  /* Disable hover effects on mobile/touch devices */
+  @media (hover: none) and (pointer: coarse), (max-width: 991px) {
+    .project-caption {
+      display: none !important; /* Hide caption overlay on mobile */
+    }
+
+    .project-link {
+      cursor: pointer !important; /* Ensure normal cursor on mobile */
+    }
+
+    .project-link:hover .caption-text {
+      transform: none; /* Disable text animation */
+    }
+
+    .project-link:is(:hover, :focus) {
+      background-color: transparent; /* No background change */
+    }
+
+    .project-link:is(:hover, :focus) .project-caption {
+      opacity: 0; /* Keep caption hidden */
+      transform: scale(1.05); /* Reset transform */
     }
   }
 </style>

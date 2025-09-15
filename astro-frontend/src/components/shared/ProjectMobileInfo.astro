@@ -1,0 +1,37 @@
+---
+interface Props {
+  title: string
+  subtitle?: string
+  class?: string
+}
+
+const { title, subtitle, class: className = '' } = Astro.props
+---
+
+<div class={`project-info ${className}`}>
+  <h3 class="project-title">{title}</h3>
+  {subtitle && <p class="project-subtitle">{subtitle}</p>}
+</div>
+
+<style>
+  .project-title {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-regular);
+    padding-block-end: 0.6875rem;
+    margin: 0;
+  }
+
+  .project-subtitle {
+    font-size: 1rem;
+    font-weight: var(--font-weight-light);
+    line-height: 1;
+    margin: 0;
+  }
+
+  /* Hide on desktop by default */
+  @media (min-width: 992px) {
+    .project-info {
+      display: none;
+    }
+  }
+</style>

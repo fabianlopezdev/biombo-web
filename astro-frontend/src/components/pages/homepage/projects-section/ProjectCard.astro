@@ -1,4 +1,6 @@
 ---
+import ProjectMobileInfo from '@/components/shared/ProjectMobileInfo.astro'
+
 export interface ProjectCardProps {
   slug?: string
   projectNumber: number
@@ -39,10 +41,10 @@ const {
           loading={loading}
         />
       </div>
-      <div class="project-info">
-        <h3 class="project-title">{title || `Project ${projectNumber}`}</h3>
-        <p class="project-client">{clients}</p>
-      </div>
+      <ProjectMobileInfo
+        title={title || `Project ${projectNumber}`}
+        subtitle={clients}
+      />
     </a>
   ) : null
 }
@@ -58,12 +60,6 @@ const {
     flex: 0 0 auto;
     scroll-snap-align: start;
     width: min(72.3vw, 19.43rem);
-  }
-
-  .project-client {
-    font-size: 1rem;
-    font-weight: var(--font-weight-light);
-    line-height: 0;
   }
 
   .project-mobile:active {
@@ -83,11 +79,5 @@ const {
     height: 100%;
     object-fit: cover;
     display: block;
-  }
-
-  .project-title {
-    font-size: 1.25rem;
-    font-weight: var(--font-weight-regular);
-    padding-block-end: 0.6875rem;
   }
 </style>
