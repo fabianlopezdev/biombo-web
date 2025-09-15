@@ -1,0 +1,18 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+const { pageTitle } = Astro.props
+---
+
+<BaseLayout title={pageTitle}>
+  <main class="main-content">
+    <h1 class="hero-big-text-2">{pageTitle}</h1>
+    <slot />
+  </main>
+</BaseLayout>
+
+<style>
+  .main-content {
+    padding-inline: var(--padding-inline);
+    padding-block: var(--padding-block);
+  }
+</style>
