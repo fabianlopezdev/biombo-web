@@ -1,0 +1,131 @@
+---
+import CustomCursor from '@/components/pages/homepage/CustomCursor.astro'
+
+interface Props {
+  title: string
+  imageUrl: string
+  imageAlt?: string
+  slug: string
+  hoverColor?: string
+  textHoverColor?: string
+  viewProjectText?: string
+  class?: string
+}
+
+const {
+  title,
+  imageUrl,
+  imageAlt = title,
+  slug,
+  hoverColor = '#272727',
+  textHoverColor = '#fff',
+  viewProjectText = 'Veure projecte',
+  class: className = '',
+} = Astro.props
+
+// Create a simple project object for CustomCursor
+const project = {
+  viewProjectText,
+  hoverColor,
+  textHoverColor,
+}
+---
+
+<figure
+  class={`project project-card ${className}`}
+  style={`--hover-bg-color: ${hoverColor}; --hover-text-color: ${textHoverColor};`}
+>
+  <a href={`/project/${slug}`} class="project-link">
+    <img src={imageUrl} alt={imageAlt} class="project-image" loading="lazy" />
+    <div class="project-caption">
+      <figcaption class="caption-text">
+        {title}
+      </figcaption>
+    </div>
+  </a>
+  <CustomCursor {project} viewProjectTextVal={viewProjectText} />
+</figure>
+
+<style>
+  .project-card {
+    --cursor-size: 8.5625rem;
+    position: relative;
+    height: 100%;
+    border-radius: 0.621875rem;
+    overflow: hidden;
+  }
+
+  .project-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    overflow: hidden;
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+
+    &:focus-visible .project-caption {
+      outline: 0.25rem solid var(--color-secondary);
+      outline-offset: -0.25rem;
+      border-radius: inherit;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        cursor: none;
+      }
+    }
+  }
+
+  .project-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .project-caption {
+    position: absolute;
+    inset: 0;
+    background: var(--hover-bg-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transform: scale(1.05);
+    transition:
+      opacity 0.5s ease,
+      transform 0.5s ease;
+    pointer-events: none;
+    color: var(--hover-text-color);
+    font-size: 2.375rem;
+    text-align: center;
+  }
+
+  .caption-text {
+    color: var(--hover-text-color);
+    transform: translateY(50%);
+    transition: transform 0.5s ease;
+  }
+
+  .project-link:hover .caption-text {
+    transform: translateY(0);
+  }
+
+  .project-link:is(:hover, :focus) {
+    background-color: var(--hover-bg-color);
+
+    .project-caption {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @media (max-width: 991px) {
+    .project-caption {
+      font-size: 1.5rem;
+    }
+  }
+</style>

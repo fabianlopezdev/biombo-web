@@ -1,6 +1,7 @@
 ---
 import ProjectesLayout from '@/layouts/ProjectesLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
+import ProjectCard from '@/components/shared/ProjectCard.astro'
 // This is the root index.astro file (Catalan)
 
 const projectsFilters = [
@@ -8,6 +9,28 @@ const projectsFilters = [
   { name: 'Disseny i desenvolupament web', category: 'web-design' },
   { name: 'Brànding i Identitat Corporativa', category: 'branding' },
   { name: 'Il·lustració', category: 'illustration' },
+]
+
+// Temporary mock data - replace with real project data from Sanity
+const mockProjects = [
+  {
+    title: 'Projecte 1',
+    imageUrl: '/projects-mock.jpg',
+    slug: 'projecte-1',
+    hoverColor: '#f35c77',
+  },
+  {
+    title: 'Projecte 2',
+    imageUrl: '/projects-mock.jpg',
+    slug: 'projecte-2',
+    hoverColor: '#ffc904',
+  },
+  {
+    title: 'Projecte 3',
+    imageUrl: '/projects-mock.jpg',
+    slug: 'projecte-3',
+    hoverColor: '#63b2d5',
+  },
 ]
 ---
 
@@ -32,46 +55,21 @@ const projectsFilters = [
     </nav>
   </section>
   <section class="projects-container">
-    <nav>
-      <ul class="projects-grid-container">
-        <li>
-          <article class="project">
-            <a href="#">
-              <img src="../../public/projects-mock.jpg" alt="">
-            </a>
-            <div class="project-caption">
-              <figcaption class="caption-text">
-                Projecte 1
-              </figcaption>
-            </div>
-          </article>
-        </li>
-        <li>
-          <article class="project">
-            <a href="#">
-              <img src="../../public/projects-mock.jpg" alt="">
-            </a>
-            <div class="project-caption">
-              <figcaption class="caption-text">
-                Projecte 1
-              </figcaption>
-            </div>
-          </article>
-        </li>
-        <li>
-          <article class="project">
-            <a href="#">
-              <img src="../../public/projects-mock.jpg" alt="">
-            </a>
-            <div class="project-caption">
-              <figcaption class="caption-text">
-                Projecte 1
-              </figcaption>
-            </div>
-          </article>
-        </li>
-      </ul>
-    </nav>
+    <div class="projects-grid-container">
+      {
+        mockProjects.map((project) => (
+          <div class="project-item">
+            <ProjectCard
+              title={project.title}
+              imageUrl={project.imageUrl}
+              slug={project.slug}
+              hoverColor={project.hoverColor}
+              viewProjectText="Veure projecte"
+            />
+          </div>
+        ))
+      }
+    </div>
   </section>
 </ProjectesLayout>
 
@@ -118,19 +116,8 @@ const projectsFilters = [
     gap: 1.85rem;
   }
 
-  .project {
-   height: clamp(25.375rem, -2.75rem + 41.705vi, 36.688rem);
-   overflow: hidden;
-   border-radius: 0.621875rem;
-   
-  }
-
-  .project img {
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-    display: block;
-    /* object-position: right center; */
+  .project-item {
+    height: clamp(25.375rem, -2.75rem + 41.705vi, 36.688rem);
   }
 
   @media (width < 992px) {
@@ -171,6 +158,7 @@ const projectsFilters = [
   }
 </style>
 
+<script src="@/scripts/pages/homepage/customCursor.ts"></script>
 <script>
   const filterNav = document.querySelector('.projects-nav-filter') as HTMLElement
 
