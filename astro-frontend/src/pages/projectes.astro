@@ -1,12 +1,13 @@
 ---
 import ProjectesLayout from '@/layouts/ProjectesLayout.astro'
+import PillButton from '@/components/shared/PillButton.astro'
 // This is the root index.astro file (Catalan)
 
 const projectsFilters = [
-  { name: 'Disseny gràfic', link: '#' },
-  { name: 'Disseny i desenvolupament web', link: '#' },
-  { name: 'Brànding i Identitat Corporativa', link: '#' },
-  { name: 'Il·lustració', link: '#' },
+  { name: 'Disseny gràfic', category: 'graphic-design' },
+  { name: 'Disseny i desenvolupament web', category: 'web-design' },
+  { name: 'Brànding i Identitat Corporativa', category: 'branding' },
+  { name: 'Il·lustració', category: 'illustration' },
 ]
 ---
 
@@ -18,9 +19,11 @@ const projectsFilters = [
         {
           projectsFilters.map((filter) => (
             <li>
-              <a class="pill" href={filter.link}>
-                {filter.name}
-              </a>
+              <PillButton
+                text={filter.name}
+                data-category={filter.category}
+                class="filter-pill"
+              />
             </li>
           ))
         }
@@ -28,7 +31,48 @@ const projectsFilters = [
       <button class="delete-filters">Borrar filtres</button>
     </nav>
   </section>
-  <section class="projects-container"></section>
+  <section class="projects-container">
+    <nav>
+      <ul class="projects-grid-container">
+        <li>
+          <article class="project">
+            <a href="#">
+              <img src="../../public/projects-mock.jpg" alt="">
+            </a>
+            <div class="project-caption">
+              <figcaption class="caption-text">
+                Projecte 1
+              </figcaption>
+            </div>
+          </article>
+        </li>
+        <li>
+          <article class="project">
+            <a href="#">
+              <img src="../../public/projects-mock.jpg" alt="">
+            </a>
+            <div class="project-caption">
+              <figcaption class="caption-text">
+                Projecte 1
+              </figcaption>
+            </div>
+          </article>
+        </li>
+        <li>
+          <article class="project">
+            <a href="#">
+              <img src="../../public/projects-mock.jpg" alt="">
+            </a>
+            <div class="project-caption">
+              <figcaption class="caption-text">
+                Projecte 1
+              </figcaption>
+            </div>
+          </article>
+        </li>
+      </ul>
+    </nav>
+  </section>
 </ProjectesLayout>
 
 <style>
@@ -48,6 +92,7 @@ const projectsFilters = [
     align-items: center;
     gap: 1.25rem;
     flex: 1;
+    padding-block-end: clamp(1.625rem, 1.321rem + 1.247vi, 2.5rem);
   }
   .projects-filter-list {
     list-style: none;
@@ -57,31 +102,35 @@ const projectsFilters = [
     cursor: grab;
   }
 
-  .pill {
-    padding-inline: 1.78rem;
-    padding-block: 0.3rem;
-    border: 1px solid var(--color-secondary);
-    border-radius: 9999px;
-    text-decoration: none;
-    color: var(--color-secondary);
-    font-size: clamp(1rem, 0.913rem + 0.356vi, 1.25rem);
-    transition:
-      background-color 0.3s,
-      color 0.3s;
-    text-wrap: nowrap;
-  }
-
-  .pill:hover {
-    background-color: var(--color-secondary);
-    color: var(--color-primary);
-  }
-
   .delete-filters {
     margin-inline-start: auto;
     font-size: var(--projects-text-size);
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
+  }
+
+  .projects-grid-container {
+    max-width: 85.3125rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    margin-inline: auto;
+    gap: 1.85rem;
+  }
+
+  .project {
+   height: clamp(25.375rem, -2.75rem + 41.705vi, 36.688rem);
+   overflow: hidden;
+   border-radius: 0.621875rem;
+   
+  }
+
+  .project img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    display: block;
+    /* object-position: right center; */
   }
 
   @media (width < 992px) {
