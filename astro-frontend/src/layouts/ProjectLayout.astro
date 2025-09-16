@@ -1,9 +1,10 @@
 ---
 import ProjectesLayout from "./ProjectesLayout.astro";
 
+const { pageTitle } = Astro.props
 ---
 
 
-<ProjectesLayout pageTitle="Obert x Vacances">
+<ProjectesLayout pageTitle={pageTitle}>
   <slot />
 </ProjectesLayout>

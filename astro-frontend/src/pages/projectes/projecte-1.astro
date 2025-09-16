@@ -1,9 +1,80 @@
 ---
-import ProjectLayout from "@/layouts/ProjectLayout.astro";
+import ProjectLayout from '@/layouts/ProjectLayout.astro'
+import PillButton from '@/components/shared/PillButton.astro'
 
-
+const projectServices = [
+  { name: 'Disseny gràfic', category: 'graphic-design' },
+  { name: 'Il·lustració', category: 'illustration' },
+  { name: 'Disseny i desenvolupament web', category: 'web-design' },
+  { name: 'Brànding i Identitat Corporativa', category: 'branding' },
+]
 ---
 
-<ProjectLayout> 
-    
+<ProjectLayout pageTitle="Obert x Vacances">
+  <img class="hero-image" src="../../../public/projects-mock.jpg" alt="Obert x Vacances" />
+
+  <section class="project-info-container">
+    <div class="first-column">
+      <h2 class="section-titles">Client:</h2>
+      <p class="padding-bottom">Roca Umbert. Fàbrica de les arts</p>
+      <h2 class="section-titles">Serveis:</h2>
+      <div class="services-container">
+        {
+          projectServices.map((service) => (
+            <PillButton text={service.name} />
+          ))
+        }
+      </div>
+    </div>
+    <div>
+        <p class="project-copy">Projecte de creació de marca: Conceptualització, naming, il·lustració i disseny gràfic, per a un projecte cultural infantil. Les entitats culturals de Granollers, Teatre Auditori, Centre Cultural i Brubaker s'uneixen per oferir una programació infantil conjunta, i d'aquesta manera neixen els PATINAUTES, els 3 viatgers interestel·lars que amb els seus patinets voladors, naveguen per l'espai a la recerca d'espectacles. La Pati, la Nau i en Ta doncs, estaran presents en tots els actes que es realitzen a la ciutat, i acompanyaran els petits en les seves aventures culturals.</p>
+    </div>
+  </section>
 </ProjectLayout>
+
+<style>
+  .hero-image {
+    width: 100vw;
+    max-inline-size: none;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 1513/722;
+    margin-inline: calc(-1 * var(--padding-inline));
+    padding-block-start: var(--padding-block);
+  }
+  .padding-bottom {
+    padding-block-end: 1.75rem;
+  }
+  
+  .section-titles {
+      font-size: var(--font-size);
+      font-weight: var(--font-weight-semibold);
+    }
+    .project-info-container {
+        max-inline-size: 85.3125rem;
+        display: flex;
+        align-items: center;
+       
+        padding-block: var(--padding-block);
+    }
+    
+    .services-container {
+        padding-block-start: 0.75rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .first-column {
+      min-width: 36%;
+    }
+    .project-copy {
+        font-size: 28px;
+        line-height: 1;
+    }
+    @media (width < 992px) {
+    .hero-image {
+      aspect-ratio: 65/59;
+    }
+  }
+
+</style>
