@@ -150,6 +150,7 @@ const getProjectSlug = (slug: any) => {
   }
 
   .project-item {
+ aspect-ratio: 3/4;
     display: block; /* Override default list-item display to fix grid layout */
     height: clamp(25.375rem, -2.75rem + 41.705vi, 36.688rem);
   }
@@ -166,6 +167,7 @@ const getProjectSlug = (slug: any) => {
     }
 
     .project-item {
+      aspect-ratio: none;
       height: auto; /* Reset height on mobile to prevent overlap */
     }
     .projects-nav-filter {
@@ -302,6 +304,7 @@ const getProjectSlug = (slug: any) => {
     })
   }
 </script>
+
 <script>
   const filterNav = document.querySelector('.projects-nav-filter') as HTMLElement
 
