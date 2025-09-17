@@ -11,114 +11,143 @@ const projectServices = [
 ---
 
 <ProjectLayout pageTitle="Obert x Vacances">
-  <div class="client-info mobile">
+  <aside class="client-info mobile" aria-label="Informació del client">
     <h2 class="section-titles service-clients-font-size">Client:</h2>
     <p class="service-clients-font-size">Roca Umbert. Fàbrica de les arts</p>
-  </div>
+  </aside>
 
-  <img class="hero-image" src="../../../public/projects-mock.jpg" alt="Obert x Vacances" />
+  <header class="project-header">
+    <figure class="hero-figure">
+      <img class="hero-image" src="../../../public/projects-mock.jpg" alt="Imatge principal del projecte Obert x Vacances" />
+    </figure>
+  </header>
 
-  <section class="project-info-container">
-    <div class="first-column">
-      <h2 class="section-titles service-clients-font-size">Client:</h2>
-      <p class="padding-bottom service-clients-font-size">Roca Umbert. Fàbrica de les arts</p>
-      <h2 class="section-titles service-clients-font-size">Serveis:</h2>
-      <div class="services-container">
-        {projectServices.map((service) => <PillButton text={service.name} />)}
+  <article class="project-content">
+    <header class="project-info-container">
+      <aside class="first-column project-metadata" aria-label="Detalls del projecte">
+        <div class="client-section">
+          <h2 class="section-titles service-clients-font-size">Client:</h2>
+          <p class="padding-bottom service-clients-font-size">Roca Umbert. Fàbrica de les arts</p>
+        </div>
+        <div class="services-section">
+          <h2 class="section-titles service-clients-font-size">Serveis:</h2>
+          <ul class="services-container">
+            {projectServices.map((service) => <li><PillButton text={service.name} /></li>)}
+          </ul>
+        </div>
+      </aside>
+      <div class="project-description">
+        <p class="project-copy">
+          Projecte de creació de marca: Conceptualització, naming, il·lustració i disseny gràfic, per
+          a un projecte cultural infantil. Les entitats culturals de Granollers, Teatre Auditori,
+          Centre Cultural i Brubaker s'uneixen per oferir una programació infantil conjunta, i
+          d'aquesta manera neixen els PATINAUTES, els 3 viatgers interestel·lars que amb els seus
+          patinets voladors, naveguen per l'espai a la recerca d'espectacles. La Pati, la Nau i en Ta
+          doncs, estaran presents en tots els actes que es realitzen a la ciutat, i acompanyaran els
+          petits en les seves aventures culturals.
+        </p>
       </div>
+    </header>
+
+    <div class="two-image-layout gallery">
+      <div class="two-columns">
+        <figure class="red-background">
+          <img src="" alt="Imatge del projecte" loading="lazy" />
+        </figure>
+        <figure class="red-background">
+          <img src="" alt="Imatge del projecte" loading="lazy" />
+        </figure>
+      </div>
+      <figure class="red-background standalone-image">
+        <img src="" alt="Imatge destacada del projecte" loading="lazy" />
+      </figure>
     </div>
-    <div>
-      <p class="project-copy">
-        Projecte de creació de marca: Conceptualització, naming, il·lustració i disseny gràfic, per
-        a un projecte cultural infantil. Les entitats culturals de Granollers, Teatre Auditori,
-        Centre Cultural i Brubaker s'uneixen per oferir una programació infantil conjunta, i
-        d'aquesta manera neixen els PATINAUTES, els 3 viatgers interestel·lars que amb els seus
-        patinets voladors, naveguen per l'espai a la recerca d'espectacles. La Pati, la Nau i en Ta
-        doncs, estaran presents en tots els actes que es realitzen a la ciutat, i acompanyaran els
-        petits en les seves aventures culturals.
+
+    <blockquote class="standalone-text project-copy highlight-quote">
+      <p>
+        Projecte de creació de marca: Conceptualització, naming, il·lustració i disseny gràfic, per a
+        un projecte cultural infantil. Les entitats culturals de Granollers
       </p>
-    </div>
-  </section>
+    </blockquote>
 
-  <section class="two-image-layout">
-    <div class="two-columns">
-      <div class="red-background"></div>
-      <div class="red-background"></div>
+    <div class="three-image-layout gallery">
+      <div class="three-columns">
+        <figure class="blue-background">
+          <img src="" alt="Aplicació del projecte" loading="lazy" />
+        </figure>
+        <figure class="blue-background">
+          <img src="" alt="Aplicació del projecte" loading="lazy" />
+        </figure>
+        <figure class="blue-background">
+          <img src="" alt="Aplicació del projecte" loading="lazy" />
+        </figure>
+      </div>
+      <figure class="red-background standalone-image">
+        <img src="" alt="Imatge final del projecte" loading="lazy" />
+      </figure>
     </div>
-    <div class="red-background standalone-image"></div>
-  </section>
-  <section class="standalone-text project-copy">
-    <p>
-      Projecte de creació de marca: Conceptualització, naming, il·lustració i disseny gràfic, per a
-      un projecte cultural infantil. Les entitats culturals de Granollers
-    </p>
-  </section>
+  </article>
 
-  <section class="three-image-layout">
-    <div class="three-columns">
-      <div class="blue-background"></div>
-      <div class="blue-background"></div>
-      <div class="blue-background"></div>
-    </div>
-    <div class="red-background standalone-image"></div>
-  </section>
-
-  <div class="services-container-mobile mobile">
+  <aside class="services-container-mobile mobile" aria-label="Llista de serveis">
     <h2 class="section-titles service-clients-font-size">Serveis:</h2>
     <ul class="services-list">
       {projectServices.map((service, i) => {
-        if (i === projectServices.length - 1) {
-          return <li class="list-item-mobile">{service.name}</li>
-        }
-        return <li class="list-item-mobile">{service.name},&nbsp;</li>
+        const separator = i === projectServices.length - 1 ? '' : ',\u00A0';
+        return <li class="list-item-mobile">{service.name}{separator}</li>
       })}
     </ul>
-  </div>
+  </aside>
 
-  <div class="divider-line mobile">
+  <hr class="divider-line mobile" aria-hidden="true" />
 
-  </div>
-
-  <section class="similar-projects">
-    <h3 class="similar-title">{'Projectes similars'}</h3>
-    <div class="similar-projects-container">
-      <div class="similar-project-item">
-        <div class="similar-project-image-wrapper">
-          <img class="similar-project-image" src="" alt="" />
-        </div>
-        <div class="mobile">
-          <p class="similar-project-title">Obert x Vacances</p>
-          <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
-        </div>
-      </div>
-      <div class="similar-project-item">    
-        <div class="similar-project-image-wrapper">
-          <img class="similar-project-image" src="" alt="" />
-        </div>
-        <div class="mobile">
-          <p class="similar-project-title">Obert x Vacances</p>
-          <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
-        </div>
-      </div>
-      <div class="similar-project-item">
-        <div class="similar-project-image-wrapper">
-          <img class="similar-project-image" src="" alt="" />
-        </div>
-        <div class="mobile">
-          <p class="similar-project-title">Obert x Vacances</p>
-          <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
-        </div>
-      </div>
-      <div class="similar-project-item">
-        <div class="similar-project-image-wrapper">
-          <img class="similar-project-image" src="" alt="" />
-        </div>
-        <div class="mobile">
-          <p class="similar-project-title">Obert x Vacances</p>
-          <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
-        </div>
-      </div>
-    </div>
+  <section class="similar-projects" aria-labelledby="similar-projects-title">
+    <h2 id="similar-projects-title" class="similar-title">{'Projectes similars'}</h2>
+    <ul class="similar-projects-container">
+      <li class="similar-project-item">
+        <article>
+          <figure class="similar-project-image-wrapper">
+            <img class="similar-project-image" src="" alt="Projecte similar: Obert x Vacances" loading="lazy" />
+          </figure>
+          <header class="mobile">
+            <h3 class="similar-project-title">Obert x Vacances</h3>
+            <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
+          </header>
+        </article>
+      </li>
+      <li class="similar-project-item">
+        <article>
+          <figure class="similar-project-image-wrapper">
+            <img class="similar-project-image" src="" alt="Projecte similar: Obert x Vacances" loading="lazy" />
+          </figure>
+          <header class="mobile">
+            <h3 class="similar-project-title">Obert x Vacances</h3>
+            <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
+          </header>
+        </article>
+      </li>
+      <li class="similar-project-item">
+        <article>
+          <figure class="similar-project-image-wrapper">
+            <img class="similar-project-image" src="" alt="Projecte similar: Obert x Vacances" loading="lazy" />
+          </figure>
+          <header class="mobile">
+            <h3 class="similar-project-title">Obert x Vacances</h3>
+            <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
+          </header>
+        </article>
+      </li>
+      <li class="similar-project-item">
+        <article>
+          <figure class="similar-project-image-wrapper">
+            <img class="similar-project-image" src="" alt="Projecte similar: Obert x Vacances" loading="lazy" />
+          </figure>
+          <header class="mobile">
+            <h3 class="similar-project-title">Obert x Vacances</h3>
+            <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
+          </header>
+        </article>
+      </li>
+    </ul>
   </section>
 </ProjectLayout>
 
@@ -162,6 +191,12 @@ const projectServices = [
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
+    list-style: none;
+    padding-inline-start: 0;
+  }
+
+  .services-container li {
+    display: contents;
   }
 
   .project-copy {
@@ -216,10 +251,17 @@ const projectServices = [
     display: flex;
     gap: 1.875rem;
     flex-wrap: wrap;
+    list-style: none;
+    padding-inline-start: 0;
+    margin: 0;
   }
 
   .similar-project-item {
     flex: 1;
+  }
+
+  .similar-project-item article {
+    height: 100%;
   }
 
   .similar-project-image-wrapper {
@@ -300,10 +342,6 @@ const projectServices = [
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1rem; /* Adds space between items */
-   
-    }
-    
-    .similar-project-item {
     }
     
     .similar-project-image-wrapper {
