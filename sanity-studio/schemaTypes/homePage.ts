@@ -328,17 +328,17 @@ export const servicesSection = defineType({
       rows: 3,
     }),
     defineField({
-      name: 'selectedCategories',
-      title: 'Select Service Categories',
-      description: 'Pick and order the service categories to display on the homepage',
+      name: 'selectedServices',
+      title: 'Select Services',
+      description: 'Pick and order the services to display on the homepage',
       type: 'array',
       of: [
         {
           type: 'reference',
-          to: [{type: 'serviceCategory'}],
+          to: [{type: 'service'}],
           options: {
             // Filter by the language of the Home Page document
-            // and exclude already selected categories to avoid duplicates
+            // and exclude already selected services to avoid duplicates
             filter: ({document, parent}: ReferenceFilterResolverContext) => {
               const homePageDoc = document as any
               const language = homePageDoc?.language
@@ -346,7 +346,7 @@ export const servicesSection = defineType({
                 ? parent.map((item: any) => item?._ref).filter(Boolean)
                 : []
 
-              const filterParts = ['_type == "serviceCategory"']
+              const filterParts = ['_type == "service"']
               const params: {language?: string; selected?: string[]} = {}
 
               if (language) {
@@ -365,7 +365,7 @@ export const servicesSection = defineType({
               }
             },
             noResultsText:
-              'No categories for this language. Create new service categories or change the language.',
+              'No services for this language. Create new services or change the language.',
           },
         },
       ],

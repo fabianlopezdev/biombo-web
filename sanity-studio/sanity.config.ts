@@ -63,14 +63,14 @@ export default defineConfig({
       ],
       // Explicitly list document types that should be internationalized
       schemaTypes: [
-        'project', 
-        'serviceCategory', 
-        'homePage', 
+        'project',
+        'service',
+        'homePage',
         'header',
         'footer',
         'projectsPage',
-        'servicesPage', 
-        'aboutUsPage', 
+        'servicesPage',
+        'aboutUsPage',
         'contactPage'
       ],
       // Field name that will store the language

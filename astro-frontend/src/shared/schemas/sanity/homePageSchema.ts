@@ -1,7 +1,7 @@
 // src/shared/schemas/sanity/homePageSchema.ts
 import { z } from 'zod'
 import { projectSchema } from './projectSchema'
-import { serviceCategorySchema } from './serviceCategorySchema'
+import { serviceSchema } from './serviceSchema'
 
 // Define Zod schema for localized strings (consistent with pageSchema)
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -140,7 +140,7 @@ const servicesSectionSchema = z.object({
   title: z.string(),
   subtitle: z.string().optional(),
   text: z.string().optional(),
-  selectedCategories: z.array(serviceCategorySchema).optional(),
+  selectedServices: z.array(serviceSchema).optional(),
 })
 
 // Define Zod schema for the entire HomePage
@@ -154,7 +154,6 @@ export const homePageSchema = z.object({
   projects: projectsSectionSchema.nullable().optional(), // Allow null or undefined
   about: aboutSectionSchema.nullable().optional(), // Allow null or undefined
   services: servicesSectionSchema.nullable().optional(), // Allow null or undefined
-  serviceCategories: z.array(serviceCategorySchema).optional(),
 })
 
 // Export the TypeScript types derived from the Zod schemas
@@ -178,7 +177,6 @@ export type HomePage = Omit<
   projects?: ProjectsSection | null
   about?: AboutSection | null
   services?: ServicesSection | null
-  serviceCategories?: z.infer<typeof serviceCategorySchema>[] | undefined
 }
 
 // Schema for an array of home pages (likely won't be needed, but included for consistency)

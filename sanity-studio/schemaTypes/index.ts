@@ -10,7 +10,7 @@ import { projectsPage } from './projectsPage'
 import { servicesPage } from './servicesPage'
 import { aboutUsPage } from './aboutUsPage'
 import { contactPage } from './contactPage'
-import { serviceCategory } from './serviceCategory'
+import { service } from './service'
 import { client } from './client'
 import { footer } from './footer'
 
@@ -19,7 +19,7 @@ export const schemaTypes = [
   header,
   homePage,
   projects,
-  serviceCategory,
+  service,
   client,
   footer,
   siteSettings,

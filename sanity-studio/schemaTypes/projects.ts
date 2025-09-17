@@ -213,25 +213,25 @@ export const projects = defineType({
       // No validation
     }),
     defineField({
-      name: 'categories',
-      title: 'Categories',
-      description: 'Service categories this project falls under (filtered by current language). If no options appear, click "Create new" to add a new service category.',
+      name: 'services',
+      title: 'Services',
+      description: 'Services associated with this project (filtered by current language). If no options appear, click "Create new" to add a new service.',
       type: 'array',
       of: [
         defineArrayMember({
           type: 'reference',
-          to: [{ type: 'serviceCategory' }],
+          to: [{ type: 'service' }],
           options: {
             // @ts-expect-error - Sanity Studio's type system doesn't fully capture the filter resolver pattern
             filter: ({ document }: ReferenceFilterResolverContext) => {
-              // Get the language and current categories from the document
+              // Get the language and current services from the document
               const language = document?.language
-              const selectedCategories = document?.categories as { _ref: string }[] | undefined
-              
-              // Extract refs of already selected categories
-              const selectedRefs = selectedCategories?.map(cat => cat._ref) || []
-              
-              // Filter by language AND exclude already selected categories
+              const selectedServices = document?.services as { _ref: string }[] | undefined
+
+              // Extract refs of already selected services
+              const selectedRefs = selectedServices?.map(service => service._ref) || []
+
+              // Filter by language AND exclude already selected services
               return {
                 filter: 'language == $language && !(_id in $selectedRefs)',
                 params: { language, selectedRefs },

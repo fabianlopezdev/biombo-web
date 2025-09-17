@@ -1,6 +1,6 @@
 ---
 import type { ServicesSection } from '@/shared/schemas/sanity/homePageSchema'
-import type { ServiceCategory } from '@/shared/schemas/sanity/serviceCategorySchema'
+import type { Service } from '@/shared/schemas/sanity/serviceSchema'
 import ServicesCircleSignRaw from '@/assets/services-circle-sign.svg?raw'
 import ServicesPlusSignRaw from '@/assets/services-plus-sign.svg?raw'
 
@@ -29,7 +29,7 @@ const { servicesData } = Astro.props as Props
 
   <div class="services-list">
     {
-      (servicesData?.selectedCategories ?? []).map((service: ServiceCategory) => (
+      (servicesData?.selectedServices ?? []).map((service: Service) => (
         <details data-service-item>
           <summary>
             <h3 class="text services__title">{service.title}</h3>

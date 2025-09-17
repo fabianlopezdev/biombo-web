@@ -91,27 +91,32 @@ export const structure: StructureResolver = (S, context) =>
             ])
         ),
 
-      // Service Categories organized by language
+      // Services with drag-and-drop ordering
       S.listItem()
-        .title('Service Categories')
-        .icon(() => '🏷️')
+        .title('Services')
+        .icon(() => '🛠️')
         .child(
           S.list()
-            .title('Service Categories')
+            .title('Services')
             .items([
-              // Create a separate draggable list for each language
-              ...LANGUAGES.map((lang) =>
-                orderableDocumentListDeskItem({
-                  type: 'serviceCategory',
-                  id: `orderable-serviceCategory-${lang.id}`,
-                  title: `${lang.title} Service Categories`,
-                  S,
-                  context,
-                  filter: '_type == "serviceCategory" && language == $language',
-                  params: { language: lang.id },
-                  icon: getLanguageIconFn(lang.id),
-                })
-              ),
+              // Orderable document list for drag-and-drop ordering
+              orderableDocumentListDeskItem({
+                type: 'service',
+                title: 'Services',
+                S,
+                context,
+              }),
+              // Standard document list with search for finding services
+              S.divider(),
+              S.listItem()
+                .title('Search Services')
+                .icon(() => '🔍')
+                .child(
+                  S.documentTypeList('service')
+                    .title('Search Services')
+                    .filter('_type == "service"')
+                    .apiVersion('v2023-01-01')
+                )
             ])
         ),
 
@@ -160,7 +165,7 @@ export const structure: StructureResolver = (S, context) =>
       // Other document types
       ...S.documentTypeListItems().filter((listItem: ListItemBuilder) => {
         const id = listItem.getId()
-        return id ? !excludeTypes.includes(id) && id !== 'project' && id !== 'serviceCategory' : true
+        return id ? !excludeTypes.includes(id) && id !== 'project' && id !== 'service' : true
       }),
 
       // Divider
