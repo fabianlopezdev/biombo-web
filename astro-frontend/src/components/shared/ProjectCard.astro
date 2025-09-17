@@ -12,6 +12,7 @@ interface Props {
   viewProjectText?: string
   clients?: string
   class?: string
+  projectId?: string
 }
 
 const {
@@ -24,6 +25,7 @@ const {
   viewProjectText = 'Veure projecte',
   clients,
   class: className = '',
+  projectId,
 } = Astro.props
 
 // Create a simple project object for CustomCursor
@@ -38,11 +40,11 @@ const project = {
   class={`project project-card ${className}`}
   style={`--hover-bg-color: ${hoverColor}; --hover-text-color: ${textHoverColor};`}
 >
-  <a href={`/projectes/${slug}`} class="project-link">
-    <img src={imageUrl} alt={imageAlt} class="project-image" loading="lazy" />
+  <a href={`/projectes/${slug}`} class="project-link" aria-label={`${title} - Veure detalls del projecte`}>
+    <img src={imageUrl} alt={`${title} - Imatge representativa del projecte`} class="project-image" loading="lazy" />
     <div class="project-caption">
       <figcaption class="caption-text">
-        {title}
+        <span id={projectId ? `project-${projectId}-title` : undefined}>{title}</span>
       </figcaption>
     </div>
   </a>

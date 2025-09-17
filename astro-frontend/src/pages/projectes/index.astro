@@ -28,9 +28,9 @@ const getProjectSlug = (slug: any) => {
 ---
 
 <ProjectesLayout pageTitle="Projectes">
-  <section class="projects-filter-container">
-    <h2>Filtrar per:</h2>
-    <nav class="projects-nav-filter">
+  <section class="projects-filter-container" aria-labelledby="filter-heading">
+    <h2 id="filter-heading">Filtrar per:</h2>
+    <nav class="projects-nav-filter" aria-label="Filtres de serveis">
       <ul class="projects-filter-list">
         {
           services && services.map((service) => (
@@ -44,36 +44,48 @@ const getProjectSlug = (slug: any) => {
           ))
         }
       </ul>
-      <button class="delete-filters">Borrar filtres</button>
+      <button
+        class="delete-filters"
+        type="button"
+        aria-label="Esborrar tots els filtres aplicats">
+        Borrar filtres
+      </button>
     </nav>
   </section>
-  <section class="projects-container">
-    <div class="projects-grid-container">
+  <section class="projects-container" aria-label="Llista de projectes">
+    <ul class="projects-grid-container">
       {
         projects && projects.length > 0 ? (
           projects.map((project) => (
-            <div
+            <li
               class="project-item"
               data-services={(project.services || project.categories)?.map((s: any) => {
                 // Handle both dereferenced objects and reference objects
                 return s?._id || s?._ref || ''
               }).filter(Boolean).join(',') || ''}
             >
-              <ProjectCard
-                title={project.title}
-                imageUrl={getImageUrl(project)}
-                slug={getProjectSlug(project.slug)}
-                hoverColor={"#63b2d5"}
-                clients={project.clients?.map((c: any) => c.name).join(', ') || ''}
-                viewProjectText="Veure projecte"
-              />
-            </div>
+              <article aria-labelledby={`project-${project._id}-title`}>
+                <ProjectCard
+                  title={project.title}
+                  imageUrl={getImageUrl(project)}
+                  slug={getProjectSlug(project.slug)}
+                  hoverColor={"#63b2d5"}
+                  clients={project.clients?.map((c: any) => c.name).join(', ') || ''}
+                  viewProjectText="Veure projecte"
+                  projectId={project._id}
+                />
+              </article>
+            </li>
           ))
         ) : (
-          <p class="no-projects">No hi ha projectes disponibles.</p>
+          <li class="no-projects-container">
+            <div role="status" aria-live="polite">
+              <p class="no-projects">No hi ha projectes disponibles.</p>
+            </div>
+          </li>
         )
       }
-    </div>
+    </ul>
   </section>
 </ProjectesLayout>
 
@@ -135,7 +147,12 @@ const getProjectSlug = (slug: any) => {
   }
 
   .project-item {
+    display: block; /* Override default list-item display to fix grid layout */
     height: clamp(25.375rem, -2.75rem + 41.705vi, 36.688rem);
+  }
+
+  .project-item article {
+    height: 100%; /* Pass height to ProjectCard through article element */
   }
 
   @media (width < 992px) {
@@ -192,8 +209,19 @@ const getProjectSlug = (slug: any) => {
   // Track active filters using a Set for O(1) lookup efficiency
   let activeFilters = new Set<string>()
 
-  // Add click handlers to filter pills
+  // Add keyboard support and click handlers to filter pills
   filterPills.forEach(pill => {
+    pill.setAttribute('tabindex', '0')
+    pill.setAttribute('aria-pressed', 'false')
+
+    // Keyboard support
+    pill.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        pill.click()
+      }
+    })
+
     pill.addEventListener('click', () => {
       const serviceId = pill.getAttribute('data-service')
 
@@ -202,9 +230,11 @@ const getProjectSlug = (slug: any) => {
       // Toggle active state
       if (pill.classList.contains('active')) {
         pill.classList.remove('active')
+        pill.setAttribute('aria-pressed', 'false')
         activeFilters.delete(serviceId)
       } else {
         pill.classList.add('active')
+        pill.setAttribute('aria-pressed', 'true')
         activeFilters.add(serviceId)
       }
 
@@ -223,20 +253,49 @@ const getProjectSlug = (slug: any) => {
           item.style.display = hasActiveService ? 'block' : 'none'
         }
       })
+
+      // Announce filter results to screen readers
+      announceFilterResults()
     })
   })
+
+  // Create live region for screen reader announcements
+  const liveRegion = document.createElement('div')
+  liveRegion.setAttribute('role', 'status')
+  liveRegion.setAttribute('aria-live', 'polite')
+  liveRegion.setAttribute('aria-atomic', 'true')
+  liveRegion.classList.add('sr-only')
+  document.body.appendChild(liveRegion)
+
+  // Function to announce filter results
+  function announceFilterResults() {
+    const visibleCount = [...projectItems].filter((item: HTMLElement) => item.style.display !== 'none').length
+    const filterCount = activeFilters.size
+
+    if (filterCount > 0) {
+      liveRegion.textContent = `${filterCount} filtres actius. Mostrant ${visibleCount} projectes.`
+    } else {
+      liveRegion.textContent = `Mostrant tots els ${visibleCount} projectes.`
+    }
+  }
 
   // Delete filters button
   if (deleteFiltersBtn) {
     deleteFiltersBtn.addEventListener('click', () => {
       // Clear all filters
-      filterPills.forEach(p => p.classList.remove('active'))
+      filterPills.forEach(p => {
+        p.classList.remove('active')
+        p.setAttribute('aria-pressed', 'false')
+      })
       activeFilters.clear()
 
       // Show all projects
       projectItems.forEach(item => {
         item.style.display = 'block'
       })
+
+      // Announce that filters have been cleared
+      announceFilterResults()
     })
   }
 </script>
