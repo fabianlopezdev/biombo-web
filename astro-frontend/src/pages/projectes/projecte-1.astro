@@ -11,10 +11,10 @@ const projectServices = [
 ---
 
 <ProjectLayout pageTitle="Obert x Vacances">
-    <div class="client-info mobile">
+  <div class="client-info mobile">
     <h2 class="section-titles service-clients-font-size">Client:</h2>
-      <p class="service-clients-font-size">Roca Umbert. Fàbrica de les arts</p>
-    </div>
+    <p class="service-clients-font-size">Roca Umbert. Fàbrica de les arts</p>
+  </div>
 
   <img class="hero-image" src="../../../public/projects-mock.jpg" alt="Obert x Vacances" />
 
@@ -48,7 +48,10 @@ const projectServices = [
     <div class="red-background standalone-image"></div>
   </section>
   <section class="standalone-text project-copy">
-    <p>Projecte de creació de marca: Conceptualització, naming, il·lustració i disseny gràfic, per a un projecte cultural infantil. Les entitats culturals de Granollers</p>
+    <p>
+      Projecte de creació de marca: Conceptualització, naming, il·lustració i disseny gràfic, per a
+      un projecte cultural infantil. Les entitats culturals de Granollers
+    </p>
   </section>
 
   <section class="three-image-layout">
@@ -60,28 +63,78 @@ const projectServices = [
     <div class="red-background standalone-image"></div>
   </section>
 
+  <div class="services-container-mobile mobile">
+    <h2 class="section-titles service-clients-font-size">Serveis:</h2>
+    <ul class="services-list">
+      {projectServices.map((service, i) => {
+        if (i === projectServices.length - 1) {
+          return <li class="list-item-mobile">{service.name}</li>
+        }
+        return <li class="list-item-mobile">{service.name},&nbsp;</li>
+      })}
+    </ul>
+  </div>
+
+  <div class="divider-line mobile">
+
+  </div>
+
   <section class="similar-projects">
-    <h3 class="similar-title">{"Projectes similars".toUpperCase()}</h3>
+    <h3 class="similar-title">{'Projectes similars'}</h3>
     <div class="similar-projects-container">
       <div class="similar-project-item">
-        <img src="" alt="">
+        <div class="similar-project-image-wrapper">
+          <img class="similar-project-image" src="" alt="" />
+        </div>
+        <div class="mobile">
+          <p class="similar-project-title">Obert x Vacances</p>
+          <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
+        </div>
+      </div>
+      <div class="similar-project-item">    
+        <div class="similar-project-image-wrapper">
+          <img class="similar-project-image" src="" alt="" />
+        </div>
+        <div class="mobile">
+          <p class="similar-project-title">Obert x Vacances</p>
+          <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
+        </div>
       </div>
       <div class="similar-project-item">
-        <img src="" alt="">
+        <div class="similar-project-image-wrapper">
+          <img class="similar-project-image" src="" alt="" />
+        </div>
+        <div class="mobile">
+          <p class="similar-project-title">Obert x Vacances</p>
+          <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
+        </div>
       </div>
       <div class="similar-project-item">
-        <img src="" alt="">
+        <div class="similar-project-image-wrapper">
+          <img class="similar-project-image" src="" alt="" />
+        </div>
+        <div class="mobile">
+          <p class="similar-project-title">Obert x Vacances</p>
+          <p class="similar-project-client">Roca Umbert. Fàbrica de les arts</p>
+        </div>
       </div>
-      
     </div>
   </section>
 </ProjectLayout>
 
 <style>
-    .mobile {
-        display: none;
-    }
-   
+  .mobile {
+    display: none;
+  }
+
+  .section-titles {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .service-clients-font-size {
+    font-size: clamp(1.125rem, 0.995rem + 0.534vi, 1.5rem);
+  }
+
   .hero-image {
     width: 100vw;
     max-inline-size: none;
@@ -91,23 +144,17 @@ const projectServices = [
     margin-inline: calc(-1 * var(--padding-inline));
     padding-block-start: var(--padding-block);
   }
-  .padding-bottom {
-    padding-block-end: 1.75rem;
-  }
-  .service-clients-font-size {
-      font-size: clamp(1.125rem, 0.995rem + 0.534vi, 1.5rem);
 
-  }
-
-  .section-titles {
-    font-weight: var(--font-weight-semibold);
-  }
   .project-info-container {
     max-inline-size: 85.3125rem;
     display: flex;
     align-items: center;
     gap: clamp(3rem, -30.992rem + 42.424vi, 9.125rem);
-    padding-block:clamp(2.313rem, 0.033rem + 9.35vi, 8.875rem);
+    padding-block: clamp(2.313rem, 0.033rem + 9.35vi, 8.875rem);
+  }
+
+  .padding-bottom {
+    padding-block-end: 1.75rem;
   }
 
   .services-container {
@@ -116,19 +163,17 @@ const projectServices = [
     flex-wrap: wrap;
     gap: 0.75rem;
   }
- 
+
   .project-copy {
     font-size: clamp(1.125rem, 0.908rem + 0.89vi, 1.75rem);
     line-height: 1.3;
   }
+
   .two-columns {
     display: flex;
     gap: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);
   }
-  .three-columns {
-    display: flex;
-    gap: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);
-  }
+
   .red-background {
     background-color: red;
     flex: 1;
@@ -136,37 +181,51 @@ const projectServices = [
   }
 
   .standalone-image {
-    margin-block-start: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);;
+    margin-block-start: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);
     aspect-ratio: 16/9;
   }
+
   .standalone-text {
     padding-block: clamp(3.375rem, 2.246rem + 4.63vi, 6.625rem);
     padding-inline: calc(var(--padding-inline) + 2rem);
   }
-  .similar-projects {
-    padding-block-start: var(--padding-block);
-}
-.similar-title {
-    font-weight: var(--font-weight-semibold);
-    font-size: var(--font-size);
-    padding-block-end: 4rem;
-}
 
-.similar-projects-container {
+  .three-columns {
     display: flex;
-    gap: 1.875rem;
+    gap: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);
   }
-
-  .similar-project-item {
-    flex: 1;
-    aspect-ratio:3/4;
-    background-color: green;
-    border-radius:0.62rem;
-  }
+  
   .blue-background {
     background-color: blue;
     flex: 1;
     aspect-ratio: 217/328;
+  }
+
+  .similar-projects {
+    padding-block-start: var(--padding-block);
+  }
+
+  .similar-title {
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size);
+    padding-block-end: clamp(1.125rem, 0.127rem + 4.096vi, 4rem);
+    text-transform: uppercase;
+  }
+
+  .similar-projects-container {
+    display: flex;
+    gap: 1.875rem;
+    flex-wrap: wrap;
+  }
+
+  .similar-project-item {
+    flex: 1;
+  }
+
+  .similar-project-image-wrapper {
+    aspect-ratio: 3/4;
+    background-color: green;
+    border-radius: 0.62rem;
   }
 
   /* @media (width < 1266px) {
@@ -175,40 +234,93 @@ const projectServices = [
       align-items: flex-start;
       gap: var(--padding-block);
     } */
-    
 
   @media (width < 992px) {
-    .hero-image {
-      aspect-ratio: 65/59;
-    margin-block-start: 2rem;
-    padding-block: 0rem;
-    }
     .mobile {
-        display: block;
+      display: block;
     }
 
     .client-info {
-        padding-block-start: var(--padding-block);
+      padding-block-start: var(--padding-block);
+    }
+    
+    .hero-image {
+      aspect-ratio: 65/59;
+      margin-block-start: 2rem;
+      padding-block: 0rem;
+    }
+    
+    .first-column {
+      display: none;
     }
 
-    .first-column {
-        display: none;
+    .two-columns,
+    .three-columns {
+      flex-direction: column;
+    }
+    
+    .red-background,
+    .blue-background {
+      aspect-ratio: 362 / 315;
+      margin-inline: calc(0.875rem - var(--padding-inline));
     }
 
     .standalone-text {
-        padding-inline: var(--padding-inline)
-        
-  }
-
-  .two-columns, .three-columns {
-    flex-direction: column;
-  }
-
-  .red-background, .blue-background {
-    aspect-ratio: 362 / 315;
-    margin-inline: calc(0.875rem - var(--padding-inline));
+      padding-inline: var(--padding-inline);
+    }
     
-  }
+    .standalone-text {
+      padding-inline: 0rem;
+    }
 
-  
+    .services-container-mobile {
+      padding-block-start: 2.3125rem;
+      padding-block-end: 3.5625rem;
+    }
+
+    .services-list {
+      font-size: 1.125rem;
+    }
+
+    .list-item-mobile {
+      display: inline-block;
+    }
+
+    .divider-line {
+      width: 100%;
+      height: 1px;
+      background-color: #ADADAD;
+    }
+    
+    .similar-title {
+      text-transform: none;
+    }
+
+    .similar-projects-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem; /* Adds space between items */
+   
+    }
+    
+    .similar-project-item {
+    }
+    
+    .similar-project-image-wrapper {
+        aspect-ratio: 152/183;
+        margin-block-end: 1.125rem;
+    }
+
+    .similar-project-title {
+      font-size: 1.25rem;
+      font-weight: var(--font-weight-regular);
+      line-height: 1.2;
+      padding-block-end: 0.5rem;
+    }
+
+    .similar-project-client {
+      font-size: 1rem;
+      line-height: 1.375;
+    }
+  }
 </style>
