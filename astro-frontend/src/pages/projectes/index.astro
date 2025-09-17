@@ -2,39 +2,29 @@
 import ProjectesLayout from '@/layouts/ProjectesLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
+import { fetchProjectsByLocale } from '@/shared/lib/sanity/queries/projectQueries'
+import { fetchServicesByLocale } from '@/shared/lib/sanity/queries/serviceQueries'
+
 // This is the root index.astro file (Catalan)
+const locale = 'ca'
 
-const projectsFilters = [
-  { name: 'Disseny gràfic', category: 'graphic-design' },
-  { name: 'Disseny i desenvolupament web', category: 'web-design' },
-  { name: 'Brànding i Identitat Corporativa', category: 'branding' },
-  { name: 'Il·lustració', category: 'illustration' },
-]
+// Fetch all projects and services for Catalan
+const projects = await fetchProjectsByLocale(locale)
+const services = await fetchServicesByLocale(locale)
 
-// Temporary mock data - replace with real project data from Sanity
-const mockProjects = [
-  {
-    title: 'Projecte 1',
-    imageUrl: '/projects-mock.jpg',
-    slug: 'projecte-1',
-    hoverColor: '#f35c77',
-    clients: 'Client A',
-  },
-  {
-    title: 'Projecte 2',
-    imageUrl: '/projects-mock.jpg',
-    slug: 'projecte-2',
-    hoverColor: '#ffc904',
-    clients: 'Client B',
-  },
-  {
-    title: 'Projecte 3',
-    imageUrl: '/projects-mock.jpg',
-    slug: 'projecte-3',
-    hoverColor: '#63b2d5',
-    clients: 'Client C',
-  },
-]
+// Helper function to get image URL
+const getImageUrl = (project: any) => {
+  if (project.useSeparateThumbnail && project.thumbnailImage?.asset?.url) {
+    return project.thumbnailImage.asset.url
+  }
+  return project.mainImage?.asset?.url || '/projects-mock.jpg'
+}
+
+// Helper function to get project slug
+const getProjectSlug = (slug: any) => {
+  return typeof slug === 'string' ? slug : slug?.current || ''
+}
+
 ---
 
 <ProjectesLayout pageTitle="Projectes">
@@ -43,11 +33,11 @@ const mockProjects = [
     <nav class="projects-nav-filter">
       <ul class="projects-filter-list">
         {
-          projectsFilters.map((filter) => (
+          services && services.map((service) => (
             <li>
               <PillButton
-                text={filter.name}
-                data-category={filter.category}
+                text={service.title}
+                data-service={service._id}
                 class="filter-pill"
               />
             </li>
@@ -60,18 +50,28 @@ const mockProjects = [
   <section class="projects-container">
     <div class="projects-grid-container">
       {
-        mockProjects.map((project) => (
-          <div class="project-item">
-            <ProjectCard
-              title={project.title}
-              imageUrl={project.imageUrl}
-              slug={project.slug}
-              hoverColor={project.hoverColor}
-              clients={project.clients}
-              viewProjectText="Veure projecte"
-            />
-          </div>
-        ))
+        projects && projects.length > 0 ? (
+          projects.map((project) => (
+            <div
+              class="project-item"
+              data-services={(project.services || project.categories)?.map((s: any) => {
+                // Handle both dereferenced objects and reference objects
+                return s?._id || s?._ref || ''
+              }).filter(Boolean).join(',') || ''}
+            >
+              <ProjectCard
+                title={project.title}
+                imageUrl={getImageUrl(project)}
+                slug={getProjectSlug(project.slug)}
+                hoverColor={"#63b2d5"}
+                clients={project.clients?.map((c: any) => c.name).join(', ') || ''}
+                viewProjectText="Veure projecte"
+              />
+            </div>
+          ))
+        ) : (
+          <p class="no-projects">No hi ha projectes disponibles.</p>
+        )
       }
     </div>
   </section>
@@ -102,6 +102,20 @@ const mockProjects = [
     flex-wrap: wrap;
     gap: clamp(0.625rem, 0.582rem + 0.178vi, 0.75rem);
     cursor: grab;
+  }
+
+  /* Visual feedback for filter pill clicks */
+  .filter-pill {
+    transition: transform 0.1s ease-out, background-color 0.3s ease;
+  }
+
+  .filter-pill:active {
+    transform: scale(0.99);
+  }
+
+  .filter-pill.active {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
   }
 
   .delete-filters {
@@ -169,6 +183,63 @@ const mockProjects = [
 </style>
 
 <script src="@/scripts/pages/homepage/customCursor.ts"></script>
+<script>
+  // Service filtering functionality
+  const filterPills = document.querySelectorAll('.filter-pill') as NodeListOf<HTMLElement>
+  const projectItems = document.querySelectorAll('.project-item') as NodeListOf<HTMLElement>
+  const deleteFiltersBtn = document.querySelector('.delete-filters') as HTMLButtonElement
+
+  // Track active filters using a Set for O(1) lookup efficiency
+  let activeFilters = new Set<string>()
+
+  // Add click handlers to filter pills
+  filterPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      const serviceId = pill.getAttribute('data-service')
+
+      if (!serviceId) return
+
+      // Toggle active state
+      if (pill.classList.contains('active')) {
+        pill.classList.remove('active')
+        activeFilters.delete(serviceId)
+      } else {
+        pill.classList.add('active')
+        activeFilters.add(serviceId)
+      }
+
+      // Filter projects efficiently
+      projectItems.forEach((item) => {
+        if (activeFilters.size === 0) {
+          // No filters active, show all
+          item.style.display = 'block'
+        } else {
+          // Check if project has any of the active service filters
+          const itemServicesStr = item.getAttribute('data-services') || ''
+          const itemServices = itemServicesStr ? itemServicesStr.split(',').filter(s => s) : []
+
+          // Using .some() for efficiency - stops at first match
+          const hasActiveService = itemServices.some(service => activeFilters.has(service))
+          item.style.display = hasActiveService ? 'block' : 'none'
+        }
+      })
+    })
+  })
+
+  // Delete filters button
+  if (deleteFiltersBtn) {
+    deleteFiltersBtn.addEventListener('click', () => {
+      // Clear all filters
+      filterPills.forEach(p => p.classList.remove('active'))
+      activeFilters.clear()
+
+      // Show all projects
+      projectItems.forEach(item => {
+        item.style.display = 'block'
+      })
+    })
+  }
+</script>
 <script>
   const filterNav = document.querySelector('.projects-nav-filter') as HTMLElement
 

@@ -1,0 +1,268 @@
+---
+import type { Projects } from '@/shared/schemas/sanity/projectSchema'
+import type { Services } from '@/shared/schemas/sanity/serviceSchema'
+
+interface Props {
+  projects: Projects | null
+  services: Services | null
+  locale: 'ca' | 'es' | 'en'
+}
+
+const { projects, services, locale } = Astro.props
+
+// Helper function to get image URL
+const getImageUrl = (project: any) => {
+  if (project.useSeparateThumbnail && project.thumbnailImage?.asset?.url) {
+    return project.thumbnailImage.asset.url
+  }
+  return project.mainImage?.asset?.url || ''
+}
+
+// Helper function to get project URL
+const getProjectUrl = (slug: any, locale: string) => {
+  const slugString = typeof slug === 'string' ? slug : slug?.current || ''
+
+  switch(locale) {
+    case 'ca':
+      return `/projectes/${slugString}`
+    case 'es':
+      return `/es/proyectos/${slugString}`
+    case 'en':
+      return `/en/projects/${slugString}`
+    default:
+      return `/projectes/${slugString}`
+  }
+}
+---
+
+<section class="projects-list-container">
+  <!-- Services Filter -->
+  {services && services.length > 0 && (
+    <nav class="services-filter" aria-label="Filter projects by service">
+      <button
+        class="filter-button active"
+        data-filter="all"
+        aria-pressed="true"
+      >
+        {locale === 'ca' ? 'Tots' : locale === 'es' ? 'Todos' : 'All'}
+      </button>
+      {services.map((service) => (
+        <button
+          class="filter-button"
+          data-filter={service._id}
+          aria-pressed="false"
+        >
+          {service.title}
+        </button>
+      ))}
+    </nav>
+  )}
+
+  <!-- Projects Grid -->
+  {projects && projects.length > 0 ? (
+    <div class="projects-grid">
+      {projects.map((project) => (
+        <article
+          class="project-card"
+          data-services={project.services?.map((s: any) => s._id).join(',') || ''}
+        >
+          <a href={getProjectUrl(project.slug, locale)}>
+            <div class="project-image">
+              {getImageUrl(project) && (
+                <img
+                  src={getImageUrl(project)}
+                  alt={project.title}
+                  loading="lazy"
+                />
+              )}
+            </div>
+            <div class="project-info">
+              <h2 class="project-title">{project.title}</h2>
+              {project.clients && project.clients.length > 0 && (
+                <p class="project-client">
+                  {project.clients.map((client: any) => client.name).join(', ')}
+                </p>
+              )}
+              {project.services && project.services.length > 0 && (
+                <ul class="project-services">
+                  {project.services.map((service: any) => (
+                    <li class="service-tag">{service.title}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </a>
+        </article>
+      ))}
+    </div>
+  ) : (
+    <div class="no-projects">
+      <p>
+        {locale === 'ca'
+          ? 'No hi ha projectes disponibles.'
+          : locale === 'es'
+          ? 'No hay proyectos disponibles.'
+          : 'No projects available.'}
+      </p>
+    </div>
+  )}
+</section>
+
+<script>
+  // Service filtering functionality
+  const filterButtons = document.querySelectorAll('.filter-button')
+  const projectCards = document.querySelectorAll('.project-card')
+
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const filter = button.getAttribute('data-filter')
+
+      // Update active state
+      filterButtons.forEach(btn => {
+        btn.classList.remove('active')
+        btn.setAttribute('aria-pressed', 'false')
+      })
+      button.classList.add('active')
+      button.setAttribute('aria-pressed', 'true')
+
+      // Filter projects
+      projectCards.forEach((card) => {
+        const cardElement = card as HTMLElement
+        if (filter === 'all') {
+          cardElement.style.display = 'block'
+        } else {
+          const cardServices = cardElement.getAttribute('data-services')?.split(',') || []
+          if (cardServices.includes(filter || '')) {
+            cardElement.style.display = 'block'
+          } else {
+            cardElement.style.display = 'none'
+          }
+        }
+      })
+    })
+  })
+</script>
+
+<style>
+  .projects-list-container {
+    padding: var(--padding-block) var(--padding-inline);
+    min-height: calc(100vh - var(--header-height));
+  }
+
+  /* Services Filter */
+  .services-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-secondary);
+  }
+
+  .filter-button {
+    padding: 0.5rem 1.5rem;
+    background-color: transparent;
+    border: 1px solid var(--color-secondary);
+    border-radius: 2rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .filter-button:hover {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+  }
+
+  .filter-button.active {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+  }
+
+  /* Projects Grid */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+
+  .project-card {
+    transition: transform 0.3s ease;
+  }
+
+  .project-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .project-card a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .project-image {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: var(--color-neutral-100);
+    margin-bottom: 1rem;
+  }
+
+  .project-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .project-card:hover .project-image img {
+    transform: scale(1.05);
+  }
+
+  .project-info {
+    padding: 0.5rem;
+  }
+
+  .project-title {
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-regular);
+    margin-bottom: 0.5rem;
+  }
+
+  .project-client {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .project-services {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .service-tag {
+    padding: 0.25rem 0.75rem;
+    background-color: var(--color-neutral-100);
+    border-radius: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .no-projects {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--color-text-secondary);
+  }
+
+  /* Mobile styles */
+  @media (max-width: 768px) {
+    .projects-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .services-filter {
+      justify-content: center;
+    }
+  }
+</style>

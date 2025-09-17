@@ -187,3 +187,85 @@ export async function fetchAllProjects(): Promise<Projects | null> {
     return null
   }
 }
+
+/**
+ * Fetches all projects for a specific locale
+ * @param locale - The locale to fetch projects for
+ * @returns Array of projects for the specified locale or null if none found
+ */
+export async function fetchProjectsByLocale(
+  locale: 'ca' | 'es' | 'en',
+): Promise<Projects | null> {
+  try {
+    // Query for all projects in the specified language, ordered by orderRank (manual order)
+    const query = `*[_type == "project" && language == $locale] | order(orderRank) {
+      _id,
+      _type,
+      _createdAt,
+      _updatedAt,
+      language,
+      title,
+      slug,
+      mainImage {
+        ...,
+        asset->
+      },
+      thumbnailImage {
+        ...,
+        asset->
+      },
+      useSeparateThumbnail,
+      clients[]-> {
+        _id,
+        name
+      },
+      services[]-> {
+        _id,
+        title,
+        description
+      },
+      categories[]-> {
+        _id,
+        title,
+        description
+      },
+      mainText,
+      publishDate
+    }`
+
+    const params = { locale }
+
+    // Try fetching with schema validation
+    const projects = await fetchSanityQuery({
+      query,
+      params,
+      schema: projectsSchema,
+    })
+
+    return projects
+  } catch {
+    // If schema validation fails, try without it
+    try {
+      const query = `*[_type == "project" && language == $locale] | order(orderRank) {
+        _id,
+        _type,
+        title,
+        slug,
+        mainImage,
+        thumbnailImage,
+        useSeparateThumbnail,
+        clients,
+        services,
+        mainText,
+        publishDate
+      }`
+
+      const params = { locale }
+      const rawProjects = await fetchSanityQuery({ query, params })
+
+      return Array.isArray(rawProjects) ? (rawProjects as Projects) : null
+    } catch {
+      return null
+    }
+  }
+}

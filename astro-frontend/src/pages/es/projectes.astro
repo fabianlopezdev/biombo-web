@@ -1,10 +1,290 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
+import ProjectesLayout from '@/layouts/ProjectesLayout.astro'
+import PillButton from '@/components/shared/PillButton.astro'
+import ProjectCard from '@/components/shared/ProjectCard.astro'
+import { fetchProjectsByLocale } from '@/shared/lib/sanity/queries/projectQueries'
+import { fetchServicesByLocale } from '@/shared/lib/sanity/queries/serviceQueries'
+
 // This is the Spanish projects page
+const locale = 'es'
+
+// Fetch all projects and services for Spanish
+const projects = await fetchProjectsByLocale(locale)
+const services = await fetchServicesByLocale(locale)
+
+// Helper function to get image URL
+const getImageUrl = (project: any) => {
+  if (project.useSeparateThumbnail && project.thumbnailImage?.asset?.url) {
+    return project.thumbnailImage.asset.url
+  }
+  return project.mainImage?.asset?.url || '/projects-mock.jpg'
+}
+
+// Helper function to get project slug
+const getProjectSlug = (slug: any) => {
+  return typeof slug === 'string' ? slug : slug?.current || ''
+}
 ---
 
-<BaseLayout title="Proyectos">
+<ProjectesLayout pageTitle="Proyectos">
+  <section class="projects-filter-container">
+    <h2>Filtrar por:</h2>
+    <nav class="projects-nav-filter">
+      <ul class="projects-filter-list">
+        {
+          services && services.map((service) => (
+            <li>
+              <PillButton
+                text={service.title}
+                data-service={service._id}
+                class="filter-pill"
+              />
+            </li>
+          ))
+        }
+      </ul>
+      <button class="delete-filters">Borrar filtros</button>
+    </nav>
+  </section>
+  <section class="projects-container">
+    <div class="projects-grid-container">
+      {
+        projects && projects.length > 0 ? (
+          projects.map((project) => (
+            <div
+              class="project-item"
+              data-services={(project.services || project.categories)?.map((s: any) => {
+                // Handle both dereferenced objects and reference objects
+                return s?._id || s?._ref || ''
+              }).filter(Boolean).join(',') || ''}
+            >
+              <ProjectCard
+                title={project.title}
+                imageUrl={getImageUrl(project)}
+                slug={`/es/proyectos/${getProjectSlug(project.slug)}`}
+                hoverColor={"#63b2d5"}
+                clients={project.clients?.map((c: any) => c.name).join(', ') || ''}
+                viewProjectText="Ver proyecto"
+              />
+            </div>
+          ))
+        ) : (
+          <p class="no-projects">No hay proyectos disponibles.</p>
+        )
+      }
+    </div>
+  </section>
+</ProjectesLayout>
 
-    <h1 class="hero-big-text-2">Proyectos</h1> 
+<style>
+  .projects-filter-container {
+    --projects-text-size: clamp(1.125rem, 1.082rem + 0.178vi, 1.25rem);
+    padding-block-start: var(--padding-block);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding-block-end: clamp(1.625rem, 1.321rem + 1.247vi, 2.5rem);
+  }
+  h2 {
+    font-size: var(--projects-text-size);
+    font-weight: var(--font-weight-light);
+  }
+  .projects-nav-filter {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex: 1;
+  }
+  .projects-filter-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(0.625rem, 0.582rem + 0.178vi, 0.75rem);
+    cursor: grab;
+  }
 
-</BaseLayout>
+  /* Visual feedback for filter pill clicks */
+  .filter-pill {
+    transition: transform 0.1s ease-out, background-color 0.3s ease;
+  }
+
+  .filter-pill:active {
+    transform: scale(0.97);
+  }
+
+  .filter-pill.active {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+  }
+
+  .delete-filters {
+    margin-inline-start: auto;
+    font-size: var(--projects-text-size);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  .projects-grid-container {
+    max-width: 85.3125rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    margin-inline: auto;
+    gap: 1.85rem;
+  }
+
+  .project-item {
+    height: clamp(25.375rem, -2.75rem + 41.705vi, 36.688rem);
+  }
+
+  .no-projects {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-secondary);
+  }
+
+  @media (width < 992px) {
+    .projects-filter-container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.125rem;
+    }
+
+    .project-item {
+      height: auto;
+    }
+    .projects-nav-filter {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin-inline: calc(-1 * var(--padding-inline));
+      width: 100vw;
+      display: flex;
+      align-items: center;
+      gap: clamp(0.625rem, 0.582rem + 0.178vi, 0.75rem);
+      padding-block: 4px;
+    }
+    .projects-nav-filter::-webkit-scrollbar {
+      display: none;
+    }
+    .projects-filter-list {
+      flex-wrap: nowrap;
+      padding-inline-start: var(--padding-inline);
+    }
+
+    .projects-filter-list:active {
+      cursor: grabbing;
+    }
+
+    .delete-filters {
+      margin-inline-start: 0;
+      flex-shrink: 0;
+      padding-inline-start: 1rem;
+      padding-inline-end: var(--padding-inline);
+    }
+  }
+</style>
+
+<script src="@/scripts/pages/homepage/customCursor.ts"></script>
+<script>
+  // Service filtering functionality
+  const filterPills = document.querySelectorAll('.filter-pill') as NodeListOf<HTMLElement>
+  const projectItems = document.querySelectorAll('.project-item') as NodeListOf<HTMLElement>
+  const deleteFiltersBtn = document.querySelector('.delete-filters') as HTMLButtonElement
+
+  // Track active filters
+  let activeFilters = new Set<string>()
+
+  // Add click handlers to filter pills
+  filterPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      const serviceId = pill.getAttribute('data-service')
+
+      if (!serviceId) return
+
+      // Toggle active state
+      if (pill.classList.contains('active')) {
+        pill.classList.remove('active')
+        activeFilters.delete(serviceId)
+      } else {
+        pill.classList.add('active')
+        activeFilters.add(serviceId)
+      }
+
+      // Filter projects
+      projectItems.forEach((item) => {
+        if (activeFilters.size === 0) {
+          // No filters active, show all
+          item.style.display = 'block'
+        } else {
+          // Check if project has any of the active service filters
+          const itemServices = item.getAttribute('data-services')?.split(',') || []
+          const hasActiveService = itemServices.some(service => activeFilters.has(service))
+          item.style.display = hasActiveService ? 'block' : 'none'
+        }
+      })
+    })
+  })
+
+  // Delete filters button
+  if (deleteFiltersBtn) {
+    deleteFiltersBtn.addEventListener('click', () => {
+      // Clear all filters
+      filterPills.forEach(p => p.classList.remove('active'))
+      activeFilters.clear()
+
+      // Show all projects
+      projectItems.forEach(item => {
+        item.style.display = 'block'
+      })
+    })
+  }
+
+  // Drag to scroll functionality
+  const filterNav = document.querySelector('.projects-nav-filter') as HTMLElement
+
+  if (filterNav) {
+    let isDown = false
+    let startX: number
+    let scrollLeft: number
+
+    filterNav.addEventListener('mousedown', (e) => {
+      isDown = true
+      filterNav.style.cursor = 'grabbing'
+      startX = e.pageX - filterNav.offsetLeft
+      scrollLeft = filterNav.scrollLeft
+    })
+
+    filterNav.addEventListener('mouseleave', () => {
+      isDown = false
+      filterNav.style.cursor = 'grab'
+    })
+
+    filterNav.addEventListener('mouseup', () => {
+      isDown = false
+      filterNav.style.cursor = 'grab'
+    })
+
+    filterNav.addEventListener('mousemove', (e) => {
+      if (!isDown) return
+      e.preventDefault()
+      const x = e.pageX - filterNav.offsetLeft
+      const walk = (x - startX) * 2
+      filterNav.scrollLeft = scrollLeft - walk
+    })
+
+    // Prevent link clicks when dragging
+    const links = filterNav.querySelectorAll('a')
+    links.forEach((link) => {
+      link.addEventListener('click', (e) => {
+        if (filterNav.scrollLeft !== scrollLeft) {
+          e.preventDefault()
+        }
+      })
+    })
+
+    // Set initial cursor
+    filterNav.style.cursor = 'grab'
+  }
+</script>
