@@ -2,15 +2,16 @@
 import ProjectesLayout from '@/layouts/ProjectesLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
-import { fetchProjectsByLocale } from '@/shared/lib/sanity/queries/projectQueries'
-import { fetchServicesByLocale } from '@/shared/lib/sanity/queries/serviceQueries'
+import { projectsTranslations, getProjectUrl, type Locale } from '@/shared/translations/projects'
 
-// This is the Spanish projects page
-const locale = 'es'
+interface Props {
+  locale: Locale
+  projects: any[] | null
+  services: any[] | null
+}
 
-// Fetch all projects and services for Spanish
-const projects = await fetchProjectsByLocale(locale)
-const services = await fetchServicesByLocale(locale)
+const { locale, projects, services } = Astro.props
+const t = projectsTranslations[locale]
 
 // Helper function to get image URL
 const getImageUrl = (project: any) => {
@@ -26,10 +27,10 @@ const getProjectSlug = (slug: any) => {
 }
 ---
 
-<ProjectesLayout pageTitle="Proyectos">
-  <section class="projects-filter-container">
-    <h2>Filtrar por:</h2>
-    <nav class="projects-nav-filter">
+<ProjectesLayout pageTitle={t.pageTitle}>
+  <section class="projects-filter-container" aria-labelledby="filter-heading">
+    <h2 id="filter-heading">{t.filterBy}</h2>
+    <nav class="projects-nav-filter" aria-label={t.filterAriaLabel}>
       <ul class="projects-filter-list">
         {
           services && services.map((service) => (
@@ -43,36 +44,48 @@ const getProjectSlug = (slug: any) => {
           ))
         }
       </ul>
-      <button class="delete-filters">Borrar filtros</button>
+      <button
+        class="delete-filters"
+        type="button"
+        aria-label={t.clearFiltersAriaLabel}>
+        {t.clearFilters}
+      </button>
     </nav>
   </section>
-  <section class="projects-container">
-    <div class="projects-grid-container">
+  <section class="projects-container" aria-label={t.projectListAriaLabel}>
+    <ul class="projects-grid-container">
       {
         projects && projects.length > 0 ? (
           projects.map((project) => (
-            <div
+            <li
               class="project-item"
               data-services={(project.services || project.categories)?.map((s: any) => {
                 // Handle both dereferenced objects and reference objects
                 return s?._id || s?._ref || ''
               }).filter(Boolean).join(',') || ''}
             >
-              <ProjectCard
-                title={project.title}
-                imageUrl={getImageUrl(project)}
-                slug={`/es/proyectos/${getProjectSlug(project.slug)}`}
-                hoverColor={"#63b2d5"}
-                clients={project.clients?.map((c: any) => c.name).join(', ') || ''}
-                viewProjectText="Ver proyecto"
-              />
-            </div>
+              <article aria-labelledby={`project-${project._id}-title`}>
+                <ProjectCard
+                  title={project.title}
+                  imageUrl={getImageUrl(project)}
+                  slug={getProjectUrl(getProjectSlug(project.slug), locale)}
+                  hoverColor={"#63b2d5"}
+                  clients={project.clients?.map((c: any) => c.name).join(', ') || ''}
+                  viewProjectText={t.viewProject}
+                  projectId={project._id}
+                />
+              </article>
+            </li>
           ))
         ) : (
-          <p class="no-projects">No hay proyectos disponibles.</p>
+          <li class="no-projects-container">
+            <div role="status" aria-live="polite">
+              <p class="no-projects">{t.noProjects}</p>
+            </div>
+          </li>
         )
       }
-    </div>
+    </ul>
   </section>
 </ProjectesLayout>
 
@@ -109,7 +122,7 @@ const getProjectSlug = (slug: any) => {
   }
 
   .filter-pill:active {
-    transform: scale(0.97);
+    transform: scale(0.99);
   }
 
   .filter-pill.active {
@@ -134,13 +147,12 @@ const getProjectSlug = (slug: any) => {
   }
 
   .project-item {
+    display: block; /* Override default list-item display to fix grid layout */
     height: clamp(25.375rem, -2.75rem + 41.705vi, 36.688rem);
   }
 
-  .no-projects {
-    text-align: center;
-    padding: 2rem;
-    color: var(--color-text-secondary);
+  .project-item article {
+    height: 100%; /* Pass height to ProjectCard through article element */
   }
 
   @media (width < 992px) {
@@ -151,7 +163,7 @@ const getProjectSlug = (slug: any) => {
     }
 
     .project-item {
-      height: auto;
+      height: auto; /* Reset height on mobile to prevent overlap */
     }
     .projects-nav-filter {
       overflow-x: auto;
@@ -177,6 +189,7 @@ const getProjectSlug = (slug: any) => {
       cursor: grabbing;
     }
 
+
     .delete-filters {
       margin-inline-start: 0;
       flex-shrink: 0;
@@ -187,17 +200,28 @@ const getProjectSlug = (slug: any) => {
 </style>
 
 <script src="@/scripts/pages/homepage/customCursor.ts"></script>
-<script>
+<script define:vars={{ locale, t }}>
   // Service filtering functionality
-  const filterPills = document.querySelectorAll('.filter-pill') as NodeListOf<HTMLElement>
-  const projectItems = document.querySelectorAll('.project-item') as NodeListOf<HTMLElement>
-  const deleteFiltersBtn = document.querySelector('.delete-filters') as HTMLButtonElement
+  const filterPills = document.querySelectorAll('.filter-pill')
+  const projectItems = document.querySelectorAll('.project-item')
+  const deleteFiltersBtn = document.querySelector('.delete-filters')
 
-  // Track active filters
-  let activeFilters = new Set<string>()
+  // Track active filters using a Set for O(1) lookup efficiency
+  let activeFilters = new Set()
 
-  // Add click handlers to filter pills
+  // Add keyboard support and click handlers to filter pills
   filterPills.forEach(pill => {
+    pill.setAttribute('tabindex', '0')
+    pill.setAttribute('aria-pressed', 'false')
+
+    // Keyboard support
+    pill.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        pill.click()
+      }
+    })
+
     pill.addEventListener('click', () => {
       const serviceId = pill.getAttribute('data-service')
 
@@ -206,42 +230,76 @@ const getProjectSlug = (slug: any) => {
       // Toggle active state
       if (pill.classList.contains('active')) {
         pill.classList.remove('active')
+        pill.setAttribute('aria-pressed', 'false')
         activeFilters.delete(serviceId)
       } else {
         pill.classList.add('active')
+        pill.setAttribute('aria-pressed', 'true')
         activeFilters.add(serviceId)
       }
 
-      // Filter projects
+      // Filter projects efficiently
       projectItems.forEach((item) => {
         if (activeFilters.size === 0) {
           // No filters active, show all
           item.style.display = 'block'
         } else {
           // Check if project has any of the active service filters
-          const itemServices = item.getAttribute('data-services')?.split(',') || []
+          const itemServicesStr = item.getAttribute('data-services') || ''
+          const itemServices = itemServicesStr ? itemServicesStr.split(',').filter(s => s) : []
+
+          // Using .some() for efficiency - stops at first match
           const hasActiveService = itemServices.some(service => activeFilters.has(service))
           item.style.display = hasActiveService ? 'block' : 'none'
         }
       })
+
+      // Announce filter results to screen readers
+      announceFilterResults()
     })
   })
+
+  // Create live region for screen reader announcements
+  const liveRegion = document.createElement('div')
+  liveRegion.setAttribute('role', 'status')
+  liveRegion.setAttribute('aria-live', 'polite')
+  liveRegion.setAttribute('aria-atomic', 'true')
+  liveRegion.classList.add('sr-only')
+  document.body.appendChild(liveRegion)
+
+  // Function to announce filter results
+  function announceFilterResults() {
+    const visibleCount = [...projectItems].filter((item) => item.style.display !== 'none').length
+    const filterCount = activeFilters.size
+
+    if (filterCount > 0) {
+      liveRegion.textContent = t.screenReaderAnnouncements.filtersActive(filterCount, visibleCount)
+    } else {
+      liveRegion.textContent = t.screenReaderAnnouncements.allProjectsShowing(visibleCount)
+    }
+  }
 
   // Delete filters button
   if (deleteFiltersBtn) {
     deleteFiltersBtn.addEventListener('click', () => {
       // Clear all filters
-      filterPills.forEach(p => p.classList.remove('active'))
+      filterPills.forEach(p => {
+        p.classList.remove('active')
+        p.setAttribute('aria-pressed', 'false')
+      })
       activeFilters.clear()
 
       // Show all projects
       projectItems.forEach(item => {
         item.style.display = 'block'
       })
+
+      // Announce that filters have been cleared
+      announceFilterResults()
     })
   }
-
-  // Drag to scroll functionality
+</script>
+<script>
   const filterNav = document.querySelector('.projects-nav-filter') as HTMLElement
 
   if (filterNav) {
@@ -270,7 +328,7 @@ const getProjectSlug = (slug: any) => {
       if (!isDown) return
       e.preventDefault()
       const x = e.pageX - filterNav.offsetLeft
-      const walk = (x - startX) * 2
+      const walk = (x - startX) * 2 // Scroll speed multiplier
       filterNav.scrollLeft = scrollLeft - walk
     })
 

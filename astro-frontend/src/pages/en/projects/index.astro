@@ -3,10 +3,10 @@ import ProjectsPageLayout from '@/layouts/ProjectsPageLayout.astro'
 import { fetchProjectsByLocale } from '@/shared/lib/sanity/queries/projectQueries'
 import { fetchServicesByLocale } from '@/shared/lib/sanity/queries/serviceQueries'
 
-// This is the root index.astro file (Catalan)
-const locale = 'ca'
+// This is the English projects page
+const locale = 'en'
 
-// Fetch all projects and services for Catalan
+// Fetch all projects and services for English
 const projects = await fetchProjectsByLocale(locale)
 const services = await fetchServicesByLocale(locale)
 ---
