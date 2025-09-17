@@ -150,12 +150,12 @@ export const projects = defineType({
     defineField({
       name: 'mainImage',
       title: 'Main Project Image',
-      description: 'Main project image - appears prominently on the project page',
+      description: 'Main project image - appears prominently on the project page (REQUIRED)',
       type: 'image',
       options: {
         hotspot: true,
       },
-      // No validation - main image is now optional
+      validation: (Rule) => Rule.required().error('Main image is required for all projects'),
     }),
     defineField({
       name: 'useSeparateThumbnail',
@@ -174,6 +174,30 @@ export const projects = defineType({
       },
       hidden: ({parent}) => !parent?.useSeparateThumbnail,
       // No validation
+    }),
+    defineField({
+      name: 'hoverColor',
+      title: 'Hover Color',
+      description: 'Background color when hovering over the project',
+      type: 'color',
+      options: {
+        disableAlpha: true,
+      },
+      initialValue: {
+        hex: '#63b2d5',
+      },
+    }),
+    defineField({
+      name: 'textHoverColor',
+      title: 'Text Hover Color',
+      description: 'Text color when hovering over the project',
+      type: 'color',
+      options: {
+        disableAlpha: true,
+      },
+      initialValue: {
+        hex: '#ffffff',
+      },
     }),
     defineField({
       name: 'slug',

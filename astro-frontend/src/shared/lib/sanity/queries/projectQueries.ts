@@ -215,6 +215,8 @@ export async function fetchProjectsByLocale(
         asset->
       },
       useSeparateThumbnail,
+      hoverColor { hex },
+      textHoverColor { hex },
       clients[]-> {
         _id,
         name

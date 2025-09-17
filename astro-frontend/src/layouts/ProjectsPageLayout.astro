@@ -69,7 +69,8 @@ const getProjectSlug = (slug: any) => {
                   title={project.title}
                   imageUrl={getImageUrl(project)}
                   slug={getProjectUrl(getProjectSlug(project.slug), locale)}
-                  hoverColor={"#63b2d5"}
+                  hoverColor={project.hoverColor?.hex || "#63b2d5"}
+                  textHoverColor={project.textHoverColor?.hex || "#ffffff"}
                   clients={project.clients?.map((c: any) => c.name).join(', ') || ''}
                   viewProjectText={t.viewProject}
                   projectId={project._id}

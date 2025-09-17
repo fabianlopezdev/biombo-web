@@ -106,6 +106,8 @@ export const projectSchema = z.object({
   excerpt: z.array(z.any()).nullable().optional(), // Added nullable
   description: z.array(z.any()).nullable().optional(), // Added nullable
   mainText: z.array(z.any()).nullable().optional(), // Added mainText field
+  hoverColor: z.object({ hex: z.string() }).nullable().optional(), // Added hover color
+  textHoverColor: z.object({ hex: z.string() }).nullable().optional(), // Added text hover color
   clients: z
     .array(z.object({
       _id: z.string(),

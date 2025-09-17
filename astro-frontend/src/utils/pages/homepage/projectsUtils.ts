@@ -61,19 +61,21 @@ export function transformProject(
   let mainImageUrl: string | undefined
   let chosenImageSource: 'thumbnail' | 'main' | undefined
 
+  // Check if project uses separate thumbnail flag
+  const useSeparateThumbnail = projectDoc.useSeparateThumbnail === true
+
+  // Extract thumbnail URL if it exists
   if (projectDoc.thumbnailImage?.asset?.url) {
     thumbnailUrl = projectDoc.thumbnailImage.asset.url
-  } else {
-    // No thumbnail URL found
   }
 
+  // Extract main image URL if it exists
   if (projectDoc.mainImage?.asset?.url) {
     mainImageUrl = projectDoc.mainImage.asset.url
-  } else {
-    // No main image URL found
   }
 
-  // Use thumbnailImage if available, otherwise use mainImage
+  // HOMEPAGE LOGIC: Always prefer thumbnail if it exists, regardless of the flag
+  // The useSeparateThumbnail flag is only for controlling whether to show the thumbnail field in Sanity
   const imageUrlToUse = thumbnailUrl || mainImageUrl
   if (thumbnailUrl) {
     chosenImageSource = 'thumbnail'
@@ -178,8 +180,8 @@ export function transformProject(
     title,
     clients,
     viewProjectText: viewProjectTextValue,
-    hoverColor: featuredItem.hoverColor?.hex,
-    textHoverColor: featuredItem.textHoverColor?.hex,
+    hoverColor: projectDoc.hoverColor?.hex,
+    textHoverColor: projectDoc.textHoverColor?.hex,
   }
 
   return result

@@ -108,8 +108,6 @@ const colorValueSchema = z
 // Define Zod schema for an individual featured project item
 export const featuredProjectItemSchema = z.object({
   _key: z.string(),
-  hoverColor: colorValueSchema,
-  textHoverColor: colorValueSchema,
   project: projectSchema, // This is the dereferenced project document
 })
 

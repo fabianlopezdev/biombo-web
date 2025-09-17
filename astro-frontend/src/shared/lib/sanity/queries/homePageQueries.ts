@@ -14,8 +14,6 @@ const HOME_PAGE_FIELDS = `
     ...,
     featuredProjects[] {
       _key,
-      hoverColor { hex },
-      textHoverColor { hex },
       project -> {
         _id,
         _type,
@@ -31,6 +29,8 @@ const HOME_PAGE_FIELDS = `
           ...,
           asset->
         },
+        hoverColor { hex },
+        textHoverColor { hex },
         excerpt,
         description,
         clients[]->{ name },

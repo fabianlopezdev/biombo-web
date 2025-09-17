@@ -40,6 +40,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
       // Debug log before transformation
       const rawItem = rawFeaturedProjects[i] // rawItem is now FeaturedProjectItem | undefined
       const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
+
       // Add a class for odd/even styling if needed, or handle directly in CSS
       const projectNumber = i + 1
       const directionClass = projectNumber % 2 !== 0 ? 'reveal-from-top' : 'reveal-from-bottom'
@@ -199,7 +200,7 @@ inferSize
     .project-caption {
       position: absolute;
       inset: 0;
-      /* background will be set by specific project styles */
+      background: var(--hover-bg-color, transparent);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -210,7 +211,7 @@ inferSize
         opacity 0.5s ease,
         transform 0.5s ease;
       pointer-events: none;
-      color: #fff;
+      color: var(--hover-text-color, #fff);
       font-size: 2.375rem;
       text-align: center;
       .caption-text {
@@ -235,33 +236,21 @@ inferSize
     grid-column: var(--column-size-project-1);
     grid-row: var(--row-size-project-1);
   }
-  .project-1 .project-caption {
-    background: var(--color-project-1);
-  }
   .project-2 {
     background: var(--color-project-2);
     grid-column: var(--column-size-project-2);
     grid-row: var(--row-size-project-2);
     margin-block-end: var(--margin-bottom);
   }
-  .project-2 .project-caption {
-    background: var(--color-project-2);
-  }
   .project-3 {
     background: var(--color-project-3);
     grid-column: var(--column-size-project-3);
     grid-row: var(--row-size-project-3);
   }
-  .project-3 .project-caption {
-    background: var(--color-project-3);
-  }
   .project-4 {
     background: var(--color-project-4);
     grid-column: var(--column-size-project-4);
     grid-row: var(--row-size-project-4);
-  }
-  .project-4 .project-caption {
-    background: var(--color-project-4);
   }
   .project-5 {
     background: var(--color-project-5);
@@ -269,16 +258,10 @@ inferSize
     grid-row: var(--row-size-project-5);
     margin-block-end: var(--margin-bottom);
   }
-  .project-5 .project-caption {
-    background: var(--color-project-5);
-  }
   .project-6 {
     background: var(--color-project-6);
     grid-column: var(--column-size-project-6);
     grid-row: var(--row-size-project-6);
-  }
-  .project-6 .project-caption {
-    background: var(--color-project-6);
   }
   .projects-view-all {
     grid-row: var(--row-top-limit) / span 3;

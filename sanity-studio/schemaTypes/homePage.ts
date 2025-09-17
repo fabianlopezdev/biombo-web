@@ -176,22 +176,6 @@ export const projectsSection = defineType({
               },
               validation: (Rule) => Rule.required(),
             },
-            {
-              name: 'hoverColor',
-              title: 'Hover Color',
-              type: 'color',
-              options: {
-                disableAlpha: true,
-              },
-            },
-            {
-              name: 'textHoverColor',
-              title: 'Text Hover Color',
-              type: 'color',
-              options: {
-                disableAlpha: true,
-              },
-            },
           ],
           preview: {
             select: {
@@ -200,23 +184,23 @@ export const projectsSection = defineType({
               // Corrected paths to select the actual title and slug string.
               actualProjectTitle: 'project.title',
               projectSlugString: 'project.slug.current',
-              hoverColorValue: 'hoverColor.hex',
-              textHoverColorValue: 'textHoverColor.hex',
+              projectHoverColor: 'project.hoverColor.hex',
+              projectTextHoverColor: 'project.textHoverColor.hex',
               media: 'project.mainImage', // This was working correctly
             },
             prepare({
               actualProjectTitle,
               projectSlugString,
-              hoverColorValue,
-              textHoverColorValue,
+              projectHoverColor,
+              projectTextHoverColor,
               media,
             }) {
               // Rationale for fix: Use the directly selected project title, then slug string, then default text.
               const title = actualProjectTitle || projectSlugString || 'No project selected'
               let subtitles = []
-              if (hoverColorValue) subtitles.push(`Hover: ${hoverColorValue}`)
-              if (textHoverColorValue) subtitles.push(`Text Hover: ${textHoverColorValue}`)
-              const subtitle = subtitles.length > 0 ? subtitles.join(' | ') : 'No colors set'
+              if (projectHoverColor) subtitles.push(`Hover: ${projectHoverColor}`)
+              if (projectTextHoverColor) subtitles.push(`Text: ${projectTextHoverColor}`)
+              const subtitle = subtitles.length > 0 ? subtitles.join(' | ') : 'Project selected'
               return {
                 title: title,
                 subtitle: subtitle,
