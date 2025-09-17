@@ -74,8 +74,9 @@ export function transformProject(
     mainImageUrl = projectDoc.mainImage.asset.url
   }
 
-  // HOMEPAGE LOGIC: Always prefer thumbnail if it exists, regardless of the flag
-  // The useSeparateThumbnail flag is only for controlling whether to show the thumbnail field in Sanity
+  // IMAGE SELECTION FOR CARD DISPLAYS: Always prefer thumbnail if it exists
+  // Thumbnail is for cards/grids, main image is for project detail pages
+  // The useSeparateThumbnail flag is ONLY for Sanity UI, not for frontend display logic
   const imageUrlToUse = thumbnailUrl || mainImageUrl
   if (thumbnailUrl) {
     chosenImageSource = 'thumbnail'

@@ -15,7 +15,9 @@ const t = projectsTranslations[locale]
 
 // Helper function to get image URL
 const getImageUrl = (project: any) => {
-  if (project.useSeparateThumbnail && project.thumbnailImage?.asset?.url) {
+  // Always prefer thumbnail if it exists, regardless of useSeparateThumbnail flag
+  // The flag is only for Sanity UI, not for frontend display logic
+  if (project.thumbnailImage?.asset?.url) {
     return project.thumbnailImage.asset.url
   }
   return project.mainImage?.asset?.url || '/projects-mock.jpg'
