@@ -66,18 +66,16 @@ const getProjectSlug = (slug: any) => {
                 return s?._id || s?._ref || ''
               }).filter(Boolean).join(',') || ''}
             >
-              <article aria-labelledby={`project-${project._id}-title`}>
-                <ProjectCard
-                  title={project.title}
-                  imageUrl={getImageUrl(project)}
-                  slug={getProjectUrl(getProjectSlug(project.slug), locale)}
-                  hoverColor={project.hoverColor?.hex || "#63b2d5"}
-                  textHoverColor={project.textHoverColor?.hex || "#ffffff"}
-                  clients={project.clients?.map((c: any) => c.name).join(', ') || ''}
-                  viewProjectText={t.viewProject}
-                  projectId={project._id}
-                />
-              </article>
+              <ProjectCard
+                title={project.title}
+                imageUrl={getImageUrl(project)}
+                slug={getProjectUrl(getProjectSlug(project.slug), locale)}
+                hoverColor={project.hoverColor?.hex || "#63b2d5"}
+                textHoverColor={project.textHoverColor?.hex || "#ffffff"}
+                clients={project.clients?.map((c: any) => c.name).join(', ') || ''}
+                viewProjectText={t.viewProject}
+                projectId={project._id}
+              />
             </li>
           ))
         ) : (
@@ -150,7 +148,7 @@ const getProjectSlug = (slug: any) => {
   }
 
   .project-item {
- aspect-ratio: 3/4;
+    aspect-ratio: 3/4;
     display: block; /* Override default list-item display to fix grid layout */
     height: clamp(25.375rem, -2.75rem + 41.705vi, 36.688rem);
   }

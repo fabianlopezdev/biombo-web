@@ -1,6 +1,5 @@
 ---
 import CustomCursor from '@/components/pages/homepage/CustomCursor.astro'
-import ProjectMobileInfo from '@/components/shared/ProjectMobileInfo.astro'
 
 interface Props {
   title: string
@@ -34,23 +33,43 @@ const project = {
   hoverColor,
   textHoverColor,
 }
+
+// Generate unique IDs for ARIA relationships
+const mobileInfoId = projectId ? `project-${projectId}-mobile-info` : undefined
+const imageId = projectId ? `project-${projectId}-image` : undefined
 ---
 
-<figure
+<article
   class={`project project-card ${className}`}
   style={`--hover-bg-color: ${hoverColor}; --hover-text-color: ${textHoverColor};`}
 >
-  <a href={`/projectes/${slug}`} class="project-link" aria-label={`${title} - Veure detalls del projecte`}>
-    <img src={imageUrl} alt={`${title} - Imatge representativa del projecte`} class="project-image" loading="lazy" />
-    <div class="project-caption">
-      <figcaption class="caption-text">
-        <span id={projectId ? `project-${projectId}-title` : undefined}>{title}</span>
+  <a
+    href={`/projectes/${slug}`}
+    class="project-link"
+    aria-label={`${title}${clients ? ` - ${clients}` : ''} - Veure detalls del projecte`}
+  >
+    <figure class="project-figure">
+      <img
+        id={imageId}
+        src={imageUrl}
+        alt={imageAlt}
+        class="project-image"
+        loading="lazy"
+        aria-describedby={mobileInfoId}
+      />
+      <figcaption class="project-caption">
+        <span class="caption-text" id={projectId ? `project-${projectId}-title` : undefined}>
+          {title}
+        </span>
       </figcaption>
+    </figure>
+    <div class="project-mobile-info" id={mobileInfoId} aria-hidden="false">
+      <h3 class="project-mobile-title">{title}</h3>
+      {clients && <p class="project-mobile-subtitle">{clients}</p>}
     </div>
   </a>
-  <ProjectMobileInfo {title} subtitle={clients} />
   <CustomCursor {project} viewProjectTextVal={viewProjectText} />
-</figure>
+</article>
 
 <style>
   .project-card {
@@ -71,7 +90,7 @@ const project = {
     text-decoration: none;
     color: inherit;
 
-    &:focus-visible .project-caption {
+    &:focus-visible {
       outline: 0.25rem solid var(--color-secondary);
       outline-offset: -0.25rem;
       border-radius: inherit;
@@ -85,11 +104,24 @@ const project = {
     }
   }
 
+  .project-figure {
+    position: relative;
+    margin: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    height: 100%;
+  }
+
   .project-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+
+  /* Mobile info - hidden on desktop */
+  .project-mobile-info {
+    display: none;
   }
 
   .project-caption {
@@ -132,14 +164,20 @@ const project = {
 
   @media (max-width: 991px) {
     .project-card {
-      display: flex;
-      flex-direction: column;
-      gap: 1.125rem;
       height: auto; /* Reset height on mobile */
     }
 
     .project-link {
+      display: flex;
+      flex-direction: column;
+      gap: 1.125rem;
       height: auto; /* Reset height on mobile */
+      overflow: visible; /* Allow mobile info to show */
+    }
+
+    .project-figure {
+      height: auto;
+      border-radius: 0.621875rem;
     }
 
     .project-caption {
@@ -147,9 +185,32 @@ const project = {
     }
 
     .project-image {
-      height: clamp(24.063rem, 19.678rem + 17.988vi, 36.688rem);
+      aspect-ratio: 318 / 386;
       width: 100%;
       object-fit: cover;
+      border-radius: inherit;
+    }
+
+    /* Show mobile info on mobile */
+    .project-mobile-info {
+      display: block;
+      padding-inline: 0;
+    }
+
+    .project-mobile-title {
+      font-size: 1.25rem;
+      font-weight: var(--font-weight-regular);
+      padding-block-end: 0.6875rem;
+      margin: 0;
+      color: inherit;
+    }
+
+    .project-mobile-subtitle {
+      font-size: 1rem;
+      font-weight: var(--font-weight-light);
+      line-height: 1;
+      margin: 0;
+      color: inherit;
     }
   }
 
