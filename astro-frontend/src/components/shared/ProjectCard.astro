@@ -76,26 +76,25 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
     --cursor-size: 8.5625rem;
     position: relative;
     height: 100%;
-    border-radius: 0.621875rem;
     overflow: hidden;
   }
-
+  
   .project-link {
     display: block;
     width: 100%;
     height: 100%;
-    border-radius: inherit;
+    /* border-radius: inherit; */
     overflow: hidden;
     position: relative;
     text-decoration: none;
     color: inherit;
-
+    
     &:focus-visible {
       outline: 0.25rem solid var(--color-secondary);
       outline-offset: -0.25rem;
       border-radius: inherit;
     }
-
+    
     /* Only hide cursor on devices that truly support hover (desktop) */
     @media (hover: hover) and (pointer: fine) {
       &:hover {
@@ -103,11 +102,12 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
       }
     }
   }
-
+  
   .project-figure {
     position: relative;
     margin: 0;
-    border-radius: inherit;
+    border-radius: 0.621875rem;
+    /* border-radius: inherit; */
     overflow: hidden;
     height: 100%;
   }
