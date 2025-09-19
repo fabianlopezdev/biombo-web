@@ -7,7 +7,6 @@ import type { PortableTextBlock } from '@portabletext/types'
 import {
   fetchProjectBySlug,
   fetchProjectsByLocale,
-  fetchSimilarProjects,
 } from '@/shared/lib/sanity/queries/projectQueries'
 
 export const prerender = true
@@ -35,8 +34,45 @@ if (!project) {
   return Astro.redirect('/404')
 }
 
-// Fetch similar projects
-const similarProjects = await fetchSimilarProjects(project._id, locale, 4)
+// Helper function to get similar projects based on shared services
+function getSimilarProjects(currentProject: any, allProjects: any[], limit: number = 4) {
+  // Create Set of current project's service IDs for O(1) lookup
+  const currentServiceIds = new Set(currentProject.services?.map((s: any) => s._id) || [])
+
+  if (currentServiceIds.size === 0) {
+    // No services to compare, return random projects
+    return allProjects.filter((p) => p._id !== currentProject._id).slice(0, limit)
+  }
+
+  // Calculate shared services for each project
+  const projectsWithScore = allProjects
+    .filter((p) => p._id !== currentProject._id) // Exclude current
+    .map((project) => {
+      const sharedCount =
+        project.services?.filter((service: any) => currentServiceIds.has(service._id)).length || 0
+
+      return { project, sharedCount }
+    })
+    .filter((item) => item.sharedCount > 0) // Only projects with shared services
+
+  // Sort by: 1) shared services (desc), 2) title (asc)
+  projectsWithScore.sort((a, b) => {
+    if (a.sharedCount !== b.sharedCount) {
+      return b.sharedCount - a.sharedCount // More services first
+    }
+    // Same service count, sort alphabetically
+    return a.project.title.localeCompare(b.project.title)
+  })
+
+  // Return just the projects (not the scores)
+  return projectsWithScore.slice(0, limit).map((item) => item.project)
+}
+
+// Fetch all projects in the same locale for similarity calculation
+const allProjects = await fetchProjectsByLocale(locale)
+
+// Calculate similar projects based on shared services
+const similarProjects = allProjects ? getSimilarProjects(project, allProjects, 4) : null
 
 // Helper function to convert portable text to HTML
 function portableTextToHtml(content: PortableTextBlock[] | undefined): string {

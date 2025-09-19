@@ -244,55 +244,6 @@ export async function fetchAllProjects(): Promise<Projects | null> {
 }
 
 /**
- * Fetches similar projects (excluding the current one)
- * @param currentProjectId - The ID of the current project to exclude
- * @param locale - The locale to fetch projects for
- * @param limit - Maximum number of projects to return (defaults to 4)
- * @returns Array of similar projects or null if none found
- */
-export async function fetchSimilarProjects(
-  currentProjectId: string,
-  locale: 'ca' | 'es' | 'en',
-  limit: number = 4,
-): Promise<Projects | null> {
-  try {
-    // Query for projects in the same locale, excluding the current one
-    const query = `*[_type == "project" && language == $locale && _id != $currentId][0...$limit] {
-      _id,
-      _type,
-      title,
-      slug,
-      mainImage {
-        ...,
-        asset->
-      },
-      thumbnailImage {
-        ...,
-        asset->
-      },
-      useSeparateThumbnail,
-      clients[]-> {
-        _id,
-        name
-      }
-    }`
-
-    const params = { locale, currentId: currentProjectId, limit }
-
-    // Try fetching with schema validation
-    const projects = await fetchSanityQuery({
-      query,
-      params,
-      schema: projectsSchema,
-    })
-
-    return projects
-  } catch {
-    return null
-  }
-}
-
-/**
  * Fetches all projects for a specific locale
  * @param locale - The locale to fetch projects for
  * @returns Array of projects for the specified locale or null if none found
