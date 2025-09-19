@@ -8,7 +8,7 @@ import { projects, imageSection, textBlock } from './projects'
 import { siteSettings } from './siteSettings'
 import { projectsPage } from './projectsPage'
 import { servicesPage } from './servicesPage'
-import { aboutUsPage } from './aboutUsPage'
+import { aboutUsPage, aboutSlider } from './aboutUsPage'
 import { contactPage } from './contactPage'
 import { service } from './service'
 import { client } from './client'
@@ -37,6 +37,7 @@ export const schemaTypes = [
   projectsSection,
   aboutSection,
   servicesSection,
+  aboutSlider,
   imageSection,
   textBlock,
 ]

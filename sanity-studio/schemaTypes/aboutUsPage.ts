@@ -1,5 +1,61 @@
 import { defineField, defineType } from 'sanity'
 
+// Schema for the About Slider section
+export const aboutSlider = defineType({
+  name: 'aboutSlider',
+  title: 'About Slider',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Section Title',
+      type: 'string',
+      validation: (Rule) => Rule.required().error('The section title is required.'),
+    }),
+    defineField({
+      name: 'description',
+      title: 'Descriptive Paragraph',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+        },
+      ],
+      validation: (Rule) => Rule.required().error('The descriptive paragraph is required.'),
+    }),
+    defineField({
+      name: 'images',
+      title: 'Images to Display',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: {
+            hotspot: true,
+          },
+        },
+      ],
+      validation: (Rule) =>
+        Rule.required()
+          .min(1)
+          .error('At least one image is required for the slider.'),
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      media: 'images.0.asset',
+    },
+    prepare({title, media}) {
+      return {
+        title: title || 'About Slider',
+        subtitle: title ? 'About Slider Content' : 'No title set',
+        media: media,
+      }
+    },
+  },
+})
+
 export const aboutUsPage = defineType({
   name: 'aboutUsPage',
   title: 'About Us Page',
@@ -19,11 +75,17 @@ export const aboutUsPage = defineType({
       validation: (Rule) => Rule.required().error('A title is required'),
     }),
     defineField({
-      name: 'mainContent',
-      title: 'Main Content',
+      name: 'description',
+      title: 'Description',
       type: 'array',
       of: [{type: 'block'}],
-      validation: (Rule) => Rule.required().error('Main content is required'),
+      validation: (Rule) => Rule.required().error('Description is required'),
+    }),
+    defineField({
+      name: 'aboutSlider',
+      title: 'About Slider',
+      type: 'aboutSlider',
+      description: 'Content section with title, description, and image slider',
     }),
   ],
   preview: {

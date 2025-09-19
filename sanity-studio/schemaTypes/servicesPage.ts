@@ -1,4 +1,4 @@
-import { defineField, defineType } from 'sanity'
+import { defineField, defineType, ReferenceFilterResolverContext } from 'sanity'
 
 export const servicesPage = defineType({
   name: 'servicesPage',
@@ -19,11 +19,54 @@ export const servicesPage = defineType({
       validation: (Rule) => Rule.required().error('A title is required'),
     }),
     defineField({
-      name: 'mainContent',
-      title: 'Main Content',
+      name: 'description',
+      title: 'Description',
       type: 'array',
       of: [{type: 'block'}],
-      validation: (Rule) => Rule.required().error('Main content is required'),
+      validation: (Rule) => Rule.required().error('Description is required'),
+    }),
+    defineField({
+      name: 'selectedServices',
+      title: 'Select Services',
+      description: 'Pick and order the services to display on the services page',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'service'}],
+          options: {
+            // Filter by the language of the Services Page document
+            // and exclude already selected services to avoid duplicates
+            filter: ({document, parent}: ReferenceFilterResolverContext) => {
+              const servicesPageDoc = document as any
+              const language = servicesPageDoc?.language
+              const alreadySelected = Array.isArray(parent)
+                ? parent.map((item: any) => item?._ref).filter(Boolean)
+                : []
+
+              const filterParts = ['_type == "service"']
+              const params: {language?: string; selected?: string[]} = {}
+
+              if (language) {
+                filterParts.push('language == $language')
+                params.language = language
+              }
+
+              if (alreadySelected.length > 0) {
+                filterParts.push('!(_id in $selected)')
+                params.selected = alreadySelected
+              }
+
+              return {
+                filter: filterParts.join(' && '),
+                params,
+              }
+            },
+            noResultsText:
+              'No services for this language. Create new services or change the language.',
+          },
+        },
+      ],
     }),
   ],
   preview: {
