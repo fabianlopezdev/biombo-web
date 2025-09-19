@@ -243,7 +243,7 @@ const isTouchDevice = () => {
 
 // Only initialize custom cursor on non-touch devices
 if (!isTouchDevice()) {
-  document.querySelectorAll<HTMLElement>('.project').forEach(initProject)
+  document.querySelectorAll<HTMLElement>('.project, .project-card').forEach(initProject)
 
   /* cleanup on page hide (browser back-nav, hot-reload etc.) */
   window.addEventListener(

@@ -2,6 +2,7 @@
 import ProjectLayout from '@/layouts/ProjectLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
 import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
+import ProjectCard from '@/components/shared/ProjectCard.astro'
 import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
 import type { PortableTextBlock } from '@portabletext/types'
 import {
@@ -319,26 +320,16 @@ const getImageSectionLayout = (section: any) => {
                 : similarProject.mainImage
             return (
               <li class="similar-project-item">
-                <article>
-                  <a href={`/projectes/${similarProject.slug.current}`}>
-                    <figure class="similar-project-image-wrapper">
-                      <img
-                        class="similar-project-image"
-                        src={getImageUrl(thumbnailImage)}
-                        alt={`Projecte: ${similarProject.title}`}
-                        loading="lazy"
-                      />
-                    </figure>
-                    <header>
-                      <h3 class="similar-project-title">{similarProject.title}</h3>
-                      {similarProject.clients && similarProject.clients.length > 0 && (
-                        <p class="similar-project-client">
-                          {similarProject.clients.map((client: any) => client.name).join(', ')}
-                        </p>
-                      )}
-                    </header>
-                  </a>
-                </article>
+                <ProjectCard
+                  title={similarProject.title}
+                  imageUrl={getImageUrl(thumbnailImage)}
+                  slug={`/projectes/${similarProject.slug.current}`}
+                  hoverColor={similarProject.hoverColor?.hex || '#272727'}
+                  textHoverColor={similarProject.textHoverColor?.hex || '#fff'}
+                  viewProjectText="Veure projecte"
+                  clients={similarProject.clients?.map((client: any) => client.name).join(', ')}
+                  projectId={similarProject._id}
+                />
               </li>
             )
           })}
@@ -347,6 +338,8 @@ const getImageSectionLayout = (section: any) => {
     )
   }
 </ProjectLayout>
+
+<script src="@/scripts/pages/homepage/customCursor.ts"></script>
 
 <style>
   .mobile {
@@ -464,40 +457,7 @@ const getImageSectionLayout = (section: any) => {
     flex: 1;
   }
 
-  .similar-project-item article {
-    height: 100%;
-  }
-
-  .similar-project-item a {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-  }
-
-  .similar-project-image-wrapper {
-    aspect-ratio: 3/4;
-    background-color: green;
-    border-radius: 0.62rem;
-    overflow: hidden;
-  }
-
-  .similar-project-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .similar-project-title {
-    font-size: 1.25rem;
-    font-weight: var(--font-weight-regular);
-    line-height: 1.2;
-    padding-block-end: 0.5rem;
-  }
-
-  .similar-project-client {
-    font-size: 1rem;
-    line-height: 1.375;
-  }
+  /* ProjectCard handles its own styles internally */
 
   .services-container-mobile {
     padding-block-start: 2.3125rem;
@@ -570,9 +530,6 @@ const getImageSectionLayout = (section: any) => {
       gap: 1rem;
     }
 
-    .similar-project-image-wrapper {
-      aspect-ratio: 152/183;
-      margin-block-end: 1.125rem;
-    }
+    /* Mobile styles handled by ProjectCard component */
   }
 </style>
