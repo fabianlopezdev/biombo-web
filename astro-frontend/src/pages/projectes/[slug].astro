@@ -13,20 +13,8 @@ import {
 export const prerender = true
 
 export async function getStaticPaths() {
-  console.log('=== FETCHING CATALAN PROJECTS FOR STATIC PATHS ===')
-
   // Only fetch Catalan projects for this route
   const projectsCa = (await fetchProjectsByLocale('ca')) || []
-
-  console.log('Catalan projects found:', projectsCa.length)
-  console.log(
-    'Catalan projects:',
-    projectsCa.map((p) => ({
-      title: p.title,
-      slug: p.slug.current,
-      language: p.language,
-    })),
-  )
 
   const paths = projectsCa.map((project) => ({
     params: { slug: project.slug.current },
@@ -35,69 +23,20 @@ export async function getStaticPaths() {
     },
   }))
 
-  console.log(
-    'Generated paths:',
-    paths.map((p) => p.params.slug),
-  )
-
   return paths
 }
 
 const { projectSlug } = Astro.props
 const locale = 'ca' // Always Catalan for this route
 
-console.log('=== RENDERING PROJECT PAGE ===')
-console.log('Project slug:', projectSlug)
-console.log('Locale:', locale)
-
 const project = await fetchProjectBySlug(projectSlug, locale)
 
-console.log(
-  'Fetched project:',
-  project
-    ? {
-        title: project.title,
-        _id: project._id,
-        language: project.language,
-        contentSections: project.contentSections?.length || 0,
-      }
-    : null,
-)
-
 if (!project) {
-  console.error('Project not found, redirecting to 404')
   return Astro.redirect('/404')
 }
 
-console.log(
-  'Content sections:',
-  project.contentSections?.map((section: any) => ({
-    type: section._type,
-    ...(section._type === 'imageSection'
-      ? {
-          featuredImage: !!section.featuredImage,
-          otherImages: section.otherImages?.length || 0,
-        }
-      : {}),
-    ...(section._type === 'textBlock'
-      ? {
-          hasText: !!section.text,
-        }
-      : {}),
-  })),
-)
-
 // Fetch similar projects
 const similarProjects = await fetchSimilarProjects(project._id, locale, 4)
-
-console.log('Similar projects found:', similarProjects?.length || 0)
-console.log(
-  'Similar projects:',
-  similarProjects?.map((p: any) => ({
-    title: p.title,
-    slug: p.slug.current,
-  })),
-)
 
 // Helper function to convert portable text to HTML
 function portableTextToHtml(content: PortableTextBlock[] | undefined): string {
@@ -188,13 +127,17 @@ const getImageSectionLayout = (section: any) => {
 
     {/* Dynamic content sections */}
     {
-      project.contentSections?.map((section: any) => {
+      project.contentSections?.map((section: any, index: number) => {
+        const isLastSection = index === project.contentSections.length - 1
+
         if (section._type === 'textBlock') {
           return (
-            <blockquote
-              class="standalone-text project-copy highlight-quote"
-              set:html={portableTextToHtml(section.text)}
-            />
+            <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+              <blockquote
+                class="standalone-text project-copy highlight-quote"
+                set:html={portableTextToHtml(section.text)}
+              />
+            </div>
           )
         }
 
@@ -204,66 +147,100 @@ const getImageSectionLayout = (section: any) => {
           // 1 image layout - full width (like the standalone image)
           if (layout.totalImages === 1) {
             return (
-              <figure class="red-background standalone-image">
-                <img
-                  src={getImageUrl(
-                    layout.hasFeatured ? section.featuredImage : layout.otherImages[0],
-                  )}
-                  alt="Imatge destacada del projecte"
-                  loading="lazy"
-                />
-              </figure>
+              <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+                <figure class="red-background standalone-image">
+                  <img
+                    src={getImageUrl(
+                      layout.hasFeatured ? section.featuredImage : layout.otherImages[0],
+                    )}
+                    alt="Imatge destacada del projecte"
+                    loading="lazy"
+                  />
+                </figure>
+              </div>
             )
           }
 
           // 2 images layout - side by side (two columns only)
           if (layout.totalImages === 2) {
             return (
-              <div class="two-image-layout gallery">
-                <div class="two-columns">
-                  {layout.otherImages.map((img: any) => (
-                    <figure class="red-background">
-                      <img src={getImageUrl(img)} alt="Imatge del projecte" loading="lazy" />
-                    </figure>
-                  ))}
+              <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+                <div class="two-image-layout gallery">
+                  <div class="two-columns">
+                    {layout.otherImages.map((img: any) => (
+                      <figure class="red-background">
+                        <img src={getImageUrl(img)} alt="Imatge del projecte" loading="lazy" />
+                      </figure>
+                    ))}
+                  </div>
                 </div>
               </div>
             )
           }
 
-          // 3 images layout - three in a row (three columns only)
+          // 3 images layout - depends on whether there's a featured image
           if (layout.totalImages === 3) {
-            return (
-              <div class="three-image-layout gallery">
-                <div class="three-columns">
-                  {layout.otherImages.map((img: any) => (
-                    <figure class="blue-background">
-                      <img src={getImageUrl(img)} alt="Aplicació del projecte" loading="lazy" />
+            // If there's a featured image: 2 on top, featured below
+            if (layout.hasFeatured) {
+              return (
+                <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+                  <div class="two-image-layout gallery">
+                    <div class="two-columns">
+                      {layout.otherImages.map((img: any) => (
+                        <figure class="red-background">
+                          <img src={getImageUrl(img)} alt="Imatge del projecte" loading="lazy" />
+                        </figure>
+                      ))}
+                    </div>
+                    <figure class="red-background standalone-image-within">
+                      <img
+                        src={getImageUrl(section.featuredImage)}
+                        alt="Imatge destacada del projecte"
+                        loading="lazy"
+                      />
                     </figure>
-                  ))}
+                  </div>
                 </div>
-              </div>
-            )
+              )
+            }
+            // If no featured image: 3 in a row
+            else {
+              return (
+                <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+                  <div class="three-image-layout gallery">
+                    <div class="three-columns">
+                      {layout.otherImages.map((img: any) => (
+                        <figure class="blue-background">
+                          <img src={getImageUrl(img)} alt="Aplicació del projecte" loading="lazy" />
+                        </figure>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )
+            }
           }
 
           // 4 images layout - 3 on top, featured below
           if (layout.totalImages === 4) {
             return (
-              <div class="three-image-layout gallery">
-                <div class="three-columns">
-                  {layout.otherImages.map((img: any) => (
-                    <figure class="blue-background">
-                      <img src={getImageUrl(img)} alt="Aplicació del projecte" loading="lazy" />
-                    </figure>
-                  ))}
+              <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+                <div class="three-image-layout gallery">
+                  <div class="three-columns">
+                    {layout.otherImages.map((img: any) => (
+                      <figure class="blue-background">
+                        <img src={getImageUrl(img)} alt="Aplicació del projecte" loading="lazy" />
+                      </figure>
+                    ))}
+                  </div>
+                  <figure class="red-background standalone-image-within">
+                    <img
+                      src={getImageUrl(section.featuredImage)}
+                      alt="Imatge final del projecte"
+                      loading="lazy"
+                    />
+                  </figure>
                 </div>
-                <figure class="red-background standalone-image">
-                  <img
-                    src={getImageUrl(section.featuredImage)}
-                    alt="Imatge final del projecte"
-                    loading="lazy"
-                  />
-                </figure>
               </div>
             )
           }
@@ -410,13 +387,20 @@ const getImageSectionLayout = (section: any) => {
     object-fit: cover;
   }
 
+  .content-section.with-spacing {
+    margin-block-end: clamp(3.375rem, 2.246rem + 4.63vi, 6.625rem);
+  }
+
   .standalone-image {
+    aspect-ratio: 16/9;
+  }
+
+  .standalone-image-within {
     margin-block-start: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);
     aspect-ratio: 16/9;
   }
 
   .standalone-text {
-    padding-block: clamp(3.375rem, 2.246rem + 4.63vi, 6.625rem);
     padding-inline: calc(var(--padding-inline) + 2rem);
   }
 
@@ -499,6 +483,10 @@ const getImageSectionLayout = (section: any) => {
   }
 
   @media (width < 992px) {
+    .content-section.with-spacing {
+      margin-block-end: clamp(2rem, 1.5rem + 2vi, 3.5rem);
+    }
+
     .mobile {
       display: block;
     }
@@ -530,6 +518,10 @@ const getImageSectionLayout = (section: any) => {
 
     .standalone-text {
       padding-inline: 0rem;
+    }
+
+    .standalone-image-within {
+      margin-block-start: clamp(0.875rem, 0.75rem + 0.5vi, 1.25rem);
     }
 
     .similar-title {

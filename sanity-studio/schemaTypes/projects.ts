@@ -9,24 +9,12 @@ const imageSection = defineType({
   name: 'imageSection',
   title: 'Image Section',
   type: 'object',
-  description: `Image layouts:
-┌─────────────┐
-│   1 image   │ → Use Featured Image only
-└─────────────┘
-
-┌──────┬──────┐
-│  1   │  2   │ → Use Other Images only (2 images)
-└──────┴──────┘
-
-┌────┬────┬────┐
-│ 1  │ 2  │ 3  │ → Use Other Images only (3 images)
-└────┴────┴────┘
-
-┌────┬────┬────┐
-│ 1  │ 2  │ 3  │ → Featured + 3 Other Images
-├──────────────┤
-│   Featured   │
-└──────────────┘`,
+  description: `Dynamic image layouts based on your selection:
+• 1 IMAGE: Featured image only (full width)
+• 2 IMAGES: Two other images (side by side)
+• 3 IMAGES WITH FEATURED: Two other images on top, featured image below (full width)
+• 3 IMAGES WITHOUT FEATURED: Three other images in a single row
+• 4 IMAGES: Three other images on top, featured image below (full width)`,
   fields: [
     defineField({
       name: 'featuredImage',
@@ -34,11 +22,12 @@ const imageSection = defineType({
       type: 'image',
       description: `LAYOUT GUIDE:
 • 1 IMAGE: Use Featured only (full width)
-• 2 IMAGES: Use Other Images only (side by side)
-• 3 IMAGES: Use Other Images only (three in a row)
-• 4 IMAGES: Use Featured + 3 Other Images (3 on top, Featured large below)
+• 2 IMAGES: Leave empty, use Other Images only (side by side)
+• 3 IMAGES: Option A - Add Featured + 2 Other Images (2 on top, featured below)
+• 3 IMAGES: Option B - Leave empty, use 3 Other Images only (row layout)
+• 4 IMAGES: Use Featured + 3 Other Images (3 on top, featured below)
 
-This field: Use for 1 image layout OR 4 images layout (becomes large bottom image)`,
+This field controls whether 3 images display as 2+1 or as a row of 3`,
       options: {
         hotspot: true,
       },
@@ -48,7 +37,7 @@ This field: Use for 1 image layout OR 4 images layout (becomes large bottom imag
       name: 'otherImages',
       title: 'Other Images',
       type: 'array',
-      description: 'Use alone for 2-3 images layout, OR add 3 images here + Featured for 4 images layout',
+      description: 'For 2 images: Add 2 here (side by side). For 3 images: Add 2 here with Featured (2+1 layout) OR add 3 here without Featured (row layout). For 4 images: Add 3 here with Featured.',
       of: [
         defineArrayMember({
           type: 'image',
@@ -82,7 +71,7 @@ This field: Use for 1 image layout OR 4 images layout (becomes large bottom imag
         subtitle = 'Side by side layout'
       } else if (totalImages === 3) {
         title = 'Image Section with 3 images'
-        subtitle = '3 images in a row'
+        subtitle = featuredImage ? '2 on top + featured below' : '3 images in a row'
       } else if (totalImages === 4) {
         title = 'Image Section with 4 images'
         subtitle = '3 on top, featured below'

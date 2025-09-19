@@ -91,6 +91,24 @@ const imageWithResolvedAssetSchema = z.object({
     .optional(),
 })
 
+// Schema for text block content section
+const textBlockSchema = z.object({
+  _type: z.literal('textBlock'),
+  _key: z.string(),
+  text: z.array(z.any()).nullable().optional(), // Portable text blocks
+})
+
+// Schema for image section content
+const imageSectionSchema = z.object({
+  _type: z.literal('imageSection'),
+  _key: z.string(),
+  featuredImage: imageWithResolvedAssetSchema.nullable().optional(),
+  otherImages: z.array(imageWithResolvedAssetSchema).nullable().optional(),
+})
+
+// Combined content section schema
+const contentSectionSchema = z.union([textBlockSchema, imageSectionSchema])
+
 // Schema for a single project
 export const projectSchema = z.object({
   _id: z.string(),
@@ -106,25 +124,38 @@ export const projectSchema = z.object({
   excerpt: z.array(z.any()).nullable().optional(), // Added nullable
   description: z.array(z.any()).nullable().optional(), // Added nullable
   mainText: z.array(z.any()).nullable().optional(), // Added mainText field
+  contentSections: z.array(contentSectionSchema).nullable().optional(), // Added contentSections field
   hoverColor: z.object({ hex: z.string() }).nullable().optional(), // Added hover color
   textHoverColor: z.object({ hex: z.string() }).nullable().optional(), // Added text hover color
   clients: z
-    .array(z.object({
-      _id: z.string(),
-      name: z.string()
-    }))
+    .array(
+      z.object({
+        _id: z.string(),
+        name: z.string(),
+      }),
+    )
     .nullable()
     .optional(), // Updated to include _id since we're dereferencing
-  categories: z.array(z.object({
-    _id: z.string(),
-    title: z.string(),
-    description: z.string().optional()
-  })).nullable().optional(), // Changed to expect dereferenced objects, added nullable
-  services: z.array(z.object({
-    _id: z.string(),
-    title: z.string(),
-    description: z.string().optional()
-  })).nullable().optional(), // Added services field for dereferenced services
+  categories: z
+    .array(
+      z.object({
+        _id: z.string(),
+        title: z.string(),
+        description: z.string().optional(),
+      }),
+    )
+    .nullable()
+    .optional(), // Changed to expect dereferenced objects, added nullable
+  services: z
+    .array(
+      z.object({
+        _id: z.string(),
+        title: z.string(),
+        description: z.string().optional(),
+      }),
+    )
+    .nullable()
+    .optional(), // Added services field for dereferenced services
   projectDate: z.string().nullable().optional(), // Added nullable
   publishDate: z.string().nullable().optional(), // Added publishDate field
   gallery: z.array(imageWithResolvedAssetSchema).optional(), // Gallery images also use resolved assets

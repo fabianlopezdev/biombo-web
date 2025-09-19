@@ -67,7 +67,21 @@ export async function fetchProjectBySlug(
         description
       },
       mainText,
-      contentSections,
+      contentSections[] {
+        _type,
+        _key,
+        // For textBlock
+        text,
+        // For imageSection
+        featuredImage {
+          ...,
+          asset->
+        },
+        otherImages[] {
+          ...,
+          asset->
+        }
+      },
       publishDate
     }`
     const params = { slug, locale }
