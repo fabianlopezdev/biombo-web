@@ -1,0 +1,51 @@
+---
+export interface Props {
+  class?: string
+}
+
+const { class: className = '' } = Astro.props
+---
+
+<div class={`two-column-layout ${className}`}>
+  <aside class="first-column">
+    <slot name="first-column" />
+  </aside>
+  <div class="second-column">
+    <slot name="second-column" />
+  </div>
+</div>
+
+<style>
+  .two-column-layout {
+    max-inline-size: 85.3125rem;
+    display: flex;
+    align-items: center;
+    gap: clamp(3rem, -30.992rem + 42.424vi, 9.125rem);
+    padding-block: clamp(2.313rem, 0.033rem + 9.35vi, 8.875rem);
+  }
+
+  .first-column {
+    min-width: 36%;
+    max-width: 36%;
+  }
+
+  .second-column {
+    flex: 1;
+  }
+
+  @media (width < 992px) {
+    .two-column-layout {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+
+    .first-column {
+      width: 100%;
+    }
+
+    .second-column {
+      width: 100%;
+    }
+  }
+</style>

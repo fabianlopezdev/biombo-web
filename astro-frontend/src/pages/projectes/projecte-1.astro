@@ -1,6 +1,7 @@
 ---
 import ProjectLayout from '@/layouts/ProjectLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
+import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 
 const projectServices = [
   { name: 'Disseny gràfic', category: 'graphic-design' },
@@ -18,13 +19,17 @@ const projectServices = [
 
   <header class="project-header">
     <figure class="hero-figure">
-      <img class="hero-image" src="../../../public/projects-mock.jpg" alt="Imatge principal del projecte Obert x Vacances" />
+      <img
+        class="hero-image"
+        src="../../../public/projects-mock.jpg"
+        alt="Imatge principal del projecte Obert x Vacances"
+      />
     </figure>
   </header>
 
   <article class="project-content">
-    <header class="project-info-container">
-      <aside class="first-column project-metadata" aria-label="Detalls del projecte">
+    <TwoColumnLayout>
+      <aside slot="first-column" class="project-metadata" aria-label="Detalls del projecte">
         <div class="client-section">
           <h2 class="section-titles service-clients-font-size">Client:</h2>
           <p class="padding-bottom service-clients-font-size">Roca Umbert. Fàbrica de les arts</p>
@@ -32,22 +37,28 @@ const projectServices = [
         <div class="services-section">
           <h2 class="section-titles service-clients-font-size">Serveis:</h2>
           <ul class="services-container">
-            {projectServices.map((service) => <li><PillButton text={service.name} /></li>)}
+            {
+              projectServices.map((service) => (
+                <li>
+                  <PillButton text={service.name} />
+                </li>
+              ))
+            }
           </ul>
         </div>
       </aside>
-      <div class="project-description">
+      <div slot="second-column" class="project-description">
         <p class="project-copy">
-          Projecte de creació de marca: Conceptualització, naming, il·lustració i disseny gràfic, per
-          a un projecte cultural infantil. Les entitats culturals de Granollers, Teatre Auditori,
-          Centre Cultural i Brubaker s'uneixen per oferir una programació infantil conjunta, i
-          d'aquesta manera neixen els PATINAUTES, els 3 viatgers interestel·lars que amb els seus
-          patinets voladors, naveguen per l'espai a la recerca d'espectacles. La Pati, la Nau i en Ta
-          doncs, estaran presents en tots els actes que es realitzen a la ciutat, i acompanyaran els
-          petits en les seves aventures culturals.
+          Projecte de creació de marca: Conceptualització, naming, il·lustració i disseny gràfic,
+          per a un projecte cultural infantil. Les entitats culturals de Granollers, Teatre
+          Auditori, Centre Cultural i Brubaker s'uneixen per oferir una programació infantil
+          conjunta, i d'aquesta manera neixen els PATINAUTES, els 3 viatgers interestel·lars que amb
+          els seus patinets voladors, naveguen per l'espai a la recerca d'espectacles. La Pati, la
+          Nau i en Ta doncs, estaran presents en tots els actes que es realitzen a la ciutat, i
+          acompanyaran els petits en les seves aventures culturals.
         </p>
       </div>
-    </header>
+    </TwoColumnLayout>
 
     <div class="two-image-layout gallery">
       <div class="two-columns">
@@ -65,8 +76,8 @@ const projectServices = [
 
     <blockquote class="standalone-text project-copy highlight-quote">
       <p>
-        Projecte de creació de marca: Conceptualització, naming, il·lustració i disseny gràfic, per a
-        un projecte cultural infantil. Les entitats culturals de Granollers
+        Projecte de creació de marca: Conceptualització, naming, il·lustració i disseny gràfic, per
+        a un projecte cultural infantil. Les entitats culturals de Granollers
       </p>
     </blockquote>
 
@@ -91,10 +102,17 @@ const projectServices = [
   <aside class="services-container-mobile mobile" aria-label="Llista de serveis">
     <h2 class="section-titles service-clients-font-size">Serveis:</h2>
     <ul class="services-list">
-      {projectServices.map((service, i) => {
-        const separator = i === projectServices.length - 1 ? '' : ',\u00A0';
-        return <li class="list-item-mobile">{service.name}{separator}</li>
-      })}
+      {
+        projectServices.map((service, i) => {
+          const separator = i === projectServices.length - 1 ? '' : ',\u00A0'
+          return (
+            <li class="list-item-mobile">
+              {service.name}
+              {separator}
+            </li>
+          )
+        })
+      }
     </ul>
   </aside>
 
@@ -106,7 +124,12 @@ const projectServices = [
       <li class="similar-project-item">
         <article>
           <figure class="similar-project-image-wrapper">
-            <img class="similar-project-image" src="" alt="Projecte similar: Obert x Vacances" loading="lazy" />
+            <img
+              class="similar-project-image"
+              src=""
+              alt="Projecte similar: Obert x Vacances"
+              loading="lazy"
+            />
           </figure>
           <header class="mobile">
             <h3 class="similar-project-title">Obert x Vacances</h3>
@@ -117,7 +140,12 @@ const projectServices = [
       <li class="similar-project-item">
         <article>
           <figure class="similar-project-image-wrapper">
-            <img class="similar-project-image" src="" alt="Projecte similar: Obert x Vacances" loading="lazy" />
+            <img
+              class="similar-project-image"
+              src=""
+              alt="Projecte similar: Obert x Vacances"
+              loading="lazy"
+            />
           </figure>
           <header class="mobile">
             <h3 class="similar-project-title">Obert x Vacances</h3>
@@ -128,7 +156,12 @@ const projectServices = [
       <li class="similar-project-item">
         <article>
           <figure class="similar-project-image-wrapper">
-            <img class="similar-project-image" src="" alt="Projecte similar: Obert x Vacances" loading="lazy" />
+            <img
+              class="similar-project-image"
+              src=""
+              alt="Projecte similar: Obert x Vacances"
+              loading="lazy"
+            />
           </figure>
           <header class="mobile">
             <h3 class="similar-project-title">Obert x Vacances</h3>
@@ -139,7 +172,12 @@ const projectServices = [
       <li class="similar-project-item">
         <article>
           <figure class="similar-project-image-wrapper">
-            <img class="similar-project-image" src="" alt="Projecte similar: Obert x Vacances" loading="lazy" />
+            <img
+              class="similar-project-image"
+              src=""
+              alt="Projecte similar: Obert x Vacances"
+              loading="lazy"
+            />
           </figure>
           <header class="mobile">
             <h3 class="similar-project-title">Obert x Vacances</h3>
@@ -172,14 +210,6 @@ const projectServices = [
     aspect-ratio: 1513/722;
     margin-inline: calc(-1 * var(--padding-inline));
     padding-block-start: var(--padding-block);
-  }
-
-  .project-info-container {
-    max-inline-size: 85.3125rem;
-    display: flex;
-    align-items: center;
-    gap: clamp(3rem, -30.992rem + 42.424vi, 9.125rem);
-    padding-block: clamp(2.313rem, 0.033rem + 9.35vi, 8.875rem);
   }
 
   .padding-bottom {
@@ -229,7 +259,7 @@ const projectServices = [
     display: flex;
     gap: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);
   }
-  
+
   .blue-background {
     background-color: blue;
     flex: 1;
@@ -285,14 +315,14 @@ const projectServices = [
     .client-info {
       padding-block-start: var(--padding-block);
     }
-    
+
     .hero-image {
       aspect-ratio: 65/59;
       margin-block-start: 2rem;
       padding-block: 0rem;
     }
-    
-    .first-column {
+
+    .project-metadata {
       display: none;
     }
 
@@ -300,7 +330,7 @@ const projectServices = [
     .three-columns {
       flex-direction: column;
     }
-    
+
     .red-background,
     .blue-background {
       aspect-ratio: 362 / 315;
@@ -310,7 +340,7 @@ const projectServices = [
     .standalone-text {
       padding-inline: var(--padding-inline);
     }
-    
+
     .standalone-text {
       padding-inline: 0rem;
     }
@@ -331,9 +361,9 @@ const projectServices = [
     .divider-line {
       width: 100%;
       height: 1px;
-      background-color: #ADADAD;
+      background-color: #adadad;
     }
-    
+
     .similar-title {
       text-transform: none;
     }
@@ -343,10 +373,10 @@ const projectServices = [
       grid-template-columns: 1fr 1fr;
       gap: 1rem; /* Adds space between items */
     }
-    
+
     .similar-project-image-wrapper {
-        aspect-ratio: 152/183;
-        margin-block-end: 1.125rem;
+      aspect-ratio: 152/183;
+      margin-block-end: 1.125rem;
     }
 
     .similar-project-title {
