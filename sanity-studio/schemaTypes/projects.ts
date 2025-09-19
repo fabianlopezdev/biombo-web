@@ -136,13 +136,15 @@ export const projects = defineType({
     defineField({
       name: 'slug',
       title: 'Slug',
-      description: 'This will be used for the project URL (click "Generate" button to create from title)',
+      description: 'This will be used for the project URL. Note: Accented characters (á, é, ñ, etc.) will be converted to their base forms (a, e, n). Please review and edit if needed after generation.',
       type: 'slug',
       hidden: false, // Show slug field so users can regenerate it
       options: {
         source: 'title',
         slugify: input => input
           ? input
+              .normalize('NFD') // Decompose accented characters
+              .replace(/[\u0300-\u036f]/g, '') // Remove diacritical marks
               .toLowerCase()
               .replace(/\s+/g, '-')
               .replace(/[^\w-]+/g, '')
