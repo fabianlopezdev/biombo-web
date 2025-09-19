@@ -1,0 +1,550 @@
+---
+import ProjectLayout from '@/layouts/ProjectLayout.astro'
+import PillButton from '@/components/shared/PillButton.astro'
+import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
+import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
+import type { PortableTextBlock } from '@portabletext/types'
+import {
+  fetchProjectBySlug,
+  fetchProjectsByLocale,
+  fetchSimilarProjects,
+} from '@/shared/lib/sanity/queries/projectQueries'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  console.log('=== FETCHING SPANISH PROJECTS FOR STATIC PATHS ===')
+
+  // Only fetch Spanish projects for this route
+  const projectsEs = (await fetchProjectsByLocale('es')) || []
+
+  console.log('Spanish projects found:', projectsEs.length)
+  console.log(
+    'Spanish projects:',
+    projectsEs.map((p) => ({
+      title: p.title,
+      slug: p.slug.current,
+      language: p.language,
+    })),
+  )
+
+  const paths = projectsEs.map((project) => ({
+    params: { slug: project.slug.current },
+    props: {
+      projectSlug: project.slug.current,
+    },
+  }))
+
+  console.log(
+    'Generated paths:',
+    paths.map((p) => p.params.slug),
+  )
+
+  return paths
+}
+
+const { projectSlug } = Astro.props
+const locale = 'es' // Always Spanish for this route
+
+console.log('=== RENDERING PROJECT PAGE ===')
+console.log('Project slug:', projectSlug)
+console.log('Locale:', locale)
+
+const project = await fetchProjectBySlug(projectSlug, locale)
+
+console.log(
+  'Fetched project:',
+  project
+    ? {
+        title: project.title,
+        _id: project._id,
+        language: project.language,
+        contentSections: project.contentSections?.length || 0,
+      }
+    : null,
+)
+
+if (!project) {
+  console.error('Project not found, redirecting to 404')
+  return Astro.redirect('/404')
+}
+
+console.log(
+  'Content sections:',
+  project.contentSections?.map((section: any) => ({
+    type: section._type,
+    ...(section._type === 'imageSection'
+      ? {
+          featuredImage: !!section.featuredImage,
+          otherImages: section.otherImages?.length || 0,
+        }
+      : {}),
+    ...(section._type === 'textBlock'
+      ? {
+          hasText: !!section.text,
+        }
+      : {}),
+  })),
+)
+
+// Fetch similar projects
+const similarProjects = await fetchSimilarProjects(project._id, locale, 4)
+
+console.log('Similar projects found:', similarProjects?.length || 0)
+console.log(
+  'Similar projects:',
+  similarProjects?.map((p: any) => ({
+    title: p.title,
+    slug: p.slug.current,
+  })),
+)
+
+// Helper function to convert portable text to HTML
+function portableTextToHtml(content: PortableTextBlock[] | undefined): string {
+  if (!content || content.length === 0) return ''
+
+  const customPortableTextComponents: Partial<PortableTextComponents> = {
+    block: {
+      // Keep default block rendering with <p> tags
+      normal({ children }): string {
+        return `<p>${children || ''}</p>`
+      },
+    },
+  }
+
+  return toHTML(content as any, {
+    components: customPortableTextComponents,
+  })
+}
+
+// Helper to get image URL
+const getImageUrl = (image: any) => {
+  if (!image?.asset) return ''
+  return image.asset.url || ''
+}
+
+// Helper to determine image section layout
+const getImageSectionLayout = (section: any) => {
+  const hasFeatured = section.featuredImage?.asset
+  const otherCount = section.otherImages?.length || 0
+  const totalImages = (hasFeatured ? 1 : 0) + otherCount
+
+  return {
+    totalImages,
+    hasFeatured,
+    otherImages: section.otherImages || [],
+  }
+}
+---
+
+<ProjectLayout pageTitle={project.title}>
+  <aside class="client-info mobile" aria-label="Información del cliente">
+    <h2 class="section-titles service-clients-font-size">Cliente:</h2>
+    <p class="service-clients-font-size">
+      {project.clients?.map((client: any) => client.name).join(', ') || 'N/A'}
+    </p>
+  </aside>
+
+  <header class="project-header">
+    <figure class="hero-figure">
+      <img
+        class="hero-image"
+        src={getImageUrl(project.mainImage)}
+        alt={`Imagen principal del proyecto ${project.title}`}
+      />
+    </figure>
+  </header>
+
+  <article class="project-content">
+    <TwoColumnLayout>
+      <aside slot="first-column" class="project-metadata" aria-label="Detalles del proyecto">
+        <div class="client-section">
+          <h2 class="section-titles service-clients-font-size">Cliente:</h2>
+          <p class="padding-bottom service-clients-font-size">
+            {project.clients?.map((client: any) => client.name).join(', ') || 'N/A'}
+          </p>
+        </div>
+        <div class="services-section">
+          <h2 class="section-titles service-clients-font-size">Servicios:</h2>
+          <ul class="services-container">
+            {
+              project.services?.map((service: any) => (
+                <li>
+                  <PillButton text={service.title} />
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </aside>
+      <div slot="second-column" class="project-description">
+        {
+          project.mainText && (
+            <div class="project-copy" set:html={portableTextToHtml(project.mainText)} />
+          )
+        }
+      </div>
+    </TwoColumnLayout>
+
+    {/* Dynamic content sections */}
+    {
+      project.contentSections?.map((section: any) => {
+        if (section._type === 'textBlock') {
+          return (
+            <blockquote
+              class="standalone-text project-copy highlight-quote"
+              set:html={portableTextToHtml(section.text)}
+            />
+          )
+        }
+
+        if (section._type === 'imageSection') {
+          const layout = getImageSectionLayout(section)
+
+          // 1 image layout - full width (like the standalone image)
+          if (layout.totalImages === 1) {
+            return (
+              <figure class="red-background standalone-image">
+                <img
+                  src={getImageUrl(
+                    layout.hasFeatured ? section.featuredImage : layout.otherImages[0],
+                  )}
+                  alt="Imagen destacada del proyecto"
+                  loading="lazy"
+                />
+              </figure>
+            )
+          }
+
+          // 2 images layout - side by side (two columns only)
+          if (layout.totalImages === 2) {
+            return (
+              <div class="two-image-layout gallery">
+                <div class="two-columns">
+                  {layout.otherImages.map((img: any) => (
+                    <figure class="red-background">
+                      <img src={getImageUrl(img)} alt="Imagen del proyecto" loading="lazy" />
+                    </figure>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+
+          // 3 images layout - three in a row (three columns only)
+          if (layout.totalImages === 3) {
+            return (
+              <div class="three-image-layout gallery">
+                <div class="three-columns">
+                  {layout.otherImages.map((img: any) => (
+                    <figure class="blue-background">
+                      <img src={getImageUrl(img)} alt="Aplicación del proyecto" loading="lazy" />
+                    </figure>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+
+          // 4 images layout - 3 on top, featured below
+          if (layout.totalImages === 4) {
+            return (
+              <div class="three-image-layout gallery">
+                <div class="three-columns">
+                  {layout.otherImages.map((img: any) => (
+                    <figure class="blue-background">
+                      <img src={getImageUrl(img)} alt="Aplicación del proyecto" loading="lazy" />
+                    </figure>
+                  ))}
+                </div>
+                <figure class="red-background standalone-image">
+                  <img
+                    src={getImageUrl(section.featuredImage)}
+                    alt="Imagen final del proyecto"
+                    loading="lazy"
+                  />
+                </figure>
+              </div>
+            )
+          }
+        }
+      })
+    }
+  </article>
+
+  <aside class="services-container-mobile mobile" aria-label="Lista de servicios">
+    <h2 class="section-titles service-clients-font-size">Servicios:</h2>
+    <ul class="services-list">
+      {
+        project.services?.map((service: any, i: number) => {
+          const separator = i === project.services.length - 1 ? '' : ',\u00A0'
+          return (
+            <li class="list-item-mobile">
+              {service.title}
+              {separator}
+            </li>
+          )
+        })
+      }
+    </ul>
+  </aside>
+
+  <hr class="divider-line mobile" aria-hidden="true" />
+
+  {/* Similar projects section */}
+  {
+    similarProjects && similarProjects.length > 0 && (
+      <section class="similar-projects" aria-labelledby="similar-projects-title">
+        <h2 id="similar-projects-title" class="similar-title">
+          Proyectos similares
+        </h2>
+        <ul class="similar-projects-container">
+          {similarProjects.map((similarProject: any) => {
+            const thumbnailImage =
+              similarProject.useSeparateThumbnail && similarProject.thumbnailImage
+                ? similarProject.thumbnailImage
+                : similarProject.mainImage
+            return (
+              <li class="similar-project-item">
+                <article>
+                  <a href={`/es/proyectos/${similarProject.slug.current}`}>
+                    <figure class="similar-project-image-wrapper">
+                      <img
+                        class="similar-project-image"
+                        src={getImageUrl(thumbnailImage)}
+                        alt={`Proyecto: ${similarProject.title}`}
+                        loading="lazy"
+                      />
+                    </figure>
+                    <header>
+                      <h3 class="similar-project-title">{similarProject.title}</h3>
+                      {similarProject.clients && similarProject.clients.length > 0 && (
+                        <p class="similar-project-client">
+                          {similarProject.clients.map((client: any) => client.name).join(', ')}
+                        </p>
+                      )}
+                    </header>
+                  </a>
+                </article>
+              </li>
+            )
+          })}
+        </ul>
+      </section>
+    )
+  }
+</ProjectLayout>
+
+<style>
+  .mobile {
+    display: none;
+  }
+
+  .section-titles {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .service-clients-font-size {
+    font-size: clamp(1.125rem, 0.995rem + 0.534vi, 1.5rem);
+  }
+
+  .hero-image {
+    width: 100vw;
+    max-inline-size: none;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 1513/722;
+    margin-inline: calc(-1 * var(--padding-inline));
+    padding-block-start: var(--padding-block);
+  }
+
+  .padding-bottom {
+    padding-block-end: 1.75rem;
+  }
+
+  .services-container {
+    padding-block-start: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    list-style: none;
+    padding-inline-start: 0;
+  }
+
+  .services-container li {
+    display: contents;
+  }
+
+  .project-copy {
+    font-size: clamp(1.125rem, 0.908rem + 0.89vi, 1.75rem);
+    line-height: 1.21;
+  }
+
+  .two-columns {
+    display: flex;
+    gap: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);
+  }
+
+  .three-columns {
+    display: flex;
+    gap: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);
+  }
+
+  .red-background {
+    background-color: red;
+    flex: 1;
+    aspect-ratio: 1;
+  }
+
+  .blue-background {
+    background-color: blue;
+    flex: 1;
+    aspect-ratio: 217/328;
+  }
+
+  .red-background img,
+  .blue-background img,
+  .standalone-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .standalone-image {
+    margin-block-start: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);
+    aspect-ratio: 16/9;
+  }
+
+  .standalone-text {
+    padding-block: clamp(3.375rem, 2.246rem + 4.63vi, 6.625rem);
+    padding-inline: calc(var(--padding-inline) + 2rem);
+  }
+
+  .similar-projects {
+    padding-block-start: var(--padding-block);
+  }
+
+  .similar-title {
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size);
+    padding-block-end: clamp(1.125rem, 0.127rem + 4.096vi, 4rem);
+    text-transform: uppercase;
+  }
+
+  .similar-projects-container {
+    display: flex;
+    gap: 1.875rem;
+    flex-wrap: wrap;
+    list-style: none;
+    padding-inline-start: 0;
+    margin: 0;
+  }
+
+  .similar-project-item {
+    flex: 1;
+  }
+
+  .similar-project-item article {
+    height: 100%;
+  }
+
+  .similar-project-item a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .similar-project-image-wrapper {
+    aspect-ratio: 3/4;
+    background-color: green;
+    border-radius: 0.62rem;
+    overflow: hidden;
+  }
+
+  .similar-project-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .similar-project-title {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-regular);
+    line-height: 1.2;
+    padding-block-end: 0.5rem;
+  }
+
+  .similar-project-client {
+    font-size: 1rem;
+    line-height: 1.375;
+  }
+
+  .services-container-mobile {
+    padding-block-start: 2.3125rem;
+    padding-block-end: 3.5625rem;
+  }
+
+  .services-list {
+    font-size: 1.125rem;
+  }
+
+  .list-item-mobile {
+    display: inline-block;
+  }
+
+  .divider-line {
+    width: 100%;
+    height: 1px;
+    background-color: #adadad;
+  }
+
+  @media (width < 992px) {
+    .mobile {
+      display: block;
+    }
+
+    .client-info {
+      padding-block-start: var(--padding-block);
+    }
+
+    .hero-image {
+      aspect-ratio: 65/59;
+      margin-block-start: 2rem;
+      padding-block: 0rem;
+    }
+
+    .project-metadata {
+      display: none;
+    }
+
+    .two-columns,
+    .three-columns {
+      flex-direction: column;
+    }
+
+    .red-background,
+    .blue-background {
+      aspect-ratio: 362 / 315;
+      margin-inline: calc(0.875rem - var(--padding-inline));
+    }
+
+    .standalone-text {
+      padding-inline: 0rem;
+    }
+
+    .similar-title {
+      text-transform: none;
+    }
+
+    .similar-projects-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .similar-project-image-wrapper {
+      aspect-ratio: 152/183;
+      margin-block-end: 1.125rem;
+    }
+  }
+</style>

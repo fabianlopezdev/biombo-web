@@ -145,6 +145,26 @@ export const projects = defineType({
       validation: (Rule) => Rule.required().warning(),
     }),
     defineField({
+      name: 'slug',
+      title: 'Slug',
+      description: 'This will be used for the project URL (click "Generate" button to create from title)',
+      type: 'slug',
+      hidden: false, // Show slug field so users can regenerate it
+      options: {
+        source: 'title',
+        slugify: input => input
+          ? input
+              .toLowerCase()
+              .replace(/\s+/g, '-')
+              .replace(/[^\w-]+/g, '')
+              .replace(/--+/g, '-')
+              .slice(0, 96)
+          : '', // Empty fallback
+        maxLength: 96,
+      },
+      validation: Rule => Rule.required().error('A slug is required for the project URL'),
+    }),
+    defineField({
       name: 'title',
       title: 'Project Title',
       type: 'string', // Changed from localeString to string
@@ -195,30 +215,6 @@ export const projects = defineType({
       options: {
         disableAlpha: true,
       },
-    }),
-    defineField({
-      name: 'slug',
-      title: 'Slug',
-      description: 'This will be used for the project URL',
-      type: 'slug',
-      hidden: true, // Hide slug field as it's auto-generated
-      options: {
-        source: 'title',
-        slugify: input => input
-          ? input
-              .toLowerCase()
-              .replace(/\s+/g, '-')
-              .replace(/[^\w-]+/g, '')
-              .replace(/--+/g, '-')
-              .slice(0, 96)
-          : 'untitled', // Fallback if title is empty
-        maxLength: 96,
-        isUnique: () => true, // Skip uniqueness check for better performance
-      },
-      // This will force the slug to always pass validation
-      validation: Rule => Rule.custom(() => true),
-      // Set a default value to ensure it always has content
-      initialValue: {current: 'untitled'}
     }),
     defineField({
       name: 'clients',

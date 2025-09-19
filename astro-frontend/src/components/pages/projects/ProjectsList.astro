@@ -22,7 +22,20 @@ const getImageUrl = (project: any) => {
 const getProjectUrl = (slug: any, locale: string) => {
   const slugString = typeof slug === 'string' ? slug : slug?.current || ''
 
-  switch(locale) {
+  console.log('Raw slug:', slug)
+  console.log('Extracted slugString:', slugString)
+
+  // Check if slug already contains the path prefix and remove it
+  if (slugString.startsWith('/projectes/')) {
+    console.log('Slug already contains /projectes/, cleaning it')
+    return slugString // Already has the path
+  }
+  if (slugString.startsWith('projectes/')) {
+    console.log('Slug contains projectes/, cleaning it')
+    return '/' + slugString // Add leading slash
+  }
+
+  switch (locale) {
     case 'ca':
       return `/projectes/${slugString}`
     case 'es':
@@ -37,75 +50,67 @@ const getProjectUrl = (slug: any, locale: string) => {
 
 <section class="projects-list-container">
   <!-- Services Filter -->
-  {services && services.length > 0 && (
-    <nav class="services-filter" aria-label="Filter projects by service">
-      <button
-        class="filter-button active"
-        data-filter="all"
-        aria-pressed="true"
-      >
-        {locale === 'ca' ? 'Tots' : locale === 'es' ? 'Todos' : 'All'}
-      </button>
-      {services.map((service) => (
-        <button
-          class="filter-button"
-          data-filter={service._id}
-          aria-pressed="false"
-        >
-          {service.title}
+  {
+    services && services.length > 0 && (
+      <nav class="services-filter" aria-label="Filter projects by service">
+        <button class="filter-button active" data-filter="all" aria-pressed="true">
+          {locale === 'ca' ? 'Tots' : locale === 'es' ? 'Todos' : 'All'}
         </button>
-      ))}
-    </nav>
-  )}
+        {services.map((service) => (
+          <button class="filter-button" data-filter={service._id} aria-pressed="false">
+            {service.title}
+          </button>
+        ))}
+      </nav>
+    )
+  }
 
   <!-- Projects Grid -->
-  {projects && projects.length > 0 ? (
-    <div class="projects-grid">
-      {projects.map((project) => (
-        <article
-          class="project-card"
-          data-services={project.services?.map((s: any) => s._id).join(',') || ''}
-        >
-          <a href={getProjectUrl(project.slug, locale)}>
-            <div class="project-image">
-              {getImageUrl(project) && (
-                <img
-                  src={getImageUrl(project)}
-                  alt={project.title}
-                  loading="lazy"
-                />
-              )}
-            </div>
-            <div class="project-info">
-              <h2 class="project-title">{project.title}</h2>
-              {project.clients && project.clients.length > 0 && (
-                <p class="project-client">
-                  {project.clients.map((client: any) => client.name).join(', ')}
-                </p>
-              )}
-              {project.services && project.services.length > 0 && (
-                <ul class="project-services">
-                  {project.services.map((service: any) => (
-                    <li class="service-tag">{service.title}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </a>
-        </article>
-      ))}
-    </div>
-  ) : (
-    <div class="no-projects">
-      <p>
-        {locale === 'ca'
-          ? 'No hi ha projectes disponibles.'
-          : locale === 'es'
-          ? 'No hay proyectos disponibles.'
-          : 'No projects available.'}
-      </p>
-    </div>
-  )}
+  {
+    projects && projects.length > 0 ? (
+      <div class="projects-grid">
+        {projects.map((project) => (
+          <article
+            class="project-card"
+            data-services={project.services?.map((s: any) => s._id).join(',') || ''}
+          >
+            <a href={getProjectUrl(project.slug, locale)}>
+              <div class="project-image">
+                {getImageUrl(project) && (
+                  <img src={getImageUrl(project)} alt={project.title} loading="lazy" />
+                )}
+              </div>
+              <div class="project-info">
+                <h2 class="project-title">{project.title}</h2>
+                {project.clients && project.clients.length > 0 && (
+                  <p class="project-client">
+                    {project.clients.map((client: any) => client.name).join(', ')}
+                  </p>
+                )}
+                {project.services && project.services.length > 0 && (
+                  <ul class="project-services">
+                    {project.services.map((service: any) => (
+                      <li class="service-tag">{service.title}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <div class="no-projects">
+        <p>
+          {locale === 'ca'
+            ? 'No hi ha projectes disponibles.'
+            : locale === 'es'
+              ? 'No hay proyectos disponibles.'
+              : 'No projects available.'}
+        </p>
+      </div>
+    )
+  }
 </section>
 
 <script>
@@ -113,12 +118,12 @@ const getProjectUrl = (slug: any, locale: string) => {
   const filterButtons = document.querySelectorAll('.filter-button')
   const projectCards = document.querySelectorAll('.project-card')
 
-  filterButtons.forEach(button => {
+  filterButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const filter = button.getAttribute('data-filter')
 
       // Update active state
-      filterButtons.forEach(btn => {
+      filterButtons.forEach((btn) => {
         btn.classList.remove('active')
         btn.setAttribute('aria-pressed', 'false')
       })

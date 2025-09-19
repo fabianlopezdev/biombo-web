@@ -22,9 +22,9 @@ const projectsSectionSchema = z.object({
 export type ProjectsSection = z.infer<typeof projectsSectionSchema>
 
 /**
- * Fetches a single project by slug
+ * Fetches a single project by slug with all content
  * @param slug - The project slug
- * @param locale - The locale of the slug to match (defaults to 'ca')
+ * @param locale - The locale to match (defaults to 'ca')
  * @returns The project data or null if not found
  */
 export async function fetchProjectBySlug(
@@ -32,9 +32,45 @@ export async function fetchProjectBySlug(
   locale: 'ca' | 'es' | 'en' = 'ca',
 ): Promise<Project | null> {
   try {
-    // Query for a project with the matching slug in the specified locale
-    const query = `*[_type == "project" && slug.${locale}.current == $slug][0]`
-    const params = { slug }
+    // Query for a project with the matching slug and language
+    const query = `*[_type == "project" && slug.current == $slug && language == $locale][0] {
+      _id,
+      _type,
+      _createdAt,
+      _updatedAt,
+      language,
+      title,
+      slug,
+      mainImage {
+        ...,
+        asset->
+      },
+      thumbnailImage {
+        ...,
+        asset->
+      },
+      useSeparateThumbnail,
+      hoverColor { hex },
+      textHoverColor { hex },
+      clients[]-> {
+        _id,
+        name
+      },
+      services[]-> {
+        _id,
+        title,
+        description
+      },
+      categories[]-> {
+        _id,
+        title,
+        description
+      },
+      mainText,
+      contentSections,
+      publishDate
+    }`
+    const params = { slug, locale }
 
     // Try fetching with schema validation
     const project = await fetchSanityQuery({
@@ -48,6 +84,11 @@ export async function fetchProjectBySlug(
     return null
   }
 }
+
+/**
+ * Alias for fetchProjectBySlug for backwards compatibility
+ */
+export const getProjectBySlug = fetchProjectBySlug
 
 /**
  * Fetches all featured projects for the homepage
@@ -189,13 +230,60 @@ export async function fetchAllProjects(): Promise<Projects | null> {
 }
 
 /**
+ * Fetches similar projects (excluding the current one)
+ * @param currentProjectId - The ID of the current project to exclude
+ * @param locale - The locale to fetch projects for
+ * @param limit - Maximum number of projects to return (defaults to 4)
+ * @returns Array of similar projects or null if none found
+ */
+export async function fetchSimilarProjects(
+  currentProjectId: string,
+  locale: 'ca' | 'es' | 'en',
+  limit: number = 4,
+): Promise<Projects | null> {
+  try {
+    // Query for projects in the same locale, excluding the current one
+    const query = `*[_type == "project" && language == $locale && _id != $currentId][0...$limit] {
+      _id,
+      _type,
+      title,
+      slug,
+      mainImage {
+        ...,
+        asset->
+      },
+      thumbnailImage {
+        ...,
+        asset->
+      },
+      useSeparateThumbnail,
+      clients[]-> {
+        _id,
+        name
+      }
+    }`
+
+    const params = { locale, currentId: currentProjectId, limit }
+
+    // Try fetching with schema validation
+    const projects = await fetchSanityQuery({
+      query,
+      params,
+      schema: projectsSchema,
+    })
+
+    return projects
+  } catch {
+    return null
+  }
+}
+
+/**
  * Fetches all projects for a specific locale
  * @param locale - The locale to fetch projects for
  * @returns Array of projects for the specified locale or null if none found
  */
-export async function fetchProjectsByLocale(
-  locale: 'ca' | 'es' | 'en',
-): Promise<Projects | null> {
+export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise<Projects | null> {
   try {
     // Query for all projects in the specified language, ordered by orderRank (manual order)
     const query = `*[_type == "project" && language == $locale] | order(orderRank) {

@@ -44,7 +44,7 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
   style={`--hover-bg-color: ${hoverColor}; --hover-text-color: ${textHoverColor};`}
 >
   <a
-    href={`/projectes/${slug}`}
+    href={`${slug}`}
     class="project-link"
     aria-label={`${title}${clients ? ` - ${clients}` : ''} - Veure detalls del projecte`}
   >
@@ -78,7 +78,7 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
     height: 100%;
     overflow: hidden;
   }
-  
+
   .project-link {
     display: block;
     width: 100%;
@@ -88,13 +88,13 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
     position: relative;
     text-decoration: none;
     color: inherit;
-    
+
     &:focus-visible {
       outline: 0.25rem solid var(--color-secondary);
       outline-offset: -0.25rem;
       border-radius: inherit;
     }
-    
+
     /* Only hide cursor on devices that truly support hover (desktop) */
     @media (hover: hover) and (pointer: fine) {
       &:hover {
@@ -102,7 +102,7 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
       }
     }
   }
-  
+
   .project-figure {
     position: relative;
     margin: 0;
