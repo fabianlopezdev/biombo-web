@@ -1,0 +1,37 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
+---
+
+<BaseLayout title="Serveis - Biombo Studio">
+  <main>
+    <TwoColumnLayout>
+      <h1 slot="first-column">Serveis</h1>
+      <p slot="second-column">
+        Comptem amb una xarxa de col·laboradors, experts en diverses disciplines, que aporten el seu
+        coneixement per garantir resultats de primer nivell.
+      </p>
+    </TwoColumnLayout>
+  </main>
+</BaseLayout>
+
+<style>
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 2.305rem + 2.85vi, 5rem);
+    letter-spacing: -0.04em;
+    font-weight: var(--font-weight-semibold);
+    /* line-height: 1; */
+  }
+
+  p {
+    font-size: clamp(1.125rem, 0.691rem + 1.781vi, 2.375rem);
+    line-height: 1.2;
+    padding-block-start: 1.2rem;
+  }
+</style>

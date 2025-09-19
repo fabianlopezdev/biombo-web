@@ -3,18 +3,42 @@ import { orderRankField, orderRankOrdering } from '@sanity/orderable-document-li
 
 /**
  * Embedded object type for image sections within projects
- * @description A reusable structure for featured image and gallery
+ * @description Dynamic image layout: 1 image (full width), 2 images (side by side), 3 images (row), 4 images (3 top, 1 bottom)
  */
 const imageSection = defineType({
   name: 'imageSection',
   title: 'Image Section',
   type: 'object',
+  description: `Image layouts:
+┌─────────────┐
+│   1 image   │ → Use Featured Image only
+└─────────────┘
+
+┌──────┬──────┐
+│  1   │  2   │ → Use Other Images only (2 images)
+└──────┴──────┘
+
+┌────┬────┬────┐
+│ 1  │ 2  │ 3  │ → Use Other Images only (3 images)
+└────┴────┴────┘
+
+┌────┬────┬────┐
+│ 1  │ 2  │ 3  │ → Featured + 3 Other Images
+├──────────────┤
+│   Featured   │
+└──────────────┘`,
   fields: [
     defineField({
       name: 'featuredImage',
       title: 'Featured Image',
       type: 'image',
-      description: 'Main, prominent image for this section',
+      description: `LAYOUT GUIDE:
+• 1 IMAGE: Use Featured only (full width)
+• 2 IMAGES: Use Other Images only (side by side)
+• 3 IMAGES: Use Other Images only (three in a row)
+• 4 IMAGES: Use Featured + 3 Other Images (3 on top, Featured large below)
+
+This field: Use for 1 image layout OR 4 images layout (becomes large bottom image)`,
       options: {
         hotspot: true,
       },
@@ -24,7 +48,7 @@ const imageSection = defineType({
       name: 'otherImages',
       title: 'Other Images',
       type: 'array',
-      description: 'Collection of additional images',
+      description: 'Use alone for 2-3 images layout, OR add 3 images here + Featured for 4 images layout',
       of: [
         defineArrayMember({
           type: 'image',
@@ -33,7 +57,7 @@ const imageSection = defineType({
           },
         }),
       ],
-      // No validation
+      validation: Rule => Rule.max(3).warning('Maximum 3 additional images allowed (4 total including featured image)')
     }),
   ],
   preview: {
@@ -42,13 +66,31 @@ const imageSection = defineType({
       otherImages: 'otherImages',
     },
     prepare({ featuredImage, otherImages }) {
-      const hasImages = featuredImage || (otherImages && otherImages.length > 0)
+      const totalImages = (featuredImage ? 1 : 0) + (otherImages ? otherImages.length : 0)
+
+      let title = ''
+      let subtitle = ''
+
+      if (totalImages === 0) {
+        title = 'Image Section'
+        subtitle = 'No images yet'
+      } else if (totalImages === 1) {
+        title = 'Image Section with 1 image'
+        subtitle = 'Full width layout'
+      } else if (totalImages === 2) {
+        title = 'Image Section with 2 images'
+        subtitle = 'Side by side layout'
+      } else if (totalImages === 3) {
+        title = 'Image Section with 3 images'
+        subtitle = '3 images in a row'
+      } else if (totalImages === 4) {
+        title = 'Image Section with 4 images'
+        subtitle = '3 on top, featured below'
+      }
+
       return {
-        title: 'Image Section',
-        subtitle: hasImages 
-          ? `${featuredImage ? '1 featured image' : 'No featured image'}${otherImages && otherImages.length > 0 ? `, ${otherImages.length} additional image${otherImages.length === 1 ? '' : 's'}` : ''}` 
-          : 'No images yet',
-        media: featuredImage || null,
+        title,
+        subtitle
       }
     },
   },
@@ -67,62 +109,23 @@ const textBlock = defineType({
       name: 'text',
       title: 'Text Content',
       type: 'array',
-      of: [{ type: 'block' }]
+      of: [{ type: 'block' }],
+      description: 'Rich text content that can be styled as regular text or highlighted quotes in the frontend'
     })
   ],
   preview: {
-    select: {
-      text: 'text'
-    },
-    prepare({ text }) {
-      // Extract some text from the portable text blocks for preview
-      const block = (text || []).find((block: {_type: string; children: Array<{_type: string; text: string}>}) => block._type === 'block')
-      const textPreview = block
-        ? block.children
-            .filter((child: {_type: string}) => child._type === 'span')
-            .map((span: {text: string}) => span.text)
-            .join('')
-        : 'No content'
-
+    prepare() {
       return {
-        title: textPreview.length > 50 ? textPreview.substring(0, 50) + '...' : textPreview,
-        subtitle: 'Text Content'
+        title: 'Text Content',
+        subtitle: 'Rich text block'
       }
     }
   }
 })
 
-/**
- * Small text block for shorter content
- * @description A block for shorter, non-formatted text content
- */
-const smallTextBlock = defineType({
-  name: 'smallTextBlock',
-  title: 'Small Text',
-  type: 'object',
-  fields: [
-    defineField({
-      name: 'text',
-      title: 'Small Text',
-      type: 'text',
-      rows: 3
-    })
-  ],
-  preview: {
-    select: {
-      text: 'text'
-    },
-    prepare({ text }) {
-      return {
-        title: text ? (text.length > 40 ? `${text.substring(0, 40)}...` : text) : 'No content',
-        subtitle: 'Small Text'
-      }
-    }
-  }
-})
 
 // Export the content block types to use in other schemas if needed
-export { imageSection, textBlock, smallTextBlock }
+export { imageSection, textBlock }
 /**
  * Schema for project entries
  * @description Projects showcasing the company's work
@@ -160,14 +163,14 @@ export const projects = defineType({
     defineField({
       name: 'useSeparateThumbnail',
       title: 'Use Separate Thumbnail',
-      description: 'Use a different image for the homepage thumbnail?',
+      description: 'Use a different image as thumbnail instead of the main project image',
       type: 'boolean',
       initialValue: false,
     }),
     defineField({
       name: 'thumbnailImage',
-      title: 'Homepage Thumbnail',
-      description: 'Custom thumbnail for homepage (only used if option above is enabled)',
+      title: 'Thumbnail Image',
+      description: 'Image to appear as project thumbnail (only used if option above is enabled)',
       type: 'image',
       options: {
         hotspot: true,
@@ -178,25 +181,19 @@ export const projects = defineType({
     defineField({
       name: 'hoverColor',
       title: 'Hover Color',
-      description: 'Background color when hovering over the project',
+      description: 'Background color when hovering over the project thumbnail',
       type: 'color',
       options: {
         disableAlpha: true,
-      },
-      initialValue: {
-        hex: '#63b2d5',
       },
     }),
     defineField({
       name: 'textHoverColor',
       title: 'Text Hover Color',
-      description: 'Text color when hovering over the project',
+      description: 'Text color when hovering over the project thumbnail',
       type: 'color',
       options: {
         disableAlpha: true,
-      },
-      initialValue: {
-        hex: '#ffffff',
       },
     }),
     defineField({
@@ -279,15 +276,14 @@ export const projects = defineType({
     defineField({
       name: 'contentSections',
       title: 'Content Sections',
-      description: 'Add and rearrange content sections for this project',
+      description: 'Add and rearrange content sections for this project. Text blocks can be styled as regular text or highlighted quotes in the frontend.',
       type: 'array',
       of: [
         defineArrayMember({ type: 'textBlock' }),
-        defineArrayMember({ type: 'smallTextBlock' }),
         defineArrayMember({ type: 'imageSection' })
       ],
       options: {
-        layout: 'grid',
+        layout: 'list',
         sortable: true
       }
     }),

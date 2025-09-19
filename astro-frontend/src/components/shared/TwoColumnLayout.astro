@@ -17,16 +17,17 @@ const { class: className = '' } = Astro.props
 
 <style>
   .two-column-layout {
+    inline-size: 100%;
     max-inline-size: 85.3125rem;
     display: flex;
-    align-items: center;
-    gap: clamp(3rem, -30.992rem + 42.424vi, 9.125rem);
-    padding-block: clamp(2.313rem, 0.033rem + 9.35vi, 8.875rem);
+    /* align-items: center; */
+    /* gap: clamp(3rem, -30.992rem + 42.424vi, 9.125rem); */
+    padding-block: var(--padding-block);
   }
 
   .first-column {
-    min-width: 36%;
-    max-width: 36%;
+    min-width: 35.5%;
+    max-width: 35.5%;
   }
 
   .second-column {
