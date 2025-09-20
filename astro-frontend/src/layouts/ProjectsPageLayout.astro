@@ -426,15 +426,15 @@ const getProjectSlug = (slug: any) => {
             // No filters active, show all
             item.style.display = 'block'
           } else {
-            // Check if project has any of the active service filters
+            // Check if project has all of the active service filters
             const itemServicesStr = item.getAttribute('data-services') || ''
             const itemServices = itemServicesStr ? itemServicesStr.split(',').filter((s) => s) : []
 
-            // Using .some() for efficiency - stops at first match
-            const hasActiveService = itemServices.some((service) =>
-              window.activeFilters.has(service),
+            // Using .every() to check that project has ALL selected filters
+            const hasAllActiveServices = [...window.activeFilters].every((filter) =>
+              itemServices.includes(filter),
             )
-            item.style.display = hasActiveService ? 'block' : 'none'
+            item.style.display = hasAllActiveServices ? 'block' : 'none'
           }
         })
 
