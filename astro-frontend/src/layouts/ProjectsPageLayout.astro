@@ -39,7 +39,12 @@ const getProjectSlug = (slug: any) => {
             services &&
               services.map((service) => (
                 <li>
-                  <PillButton text={service.title} data-service={service._id} class="filter-pill" />
+                  <PillButton
+                    text={service.title}
+                    data-service={service._id}
+                    data-slug={service.slug?.current}
+                    class="filter-pill"
+                  />
                 </li>
               ))
           }
@@ -272,11 +277,15 @@ const getProjectSlug = (slug: any) => {
   // Check for service parameter in URL on page load
   window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search)
-    const serviceId = urlParams.get('service')
+    const serviceParam = urlParams.get('service')
 
-    if (serviceId) {
-      // Find and click the corresponding filter pill
-      const pill = document.querySelector(`[data-service="${serviceId}"]`)
+    if (serviceParam) {
+      // Try to find pill by slug first (check data-slug), then fallback to ID (data-service)
+      let pill = document.querySelector(`[data-slug="${serviceParam}"]`)
+      if (!pill) {
+        // Fallback to ID-based search for backward compatibility
+        pill = document.querySelector(`[data-service="${serviceParam}"]`)
+      }
       if (pill) {
         // Simulate a click to activate the filter
         pill.click()

@@ -151,6 +151,9 @@ export const projectSchema = z.object({
       z.object({
         _id: z.string(),
         title: z.string(),
+        slug: z.object({
+          current: z.string(),
+        }).optional(),
         description: z.string().optional(),
       }),
     )

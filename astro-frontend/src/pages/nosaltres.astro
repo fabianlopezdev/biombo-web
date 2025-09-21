@@ -40,45 +40,32 @@ const descriptionHtml = portableTextToHtml(aboutUsPageData?.description)
 ---
 
 <BaseLayout
-  title={aboutUsPageData?.title || 'Nosaltres'}
+  title="Nosaltres - Biombo Studio"
   metaDescription={aboutUsPageData?.description?.[0]?.children?.[0]?.text}
 >
   <main>
-    <TwoColumnLayout>
-      <h1 slot="first-column">{aboutUsPageData?.title || 'Nosaltres'}</h1>
-      <div slot="second-column">
-        {
-          descriptionHtml ? (
-            <p set:html={descriptionHtml} />
-          ) : (
-            <p>
-              Biombo Studio és un estudi de disseny gràfic i web liderat per Jordi Daví.
-              <br />
-              <br />
-              Comptem amb una xarxa de col·laboradors, experts en diverses disciplines, que aporten
-              el seu coneixement per garantir resultats de primer nivell.
-              <br />
-              <br />
-              Treballem amb l'objectiu de trobar el millor camí creatiu per al teu projecte, marca o
-              empresa.
-            </p>
-          )
-        }
-      </div>
-    </TwoColumnLayout>
-
-    <!-- About Slider Section (if data exists) -->
-    {
-      aboutUsPageData?.aboutSlider && (
-        <TwoColumnLayout class="about-slider-section">
-          <h2 slot="first-column">{aboutUsPageData.aboutSlider.title}</h2>
+    {aboutUsPageData && (
+      <Fragment>
+        <TwoColumnLayout>
+          <h1 slot="first-column">{aboutUsPageData.title}</h1>
           <div slot="second-column">
-            <p set:html={portableTextToHtml(aboutUsPageData.aboutSlider.description)} />
-            <AboutUsSliderSection sliderData={aboutUsPageData.aboutSlider} />
+            {descriptionHtml && <p set:html={descriptionHtml} />}
           </div>
         </TwoColumnLayout>
-      )
-    }
+
+        {aboutUsPageData.aboutSlider && (
+          <TwoColumnLayout class="about-slider-section">
+            <h2 slot="first-column">{aboutUsPageData.aboutSlider.title}</h2>
+            <div slot="second-column">
+              {aboutUsPageData.aboutSlider.description && (
+                <p set:html={portableTextToHtml(aboutUsPageData.aboutSlider.description)} />
+              )}
+              <AboutUsSliderSection sliderData={aboutUsPageData.aboutSlider} />
+            </div>
+          </TwoColumnLayout>
+        )}
+      </Fragment>
+    )}
   </main>
 </BaseLayout>
 
