@@ -190,14 +190,17 @@ const getProjectSlug = (slug: any) => {
   .projects-grid-container {
     max-width: 85.3125rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-    margin-inline: auto;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), max-content));
+    justify-content: center;
+    /* align-content: center; */
+    /* margin-inline: auto; */
     gap: 1.85rem;
   }
 
   .project-item {
+    max-inline-size: 27.148rem;
     aspect-ratio: 3/4;
-    display: block; /* Override default list-item display to fix grid layout */
+    /* display: block; Override default list-item display to fix grid layout */
     /* height: clamp(25.375rem, -2.75rem + 41.705vi, 36.688rem); */
   }
 
