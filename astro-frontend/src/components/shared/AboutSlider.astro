@@ -1,0 +1,146 @@
+---
+import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
+import AboutImage from '@/components/pages/homepage/about-section/AboutImage.astro'
+import AboutSliderComponent from '@/components/pages/homepage/about-section/AboutSlider.astro'
+import MobileSlider from '@/components/shared/MobileSlider.astro'
+import type { SanityImage as SanityImageType } from '@/shared/schemas/sanity/homePageSchema'
+import type { PortableTextBlock } from '@portabletext/types'
+
+export interface DisplayImage extends SanityImageType {}
+
+interface Props {
+  title: string
+  description?: PortableTextBlock[]
+  images: DisplayImage[]
+}
+
+const { title, description, images } = Astro.props
+
+let copyText = portableTextToHtml(description)
+
+function portableTextToHtml(description: PortableTextBlock[] | undefined): string {
+  if (!description || description.length === 0) return ''
+
+  const customPortableTextComponents: Partial<PortableTextComponents> = {
+    block: {
+      normal({ children }): string {
+        return children || ''
+      },
+    },
+  }
+
+  return toHTML(description as any, {
+    components: customPortableTextComponents,
+  })
+}
+
+const imagesToDisplay: DisplayImage[] = images || []
+const imageCount = imagesToDisplay.length
+---
+
+<section class="about-slider" data-image-count={imageCount}>
+  <div class="about-slider__text">
+    <h2 class="about-slider__title">{title.toUpperCase()}</h2>
+    <p class="about-slider__copy" set:html={copyText} />
+  </div>
+
+  <div class="about-slider__gallery">
+    <!-- Desktop slider -->
+    <div class="about-slider__gallery-desktop">
+      {
+        imageCount === 1 ? (
+          <AboutImage image={imagesToDisplay[0]} />
+        ) : (
+          <AboutSliderComponent imagesToDisplay={imagesToDisplay} imageCount={imageCount} />
+        )
+      }
+    </div>
+
+    <!-- Mobile slider -->
+    <div class="about-slider__gallery-mobile">
+      {
+        imageCount === 1 ? (
+          <AboutImage image={imagesToDisplay[0]} />
+        ) : (
+          <MobileSlider class="about-slider-mobile-slider">
+            {imagesToDisplay.map((image) => (
+              <div class="about-slider-mobile-slide">
+                <AboutImage image={image} />
+              </div>
+            ))}
+          </MobileSlider>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-slider {
+    display: grid;
+    grid-template-columns: clamp(18rem, 35vw, 40rem) 1fr;
+    gap: 4.4375rem;
+    height: 100dvh;
+    padding-block: var(--padding-block);
+    padding-inline-start: var(--padding-inline);
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    overflow: hidden;
+  }
+
+  .about-slider__title {
+    font-size: var(--font-size);
+    font-weight: var(--font-weight-light);
+  }
+
+  .about-slider__copy {
+    font-size: var(--font-size-homepage-sections);
+    font-weight: var(--font-weight-light);
+    max-width: 33.1875rem;
+    line-height: 1.184;
+    padding-block: var(--padding-block);
+  }
+
+  .about-slider__gallery-desktop {
+    display: block;
+    --slider-space: 1.981875rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--slider-space);
+    overflow: hidden;
+  }
+
+  .about-slider__gallery-mobile {
+    display: none;
+  }
+
+  @media (width < 1025px) {
+    .about-slider {
+      display: block;
+      height: auto;
+      overflow: visible;
+      padding-inline-end: var(--padding-inline);
+    }
+
+    .about-slider__gallery {
+      overflow: visible;
+    }
+
+    .about-slider__gallery-desktop {
+      display: none;
+    }
+
+    .about-slider__gallery-mobile {
+      display: block;
+    }
+
+    .about-slider-mobile-slide {
+      flex: 0 0 auto;
+      width: min(72.3vw, 19.43rem);
+      aspect-ratio: 282 / 384.9;
+      scroll-snap-align: start;
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+  }
+</style>

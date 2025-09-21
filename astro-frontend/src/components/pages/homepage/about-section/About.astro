@@ -1,13 +1,7 @@
 ---
-import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
-import AboutImage from '@/components/pages/homepage/about-section/AboutImage.astro'
-import AboutSlider from '@/components/pages/homepage/about-section/AboutSlider.astro'
-import MobileSlider from '@/components/shared/MobileSlider.astro'
-import type { SanityImage as SanityImageType } from '@/shared/schemas/sanity/homePageSchema'
+import AboutSlider from '@/components/shared/AboutSlider.astro'
 import type { AboutSection } from '@/shared/schemas/sanity/homePageSchema'
-import type { PortableTextBlock } from '@portabletext/types'
-
-export interface DisplayImage extends SanityImageType {}
+import type { DisplayImage } from '@/components/shared/AboutSlider.astro'
 
 interface Props {
   sectionData?: AboutSection | null
@@ -15,140 +9,19 @@ interface Props {
 
 const { sectionData: aboutSection } = Astro.props
 
-let copyText = portableTextToHtml(aboutSection?.description)
-
-function portableTextToHtml(description: PortableTextBlock[] | undefined): string {
-  if (!description || description.length === 0) return ''
-
-  const customPortableTextComponents: Partial<PortableTextComponents> = {
-    block: {
-      // Strip surrounding <p> for "normal" paragraphs; keep children only
-      normal({ children }): string {
-        return children || ''
-      },
-    },
-  }
-
-  return toHTML(description as any, {
-    components: customPortableTextComponents,
-  })
-}
-// Images & indicator width
 const imagesToDisplay: DisplayImage[] = aboutSection?.images
   ? aboutSection.images.map((img) => img as DisplayImage)
   : []
-
-const imageCount = imagesToDisplay.length
 ---
 
-<section id="about" class="about" data-image-count={imageCount}>
-  <div class="about__text">
-    <h2 class="about__title">{aboutSection?.title.toUpperCase()}</h2>
-    <p class="about__copy" set:html={copyText} />
-  </div>
-
-  <div class="about__gallery">
-    <!-- Desktop slider -->
-    <div class="about__gallery-desktop">
-      {
-        imageCount === 1 ? (
-          <AboutImage image={imagesToDisplay[0]} />
-        ) : (
-          <AboutSlider imagesToDisplay={imagesToDisplay} imageCount={imageCount} />
-        )
-      }
-    </div>
-
-    <!-- Mobile slider -->
-    <div class="about__gallery-mobile">
-      {
-        imageCount === 1 ? (
-          <AboutImage image={imagesToDisplay[0]} />
-        ) : (
-          <MobileSlider class="about-mobile-slider">
-            {imagesToDisplay.map((image) => (
-              <div class="about-mobile-slide">
-                <AboutImage image={image} />
-              </div>
-            ))}
-          </MobileSlider>
-        )
-      }
-    </div>
-  </div>
+<section id="about">
+  {
+    aboutSection && (
+      <AboutSlider
+        title={aboutSection.title}
+        description={aboutSection.description}
+        images={imagesToDisplay}
+      />
+    )
+  }
 </section>
-
-<style>
-  .about {
-    display: grid;
-    grid-template-columns: clamp(18rem, 35vw, 40rem) 1fr;
-    gap: 4.4375rem;
-    height: 100dvh;
-    padding-block: var(--padding-block);
-    padding-inline-start: var(--padding-inline);
-    background-color: var(--color-secondary);
-    color: var(--color-primary);
-    overflow: hidden;
-  }
-
-  .about__title {
-    font-size: var(--font-size);
-    font-weight: var(--font-weight-light);
-    /* margin-block-end: clamp(3.125rem, 1.497rem + 6.679vi, 7.813rem); */
-  }
-
-  .about__copy {
-    font-size: var(--font-size-homepage-sections);
-    font-weight: var(--font-weight-light);
-    max-width: 33.1875rem;
-    line-height: 1.184;
-    padding-block: var(--padding-block);
-  }
-
-  .about__gallery {
-  }
-
-  /* Show/hide desktop and mobile galleries */
-  .about__gallery-desktop {
-    display: block;
-    --slider-space: 1.981875rem;
-    display: flex;
-    flex-direction: column;
-    gap: var(--slider-space);
-    overflow: hidden; /* keep side clipping */
-  }
-
-  .about__gallery-mobile {
-    display: none;
-  }
-
-  @media (width < 1025px) {
-    .about {
-      display: block;
-      height: auto;
-      overflow: visible;
-      padding-inline-end: var(--padding-inline);
-    }
-
-    .about__gallery {
-      overflow: visible;
-    }
-
-    .about__gallery-desktop {
-      display: none;
-    }
-
-    .about__gallery-mobile {
-      display: block;
-    }
-
-    .about-mobile-slide {
-      flex: 0 0 auto;
-      width: min(72.3vw, 19.43rem);
-      aspect-ratio: 282 / 384.9;
-      scroll-snap-align: start;
-      border-radius: 0.75rem;
-      overflow: hidden;
-    }
-  }
-</style>

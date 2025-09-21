@@ -1,11 +1,12 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
-import AboutUsSliderSection from '@/components/pages/about/AboutUsSliderSection.astro'
+import AboutSlider from '@/components/shared/AboutSlider.astro'
 import { fetchAboutUsPageByLocale } from '@/shared/lib/sanity/queries/aboutUsPageQueries'
 import type { AboutUsPage } from '@/shared/schemas/sanity/aboutUsPageSchema'
 import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
 import type { PortableTextBlock } from '@portabletext/types'
+import type { DisplayImage } from '@/components/shared/AboutSlider.astro'
 
 // This is the Catalan about us page
 const locale = 'ca'
@@ -37,6 +38,14 @@ function portableTextToHtml(description: PortableTextBlock[] | undefined): strin
 }
 
 const descriptionHtml = portableTextToHtml(aboutUsPageData?.description)
+
+// Transform images to the expected format for AboutSlider
+const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
+  ? aboutUsPageData.aboutSlider.images.map((img) => ({
+      ...img,
+      asset: img.asset,
+    }))
+  : []
 ---
 
 <BaseLayout
@@ -44,29 +53,27 @@ const descriptionHtml = portableTextToHtml(aboutUsPageData?.description)
   metaDescription={aboutUsPageData?.description?.[0]?.children?.[0]?.text}
 >
   <main>
-    {aboutUsPageData && (
-      <Fragment>
-        <TwoColumnLayout>
-          <h1 slot="first-column">{aboutUsPageData.title}</h1>
-          <div slot="second-column">
-            {descriptionHtml && <p set:html={descriptionHtml} />}
-          </div>
-        </TwoColumnLayout>
-
-        {aboutUsPageData.aboutSlider && (
-          <TwoColumnLayout class="about-slider-section">
-            <h2 slot="first-column">{aboutUsPageData.aboutSlider.title}</h2>
-            <div slot="second-column">
-              {aboutUsPageData.aboutSlider.description && (
-                <p set:html={portableTextToHtml(aboutUsPageData.aboutSlider.description)} />
-              )}
-              <AboutUsSliderSection sliderData={aboutUsPageData.aboutSlider} />
-            </div>
+    {
+      aboutUsPageData && (
+        <Fragment>
+          <TwoColumnLayout>
+            <h1 slot="first-column">{aboutUsPageData.title}</h1>
+            <div slot="second-column">{descriptionHtml && <p set:html={descriptionHtml} />}</div>
           </TwoColumnLayout>
-        )}
-      </Fragment>
-    )}
+        </Fragment>
+      )
+    }
   </main>
+
+  {
+    aboutUsPageData?.aboutSlider && (
+      <AboutSlider
+        title={aboutUsPageData.aboutSlider.title}
+        description={aboutUsPageData.aboutSlider.description}
+        images={sliderImages}
+      />
+    )
+  }
 </BaseLayout>
 
 <style>
