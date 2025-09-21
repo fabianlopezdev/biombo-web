@@ -1,18 +1,14 @@
 // src/shared/lib/sanity/queries/serviceQueries.ts
 import { fetchSanityQuery } from '@/shared/lib/sanity/client'
-import {
-  servicesSchema,
-  type Services,
-} from '@/shared/schemas/sanity/serviceSchema'
+import { servicesSchema, type Services } from '@/shared/schemas/sanity/serviceSchema'
 
-export async function fetchServicesByLocale(
-  locale: 'ca' | 'es' | 'en',
-): Promise<Services> {
+export async function fetchServicesByLocale(locale: 'ca' | 'es' | 'en'): Promise<Services> {
   const query = `*[_type == "service" && language == $locale] | order(orderRank) {
     _id,
     _type,
     language,
     title,
+    slug,
     description
   }`
   const params = { locale }

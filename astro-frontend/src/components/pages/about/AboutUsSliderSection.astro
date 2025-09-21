@@ -1,0 +1,122 @@
+---
+import type { AboutSlider, AboutUsImage } from '@/shared/schemas/sanity/aboutUsPageSchema'
+import AboutImage from '@/components/pages/homepage/about-section/AboutImage.astro'
+import ImageSlider from '@/components/pages/homepage/about-section/AboutSlider.astro'
+import MobileSlider from '@/components/shared/MobileSlider.astro'
+
+interface Props {
+  sliderData: AboutSlider
+}
+
+const { sliderData } = Astro.props
+
+// Transform images to the expected format
+const imagesToDisplay = sliderData.images.map((img: AboutUsImage) => ({
+  ...img,
+  asset: img.asset,
+}))
+
+const imageCount = imagesToDisplay.length
+---
+
+<div class="about-us-slider">
+  <!-- Desktop slider -->
+  <div class="about-us-slider__desktop">
+    {
+      imageCount === 1 ? (
+        <div class="single-image">
+          <AboutImage image={imagesToDisplay[0]} />
+        </div>
+      ) : imageCount === 2 ? (
+        <div class="two-images">
+          {imagesToDisplay.map((image) => (
+            <div class="two-images__item">
+              <AboutImage image={image} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <ImageSlider imagesToDisplay={imagesToDisplay} imageCount={imageCount} />
+      )
+    }
+  </div>
+
+  <!-- Mobile slider -->
+  <div class="about-us-slider__mobile">
+    {
+      imageCount === 1 ? (
+        <div class="single-image-mobile">
+          <AboutImage image={imagesToDisplay[0]} />
+        </div>
+      ) : (
+        <MobileSlider class="about-us-mobile-slider">
+          {imagesToDisplay.map((image) => (
+            <div class="about-us-mobile-slide">
+              <AboutImage image={image} />
+            </div>
+          ))}
+        </MobileSlider>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .about-us-slider {
+    margin-block-start: 2rem;
+  }
+
+  .about-us-slider__desktop {
+    display: block;
+  }
+
+  .about-us-slider__mobile {
+    display: none;
+  }
+
+  .single-image {
+    width: 100%;
+    max-width: 40rem;
+    aspect-ratio: 16 / 10;
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  .two-images {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .two-images__item {
+    flex: 1;
+    aspect-ratio: 4 / 5;
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  @media (width < 1025px) {
+    .about-us-slider__desktop {
+      display: none;
+    }
+
+    .about-us-slider__mobile {
+      display: block;
+    }
+
+    .single-image-mobile {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+
+    .about-us-mobile-slide {
+      flex: 0 0 auto;
+      width: min(72.3vw, 19.43rem);
+      aspect-ratio: 282 / 384.9;
+      scroll-snap-align: start;
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+  }
+</style>

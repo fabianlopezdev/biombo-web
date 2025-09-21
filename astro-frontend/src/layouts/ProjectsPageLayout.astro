@@ -269,6 +269,21 @@ const getProjectSlug = (slug: any) => {
   // Track active filters using a Set for O(1) lookup efficiency
   window.activeFilters = new Set()
 
+  // Check for service parameter in URL on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const serviceId = urlParams.get('service')
+
+    if (serviceId) {
+      // Find and click the corresponding filter pill
+      const pill = document.querySelector(`[data-service="${serviceId}"]`)
+      if (pill) {
+        // Simulate a click to activate the filter
+        pill.click()
+      }
+    }
+  })
+
   // Add keyboard support and click handlers to filter pills
   filterPills.forEach((pill) => {
     pill.setAttribute('tabindex', '0')

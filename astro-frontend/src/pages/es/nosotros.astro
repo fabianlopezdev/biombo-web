@@ -7,8 +7,8 @@ import type { AboutUsPage } from '@/shared/schemas/sanity/aboutUsPageSchema'
 import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
 import type { PortableTextBlock } from '@portabletext/types'
 
-// This is the Catalan about us page
-const locale = 'ca'
+// This is the Spanish about us page
+const locale = 'es'
 
 // Fetch about us page data from Sanity
 let aboutUsPageData: AboutUsPage | null = null
@@ -40,27 +40,27 @@ const descriptionHtml = portableTextToHtml(aboutUsPageData?.description)
 ---
 
 <BaseLayout
-  title={aboutUsPageData?.title || 'Nosaltres'}
+  title={aboutUsPageData?.title || 'Nosotros'}
   metaDescription={aboutUsPageData?.description?.[0]?.children?.[0]?.text}
 >
   <main>
     <TwoColumnLayout>
-      <h1 slot="first-column">{aboutUsPageData?.title || 'Nosaltres'}</h1>
+      <h1 slot="first-column">{aboutUsPageData?.title || 'Nosotros'}</h1>
       <div slot="second-column">
         {
           descriptionHtml ? (
             <p set:html={descriptionHtml} />
           ) : (
             <p>
-              Biombo Studio és un estudi de disseny gràfic i web liderat per Jordi Daví.
+              Biombo Studio es un estudio de diseño gráfico y web liderado por Jordi Daví.
               <br />
               <br />
-              Comptem amb una xarxa de col·laboradors, experts en diverses disciplines, que aporten
-              el seu coneixement per garantir resultats de primer nivell.
+              Contamos con una red de colaboradores, expertos en diversas disciplinas, que aportan
+              su conocimiento para garantizar resultados de primer nivel.
               <br />
               <br />
-              Treballem amb l'objectiu de trobar el millor camí creatiu per al teu projecte, marca o
-              empresa.
+              Trabajamos con el objetivo de encontrar el mejor camino creativo para tu proyecto,
+              marca o empresa.
             </p>
           )
         }

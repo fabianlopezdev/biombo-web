@@ -59,6 +59,7 @@ export async function fetchProjectBySlug(
       services[]-> {
         _id,
         title,
+        slug,
         description
       },
       categories[]-> {
@@ -277,6 +278,7 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
       services[]-> {
         _id,
         title,
+        slug,
         description
       },
       categories[]-> {

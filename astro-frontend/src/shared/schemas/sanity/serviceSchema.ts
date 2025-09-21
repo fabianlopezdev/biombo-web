@@ -6,6 +6,11 @@ export const serviceSchema = z.object({
   _type: z.literal('service'),
   language: z.union([z.literal('ca'), z.literal('es'), z.literal('en')]),
   title: z.string(),
+  slug: z
+    .object({
+      current: z.string(),
+    })
+    .optional(),
   description: z.string().optional(),
 })
 

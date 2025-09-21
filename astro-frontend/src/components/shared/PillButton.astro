@@ -3,18 +3,29 @@ interface Props {
   text: string
   isActive?: boolean
   class?: string
+  href?: string
   [key: string]: any // For data attributes and other props
 }
 
-const { text, isActive = false, class: className = '', ...rest } = Astro.props
+const { text, isActive = false, class: className = '', href, ...rest } = Astro.props
 ---
 
-<button
-  class={`pill-button ${isActive ? 'active' : ''} ${className}`}
-  {...rest}
->
-  {text}
-</button>
+{
+  href ? (
+    <a
+      href={href}
+      class={`pill-button ${isActive ? 'active' : ''} ${className}`}
+      data-astro-prefetch
+      {...rest}
+    >
+      {text}
+    </a>
+  ) : (
+    <button class={`pill-button ${isActive ? 'active' : ''} ${className}`} {...rest}>
+      {text}
+    </button>
+  )
+}
 
 <style>
   .pill-button {
@@ -27,9 +38,12 @@ const { text, isActive = false, class: className = '', ...rest } = Astro.props
     font-size: clamp(1rem, 0.913rem + 0.356vi, 1.25rem);
     text-wrap: nowrap;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+    transition:
+      background-color 0.3s,
+      color 0.3s;
     text-decoration: none;
     font-family: inherit;
+    display: inline-block;
   }
 
   .pill-button:hover,
