@@ -288,6 +288,23 @@ export const aboutSection = defineType({
   },
 })
 
+// Schema for the Clients section
+export const clientsSection = defineType({
+  name: 'clientsSection',
+  title: 'Clients Section',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Section Title',
+      description: 'The title for the clients section',
+      type: 'string',
+      validation: (Rule) => Rule.required().error('Section title is required'),
+      initialValue: 'Clients destacats que han confiat en nosaltres',
+    }),
+  ],
+})
+
 // Schema for the Services section (placeholder for now)
 export const servicesSection = defineType({
   name: 'servicesSection',
@@ -395,6 +412,11 @@ export const homePage = defineType({
       name: 'services',
       title: 'Services Section',
       type: 'servicesSection',
+    }),
+    defineField({
+      name: 'clients',
+      title: 'Clients Section',
+      type: 'clientsSection',
     }),
   ],
   preview: {

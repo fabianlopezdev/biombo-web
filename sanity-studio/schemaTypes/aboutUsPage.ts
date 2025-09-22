@@ -87,6 +87,13 @@ export const aboutUsPage = defineType({
       type: 'aboutSlider',
       description: 'Content section with title, description, and image slider',
     }),
+    defineField({
+      name: 'clientsTitle',
+      title: 'Clients Section Title',
+      type: 'string',
+      description: 'The title for the clients section. The client logos displayed are shared with the homepage. To select which clients appear in the slider, go to the Clients section in Sanity and mark them as "Featured".',
+      validation: (Rule) => Rule.required().error('Clients section title is required'),
+    }),
   ],
   preview: {
     select: {

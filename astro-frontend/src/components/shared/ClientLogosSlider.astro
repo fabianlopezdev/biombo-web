@@ -1,16 +1,21 @@
 ---
-import type { Client } from '@/shared/schemas/sanity/clientSchema'
+import { fetchFeaturedClients } from '@/shared/lib/sanity/queries/clientQueries'
 
 interface Props {
-  clients: Client[]
   speed?: 'slow' | 'normal' | 'fast'
   pauseOnHover?: boolean
 }
 
-const { clients, speed = 'normal', pauseOnHover = true } = Astro.props
+const { speed = 'normal', pauseOnHover = true } = Astro.props
+
+// Fetch featured clients
+const clients = await fetchFeaturedClients()
+console.log('Featured Clients in ClientLogosSlider:', clients)
+console.log('Number of featured clients:', clients.length)
 
 // Filter out clients without logos
 const clientsWithLogos = clients.filter((client) => client.logo?.asset?.url)
+console.log('Clients with logos:', clientsWithLogos.length)
 
 // Duplicate the array for seamless infinite scroll
 const duplicatedClients = [...clientsWithLogos, ...clientsWithLogos]

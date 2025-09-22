@@ -97,14 +97,6 @@ const heroSectionSchema = z.object({
   mobileTextAlignment: z.string().optional(), // Mobile text alignment: 'left' | 'center' | 'right'
 })
 
-// Define Zod schema for color value (hex)
-const colorValueSchema = z
-  .object({
-    hex: z.string().optional(), // hex might be undefined if color is not set
-  })
-  .optional()
-  .nullable() // The whole color object can be null or undefined
-
 // Define Zod schema for an individual featured project item
 export const featuredProjectItemSchema = z.object({
   _key: z.string(),
@@ -141,6 +133,12 @@ const servicesSectionSchema = z.object({
   selectedServices: z.array(serviceSchema).optional(),
 })
 
+// Zod schema for the Clients section
+const clientsSectionSchema = z.object({
+  _type: z.literal('clientsSection').optional(),
+  title: z.string(),
+})
+
 // Define Zod schema for the entire HomePage
 export const homePageSchema = z.object({
   _id: z.string(),
@@ -152,6 +150,7 @@ export const homePageSchema = z.object({
   projects: projectsSectionSchema.nullable().optional(), // Allow null or undefined
   about: aboutSectionSchema.nullable().optional(), // Allow null or undefined
   services: servicesSectionSchema.nullable().optional(), // Allow null or undefined
+  clients: clientsSectionSchema.nullable().optional(), // Allow null or undefined
 })
 
 // Export the TypeScript types derived from the Zod schemas
@@ -165,16 +164,18 @@ export type HeroSection = z.infer<typeof heroSectionSchema>
 export type ProjectsSection = z.infer<typeof projectsSectionSchema>
 export type AboutSection = z.infer<typeof aboutSectionSchema>
 export type ServicesSection = z.infer<typeof servicesSectionSchema>
+export type ClientsSection = z.infer<typeof clientsSectionSchema>
 
 // Define HomePage type to properly handle nullable fields
 export type HomePage = Omit<
   z.infer<typeof homePageSchema>,
-  'hero' | 'projects' | 'about' | 'services'
+  'hero' | 'projects' | 'about' | 'services' | 'clients'
 > & {
   hero: HeroSection | null
   projects?: ProjectsSection | null
   about?: AboutSection | null
   services?: ServicesSection | null
+  clients?: ClientsSection | null
 }
 
 // Schema for an array of home pages (likely won't be needed, but included for consistency)

@@ -62,6 +62,7 @@ export const aboutUsPageSchema = z.object({
   title: z.string(),
   description: z.array(portableTextBlockSchema),
   aboutSlider: aboutSliderSchema.optional(),
+  clientsTitle: z.string().optional(),
 })
 
 // Type exports
