@@ -162,10 +162,12 @@ const getImageSectionLayout = (section: any) => {
     {
       project.contentSections?.map((section: any, index: number) => {
         const isLastSection = index === project.contentSections.length - 1
+        const nextSection = !isLastSection ? project.contentSections[index + 1] : null
+        const isBeforeText = nextSection && nextSection._type === 'textBlock'
 
         if (section._type === 'textBlock') {
           return (
-            <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+            <div class="content-section standalone-text-section">
               <blockquote
                 class="standalone-text project-copy highlight-quote"
                 set:html={portableTextToHtml(section.text)}
@@ -176,11 +178,12 @@ const getImageSectionLayout = (section: any) => {
 
         if (section._type === 'imageSection') {
           const layout = getImageSectionLayout(section)
+          const spacingClass = !isLastSection ? (isBeforeText ? 'before-text' : 'with-spacing') : ''
 
           // 1 image layout - full width (like the standalone image)
           if (layout.totalImages === 1) {
             return (
-              <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+              <div class={`content-section ${spacingClass}`}>
                 <figure class="red-background standalone-image">
                   <img
                     src={getImageUrl(
@@ -197,7 +200,7 @@ const getImageSectionLayout = (section: any) => {
           // 2 images layout - side by side (two columns only)
           if (layout.totalImages === 2) {
             return (
-              <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+              <div class={`content-section ${spacingClass}`}>
                 <div class="two-image-layout gallery">
                   <div class="two-columns">
                     {layout.otherImages.map((img: any) => (
@@ -216,7 +219,7 @@ const getImageSectionLayout = (section: any) => {
             // If there's a featured image: 2 on top, featured below
             if (layout.hasFeatured) {
               return (
-                <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+                <div class={`content-section ${spacingClass}`}>
                   <div class="two-image-layout gallery">
                     <div class="two-columns">
                       {layout.otherImages.map((img: any) => (
@@ -239,7 +242,7 @@ const getImageSectionLayout = (section: any) => {
             // If no featured image: 3 in a row
             else {
               return (
-                <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+                <div class={`content-section ${spacingClass}`}>
                   <div class="three-image-layout gallery">
                     <div class="three-columns">
                       {layout.otherImages.map((img: any) => (
@@ -257,7 +260,7 @@ const getImageSectionLayout = (section: any) => {
           // 4 images layout - 3 on top, featured below
           if (layout.totalImages === 4) {
             return (
-              <div class={`content-section ${!isLastSection ? 'with-spacing' : ''}`}>
+              <div class={`content-section ${spacingClass}`}>
                 <div class="three-image-layout gallery">
                   <div class="three-columns">
                     {layout.otherImages.map((img: any) => (
@@ -414,6 +417,16 @@ const getImageSectionLayout = (section: any) => {
 
   .content-section.with-spacing {
     margin-block-end: clamp(3.375rem, 2.246rem + 4.63vi, 6.625rem);
+  }
+
+  /* Override margin when section is before standalone text */
+  .content-section.before-text {
+    margin-block-end: 0;
+  }
+
+  /* Special margin for standalone text sections */
+  .content-section.standalone-text-section {
+    margin-block: clamp(3.375rem, 1.291rem + 8.549vi, 9.375rem);
   }
 
   .standalone-image {
