@@ -441,16 +441,23 @@ const getImageSectionLayout = (section: any) => {
   }
 
   .similar-projects-container {
-    display: flex;
-    gap: 1.875rem;
-    flex-wrap: wrap;
+    max-width: 85.3125rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), max-content));
+    justify-content: center;
+    gap: 1.85rem;
     list-style: none;
     padding-inline-start: 0;
-    margin: 0;
+    margin-inline: auto;
   }
 
   .similar-project-item {
-    flex: 1;
+    max-inline-size: 27.148rem;
+    aspect-ratio: 3/4;
+  }
+
+  .similar-project-item article {
+    height: 100%;
   }
 
   /* ProjectCard handles its own styles internally */
@@ -524,6 +531,13 @@ const getImageSectionLayout = (section: any) => {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1rem;
+      max-width: none;
+      margin-inline: 0;
+    }
+
+    .similar-project-item {
+      max-inline-size: none;
+      aspect-ratio: auto;
     }
 
     /* Mobile styles handled by ProjectCard component */
