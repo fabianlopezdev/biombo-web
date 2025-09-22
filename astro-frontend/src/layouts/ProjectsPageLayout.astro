@@ -97,6 +97,9 @@ const getProjectSlug = (slug: any) => {
 </ProjectesLayout>
 
 <style>
+  #filter-heading {
+    padding-inline-end: 0.2rem;
+  }
   .projects-filter-container {
     --projects-text-size: clamp(1.125rem, 1.082rem + 0.178vi, 1.25rem);
     padding-block-start: var(--padding-block);
@@ -113,20 +116,16 @@ const getProjectSlug = (slug: any) => {
   }
 
   .projects-nav-filter {
+    max-inline-size: 85.3125rem;
+    min-width: 0; /* Allow flex item to shrink below content width */
     display: flex;
     align-items: center;
     /* gap: 1.25rem; */
     flex: 1;
     position: relative;
     /* padding-inline-start: 1rem; Slightly more padding to push first pill past the 3% fade */
-    mask-image: linear-gradient(to right, transparent 0%, black 3%, black 90%, transparent 100%);
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      black 3%,
-      black 90%,
-      transparent 100%
-    );
+    mask-image: linear-gradient(to right, transparent 0%, black 3%, black 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 100%);
   }
 
   .projects-filter-wrapper {
@@ -136,7 +135,7 @@ const getProjectSlug = (slug: any) => {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     position: relative;
-    padding-inline-start: 2rem; /* Slightly more padding to push first pill past the 3% fade */
+    padding-inline-start: 1.6rem; /* Slightly more padding to push first pill past the 3% fade */
     /* Add mask for right fade only */
     mask-image: linear-gradient(to right, black 0%, black 90%, transparent 100%);
     -webkit-mask-image: linear-gradient(to right, black 0%, black 90%, transparent 100%);
@@ -240,6 +239,7 @@ const getProjectSlug = (slug: any) => {
 
     /* Reset wrapper styles on mobile */
     .projects-filter-wrapper {
+      padding-inline-start: var(--padding-inline);
       overflow: visible;
       flex: none;
       mask-image: none;
@@ -263,6 +263,14 @@ const getProjectSlug = (slug: any) => {
       padding-inline-start: 1rem;
       padding-inline-end: var(--padding-inline);
       background: none; /* Remove desktop gradient */
+    }
+
+    .projects-filter-list {
+      padding-inline-start: 0;
+    }
+
+    .projects-grid-container {
+      gap: clamp(2.25rem, 2.389rem + -0.57vi, 1.85rem);
     }
   }
 </style>

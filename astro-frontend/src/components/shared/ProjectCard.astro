@@ -84,7 +84,7 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
     display: block;
     width: 100%;
     height: 100%;
-    border-radius: 0.621875rem;
+    /* border-radius: 0.621875rem; */
     overflow: hidden;
     position: relative;
     text-decoration: none;
@@ -107,7 +107,7 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
   .project-figure {
     position: relative;
     margin: 0;
-    border-radius: 0.621875rem;
+    /* border-radius: 0.621875rem; */
     /* border-radius: inherit; */
     overflow: hidden;
     height: 100%;
@@ -168,12 +168,13 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
   @media (width < 991px) {
     .project-card {
       height: auto; /* Reset height on mobile */
+      border-radius: 0;
     }
 
     .project-link {
       display: flex;
       flex-direction: column;
-      gap: 1.125rem;
+      gap: 1.25rem;
       height: auto; /* Reset height on mobile */
       overflow: visible; /* Allow mobile info to show */
     }
@@ -203,7 +204,7 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
     .project-mobile-title {
       font-size: 1.25rem;
       font-weight: var(--font-weight-regular);
-      padding-block-end: 0.6875rem;
+      padding-block-end: 0.5875rem;
       margin: 0;
       color: inherit;
     }
