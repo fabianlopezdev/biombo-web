@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import PageSection from '@/components/shared/PageSection.astro'
+import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 import ServicesList from '@/components/shared/ServicesList.astro'
 import { fetchServicesPageByLocale } from '@/shared/lib/sanity/queries/servicesPageQueries'
 import type { ServicesPage } from '@/shared/schemas/sanity/servicesPageSchema'
@@ -22,7 +22,7 @@ const descriptionHtml = portableTextToHtmlForPageSection(servicesPageData?.descr
 <BaseLayout title="Serveis - Biombo Studio">
   <main>
 
-    <PageSection
+    <TwoColumnLayout
       title={servicesPageData?.title || "Serveis"}
       description={descriptionHtml || "Comptem amb una xarxa de col·laboradors, experts en diverses disciplines, que aporten el seu coneixement per garantir resultats de primer nivell."}
     />

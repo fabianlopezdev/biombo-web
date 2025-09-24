@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import PageSection from '@/components/shared/PageSection.astro'
+import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 import AboutSlider from '@/components/shared/AboutSlider.astro'
 import ClientLogosSlider from '@/components/shared/ClientLogosSlider.astro'
 import { fetchAboutUsPageByLocale } from '@/shared/lib/sanity/queries/aboutUsPageQueries'
@@ -38,7 +38,7 @@ const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
   metaDescription={aboutUsPageData?.description?.[0]?.children?.[0]?.text}
 >
   <main>
-    {aboutUsPageData && <PageSection title={aboutUsPageData.title} description={descriptionHtml} />}
+    {aboutUsPageData && <TwoColumnLayout title={aboutUsPageData.title} description={descriptionHtml} />}
   </main>
 
   {
