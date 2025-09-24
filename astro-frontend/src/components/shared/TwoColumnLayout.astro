@@ -19,7 +19,9 @@ const hasCustomSecondColumn = Astro.slots.has('second-column')
         <p set:html={description} />
       </div>
     ) : (
+      <div class="content-wrapper"> 
       <slot name="second-column" />
+      </div>
     )}
   </div>
 </div>
@@ -73,7 +75,7 @@ const hasCustomSecondColumn = Astro.slots.has('second-column')
     font-weight: var(--font-weight-semibold);
   }
 
-  :global(.content-wrapper p) {
+  :global(.content-wrapper) {
     font-size: clamp(1.125rem, 0.691rem + 1.781vi, 2.375rem);
     line-height: 1.2;
     padding-block-start: 1.2rem;

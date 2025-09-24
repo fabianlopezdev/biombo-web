@@ -84,8 +84,8 @@ const formSection = contactPageData?.formSection
     display: flex;
     flex-direction: column;
     font-style: normal;
-    gap: 1rem;
     margin-bottom: 3rem;
+
   }
 
   .contact-content {
@@ -95,7 +95,6 @@ const formSection = contactPageData?.formSection
   .contact-link {
     color: var(--color-text);
     text-decoration: none;
-    font-size: 1.125rem;
     transition: opacity 0.3s ease;
   }
 
@@ -104,17 +103,17 @@ const formSection = contactPageData?.formSection
   }
 
   .contact-form-section {
-    margin-top: 3rem;
+    margin-top: 3.75rem;
   }
 
   .form-title {
-    font-size: 1.875rem;
-    font-weight: var(--font-weight-light);
-    margin-bottom: 2rem;
+    font-size: inherit;
+    margin-bottom: 2.5rem;
+    font-weight: inherit;
   }
 
   .contact-form {
-    max-width: 600px;
+    font-size: clamp(1.125rem, 0.995rem + 0.534vi, 1.5rem);
   }
 
   .form-group {
@@ -124,7 +123,6 @@ const formSection = contactPageData?.formSection
   .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    font-size: 1rem;
     font-weight: var(--font-weight-light);
   }
 
@@ -134,7 +132,6 @@ const formSection = contactPageData?.formSection
     padding: 0.75rem;
     border: 1px solid rgba(0, 0, 0, 0.1);
     background: rgba(255, 255, 255, 0.05);
-    font-size: 1rem;
     font-family: inherit;
     transition: border-color 0.3s ease;
   }
@@ -155,7 +152,6 @@ const formSection = contactPageData?.formSection
     background: var(--color-text);
     color: var(--color-bg);
     border: none;
-    font-size: 1rem;
     font-weight: var(--font-weight-regular);
     cursor: pointer;
     transition: opacity 0.3s ease;
