@@ -1,0 +1,115 @@
+import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
+import type { PortableTextBlock } from '@portabletext/types'
+
+/**
+ * Converts Portable Text to HTML for use in PageSection component
+ * Returns content without wrapper <p> tags since PageSection adds them
+ * Used for about pages and services pages
+ */
+export function portableTextToHtmlForPageSection(
+  content: PortableTextBlock[] | undefined
+): string {
+  if (!content || content.length === 0) return ''
+
+  const components: Partial<PortableTextComponents> = {
+    block: {
+      normal({ children }): string {
+        // Return content with line breaks between blocks
+        // PageSection will wrap this in a <p> tag
+        return `${children || ''}<br /><br />`
+      },
+      h1({ children }): string {
+        return `<h1>${children || ''}</h1>`
+      },
+      h2({ children }): string {
+        return `<h2>${children || ''}</h2>`
+      },
+      h3({ children }): string {
+        return `<h3>${children || ''}</h3>`
+      },
+      h4({ children }): string {
+        return `<h4>${children || ''}</h4>`
+      },
+      blockquote({ children }): string {
+        return `<blockquote>${children || ''}</blockquote>`
+      },
+    },
+    marks: {
+      strong: ({ children }) => `<strong>${children}</strong>`,
+      em: ({ children }) => `<em>${children}</em>`,
+      underline: ({ children }) => `<u>${children}</u>`,
+      code: ({ children }) => `<code>${children}</code>`,
+      link: ({ children, value }) => {
+        const href = value?.href || '#'
+        const target = value?.blank ? 'target="_blank" rel="noopener noreferrer"' : ''
+        return `<a href="${href}" ${target}>${children}</a>`
+      },
+    },
+    list: {
+      bullet: ({ children }) => `<ul>${children}</ul>`,
+      number: ({ children }) => `<ol>${children}</ol>`,
+    },
+    listItem: {
+      bullet: ({ children }) => `<li>${children}</li>`,
+      number: ({ children }) => `<li>${children}</li>`,
+    },
+  }
+
+  return toHTML(content as any, { components })
+    .replace(/<br \/><br \/>$/, '') // Remove trailing line breaks
+}
+
+/**
+ * Converts Portable Text to HTML for general use
+ * Returns content with <p> tags for normal blocks
+ * Used for project detail pages and other content
+ */
+export function portableTextToHtml(
+  content: PortableTextBlock[] | undefined
+): string {
+  if (!content || content.length === 0) return ''
+
+  const components: Partial<PortableTextComponents> = {
+    block: {
+      normal({ children }): string {
+        return `<p>${children || ''}</p>`
+      },
+      h1({ children }): string {
+        return `<h1>${children || ''}</h1>`
+      },
+      h2({ children }): string {
+        return `<h2>${children || ''}</h2>`
+      },
+      h3({ children }): string {
+        return `<h3>${children || ''}</h3>`
+      },
+      h4({ children }): string {
+        return `<h4>${children || ''}</h4>`
+      },
+      blockquote({ children }): string {
+        return `<blockquote>${children || ''}</blockquote>`
+      },
+    },
+    marks: {
+      strong: ({ children }) => `<strong>${children}</strong>`,
+      em: ({ children }) => `<em>${children}</em>`,
+      underline: ({ children }) => `<u>${children}</u>`,
+      code: ({ children }) => `<code>${children}</code>`,
+      link: ({ children, value }) => {
+        const href = value?.href || '#'
+        const target = value?.blank ? 'target="_blank" rel="noopener noreferrer"' : ''
+        return `<a href="${href}" ${target}>${children}</a>`
+      },
+    },
+    list: {
+      bullet: ({ children }) => `<ul>${children}</ul>`,
+      number: ({ children }) => `<ol>${children}</ol>`,
+    },
+    listItem: {
+      bullet: ({ children }) => `<li>${children}</li>`,
+      number: ({ children }) => `<li>${children}</li>`,
+    },
+  }
+
+  return toHTML(content as any, { components })
+}

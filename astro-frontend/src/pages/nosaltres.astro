@@ -5,8 +5,7 @@ import AboutSlider from '@/components/shared/AboutSlider.astro'
 import ClientLogosSlider from '@/components/shared/ClientLogosSlider.astro'
 import { fetchAboutUsPageByLocale } from '@/shared/lib/sanity/queries/aboutUsPageQueries'
 import type { AboutUsPage } from '@/shared/schemas/sanity/aboutUsPageSchema'
-import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
-import type { PortableTextBlock } from '@portabletext/types'
+import { portableTextToHtmlForPageSection } from '@/shared/lib/sanity/utils/portableTextToHtml'
 import type { DisplayImage } from '@/components/shared/AboutSlider.astro'
 
 // This is the Catalan about us page
@@ -23,24 +22,7 @@ try {
   console.error('Error fetching about us page data:', error)
 }
 
-// Convert Portable Text to HTML
-function portableTextToHtml(description: PortableTextBlock[] | undefined): string {
-  if (!description || description.length === 0) return ''
-
-  const customPortableTextComponents: Partial<PortableTextComponents> = {
-    block: {
-      normal({ children }): string {
-        return `${children || ''}<br /><br />`
-      },
-    },
-  }
-
-  return toHTML(description as any, {
-    components: customPortableTextComponents,
-  }).replace(/<br \/><br \/>$/, '') // Remove trailing line breaks
-}
-
-const descriptionHtml = portableTextToHtml(aboutUsPageData?.description)
+const descriptionHtml = portableTextToHtmlForPageSection(aboutUsPageData?.description)
 
 // Transform images to the expected format for AboutSlider
 const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images

@@ -1,8 +1,6 @@
 ---
 import type { ServicesSection } from '@/shared/schemas/sanity/homePageSchema'
-import type { Service } from '@/shared/schemas/sanity/serviceSchema'
-import ServicesCircleSignRaw from '@/assets/services-circle-sign.svg?raw'
-import ServicesPlusSignRaw from '@/assets/services-plus-sign.svg?raw'
+import ServicesList from '@/components/shared/ServicesList.astro'
 
 interface Props {
   servicesData?: ServicesSection | null
@@ -11,9 +9,6 @@ interface Props {
 const { servicesData } = Astro.props as Props
 ---
 
-<!-- Animation script removed - already loaded by Hero component -->
-<script src="@/scripts/animations/servicesListAnimation.ts"></script>
-<script src="@/scripts/animations/servicesMobileAnimation.ts"></script>
 <section id="services">
   <div class="services-hero">
     {servicesData?.title && <h2 class="services__title">{servicesData.title.toUpperCase()}</h2>}
@@ -27,28 +22,7 @@ const { servicesData } = Astro.props as Props
     {servicesData?.text && <p class="text services__text">{servicesData.text}</p>}
   </div>
 
-  <div class="services-list">
-    {
-      (servicesData?.selectedServices ?? []).map((service: Service) => (
-        <details data-service-item>
-          <summary>
-            <h3 class="text services__title">{service.title}</h3>
-            <div class="services-toggle" aria-hidden="true">
-              <span class="services-toggle-plus-text">+</span>
-              <span class="services-toggle-plus-svg">
-                <Fragment set:html={ServicesPlusSignRaw} />
-              </span>
-              <span class="services-toggle-circle">
-                <Fragment set:html={ServicesCircleSignRaw} />
-              </span>
-              <span class="services-toggle-minus">-</span>
-            </div>
-          </summary>
-          {service.description && <p>{service.description}</p>}
-        </details>
-      ))
-    }
-  </div>
+  <ServicesList services={servicesData?.selectedServices} />
 </section>
 
 <style>
@@ -84,281 +58,8 @@ const { servicesData } = Astro.props as Props
     margin-inline-end: 2rem;
   }
 
-  .services-list {
+  :global(.services-list) {
     padding-block-start: var(--internal-padding-block);
-  }
-
-  /* Details animation styles */
-  details {
-    --internal-padding-details-block: clamp(1.25rem, 0.469rem + 3.206vi, 3.5rem);
-    --animation-duration: 0.35s; /* For general fades */
-    --rotation-duration: 1s; /* Slower rotation */
-    --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
-    --background-color: #dee1e4;
-    overflow: hidden;
-  }
-
-  /* Target the pseudo-element that contains the collapsible content */
-  details::details-content {
-    block-size: 0;
-    overflow: hidden;
-    transition:
-      block-size var(--animation-duration) var(--animation-easing),
-      content-visibility var(--animation-duration) var(--animation-easing);
-    transition-behavior: allow-discrete;
-  }
-
-  /* Open state - animate to auto height */
-  details[open]::details-content {
-    block-size: auto;
-  }
-
-  /* Add spacing to the actual content elements, not the details-content */
-  details > p {
-    padding-block: var(--internal-padding-details-block);
-    padding-inline: var(--padding-inline);
-    margin: 0;
-  }
-
-  /* Summary styling */
-  details > summary {
-    list-style: none;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-inline: var(--padding-inline);
-    border-top: 1px solid var(--color-secondary);
-    padding-block: var(--internal-padding-details-block);
-    transition: background-color var(--animation-duration) var(--animation-easing);
-  }
-
-  details:hover > summary {
-    background-color: var(--background-color);
-  }
-
-  /* Remove default marker and position it outside */
-  details > summary::-webkit-details-marker {
-    display: none;
-  }
-
-  details > summary::marker {
-    display: none;
-  }
-
-  details[open] > summary {
-    border-bottom: 1px solid var(--color-secondary);
-    background-color: var(--background-color);
-  }
-
-  details:last-child > summary {
-    border-bottom: 1px solid var(--color-secondary);
-  }
-
-  details:last-child[open] > p {
-    border-bottom: 1px solid var(--color-secondary);
-  }
-
-  /* --- FINAL TOGGLE STYLES START HERE --- */
-
-  summary .services-toggle {
-    position: relative;
-    flex: 0 0 auto;
-    width: 52px;
-    height: 47px;
-    transition: transform 0.2s ease-out;
-  }
-
-  /* Subtle scale on hover - only for non-touch devices */
-  @media (hover: hover) {
-    details:hover summary .services-toggle {
-      transform: scale(1.05);
-    }
-  }
-
-  .services-toggle-plus-text,
-  .services-toggle-plus-svg,
-  .services-toggle-circle,
-  .services-toggle-minus {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .services-toggle-plus-svg {
-    transform-origin: center;
-  }
-
-  .services-toggle-minus {
-    /* Base class has no transition */
-  }
-
-  /* Transitions for hover remain on the base classes */
-  .services-toggle-plus-text,
-  .services-toggle-circle {
-    transition: opacity var(--animation-duration) var(--animation-easing);
-  }
-
-  .services-toggle-plus-text,
-  .services-toggle-minus {
-    font-size: var(--font-size-homepage-sections);
-    font-weight: var(--font-weight-light);
-    line-height: 1;
-    color: inherit;
-  }
-
-  .services-toggle svg {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-  }
-
-  /* Default state */
-  .services-toggle-plus-text {
-    opacity: 1;
-  }
-  .services-toggle-plus-svg,
-  .services-toggle-circle,
-  .services-toggle-minus {
-    opacity: 0;
-  }
-
-  /* This rule fixes the hover transition - only for non-touch devices */
-  @media (hover: hover) {
-    details:hover:not([open]) summary .services-toggle-plus-svg,
-    details:hover:not([open]) summary .services-toggle-circle {
-      transition: opacity var(--animation-duration) var(--animation-easing);
-    }
-
-    /* Hover on closed state */
-    details:hover:not([open]) summary .services-toggle-plus-text {
-      opacity: 0;
-    }
-    details:hover:not([open]) summary .services-toggle-plus-svg {
-      opacity: 1;
-    }
-    details:hover:not([open]) summary .services-toggle-circle {
-      opacity: 1;
-    }
-  }
-
-  /* Open state */
-  details[open] summary .services-toggle-plus-text {
-    opacity: 0;
-  }
-  details[open] summary .services-toggle-circle {
-    opacity: 1;
-  }
-
-  details[open] summary .services-toggle-plus-svg {
-    opacity: 0;
-    transform: rotate(360deg) scale(0.8);
-    /* Transition is defined here for one-way animation */
-    transition:
-      transform var(--rotation-duration) var(--animation-easing),
-      opacity 0.1s linear var(--rotation-duration);
-  }
-
-  details[open] summary .services-toggle-minus {
-    opacity: 1;
-    /* Transition is defined here for one-way animation */
-    transition: opacity 0.1s linear var(--rotation-duration);
-  }
-
-  /* --- FINAL TOGGLE STYLES END HERE --- */
-
-  details > p {
-    opacity: 0;
-    transform: translateY(-10px);
-    transition:
-      opacity calc(var(--animation-duration) * 0.8) var(--animation-easing),
-      transform calc(var(--animation-duration) * 0.8) var(--animation-easing);
-  }
-
-  details[open] > p {
-    opacity: 1;
-    transform: translateY(0);
-    transition-delay: calc(var(--animation-duration) * 0.2);
-  }
-
-  @supports (interpolate-size: allow-keywords) {
-    /* Graceful degradation */
-  }
-
-  @supports not selector(::details-content) {
-    details > p {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height var(--animation-duration) var(--animation-easing);
-    }
-
-    details[open] > p {
-      max-height: 100vh;
-    }
-  }
-
-  /* Mobile-specific styles to disable hover animations */
-  @media (hover: none), (pointer: coarse) {
-    /* Remove tap highlight color on mobile */
-    details > summary {
-      -webkit-tap-highlight-color: transparent;
-      -webkit-touch-callout: none;
-    }
-
-    /* Disable hover background change on mobile (but keep open state background) */
-    details:not([open]):hover > summary {
-      background-color: transparent;
-    }
-
-    /* Keep background color when open on mobile */
-    details[open] > summary {
-      background-color: var(--background-color);
-    }
-
-    /* Disable hover scale effect on mobile */
-    details:hover summary .services-toggle {
-      transform: none !important;
-    }
-
-    /* Hide the plus SVG completely on mobile */
-    .services-toggle-plus-svg {
-      display: none !important;
-    }
-
-    /* Remove all transitions from text elements for instant swap */
-    .services-toggle-plus-text,
-    .services-toggle-minus {
-      transition: none !important;
-    }
-
-    /* Keep only circle transition for tap feedback */
-    .services-toggle-circle {
-      transition: opacity 0.2s ease-out;
-    }
-
-    /* Ensure hover states don't apply on mobile */
-    details:hover:not([open]) summary .services-toggle-plus-text {
-      opacity: 1;
-    }
-    details:hover:not([open]) summary .services-toggle-plus-svg {
-      opacity: 0;
-    }
-    details:hover:not([open]) summary .services-toggle-circle {
-      opacity: 0;
-    }
-
-    /* Open state - instant text swap, circle appears */
-    details[open] summary .services-toggle-plus-text {
-      opacity: 0;
-    }
-    details[open] summary .services-toggle-minus {
-      opacity: 1;
-    }
-    details[open] summary .services-toggle-circle {
-      opacity: 1;
-    }
   }
 
   @media (width < 1025px) {
@@ -383,7 +84,7 @@ const { servicesData } = Astro.props as Props
       margin-inline: 0;
     }
 
-    .services-list {
+    :global(.services-list) {
       padding-block: 0rem;
     }
   }

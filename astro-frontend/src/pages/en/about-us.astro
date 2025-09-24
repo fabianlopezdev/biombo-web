@@ -4,8 +4,7 @@ import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 import AboutUsSliderSection from '@/components/pages/about/AboutUsSliderSection.astro'
 import { fetchAboutUsPageByLocale } from '@/shared/lib/sanity/queries/aboutUsPageQueries'
 import type { AboutUsPage } from '@/shared/schemas/sanity/aboutUsPageSchema'
-import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
-import type { PortableTextBlock } from '@portabletext/types'
+import { portableTextToHtmlForPageSection } from '@/shared/lib/sanity/utils/portableTextToHtml'
 
 // This is the English about us page
 const locale = 'en'
@@ -19,24 +18,7 @@ try {
   // Error fetching about us page data
 }
 
-// Convert Portable Text to HTML
-function portableTextToHtml(description: PortableTextBlock[] | undefined): string {
-  if (!description || description.length === 0) return ''
-
-  const customPortableTextComponents: Partial<PortableTextComponents> = {
-    block: {
-      normal({ children }): string {
-        return `${children || ''}<br /><br />`
-      },
-    },
-  }
-
-  return toHTML(description as any, {
-    components: customPortableTextComponents,
-  }).replace(/<br \/><br \/>$/, '') // Remove trailing line breaks
-}
-
-const descriptionHtml = portableTextToHtml(aboutUsPageData?.description)
+const descriptionHtml = portableTextToHtmlForPageSection(aboutUsPageData?.description)
 ---
 
 <BaseLayout

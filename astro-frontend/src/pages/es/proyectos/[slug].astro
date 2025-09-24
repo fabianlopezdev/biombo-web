@@ -3,7 +3,7 @@ import ProjectLayout from '@/layouts/ProjectLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
 import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
-import { toHTML, type PortableTextComponents } from '@portabletext/to-html'
+import { portableTextToHtml } from '@/shared/lib/sanity/utils/portableTextToHtml'
 import type { PortableTextBlock } from '@portabletext/types'
 import {
   fetchProjectBySlug,
@@ -75,23 +75,7 @@ const allProjects = await fetchProjectsByLocale(locale)
 // Calculate similar projects based on shared services
 const similarProjects = allProjects ? getSimilarProjects(project, allProjects, 4) : null
 
-// Helper function to convert portable text to HTML
-function portableTextToHtml(content: PortableTextBlock[] | undefined): string {
-  if (!content || content.length === 0) return ''
-
-  const customPortableTextComponents: Partial<PortableTextComponents> = {
-    block: {
-      // Keep default block rendering with <p> tags
-      normal({ children }): string {
-        return `<p>${children || ''}</p>`
-      },
-    },
-  }
-
-  return toHTML(content as any, {
-    components: customPortableTextComponents,
-  })
-}
+// Use centralized portable text converter
 
 // Helper to get image URL
 const getImageUrl = (image: any) => {
