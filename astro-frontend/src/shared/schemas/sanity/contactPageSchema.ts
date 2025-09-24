@@ -1,13 +1,19 @@
 import { z } from 'zod'
 
+// Define Zod schema for Form Field
+const formFieldSchema = z.object({
+  _key: z.string().optional(), // Sanity array items have a _key
+  fieldType: z.enum(['name', 'email', 'phone', 'message']),
+  label: z.string(),
+  placeholder: z.string().nullable().optional(),
+  required: z.boolean().default(true),
+})
+
 // Define Zod schema for Form Section
 const formSectionSchema = z.object({
-  _type: z.literal('formSection').optional(),
+  _type: z.literal('object').optional(),
   formTitle: z.string(),
-  nameLabel: z.string(),
-  emailLabel: z.string(),
-  phoneLabel: z.string(),
-  messageLabel: z.string(),
+  formFields: z.array(formFieldSchema).min(1),
   submitButtonText: z.string(),
 })
 
@@ -25,6 +31,7 @@ export const contactPageSchema = z.object({
 })
 
 // Export the TypeScript types derived from the Zod schemas
+export type FormField = z.infer<typeof formFieldSchema>
 export type FormSection = z.infer<typeof formSectionSchema>
 export type ContactPage = z.infer<typeof contactPageSchema>
 

@@ -14,10 +14,13 @@ const CONTACT_PAGE_FIELDS = `
   formSection {
     _type,
     formTitle,
-    nameLabel,
-    emailLabel,
-    phoneLabel,
-    messageLabel,
+    formFields[] {
+      _key,
+      fieldType,
+      label,
+      placeholder,
+      required
+    },
     submitButtonText
   }
 `
