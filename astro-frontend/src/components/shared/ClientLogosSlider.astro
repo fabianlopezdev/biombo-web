@@ -40,20 +40,31 @@ const mobileAnimationDuration = mobileSpeedMap[speed]
 
 {
   clientsWithLogos.length > 0 && (
-    <div class={`client-logos-slider ${pauseOnHover ? 'pause-on-hover' : ''}`}>
-      <div
-        class="slider-track"
-        style={`--animation-duration: ${animationDuration}s; --mobile-animation-duration: ${mobileAnimationDuration}s; --total-logos: ${clientsWithLogos.length}`}
-      >
-        {duplicatedClients.map((client) => (
-          <div class="logo-item">
-            {client.website ? (
-              <a
-                href={client.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Visit ${client.name} website`}
-              >
+    <div class="clients-slider-container">
+      <div class={`client-logos-slider ${pauseOnHover ? 'pause-on-hover' : ''}`}>
+        <div
+          class="slider-track"
+          style={`--animation-duration: ${animationDuration}s; --mobile-animation-duration: ${mobileAnimationDuration}s; --total-logos: ${clientsWithLogos.length}`}
+        >
+          {duplicatedClients.map((client) => (
+            <div class="logo-item">
+              {client.website ? (
+                <a
+                  href={client.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Visit ${client.name} website`}
+                >
+                  <img
+                    src={client.logo?.asset?.url}
+                    alt={`${client.name} logo`}
+                    width={client.logo?.asset?.metadata?.dimensions?.width ?? 200}
+                    height={client.logo?.asset?.metadata?.dimensions?.height ?? 100}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
+              ) : (
                 <img
                   src={client.logo?.asset?.url}
                   alt={`${client.name} logo`}
@@ -62,25 +73,19 @@ const mobileAnimationDuration = mobileSpeedMap[speed]
                   loading="lazy"
                   decoding="async"
                 />
-              </a>
-            ) : (
-              <img
-                src={client.logo?.asset?.url}
-                alt={`${client.name} logo`}
-                width={client.logo?.asset?.metadata?.dimensions?.width ?? 200}
-                height={client.logo?.asset?.metadata?.dimensions?.height ?? 100}
-                loading="lazy"
-                decoding="async"
-              />
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
 }
 
 <style>
+  .clients-slider-container {
+    padding-block-start: clamp(4.063rem, 2.869rem + 4.898vi, 7.5rem);
+  }
   .client-logos-slider {
     --logo-gap: clamp(3.875rem, 0.988rem + 11.843vi, 12.188rem);
     position: relative;

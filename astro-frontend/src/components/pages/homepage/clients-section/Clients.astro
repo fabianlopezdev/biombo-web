@@ -15,9 +15,8 @@ const title = clientsData?.title || 'Clients destacats que han confiat en nosalt
   <h2 class="hero-big-text-2" data-slide-up-animation>
     {title}
   </h2>
-  <div class="clients-slider-container">
-    <ClientLogosSlider speed="normal" pauseOnHover={true} />
-  </div>
+
+  <ClientLogosSlider speed="normal" pauseOnHover={true} />
 </section>
 
 <style>
@@ -29,8 +28,5 @@ const title = clientsData?.title || 'Clients destacats que han confiat en nosalt
   .hero-big-text-2 {
     text-wrap: unset;
     padding-inline-end: 2rem;
-  }
-  .clients-slider-container {
-    padding-block-start: clamp(4.063rem, 2.869rem + 4.898vi, 7.5rem);
   }
 </style>
