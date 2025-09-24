@@ -1,10 +1,22 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import PageSection from '@/components/shared/PageSection.astro'
 ---
 
 <BaseLayout title="Contacte - Biombo Studio">
   <main>
-    <h1>Contacte</h1>
-    <p>Pàgina en construcció</p>
+    <PageSection title="Contacte">
+      <div slot="content">
+        <p>Pàgina en construcció</p>
+      </div>
+    </PageSection>
   </main>
 </BaseLayout>
+
+<style>
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>

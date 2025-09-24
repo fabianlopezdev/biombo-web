@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
+import PageSection from '@/components/shared/PageSection.astro'
 import AboutSlider from '@/components/shared/AboutSlider.astro'
 import ClientLogosSlider from '@/components/shared/ClientLogosSlider.astro'
 import { fetchAboutUsPageByLocale } from '@/shared/lib/sanity/queries/aboutUsPageQueries'
@@ -56,16 +56,7 @@ const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
   metaDescription={aboutUsPageData?.description?.[0]?.children?.[0]?.text}
 >
   <main>
-    {
-      aboutUsPageData && (
-        <Fragment>
-          <TwoColumnLayout>
-            <h1 slot="first-column">{aboutUsPageData.title}</h1>
-            <div slot="second-column">{descriptionHtml && <p set:html={descriptionHtml} />}</div>
-          </TwoColumnLayout>
-        </Fragment>
-      )
-    }
+    {aboutUsPageData && <PageSection title={aboutUsPageData.title} description={descriptionHtml} />}
   </main>
 
   {
@@ -95,21 +86,6 @@ const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
     align-items: center;
   }
 
-  h1 {
-    font-size: clamp(3rem, 2.305rem + 2.85vi, 5rem);
-    letter-spacing: -0.04em;
-    font-weight: var(--font-weight-semibold);
-    /* line-height: 1; */
-  }
-
-  p {
-    font-size: clamp(1.125rem, 0.691rem + 1.781vi, 2.375rem);
-    line-height: 1.2;
-    padding-block-start: 1.2rem;
-    letter-spacing: -0.04em;
-    margin-block-end: 0px !important;
-  }
-
   .about-slider-section {
     margin-block-start: 4rem;
   }
@@ -125,12 +101,6 @@ const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
     letter-spacing: -0.04em;
     font-weight: var(--font-weight-semibold);
     /* margin-block-end: clamp(2rem, 1.134rem + 3.553vi, 4.5rem); */
-  }
-
-  @media (width < 992px) {
-    p {
-      padding-block-start: 0rem;
-    }
   }
 
   /* .clients-slider-wrapper {
