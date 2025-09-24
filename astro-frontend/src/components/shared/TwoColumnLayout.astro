@@ -27,22 +27,28 @@ const hasCustomSecondColumn = Astro.slots.has('second-column')
 <style>
   .two-column-layout {
     inline-size: 100%;
-    max-inline-size: 85.3125rem;
+    /* max-inline-size: 85.3125rem; */
     display: flex;
     /* align-items: center; */
     /* gap: clamp(3rem, -30.992rem + 42.424vi, 9.125rem); */
     padding-block: var(--padding-block);
     margin-inline: auto;
+    padding-inline: var(--padding-inline);
   }
-
+  
   .first-column {
+    /* margin-inline-start: var(--padding-inline); */
     min-width: 35.5%;
     max-width: 35.5%;
   }
-
+  
   .second-column {
+    /* margin-inline-end: var(--padding-inline); */
+
     flex: 1;
   }
+  
+ 
 
   @media (width < 992px) {
     .two-column-layout {
@@ -67,7 +73,7 @@ const hasCustomSecondColumn = Astro.slots.has('second-column')
     font-weight: var(--font-weight-semibold);
   }
 
-  .content-wrapper :global(p) {
+  :global(.content-wrapper p) {
     font-size: clamp(1.125rem, 0.691rem + 1.781vi, 2.375rem);
     line-height: 1.2;
     padding-block-start: 1.2rem;
@@ -76,7 +82,7 @@ const hasCustomSecondColumn = Astro.slots.has('second-column')
   }
 
   @media (width < 992px) {
-    .content-wrapper :global(p) {
+    :global(.content-wrapper p) {
       padding-block-start: 0rem;
     }
   }

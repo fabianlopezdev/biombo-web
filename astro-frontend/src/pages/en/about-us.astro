@@ -28,7 +28,7 @@ const descriptionHtml = portableTextToHtmlForPageSection(aboutUsPageData?.descri
   <main>
     <TwoColumnLayout>
       <h1 slot="first-column">{aboutUsPageData?.title || 'About Us'}</h1>
-      <div slot="second-column">
+      <div slot="second-column" class="content-wrapper">
         {
           descriptionHtml ? (
             <p set:html={descriptionHtml} />

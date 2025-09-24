@@ -1,22 +1,189 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
+import { fetchContactPageByLocale } from '@/shared/lib/sanity/queries/contactPageQueries'
+import type { ContactPage } from '@/shared/schemas/sanity/contactPageSchema'
+
+const locale = 'ca'
+
+let contactPageData: ContactPage | null = null
+
+try {
+  contactPageData = await fetchContactPageByLocale(locale)
+} catch (error) {
+  console.error('Error fetching contact page data:', error)
+}
+
+const title = contactPageData?.title || 'Contacte'
+const email = contactPageData?.email || 'info@biombo.cat'
+const phone = contactPageData?.phone || '+(34) 699 696 969'
+const formSection = contactPageData?.formSection
 ---
 
-<BaseLayout title="Contacte - Biombo Studio">
+<BaseLayout title={`${title} - Biombo Studio`}>
   <main>
-    <TwoColumnLayout title="Contacte">
-      <div slot="second-column">
-        <p>Pàgina en construcció</p>
+    <TwoColumnLayout title={title}>
+      <div slot="second-column" class="contact-content">
+        <address class="contact-info">
+          {email && (
+            <a href={`mailto:${email}`} class="contact-link">
+              {email}
+            </a>
+          )}
+          {phone && (
+            <a href={`tel:${phone.replace(/[\s()]/g, '')}`} class="contact-link">
+              {phone}
+            </a>
+          )}
+        </address>
+
+        {formSection && (
+          <div class="contact-form-section">
+            <h2 class="form-title">{formSection.formTitle}</h2>
+            <form class="contact-form" method="POST" action="/api/contact">
+              <div class="form-group">
+                <label for="name">{formSection.nameLabel}</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="email">{formSection.emailLabel}</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="phone">{formSection.phoneLabel}</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="message">{formSection.messageLabel}</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="6"
+                  required
+                ></textarea>
+              </div>
+
+              <button type="submit" class="submit-button">
+                {formSection.submitButtonText}
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </TwoColumnLayout>
   </main>
 </BaseLayout>
 
 <style>
-  main {
+  address {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    font-style: normal;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .contact-content {
+    width: 100%;
+  }
+
+  .contact-link {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 1.125rem;
+    transition: opacity 0.3s ease;
+  }
+
+  .contact-link:hover {
+    opacity: 0.7;
+  }
+
+  .contact-form-section {
+    margin-top: 3rem;
+  }
+
+  .form-title {
+    font-size: 1.875rem;
+    font-weight: var(--font-weight-light);
+    margin-bottom: 2rem;
+  }
+
+  .contact-form {
+    max-width: 600px;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: var(--font-weight-light);
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-text);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .submit-button {
+    padding: 0.75rem 2rem;
+    background: var(--color-text);
+    color: var(--color-bg);
+    border: none;
+    font-size: 1rem;
+    font-weight: var(--font-weight-regular);
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+
+  .submit-button:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    .contact-form-section {
+      margin-top: 2rem;
+    }
+
+    .form-title {
+      font-size: 1.5rem;
+    }
   }
 </style>

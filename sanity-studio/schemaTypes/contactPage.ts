@@ -19,11 +19,129 @@ export const contactPage = defineType({
       validation: (Rule) => Rule.required().error('A title is required'),
     }),
     defineField({
-      name: 'mainContent',
-      title: 'Main Content',
-      type: 'array',
-      of: [{type: 'block'}],
-      validation: (Rule) => Rule.required().error('Main content is required'),
+      name: 'email',
+      title: 'Contact Email',
+      type: 'string',
+      description: 'Your contact email address that will be displayed on the page',
+      validation: (Rule) => Rule.email().error('Please enter a valid email address'),
+    }),
+    defineField({
+      name: 'phone',
+      title: 'Contact Phone',
+      type: 'string',
+      description: 'Your contact phone number that will be displayed on the page',
+    }),
+    defineField({
+      name: 'formSection',
+      title: 'Contact Form Configuration',
+      type: 'object',
+      description: 'Configure the contact form settings and field order',
+      fields: [
+        defineField({
+          name: 'formTitle',
+          title: 'Form Title',
+          type: 'string',
+          description: 'The title that appears above the contact form',
+          validation: (Rule) => Rule.required().error('Form title is required'),
+        }),
+        defineField({
+          name: 'formFields',
+          title: 'Form Fields',
+          type: 'array',
+          description: '⚡ Drag and drop these fields to reorder them on the contact form. The order here will be the order displayed on the website.',
+          of: [
+            {
+              type: 'object',
+              title: 'Form Field',
+              fields: [
+                defineField({
+                  name: 'fieldType',
+                  title: 'Field Type',
+                  type: 'string',
+                  description: 'Select the type of form field',
+                  options: {
+                    list: [
+                      { title: 'Name Field', value: 'name' },
+                      { title: 'Email Field', value: 'email' },
+                      { title: 'Phone Field', value: 'phone' },
+                      { title: 'Message Field', value: 'message' },
+                    ],
+                  },
+                  validation: (Rule) => Rule.required().error('Field type is required'),
+                }),
+                defineField({
+                  name: 'label',
+                  title: 'Field Label',
+                  type: 'string',
+                  description: 'The label text that appears above the input field',
+                  validation: (Rule) => Rule.required().error('Field label is required'),
+                }),
+                defineField({
+                  name: 'placeholder',
+                  title: 'Placeholder Text',
+                  type: 'string',
+                  description: 'Optional placeholder text that appears inside the empty field',
+                }),
+                defineField({
+                  name: 'required',
+                  title: 'Required Field',
+                  type: 'boolean',
+                  description: 'If checked, users cannot submit the form without filling this field',
+                  initialValue: true,
+                }),
+              ],
+              preview: {
+                select: {
+                  fieldType: 'fieldType',
+                  label: 'label',
+                  required: 'required',
+                },
+                prepare(selection) {
+                  const { fieldType, label, required } = selection
+                  const typeLabels = {
+                    name: '👤 Name',
+                    email: '✉️ Email',
+                    phone: '📞 Phone',
+                    message: '💬 Message',
+                  }
+                  return {
+                    title: label || 'Unnamed field',
+                    subtitle: `${typeLabels[fieldType] || fieldType}${required ? ' (Required)' : ' (Optional)'}`,
+                  }
+                },
+              },
+            },
+          ],
+          validation: (Rule) =>
+            Rule.custom((fields) => {
+              // If fields is undefined or null, it's valid (will be caught by parent validation)
+              if (!fields) return true
+
+              // Check that we have at least one field
+              if (!Array.isArray(fields) || fields.length === 0) {
+                return 'At least one form field is required'
+              }
+
+              // Check for duplicate field types
+              const fieldTypes = fields.map(f => f?.fieldType).filter(Boolean)
+              const uniqueTypes = new Set(fieldTypes)
+
+              if (fieldTypes.length !== uniqueTypes.size) {
+                return 'Each field type can only be used once in the form'
+              }
+
+              return true
+            }),
+        }),
+        defineField({
+          name: 'submitButtonText',
+          title: 'Submit Button Text',
+          type: 'string',
+          description: 'The text displayed on the form submit button (e.g., "Send", "Submit", "Contact Us")',
+          validation: (Rule) => Rule.required().error('Submit button text is required'),
+        }),
+      ],
+      validation: (Rule) => Rule.required().error('Form configuration is required'),
     }),
   ],
   preview: {

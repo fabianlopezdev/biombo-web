@@ -83,6 +83,10 @@ const HOME_PAGE_FIELDS = `
       title,
       description
     }
+  },
+  clients {
+    _type,
+    title
   }
 `
 
