@@ -29,7 +29,7 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
     /* SVG Animation Variables */
     --svg-scale-duration: 2.5s;
     --svg-scale-delay: 1s;
-    --svg-initial-scale: 0.437; /* Scale down 1213px to display as 530px (530/1213) */
+    --svg-initial-scale: 0.2416; /* Scale down 1213px to display as 530px (530/1213) */
     --svg-final-scale: 2.6; /* Much less extreme scaling, was 6 */
 
     /* Text Reveal Animation Variables */
@@ -287,6 +287,7 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
 
     // Mark loader as complete after animation
     setTimeout(() => {
+      debugger
       loader.setAttribute('data-loader-complete', '')
 
       // Remove loader from DOM after fade out
