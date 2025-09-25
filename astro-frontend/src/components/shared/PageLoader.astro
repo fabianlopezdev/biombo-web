@@ -16,8 +16,16 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
 </div>
 
 <style>
+  /* ==========================================
+   * LOADER TOGGLE: Change 'flex' to 'none' to disable loader
+   * ========================================== */
+  :root {
+    --show-loader: none;
+  }
+
   /* Animation variables for easy tweaking */
   .page-loader {
+    display: var(--show-loader); /* Controlled by toggle above */
     /* SVG Animation Variables */
     --svg-scale-duration: 2.5s;
     --svg-scale-delay: 1s;
@@ -50,7 +58,6 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
     height: 100vh;
     background-color: var(--color-secondary, #191919);
     z-index: 9999;
-    display: flex;
     align-items: center;
     justify-content: center;
     pointer-events: all;
