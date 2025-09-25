@@ -42,6 +42,9 @@ try {
 const pages: NavigationPage[] = fetchError ? [] : headerData?.navigationPages || []
 ---
 
+<!-- Load hide-on-scroll header behavior -->
+<script src="@/scripts/shared/hideOnScrollHeader.ts"></script>
+
 <!-- Localised skip link -->
 <a href="#main" class="skip-to-main">{getSkipLabel(locale)}</a>
 
@@ -109,13 +112,31 @@ const pages: NavigationPage[] = fetchError ? [] : headerData?.navigationPages ||
     justify-content: space-between;
     align-items: center;
     padding-block-start: 0.7rem;
-    /* serves as containing block for absolutely-centred nav */
-    position: relative;
+    /* Fixed positioning for hide-on-scroll behavior */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out;
 
     /* Mobile overrides using native nesting */
     @media (width < 768px) {
       gap: 1rem;
     }
+  }
+
+  /* Hide-on-scroll states */
+  .site-header.hide-on-scroll {
+    will-change: transform;
+  }
+
+  .site-header.header-hidden {
+    transform: translateY(-100%);
+  }
+
+  .site-header.header-visible {
+    transform: translateY(0);
   }
 
   .logo-wrapper {

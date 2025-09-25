@@ -11,7 +11,7 @@ const hasCustomSecondColumn = Astro.slots.has('second-column')
 
 <div class={`two-column-layout ${className}`}>
   <aside class="first-column">
-    {title ? <h1>{title}</h1> : <slot name="first-column" />}
+    {title ? <h1 class="hero-title-internal">{title}</h1> : <slot name="first-column" />}
   </aside>
   <div class="second-column">
     {
@@ -30,6 +30,7 @@ const hasCustomSecondColumn = Astro.slots.has('second-column')
 
 <style>
   .two-column-layout {
+    margin-block-start: var(--header-height);
     inline-size: 100%;
     /* max-inline-size: 85.3125rem; */
     display: flex;
@@ -69,16 +70,11 @@ const hasCustomSecondColumn = Astro.slots.has('second-column')
       width: 100%;
     }
   }
-  h1 {
-    font-size: clamp(3rem, 2.305rem + 2.85vi, 5rem);
-    letter-spacing: -0.04em;
-    font-weight: var(--font-weight-semibold);
-  }
 
   :global(.content-wrapper) {
     font-size: clamp(1.125rem, 0.691rem + 1.781vi, 2.375rem);
     line-height: 1.2;
-    padding-block-start: 1.2rem;
+    padding-block-start: 0.85rem;
     letter-spacing: -0.04em;
     margin-block-end: 0px !important;
   }
