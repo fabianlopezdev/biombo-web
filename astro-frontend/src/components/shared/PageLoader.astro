@@ -104,6 +104,14 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
     font-size: 1.875rem;
     font-weight: var(--font-weight-bold);
     color: var(--color-secondary, #191919); /* Black text on white SVG */
+    /* Unified text animation */
+    clip-path: inset(0 100% 0 0); /* Hidden initially, will reveal left to right */
+    animation:
+      /* First animation: Reveal entire text from left to right */
+      revealFromLeft var(--text-reveal-duration) var(--animation-easing) var(--text-reveal-delay)
+        forwards,
+      /* Second animation: Move entire text to the left while SVG scales */ divergeLeft
+        var(--text-diverge-duration) var(--animation-easing) var(--text-diverge-delay) forwards;
   }
 
   .text-biombo,
@@ -111,40 +119,10 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
     display: inline-block;
   }
 
-  .text-biombo {
-    clip-path: inset(0 100% 0 0); /* Hidden initially, will reveal left to right */
-    animation:
-      /* First animation: Reveal text from left to right */
-      revealFromLeft var(--text-reveal-duration) var(--animation-easing) var(--text-reveal-delay)
-        forwards,
-      /* Second animation: Move text to the left while SVG scales */ divergeLeft
-        var(--text-diverge-duration) var(--animation-easing) var(--text-diverge-delay) forwards;
-  }
-
-  .text-studio {
-    clip-path: inset(0 0 0 100%); /* Hidden initially, will reveal right to left */
-    animation:
-      /* First animation: Reveal text from right to left */
-      revealFromRight var(--text-reveal-duration) var(--animation-easing) var(--text-reveal-delay)
-        forwards,
-      /* Second animation: Move text to the right while SVG scales */ divergeRight
-        var(--text-diverge-duration) var(--animation-easing) var(--text-diverge-delay) forwards;
-  }
-
   /* Text reveal animation: wipes from left edge to right */
   @keyframes revealFromLeft {
     0% {
       clip-path: inset(0 100% 0 0); /* Fully hidden */
-    }
-    100% {
-      clip-path: inset(0 0 0 0); /* Fully revealed */
-    }
-  }
-
-  /* Text reveal animation: wipes from right edge to left */
-  @keyframes revealFromRight {
-    0% {
-      clip-path: inset(0 0 0 100%); /* Fully hidden */
     }
     100% {
       clip-path: inset(0 0 0 0); /* Fully revealed */
@@ -164,23 +142,6 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
     }
     to {
       transform: translateX(calc(var(--text-diverge-distance) * -1));
-      opacity: var(--text-diverge-opacity-end); /* Stay faded */
-    }
-  }
-
-  /* Text diverge animation: smooth movement right with controlled fade timing */
-  @keyframes divergeRight {
-    from {
-      transform: translateX(0);
-      opacity: var(--text-diverge-opacity-start);
-    }
-    60% {
-      /* Fade completes at 60% (3s of 5s animation) */
-      transform: translateX(60vw); /* 60% of total distance */
-      opacity: var(--text-diverge-opacity-end); /* Fully faded by this point */
-    }
-    to {
-      transform: translateX(var(--text-diverge-distance));
       opacity: var(--text-diverge-opacity-end); /* Stay faded */
     }
   }

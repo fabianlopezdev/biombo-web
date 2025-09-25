@@ -97,6 +97,8 @@ body {
   color: var(--color-secondary);
   font-size: var(--font-size);
   letter-spacing: -0.04em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 img,
