@@ -42,7 +42,7 @@ export function splitIntoLines(container: HTMLElement): LineElement[] {
 
   // Wrap each word in a span to measure positions
   textNodes.forEach(({ node, parent }) => {
-    const words = node.textContent!.split(/(\s+)/)
+    const words = (node.textContent || '').split(/(\s+)/)
     const fragment = document.createDocumentFragment()
 
     words.forEach((word) => {

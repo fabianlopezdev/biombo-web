@@ -61,9 +61,6 @@ export function transformProject(
   let mainImageUrl: string | undefined
   let chosenImageSource: 'thumbnail' | 'main' | undefined
 
-  // Check if project uses separate thumbnail flag
-  const useSeparateThumbnail = projectDoc.useSeparateThumbnail === true
-
   // Extract thumbnail URL if it exists
   if (projectDoc.thumbnailImage?.asset?.url) {
     thumbnailUrl = projectDoc.thumbnailImage.asset.url

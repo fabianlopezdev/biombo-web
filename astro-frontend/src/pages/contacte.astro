@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
+import PillButton from '@/components/shared/PillButton.astro'
 import { fetchContactPageByLocale } from '@/shared/lib/sanity/queries/contactPageQueries'
 import type { ContactPage, FormField } from '@/shared/schemas/sanity/contactPageSchema'
 
@@ -25,55 +26,67 @@ const formSection = contactPageData?.formSection
     <TwoColumnLayout title={title}>
       <div slot="second-column" class="contact-content">
         <address class="contact-info">
-          {email && (
-            <a href={`mailto:${email}`} class="contact-link">
-              {email}
-            </a>
-          )}
-          {phone && (
-            <a href={`tel:${phone.replace(/[\s()]/g, '')}`} class="contact-link">
-              {phone}
-            </a>
-          )}
+          {
+            email && (
+              <a href={`mailto:${email}`} class="contact-link">
+                {email}
+              </a>
+            )
+          }
+          {
+            phone && (
+              <a href={`tel:${phone.replace(/[\s()]/g, '')}`} class="contact-link">
+                {phone}
+              </a>
+            )
+          }
         </address>
 
-        {formSection && formSection.formFields && (
-          <div class="contact-form-section">
-            <h2 class="form-title">{formSection.formTitle}</h2>
-            <form class="contact-form" method="POST" action="/api/contact">
-              {formSection.formFields.map((field: FormField) => (
-                <div class="form-group" key={field._key}>
-                  <label for={field.fieldType}>{field.label}</label>
-                  {field.fieldType === 'message' ? (
-                    <textarea
-                      id={field.fieldType}
-                      name={field.fieldType}
-                      rows="6"
-                      placeholder={field.placeholder || ''}
-                      required={field.required}
-                    ></textarea>
-                  ) : (
-                    <input
-                      type={
-                        field.fieldType === 'email' ? 'email' :
-                        field.fieldType === 'phone' ? 'tel' :
-                        'text'
-                      }
-                      id={field.fieldType}
-                      name={field.fieldType}
-                      placeholder={field.placeholder || ''}
-                      required={field.required}
-                    />
-                  )}
-                </div>
-              ))}
+        {
+          formSection && formSection.formFields && (
+            <div class="contact-form-section">
+              <h2 class="form-title">{formSection.formTitle}</h2>
+              <form class="contact-form" method="POST" action="/api/contact">
+                {formSection.formFields.map((field: FormField) => (
+                  <div class="form-group" key={field._key}>
+                    {field.fieldType === 'message' ? (
+                      <textarea
+                        id={field.fieldType}
+                        name={field.fieldType}
+                        rows="1"
+                        placeholder={field.placeholder || field.label}
+                        aria-label={field.label}
+                        required={field.required}
+                        class="auto-expand"
+                      />
+                    ) : (
+                      <input
+                        type={
+                          field.fieldType === 'email'
+                            ? 'email'
+                            : field.fieldType === 'phone'
+                              ? 'tel'
+                              : 'text'
+                        }
+                        id={field.fieldType}
+                        name={field.fieldType}
+                        placeholder={field.placeholder || field.label}
+                        aria-label={field.label}
+                        required={field.required}
+                      />
+                    )}
+                  </div>
+                ))}
 
-              <button type="submit" class="submit-button">
-                {formSection.submitButtonText}
-              </button>
-            </form>
-          </div>
-        )}
+                <PillButton
+                  text={formSection.submitButtonText}
+                  type="submit"
+                  style="padding-block: 0.69rem;"
+                />
+              </form>
+            </div>
+          )
+        }
       </div>
     </TwoColumnLayout>
   </main>
@@ -85,7 +98,6 @@ const formSection = contactPageData?.formSection
     flex-direction: column;
     font-style: normal;
     margin-bottom: 3rem;
-
   }
 
   .contact-content {
@@ -117,23 +129,50 @@ const formSection = contactPageData?.formSection
   }
 
   .form-group {
-    margin-bottom: 1.5rem;
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: var(--font-weight-light);
+    margin-bottom: 1.875rem;
   }
 
   .form-group input,
   .form-group textarea {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-bottom: 1px solid var(--color-secondary);
+    background: var(--color-bg);
     font-family: inherit;
-    transition: border-color 0.3s ease;
+    color: inherit;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-bottom: 2.125rem;
+    /* transition: border-color 0.3s ease; */
+  }
+
+  /* Remove default placeholder opacity and set color */
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    opacity: 1;
+    color: inherit;
+  }
+
+  /* Firefox specific */
+  .form-group input::-moz-placeholder,
+  .form-group textarea::-moz-placeholder {
+    opacity: 1;
+    color: inherit;
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  .form-group input::-webkit-input-placeholder,
+  .form-group textarea::-webkit-input-placeholder {
+    opacity: 1;
+    color: inherit;
+  }
+
+  /* IE/Edge specific */
+  .form-group input:-ms-input-placeholder,
+  .form-group textarea:-ms-input-placeholder {
+    opacity: 1;
+    color: inherit;
   }
 
   .form-group input:focus,
@@ -142,23 +181,51 @@ const formSection = contactPageData?.formSection
     border-color: var(--color-text);
   }
 
+  /* Change placeholder color to gray on focus */
+  .form-group input:focus::placeholder,
+  .form-group textarea:focus::placeholder {
+    color: #888;
+    opacity: 1;
+  }
+
+  /* Firefox specific - focus state */
+  .form-group input:focus::-moz-placeholder,
+  .form-group textarea:focus::-moz-placeholder {
+    color: #888;
+    opacity: 1;
+  }
+
+  /* Webkit browsers - focus state */
+  .form-group input:focus::-webkit-input-placeholder,
+  .form-group textarea:focus::-webkit-input-placeholder {
+    color: #888;
+    opacity: 1;
+  }
+
+  /* IE/Edge specific - focus state */
+  .form-group input:focus:-ms-input-placeholder,
+  .form-group textarea:focus:-ms-input-placeholder {
+    color: #888;
+    opacity: 1;
+  }
+
   .form-group textarea {
-    resize: vertical;
-    min-height: 120px;
+    resize: none; /* Disable manual resize since we're auto-expanding */
+    min-height: 1.5rem; /* Match single line input height */
+    max-height: 200px; /* Limit maximum expansion */
+    overflow-y: auto; /* Add scroll if content exceeds max-height */
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    word-wrap: break-word; /* Break long words */
+    word-break: break-word; /* Alternative for better browser support */
+    white-space: pre-wrap; /* Preserve whitespace but wrap text */
+    field-sizing: content; /* Modern CSS for auto-sizing (Chrome 123+) */
   }
 
-  .submit-button {
-    padding: 0.75rem 2rem;
-    background: var(--color-text);
-    color: var(--color-bg);
-    border: none;
-    font-weight: var(--font-weight-regular);
-    cursor: pointer;
-    transition: opacity 0.3s ease;
-  }
-
-  .submit-button:hover {
-    opacity: 0.8;
+  /* Fallback for browsers without field-sizing support */
+  @supports not (field-sizing: content) {
+    .form-group textarea.auto-expand {
+      overflow-y: hidden; /* Hide scrollbar during expansion */
+    }
   }
 
   @media (max-width: 768px) {
@@ -170,4 +237,70 @@ const formSection = contactPageData?.formSection
       font-size: 1.5rem;
     }
   }
+
+  @media (max-width: 992px) {
+    .contact-form-section {
+      margin-inline: calc(var(--padding-inline) * -1);
+    }
+
+    .form-title {
+      padding-inline: var(--padding-inline);
+    }
+
+    .contact-form {
+      padding-inline: 0;
+    }
+
+    .form-group {
+      padding-inline: 0; /* No padding on container */
+      margin-inline: 0;
+      position: relative;
+    }
+
+    /* Create full-width border using pseudo-element */
+    .form-group::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--color-secondary);
+    }
+
+    /* Remove border from inputs and add padding to the input itself */
+    .form-group input,
+    .form-group textarea {
+      border-bottom: none;
+      padding-inline: var(--padding-inline);
+    }
+
+    /* PillButton container needs padding too */
+    .contact-form > :global(.pill-button) {
+      margin-inline: var(--padding-inline);
+    }
+  }
 </style>
+
+<script>
+  // Auto-expand textarea as user types
+  document.addEventListener('DOMContentLoaded', () => {
+    const autoExpandTextareas = document.querySelectorAll('textarea.auto-expand')
+
+    autoExpandTextareas.forEach((textarea) => {
+      // Function to adjust height
+      const adjustHeight = () => {
+        // Reset height to min-height to get accurate scrollHeight
+        textarea.style.height = 'auto'
+        // Set height to scrollHeight but respect max-height from CSS
+        textarea.style.height = textarea.scrollHeight + 'px'
+      }
+
+      // Adjust on input
+      textarea.addEventListener('input', adjustHeight)
+
+      // Initial adjustment in case there's pre-filled content
+      adjustHeight()
+    })
+  })
+</script>

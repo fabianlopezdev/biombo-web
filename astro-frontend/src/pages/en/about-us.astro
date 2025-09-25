@@ -4,7 +4,10 @@ import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 import AboutUsSliderSection from '@/components/pages/about/AboutUsSliderSection.astro'
 import { fetchAboutUsPageByLocale } from '@/shared/lib/sanity/queries/aboutUsPageQueries'
 import type { AboutUsPage } from '@/shared/schemas/sanity/aboutUsPageSchema'
-import { portableTextToHtmlForPageSection } from '@/shared/lib/sanity/utils/portableTextToHtml'
+import {
+  portableTextToHtml,
+  portableTextToHtmlForPageSection,
+} from '@/shared/lib/sanity/utils/portableTextToHtml'
 
 // This is the English about us page
 const locale = 'en'

@@ -6,9 +6,7 @@ import type { PortableTextBlock } from '@portabletext/types'
  * Returns content without wrapper <p> tags since PageSection adds them
  * Used for about pages and services pages
  */
-export function portableTextToHtmlForPageSection(
-  content: PortableTextBlock[] | undefined
-): string {
+export function portableTextToHtmlForPageSection(content: PortableTextBlock[] | undefined): string {
   if (!content || content.length === 0) return ''
 
   const components: Partial<PortableTextComponents> = {
@@ -39,7 +37,13 @@ export function portableTextToHtmlForPageSection(
       em: ({ children }) => `<em>${children}</em>`,
       underline: ({ children }) => `<u>${children}</u>`,
       code: ({ children }) => `<code>${children}</code>`,
-      link: ({ children, value }) => {
+      link: ({
+        children,
+        value,
+      }: {
+        children?: string
+        value?: { href?: string; blank?: boolean }
+      }) => {
         const href = value?.href || '#'
         const target = value?.blank ? 'target="_blank" rel="noopener noreferrer"' : ''
         return `<a href="${href}" ${target}>${children}</a>`
@@ -55,8 +59,7 @@ export function portableTextToHtmlForPageSection(
     },
   }
 
-  return toHTML(content as any, { components })
-    .replace(/<br \/><br \/>$/, '') // Remove trailing line breaks
+  return toHTML(content, { components }).replace(/<br \/><br \/>$/, '') // Remove trailing line breaks
 }
 
 /**
@@ -64,9 +67,7 @@ export function portableTextToHtmlForPageSection(
  * Returns content with <p> tags for normal blocks
  * Used for project detail pages and other content
  */
-export function portableTextToHtml(
-  content: PortableTextBlock[] | undefined
-): string {
+export function portableTextToHtml(content: PortableTextBlock[] | undefined): string {
   if (!content || content.length === 0) return ''
 
   const components: Partial<PortableTextComponents> = {
@@ -95,7 +96,13 @@ export function portableTextToHtml(
       em: ({ children }) => `<em>${children}</em>`,
       underline: ({ children }) => `<u>${children}</u>`,
       code: ({ children }) => `<code>${children}</code>`,
-      link: ({ children, value }) => {
+      link: ({
+        children,
+        value,
+      }: {
+        children?: string
+        value?: { href?: string; blank?: boolean }
+      }) => {
         const href = value?.href || '#'
         const target = value?.blank ? 'target="_blank" rel="noopener noreferrer"' : ''
         return `<a href="${href}" ${target}>${children}</a>`
@@ -111,5 +118,5 @@ export function portableTextToHtml(
     },
   }
 
-  return toHTML(content as any, { components })
+  return toHTML(content, { components })
 }
