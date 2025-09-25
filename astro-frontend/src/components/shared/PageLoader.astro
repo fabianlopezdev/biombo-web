@@ -1,0 +1,244 @@
+---
+import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
+---
+
+<div id="page-loader" class="page-loader" data-loader-active>
+  <!-- SVG Shape that scales -->
+  <div class="loader-svg-container">
+    <div class="loader-svg" set:html={BiomboIntroSVG} />
+  </div>
+
+  <!-- Text elements that don't scale -->
+  <div class="loader-text">
+    <span class="text-biombo">Biombo</span>
+    <span class="text-studio">Studio</span>
+  </div>
+</div>
+
+<style>
+  /* Animation variables for easy tweaking */
+  .page-loader {
+    /* SVG Animation Variables */
+    --svg-scale-duration: 2.5s;
+    --svg-scale-delay: 1s;
+    --svg-initial-scale: 1;
+    --svg-final-scale: 6;
+
+    /* Text Reveal Animation Variables */
+    --text-reveal-duration: 1s;
+    --text-reveal-delay: 0.2s;
+
+    /* Text Diverge Animation Variables */
+    --text-diverge-duration: 5s;
+    --text-diverge-delay: 1s;
+    --text-diverge-distance: 100vw;
+    --text-diverge-opacity-start: 1;
+    --text-diverge-opacity-end: 0; /* Set to 1 for no fade, 0 for full fade */
+    --text-fade-duration-percentage: 60%; /* Fade completes at this % of diverge animation */
+
+    /* Overall timing */
+    --loader-total-duration: 2200;
+
+    /* Easing function */
+    --animation-easing: cubic-bezier(0.19, 1, 0.22, 1);
+
+    /* Component styles */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--color-secondary, #191919);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    opacity: 1;
+    transition: opacity var(--loader-fade-duration) var(--animation-easing);
+  }
+
+  .page-loader[data-loader-complete] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .loader-svg-container {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 530px;
+    height: 357px;
+    transform: scale(var(--svg-initial-scale));
+    animation: scaleUp var(--svg-scale-duration) var(--animation-easing) var(--svg-scale-delay)
+      forwards;
+  }
+
+  .loader-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .loader-svg :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .loader-text {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    gap: 0.5rem;
+    font-size: 1.875rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-secondary, #191919); /* Black text on white SVG */
+  }
+
+  .text-biombo,
+  .text-studio {
+    display: inline-block;
+  }
+
+  .text-biombo {
+    clip-path: inset(0 100% 0 0); /* Hidden initially, will reveal left to right */
+    animation:
+      /* First animation: Reveal text from left to right */
+      revealFromLeft var(--text-reveal-duration) var(--animation-easing) var(--text-reveal-delay)
+        forwards,
+      /* Second animation: Move text to the left while SVG scales */ divergeLeft
+        var(--text-diverge-duration) var(--animation-easing) var(--text-diverge-delay) forwards;
+  }
+
+  .text-studio {
+    clip-path: inset(0 0 0 100%); /* Hidden initially, will reveal right to left */
+    animation:
+      /* First animation: Reveal text from right to left */
+      revealFromRight var(--text-reveal-duration) var(--animation-easing) var(--text-reveal-delay)
+        forwards,
+      /* Second animation: Move text to the right while SVG scales */ divergeRight
+        var(--text-diverge-duration) var(--animation-easing) var(--text-diverge-delay) forwards;
+  }
+
+  /* Text reveal animation: wipes from left edge to right */
+  @keyframes revealFromLeft {
+    0% {
+      clip-path: inset(0 100% 0 0); /* Fully hidden */
+    }
+    100% {
+      clip-path: inset(0 0 0 0); /* Fully revealed */
+    }
+  }
+
+  /* Text reveal animation: wipes from right edge to left */
+  @keyframes revealFromRight {
+    0% {
+      clip-path: inset(0 0 0 100%); /* Fully hidden */
+    }
+    100% {
+      clip-path: inset(0 0 0 0); /* Fully revealed */
+    }
+  }
+
+  /* Text diverge animation: smooth movement left with controlled fade timing */
+  @keyframes divergeLeft {
+    from {
+      transform: translateX(0);
+      opacity: var(--text-diverge-opacity-start);
+    }
+    60% {
+      /* Fade completes at 60% (3s of 5s animation) */
+      transform: translateX(-60vw); /* 60% of total distance */
+      opacity: var(--text-diverge-opacity-end); /* Fully faded by this point */
+    }
+    to {
+      transform: translateX(calc(var(--text-diverge-distance) * -1));
+      opacity: var(--text-diverge-opacity-end); /* Stay faded */
+    }
+  }
+
+  /* Text diverge animation: smooth movement right with controlled fade timing */
+  @keyframes divergeRight {
+    from {
+      transform: translateX(0);
+      opacity: var(--text-diverge-opacity-start);
+    }
+    60% {
+      /* Fade completes at 60% (3s of 5s animation) */
+      transform: translateX(60vw); /* 60% of total distance */
+      opacity: var(--text-diverge-opacity-end); /* Fully faded by this point */
+    }
+    to {
+      transform: translateX(var(--text-diverge-distance));
+      opacity: var(--text-diverge-opacity-end); /* Stay faded */
+    }
+  }
+
+  /* SVG scale animation: grows from initial size to fill viewport */
+  @keyframes scaleUp {
+    from {
+      transform: scale(var(--svg-initial-scale));
+    }
+    to {
+      transform: scale(var(--svg-final-scale));
+    }
+  }
+
+  /* Hide loader for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .page-loader {
+      display: none;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .page-loader {
+      /* Override variables for mobile */
+      --text-diverge-distance: 300px;
+      --svg-final-scale: 4;
+    }
+
+    .loader-text {
+      font-size: 20px;
+      gap: 0.3rem;
+    }
+
+    .loader-svg-container {
+      width: 293px; /* Smaller initial size on mobile */
+      height: 197px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const loader = document.getElementById('page-loader')
+    if (!loader) return
+
+    /* Animation Timeline:
+     * 0s     : Page loads, SVG visible at 530x357px
+     * 0.5s   : Text starts revealing
+     * 2s     : Text fully revealed
+     * 2s     : SVG starts scaling + text starts diverging (simultaneous)
+     * 5s     : Animations complete
+     * 5s     : Loader starts fading out
+     * 5.6s   : Loader removed from DOM
+     */
+
+    // Get the total duration from CSS variable
+    const loaderStyles = getComputedStyle(loader)
+    const animationDuration = parseInt(loaderStyles.getPropertyValue('--loader-total-duration'))
+
+    // Mark loader as complete after animation
+    setTimeout(() => {
+      debugger // Pause here to debug in Chrome DevTools
+      loader.setAttribute('data-loader-complete', '')
+
+      // Remove loader from DOM after fade out
+      setTimeout(() => {
+        loader.remove()
+      }, 600) // Match the opacity transition duration
+    }, animationDuration)
+  })
+</script>
