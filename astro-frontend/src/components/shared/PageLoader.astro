@@ -21,8 +21,8 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
     /* SVG Animation Variables */
     --svg-scale-duration: 2.5s;
     --svg-scale-delay: 1s;
-    --svg-initial-scale: 1;
-    --svg-final-scale: 6;
+    --svg-initial-scale: 0.437; /* Scale down 1213px to display as 530px (530/1213) */
+    --svg-final-scale: 2.6; /* Much less extreme scaling, was 6 */
 
     /* Text Reveal Animation Variables */
     --text-reveal-duration: 1s;
@@ -68,8 +68,8 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 530px;
-    height: 357px;
+    width: 1213px; /* New larger SVG width */
+    height: 818px; /* New larger SVG height */
     transform: scale(var(--svg-initial-scale));
     animation: scaleUp var(--svg-scale-duration) var(--animation-easing) var(--svg-scale-delay)
       forwards;
@@ -83,6 +83,10 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
   .loader-svg :global(svg) {
     width: 100%;
     height: 100%;
+    /* Improve rendering quality */
+    shape-rendering: geometricPrecision; /* Better precision for scaling */
+    /* Removed GPU acceleration properties that might cause rasterization at original size */
+    /* Since we're now scaling less dramatically (2.6x vs 6x), we don't need forced GPU */
   }
 
   .loader-text {
@@ -196,7 +200,8 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
     .page-loader {
       /* Override variables for mobile */
       --text-diverge-distance: 300px;
-      --svg-final-scale: 4;
+      --svg-initial-scale: 0.241; /* Scale down to show as 293px on mobile (293/1213) */
+      --svg-final-scale: 1.7; /* Reduced from 4, proportionally scaled */
     }
 
     .loader-text {
@@ -204,9 +209,52 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
       gap: 0.3rem;
     }
 
+    /* Keep the larger base size, just scale it down more on mobile */
     .loader-svg-container {
-      width: 293px; /* Smaller initial size on mobile */
-      height: 197px;
+      width: 1213px;
+      height: 818px;
+    }
+  }
+
+  /*
+   * Aspect-ratio based scaling for vertical screens
+   * The SVG base is now 1213×818 (1.48:1) horizontal aspect ratio
+   * On vertical screens, we need larger scale values to fill the height
+   * All scale values reduced proportionally (divided by ~2.3) for the larger base SVG
+   */
+
+  /* Square and slightly tall screens (1:1 to 3:4 aspect ratio) */
+  /* Example: iPad Pro 12.9" (1024×1366, exactly 3:4), some tablets */
+  @media (max-width: 1100px) and (max-aspect-ratio: 1/1) and (min-aspect-ratio: 3/4) {
+    .page-loader {
+      --svg-final-scale: 4.3; /* Was 10, now 4.3 (10/2.3) */
+    }
+  }
+
+  /* Tall screens (3:4 to 9:16 aspect ratio) */
+  /* Example: Most tablets in portrait, some older phones */
+  @media (max-width: 1100px) and (max-aspect-ratio: 3/4) and (min-aspect-ratio: 9/16) {
+    .page-loader {
+      --svg-final-scale: 4.3; /* Was 10, now 4.3 */
+      --text-diverge-distance: 120vw;
+    }
+  }
+
+  /* Very tall screens (9:16 to 9:20 aspect ratio) */
+  /* Example: iPhone 12/13/14, most modern Android phones */
+  @media (max-width: 1100px) and (max-aspect-ratio: 9/16) and (min-aspect-ratio: 9/20) {
+    .page-loader {
+      --svg-final-scale: 4.8; /* Was 11, now 4.8 */
+      --text-diverge-distance: 140vw;
+    }
+  }
+
+  /* Extremely tall screens (9:20 or taller) */
+  /* Example: iPhone 14 Pro, Samsung S23 Ultra */
+  @media (max-width: 1100px) and (max-aspect-ratio: 9/20) {
+    .page-loader {
+      --svg-final-scale: 5.2; /* Was 12, now 5.2 */
+      --text-diverge-distance: 150vw;
     }
   }
 </style>
@@ -232,7 +280,6 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
 
     // Mark loader as complete after animation
     setTimeout(() => {
-      debugger // Pause here to debug in Chrome DevTools
       loader.setAttribute('data-loader-complete', '')
 
       // Remove loader from DOM after fade out
