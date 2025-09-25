@@ -10,8 +10,16 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
 
   <!-- Text elements that don't scale -->
   <div class="loader-text">
-    <span class="text-biombo">Biombo</span>
-    <span class="text-studio">Studio</span>
+    <!-- Gray base text -->
+    <div class="text-base">
+      <span class="text-biombo">Biombo</span>
+      <span class="text-studio">Studio</span>
+    </div>
+    <!-- White fill overlay -->
+    <div class="text-fill">
+      <span class="text-biombo">Biombo</span>
+      <span class="text-studio">Studio</span>
+    </div>
   </div>
 </div>
 
@@ -27,28 +35,39 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
   .page-loader {
     display: var(--show-loader); /* Controlled by toggle above */
     /* SVG Animation Variables */
-    --svg-scale-duration: 2.5s;
-    --svg-scale-delay: 1s;
+    --svg-scale-duration: 2s;
+    --svg-scale-delay: 3.2s; /* Original delay */
     --svg-initial-scale: 0.2416; /* Scale down 1213px to display as 530px (530/1213) */
     --svg-final-scale: 2.6; /* Much less extreme scaling, was 6 */
 
     /* Text Reveal Animation Variables */
-    --text-reveal-duration: 1s;
-    --text-reveal-delay: 0.2s;
+    --text-reveal-duration: 3s; /* Exact duration from Motto */
+    --text-reveal-delay: 0s; /* Start immediately like Motto */
 
     /* Text Diverge Animation Variables */
-    --text-diverge-duration: 5s;
-    --text-diverge-delay: 1s;
+    --text-diverge-duration: 1s;
+    --text-diverge-delay: 3.2s; /* Original delay */
     --text-diverge-distance: 100vw;
     --text-diverge-opacity-start: 1;
     --text-diverge-opacity-end: 0; /* Set to 1 for no fade, 0 for full fade */
     --text-fade-duration-percentage: 60%; /* Fade completes at this % of diverge animation */
 
     /* Overall timing */
-    --loader-total-duration: 2200;
+    --loader-total-duration: 2200; /* Original duration */
 
-    /* Easing function */
-    --animation-easing: cubic-bezier(0.19, 1, 0.22, 1);
+    /* Easing functions */
+    --animation-easing: cubic-bezier(
+      0.19,
+      1,
+      0.22,
+      1
+    ); /* Original easing for SVG and other animations */
+    --text-fill-easing: cubic-bezier(
+      0.65,
+      0.01,
+      0.05,
+      0.99
+    ); /* Motto's easing ONLY for text fill */
 
     /* Component styles */
     position: fixed;
@@ -99,24 +118,62 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
   .loader-text {
     position: absolute;
     z-index: 2;
-    display: flex;
-    gap: 0.5rem;
     font-size: 1.875rem;
     font-weight: var(--font-weight-bold);
-    color: var(--color-secondary, #191919); /* Black text on white SVG */
-    /* Unified text animation */
+    /* No container animation - words will diverge individually */
+  }
+
+  .text-base,
+  .text-fill {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .text-base {
+    color: #8e8e8e; /* Gray base text */
+    animation: hideAfterFill 0.1s linear
+      calc(var(--text-reveal-duration) + var(--text-reveal-delay)) forwards;
+  }
+
+  @keyframes hideAfterFill {
+    to {
+      opacity: 0;
+    }
+  }
+
+  .text-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--color-secondary, #191919); /* White text that fills over gray */
     clip-path: inset(0 100% 0 0); /* Hidden initially, will reveal left to right */
     animation:
-      /* First animation: Reveal entire text from left to right */
-      revealFromLeft var(--text-reveal-duration) var(--animation-easing) var(--text-reveal-delay)
+      revealFromLeft var(--text-reveal-duration) var(--text-fill-easing) var(--text-reveal-delay)
         forwards,
-      /* Second animation: Move entire text to the left while SVG scales */ divergeLeft
-        var(--text-diverge-duration) var(--animation-easing) var(--text-diverge-delay) forwards;
+      expandClipPath 0.1s linear calc(var(--text-reveal-duration) + var(--text-reveal-delay))
+        forwards;
+  }
+
+  /* After fill completes, expand clip-path to full width so words can travel */
+  @keyframes expandClipPath {
+    to {
+      clip-path: inset(0 -100vw 0 -100vw); /* Expand clip area way beyond viewport */
+    }
   }
 
   .text-biombo,
   .text-studio {
     display: inline-block;
+  }
+
+  /* Animate Biombo to the left - both layers move together */
+  .text-biombo {
+    animation: divergeLeft var(--text-diverge-duration) linear var(--text-diverge-delay) forwards;
+  }
+
+  /* Animate Studio to the right - both layers move together */
+  .text-studio {
+    animation: divergeRight var(--text-diverge-duration) linear var(--text-diverge-delay) forwards;
   }
 
   /* Text reveal animation: wipes from left edge to right */
@@ -135,14 +192,31 @@ import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
       transform: translateX(0);
       opacity: var(--text-diverge-opacity-start);
     }
-    60% {
-      /* Fade completes at 60% (3s of 5s animation) */
-      transform: translateX(-60vw); /* 60% of total distance */
-      opacity: var(--text-diverge-opacity-end); /* Fully faded by this point */
+    70% {
+      /* Stay visible longer - 70% of animation at full opacity */
+      transform: translateX(-70vw);
+      opacity: var(--text-diverge-opacity-start); /* Still fully visible */
     }
     to {
       transform: translateX(calc(var(--text-diverge-distance) * -1));
-      opacity: var(--text-diverge-opacity-end); /* Stay faded */
+      opacity: var(--text-diverge-opacity-end); /* Fade out in the last 30% */
+    }
+  }
+
+  /* Text diverge animation: smooth movement right with controlled fade timing */
+  @keyframes divergeRight {
+    from {
+      transform: translateX(0);
+      opacity: var(--text-diverge-opacity-start);
+    }
+    70% {
+      /* Stay visible longer - 70% of animation at full opacity */
+      transform: translateX(70vw);
+      opacity: var(--text-diverge-opacity-start); /* Still fully visible */
+    }
+    to {
+      transform: translateX(var(--text-diverge-distance));
+      opacity: var(--text-diverge-opacity-end); /* Fade out in the last 30% */
     }
   }
 
