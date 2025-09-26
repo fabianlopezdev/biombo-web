@@ -205,15 +205,15 @@ const imageWidth = 29.495
     transform: translateX(0%);
     transition: transform 0.1s linear;
     display: block;
+    cursor: grab;
   }
 
   .slider__indicator:hover {
-    transform: translateX(var(--current-position, 0%));
+    transform: translateX(var(--current-position, 0%)) scale(1.05);
   }
 
   .slider__indicator:active {
     cursor: grabbing;
-    transform: translateX(var(--current-position, 0%)) scale(0.9);
   }
 
   .no-scroll-on-hover.hover-active.grow-left {
