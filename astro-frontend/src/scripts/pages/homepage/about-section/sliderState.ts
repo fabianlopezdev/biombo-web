@@ -28,6 +28,23 @@ function setArrowStates(state: SliderState) {
   nextBtn.classList.toggle('is-disabled', last)
 }
 
+/* helper: position right arrow at viewport edge ------------------- */
+function positionRightArrow(state: SliderState) {
+  const container = state.slider.parentElement
+  if (!container) return
+
+  const containerRect = container.getBoundingClientRect()
+  const viewportWidth = window.innerWidth
+
+  // Calculate where the right arrow should be positioned
+  // It should be at viewport edge minus padding, relative to the container
+  const rightPosition = viewportWidth - containerRect.left - 16 - 48 // 16px from edge + 48px arrow width
+
+  state.nextBtn.style.left = `${rightPosition}px`
+  state.nextBtn.style.right = 'auto'
+  state.nextBtn.classList.add('viewport-positioned')
+}
+
 export function createState(root: HTMLElement, count: number): SliderState {
   const q = <T extends Element>(sel: string) => root.querySelector<T>(sel)!
 
@@ -71,5 +88,10 @@ export function createState(root: HTMLElement, count: number): SliderState {
   }
 
   setArrowStates(st)
+  positionRightArrow(st)
+
+  // Reposition on window resize
+  window.addEventListener('resize', () => positionRightArrow(st))
+
   return st
 }

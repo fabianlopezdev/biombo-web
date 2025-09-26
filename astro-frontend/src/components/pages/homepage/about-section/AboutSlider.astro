@@ -14,10 +14,13 @@ const imageWidth = 29.495
 
 {
   imageCount === 2 && (
-    <div class="slider-container">
-      <div class="slider" data-slider>
+    <div class="slider-container two-images">
+      <div class="slider no-scroll" data-slider>
         {imagesToDisplay.map((image: DisplayImage, i: number) => (
-          <div class={`slider__img-container img-${i}`} style={`--image-width: 50%`}>
+          <div
+            class={`slider__img-container img-${i}`}
+            style={`--image-width: calc((100% - var(--slider-space)) / 2)`}
+          >
             <AboutImage image={image} />
           </div>
         ))}
@@ -29,7 +32,11 @@ const imageWidth = 29.495
   imageCount > 2 && (
     <>
       <div class="slider-container">
-        <div class="slider" data-slider>
+        <div
+          class="slider"
+          data-slider
+          style={`--slider-image-width: ${imageWidth}rem; --slider-gap: var(--slider-space)`}
+        >
           {imagesToDisplay.map((image: DisplayImage) => (
             <div class="slider__img-container" style={`--image-width: ${imageWidth}rem`}>
               <AboutImage image={image} />
@@ -88,9 +95,24 @@ const imageWidth = 29.495
     cursor: grabbing;
   }
 
-  .slider::after {
+  /* Add spacer for proper last image snap on scrollable sliders */
+  .slider:not(.no-scroll)::after {
     content: '';
-    flex: 0 0 0.1px;
+    /* Use CSS variables from slider element itself */
+    flex: 0 0 calc(100% - var(--slider-image-width, 29.495rem) - var(--slider-gap, 1.981875rem));
+    min-width: 10px; /* Ensure it has some width */
+    height: 100%;
+  }
+
+  /* Two images case - no scrolling, side by side with gap */
+  .two-images .slider {
+    overflow: hidden;
+    scroll-snap-type: none;
+    cursor: default;
+  }
+
+  .two-images .slider__img-container {
+    width: calc((100% - var(--slider-space)) / 2);
   }
 
   .slider__img-container {
@@ -136,21 +158,22 @@ const imageWidth = 29.495
     transform: translateX(0);
   }
 
-  .img-0:hover {
+  /* Special hover effects for two-image case */
+  .two-images .img-0:hover {
     width: 100%;
   }
 
-  .img-1:hover {
+  .two-images .img-1:hover {
     width: 100%;
     transform: translateX(calc(-50% - var(--slider-space)));
     object-position: left top !important;
   }
 
-  .img-1 img {
+  .two-images .img-1 img {
     transition: object-position 0.4s ease;
   }
 
-  .img-1:hover img {
+  .two-images .img-1:hover img {
     object-position: top;
   }
 
@@ -199,9 +222,15 @@ const imageWidth = 29.495
 </style>
 
 <style is:global>
+  /* Both arrows show on container hover */
   .slider-container:hover .slider__arrow {
     opacity: 1;
     pointer-events: auto;
     visibility: visible;
+  }
+
+  /* Position right arrow at viewport edge dynamically */
+  .slider__arrow--next.viewport-positioned {
+    /* This class will be added by JavaScript */
   }
 </style>
