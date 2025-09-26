@@ -118,12 +118,19 @@ const pages: NavigationPage[] = fetchError ? [] : headerData?.navigationPages ||
     left: 0;
     right: 0;
     z-index: 1000;
-    transition: transform 0.3s ease-in-out;
+    transition:
+      transform 0.3s ease-in-out,
+      opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Mobile overrides using native nesting */
     @media (width < 768px) {
       gap: 1rem;
     }
+  }
+
+  /* Homepage loading state - header initially hidden */
+  .site-header.header-loading {
+    opacity: 0;
   }
 
   /* Hide-on-scroll states */

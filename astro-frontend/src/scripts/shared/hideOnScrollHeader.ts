@@ -33,6 +33,16 @@ class HideOnScrollHeader {
     if (!this.header) return
 
     this.init()
+
+    // Listen for when homepage loading completes to initialize scroll position
+    window.addEventListener('loader:complete', () => {
+      // Small delay to ensure header fade-in has started
+      setTimeout(() => {
+        this.checkScrollPosition()
+        // Ensure header is visible after loader completes
+        this.showHeader()
+      }, 100)
+    })
   }
 
   private init() {
@@ -45,8 +55,13 @@ class HideOnScrollHeader {
     // Bind event listeners
     this.bindEvents()
 
-    // Check initial state
-    this.checkScrollPosition()
+    // Don't check initial position if homepage is loading
+    // The homepage orchestrator will handle the initial state
+    const isHomepageLoading = document.body.classList.contains('homepage-loading')
+    if (!isHomepageLoading) {
+      // Check initial state for non-homepage or after loading
+      this.checkScrollPosition()
+    }
   }
 
   private updateHeaderHeight() {

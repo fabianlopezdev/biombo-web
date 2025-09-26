@@ -53,8 +53,7 @@ class HomepageOrchestrator {
 
     // Hide elements via CSS classes
     if (this.header) {
-      this.header.style.opacity = '0'
-      this.header.style.transition = `opacity ${this.HEADER_FADE_DURATION}ms ${this.HEADER_FADE_EASING}`
+      this.header.classList.add('header-loading')
     }
 
     if (this.scrollIndicator) {
@@ -96,9 +95,9 @@ class HomepageOrchestrator {
     // Remove loading class from body
     document.body.classList.remove('homepage-loading')
 
-    // Fade in header and scroll indicator at the same time
+    // Fade in header by removing loading class
     if (this.header) {
-      this.header.style.opacity = '1'
+      this.header.classList.remove('header-loading')
     }
 
     if (this.scrollIndicator) {
