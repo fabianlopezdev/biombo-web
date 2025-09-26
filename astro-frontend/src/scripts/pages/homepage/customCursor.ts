@@ -24,6 +24,11 @@ interface CursorState {
   targetY: number
   collapseTimeout?: Timeout
   clickTimeout?: Timeout
+  // viewport tracking
+  mouseClientX: number
+  mouseClientY: number
+  // scroll tracking
+  scrollContainer: HTMLElement | null
   // stored listener refs for clean-up
   removeAll: () => void
 }
@@ -113,6 +118,9 @@ function initProject(project: HTMLElement) {
   const cursorText = cursorElement.querySelector<HTMLElement>('.cursor-text')
   const cursorImage = cursorElement.querySelector<HTMLImageElement>('.cursor-image')
 
+  // Find the horizontal scroll container
+  const scrollContainer = document.getElementById('horizontal-container')
+
   const state: CursorState = {
     project,
     link,
@@ -127,6 +135,9 @@ function initProject(project: HTMLElement) {
     targetY: 0,
     collapseTimeout: undefined,
     clickTimeout: undefined,
+    mouseClientX: 0,
+    mouseClientY: 0,
+    scrollContainer,
     removeAll: () => {},
   }
   states.push(state)
@@ -136,6 +147,10 @@ function initProject(project: HTMLElement) {
     state.active = true
     cursorElement.classList.add('visible')
     cursorElement.classList.remove('project-cursor-clicked', 'magnetic')
+
+    // Store viewport coordinates
+    state.mouseClientX = e.clientX
+    state.mouseClientY = e.clientY
 
     // We can safely use linkElement since we've already checked it exists
     const linkRect = linkElement.getBoundingClientRect()
@@ -172,6 +187,11 @@ function initProject(project: HTMLElement) {
 
   function moveCursor(e: PointerEvent) {
     if (!state.active) return
+
+    // Store viewport coordinates
+    state.mouseClientX = e.clientX
+    state.mouseClientY = e.clientY
+
     const bounds = getBounds(project)
     const linkRect = linkElement.getBoundingClientRect()
 
@@ -211,6 +231,41 @@ function initProject(project: HTMLElement) {
     )
   }
 
+  function handleScroll() {
+    if (!state.active || !state.scrollContainer) return
+
+    // Recalculate cursor position based on stored viewport coordinates
+    const linkRect = linkElement.getBoundingClientRect()
+
+    // Calculate new position relative to the scrolled project
+    const relX = state.mouseClientX - linkRect.left
+    const relY = state.mouseClientY - linkRect.top
+
+    // Check if cursor is still within project bounds
+    if (relX < 0 || relX > linkRect.width || relY < 0 || relY > linkRect.height) {
+      // Mouse is no longer over the project after scrolling
+      hideCursor()
+      return
+    }
+
+    // Update cursor position to maintain viewport position
+    const bounds = getBounds(project)
+    const dist = distance(state.mouseClientX, state.mouseClientY, bounds.centerX, bounds.centerY)
+    const inMag = dist < config.magnetRadius
+
+    if (inMag) {
+      const pull = 1 - dist / config.magnetRadius
+      const centerX = bounds.centerX - linkRect.left
+      const centerY = bounds.centerY - linkRect.top
+      const blend = config.centerPull * pull
+      state.targetX = relX * (1 - blend) + centerX * blend
+      state.targetY = relY * (1 - blend) + centerY * blend
+    } else {
+      state.targetX = relX
+      state.targetY = relY
+    }
+  }
+
   /* ---------- event listeners ---------- */
   const optsPassive = { passive: true } as const
   linkElement.addEventListener('pointerenter', showCursor, optsPassive)
@@ -218,12 +273,20 @@ function initProject(project: HTMLElement) {
   linkElement.addEventListener('pointermove', moveCursor, optsPassive)
   linkElement.addEventListener('pointerdown', clickCursor)
 
+  // Add scroll listener to the container if it exists
+  if (state.scrollContainer) {
+    state.scrollContainer.addEventListener('scroll', handleScroll, optsPassive)
+  }
+
   /* ---------- teardown helper ---------- */
   state.removeAll = () => {
     linkElement.removeEventListener('pointerenter', showCursor)
     linkElement.removeEventListener('pointerleave', hideCursor)
     linkElement.removeEventListener('pointermove', moveCursor)
     linkElement.removeEventListener('pointerdown', clickCursor)
+    if (state.scrollContainer) {
+      state.scrollContainer.removeEventListener('scroll', handleScroll)
+    }
   }
 }
 

@@ -8,9 +8,9 @@ class HomepageOrchestrator {
 
   // Header and scroll indicator fade timing (after loader completes)
   private readonly HEADER_SCROLL_FADE_DELAY_AFTER_LOADER = 800 // ms - Delay after loader completes before header/scroll start fading in
-  private readonly HEADER_FADE_DURATION = 300 // ms - Duration for header fade-in
+  private readonly HEADER_FADE_DURATION = 800 // ms - Duration for header fade-in
   private readonly HEADER_FADE_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)' // Easing for header fade
-  private readonly SCROLL_INDICATOR_FADE_DURATION = 300 // ms - Duration for scroll indicator fade-in
+  private readonly SCROLL_INDICATOR_FADE_DURATION = 800 // ms - Duration for scroll indicator fade-in
   private readonly SCROLL_INDICATOR_FADE_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)' // Easing for scroll indicator fade
 
   // Hero title slide-up animation timing
