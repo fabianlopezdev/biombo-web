@@ -38,7 +38,7 @@ export function initAboutSlider(about: HTMLElementWithSlider, count: number) {
 /* auto-boot -------------------------------------------------------- */
 if (typeof window !== 'undefined') {
   window.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll<HTMLElementWithSlider>('.about').forEach((el) => {
+    document.querySelectorAll<HTMLElementWithSlider>('.about-slider').forEach((el) => {
       if (el.__aboutSlider) return
       const count = Number(el.dataset.imageCount || 0)
       el.__aboutSlider = initAboutSlider(el, count)

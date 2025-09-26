@@ -29,6 +29,19 @@ class HomepageOrchestrator {
 
     if (!this.isHomepage) return
 
+    // Reset scroll position to top on homepage load/refresh
+    // This ensures users always start from the hero section
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
+    }
+    window.scrollTo(0, 0)
+
+    // Also reset horizontal container if it exists
+    const horizontalContainer = document.getElementById('horizontal-container')
+    if (horizontalContainer) {
+      horizontalContainer.scrollLeft = 0
+    }
+
     // Cache elements
     this.header = document.querySelector('.site-header')
     this.scrollIndicator = document.querySelector('.scroll-indicator')
