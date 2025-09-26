@@ -83,7 +83,9 @@ if (!isHomepage) return null
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: 100vh; /* Fallback for older browsers */
+    height: -webkit-fill-available; /* iOS Safari fix for viewport height */
+    height: 100svh; /* Small viewport height (when browser UI is expanded) */
     background-color: var(--color-secondary, #191919);
     z-index: 9999;
     align-items: center;
@@ -96,6 +98,22 @@ if (!isHomepage) return null
   .page-loader[data-loader-complete] {
     opacity: 0;
     pointer-events: none;
+  }
+
+  /* Dynamic viewport height support for modern browsers */
+  @supports (height: 100dvh) {
+    .page-loader {
+      height: 100dvh; /* Dynamically adjusts to actual viewport */
+    }
+  }
+
+  /* iOS 26 specific fix for viewport displacement bug */
+  @supports (-webkit-touch-callout: none) {
+    .page-loader {
+      /* Prevent viewport displacement on iOS */
+      -webkit-overflow-scrolling: touch;
+      transform: translate3d(0, 0, 0); /* Force GPU acceleration */
+    }
   }
 
   .loader-svg-container {
@@ -325,6 +343,39 @@ if (!isHomepage) return null
      * 5.6s   : Loader removed from DOM
      */
 
+    // Set actual viewport height for iOS Safari compatibility
+    const setViewportHeight = () => {
+      // Use visualViewport API if available (more accurate on iOS)
+      const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight
+
+      // Set CSS custom property for accurate viewport height
+      document.documentElement.style.setProperty('--vh', `${vh * 0.01}px`)
+
+      // Apply to loader if it exists
+      if (loader && !loader.hasAttribute('data-loader-complete')) {
+        loader.style.height = `${vh}px`
+      }
+    }
+
+    // Initial setting
+    setViewportHeight()
+
+    // Update on resize and orientation change
+    window.addEventListener('resize', setViewportHeight)
+    window.addEventListener('orientationchange', setViewportHeight)
+
+    // Use visualViewport resize event if available (iOS 13+)
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', setViewportHeight)
+    }
+
+    // iOS-specific: Prevent body scroll while loader is active
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    if (isIOS) {
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+    }
+
     // Get the total duration from CSS variable
     const loaderStyles = getComputedStyle(loader)
     const animationDuration = parseInt(loaderStyles.getPropertyValue('--loader-total-duration'))
@@ -337,8 +388,21 @@ if (!isHomepage) return null
       // Emit custom event for orchestrator
       window.dispatchEvent(new CustomEvent('loader:complete'))
 
+      // Restore body scroll on iOS
+      if (isIOS) {
+        document.body.style.position = ''
+        document.body.style.width = ''
+      }
+
       // Remove loader from DOM after fade out
       setTimeout(() => {
+        // Clean up event listeners
+        window.removeEventListener('resize', setViewportHeight)
+        window.removeEventListener('orientationchange', setViewportHeight)
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener('resize', setViewportHeight)
+        }
+
         loader.remove()
       }, 600) // Match the opacity transition duration
     }, animationDuration)
