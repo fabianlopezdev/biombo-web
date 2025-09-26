@@ -1,5 +1,14 @@
 ---
 import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
+
+interface Props {
+  isHomepage?: boolean
+}
+
+const { isHomepage = false } = Astro.props
+
+// Only show loader on homepage
+if (!isHomepage) return null
 ---
 
 <div id="page-loader" class="page-loader" data-loader-active>

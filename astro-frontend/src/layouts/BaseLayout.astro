@@ -16,6 +16,13 @@ const { title, metaDescription } = Astro.props
 // Get the current locale from Astro's i18n middleware
 const locale = (Astro.currentLocale ?? 'ca') as 'ca' | 'es' | 'en'
 
+// Check if we're on the homepage
+const isHomepage =
+  Astro.url.pathname === '/' ||
+  Astro.url.pathname === '/ca' ||
+  Astro.url.pathname === '/es' ||
+  Astro.url.pathname === '/en'
+
 // Fetch site settings colors with destructuring and direct fallbacks
 const { primaryColor = '#f2f2f2', secondaryColor = '#191919' } = await fetchSiteSettings()
 ---
@@ -34,7 +41,7 @@ const { primaryColor = '#f2f2f2', secondaryColor = '#191919' } = await fetchSite
     <title>{title}</title>
   </head>
   <body>
-    <PageLoader />
+    <PageLoader isHomepage={isHomepage} />
     <Fragment set:html={HeaderSVGHover} />
     <Header locale={locale} />
     <slot />
