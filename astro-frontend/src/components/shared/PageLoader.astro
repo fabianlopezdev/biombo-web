@@ -271,6 +271,8 @@ if (!isHomepage) return null
       --text-diverge-distance: 300px;
       --svg-initial-scale: 0.241; /* Scale down to show as 293px on mobile (293/1213) */
       --svg-final-scale: 1.7; /* Reduced from 4, proportionally scaled */
+      /* Slower animation for mobile to feel less rushed */
+      --svg-scale-duration: 2.5s; /* Increased from 2s for smoother mobile experience */
     }
 
     .loader-text {
@@ -296,7 +298,8 @@ if (!isHomepage) return null
   /* Example: iPad Pro 12.9" (1024×1366, exactly 3:4), some tablets */
   @media (max-width: 1100px) and (max-aspect-ratio: 1/1) and (min-aspect-ratio: 3/4) {
     .page-loader {
-      --svg-final-scale: 4.3; /* Was 10, now 4.3 (10/2.3) */
+      --svg-final-scale: 3.5; /* Reduced from 4.3 for less aggressive scaling */
+      --svg-scale-duration: 2.8s; /* Longer duration for larger scale changes */
     }
   }
 
@@ -304,8 +307,9 @@ if (!isHomepage) return null
   /* Example: Most tablets in portrait, some older phones */
   @media (max-width: 1100px) and (max-aspect-ratio: 3/4) and (min-aspect-ratio: 9/16) {
     .page-loader {
-      --svg-final-scale: 4.3; /* Was 10, now 4.3 */
+      --svg-final-scale: 3.8; /* Reduced from 4.3 for smoother animation */
       --text-diverge-distance: 120vw;
+      --svg-scale-duration: 3s; /* 3s for tall screens */
     }
   }
 
@@ -313,8 +317,9 @@ if (!isHomepage) return null
   /* Example: iPhone 12/13/14, most modern Android phones */
   @media (max-width: 1100px) and (max-aspect-ratio: 9/16) and (min-aspect-ratio: 9/20) {
     .page-loader {
-      --svg-final-scale: 4.8; /* Was 11, now 4.8 */
+      --svg-final-scale: 4; /* Reduced from 4.8 to prevent overly fast animation */
       --text-diverge-distance: 140vw;
+      --svg-scale-duration: 3.2s; /* Proportionally longer for more scaling */
     }
   }
 
@@ -322,8 +327,9 @@ if (!isHomepage) return null
   /* Example: iPhone 14 Pro, Samsung S23 Ultra */
   @media (max-width: 1100px) and (max-aspect-ratio: 9/20) {
     .page-loader {
-      --svg-final-scale: 5.2; /* Was 12, now 5.2 */
+      --svg-final-scale: 4.2; /* Reduced from 5.2 to prevent rushed feeling */
       --text-diverge-distance: 150vw;
+      --svg-scale-duration: 3.5s; /* Longest duration for tallest screens */
     }
   }
 </style>

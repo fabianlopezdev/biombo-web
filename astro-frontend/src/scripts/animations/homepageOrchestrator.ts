@@ -20,6 +20,7 @@ class HomepageOrchestrator {
   private header: HTMLElement | null = null
   private scrollIndicator: HTMLElement | null = null
   private heroTitle: HTMLElement | null = null
+  private projectsMobile: HTMLElement | null = null
 
   constructor() {
     // Check if we're on the homepage
@@ -46,6 +47,7 @@ class HomepageOrchestrator {
     this.header = document.querySelector('.site-header')
     this.scrollIndicator = document.querySelector('.scroll-indicator')
     this.heroTitle = document.querySelector('[data-slide-up-animation]')
+    this.projectsMobile = document.querySelector('.projects-container-mobile')
 
     this.init()
   }
@@ -72,6 +74,13 @@ class HomepageOrchestrator {
     if (this.scrollIndicator) {
       this.scrollIndicator.style.opacity = '0'
       this.scrollIndicator.style.transition = `opacity ${this.SCROLL_INDICATOR_FADE_DURATION}ms ${this.SCROLL_INDICATOR_FADE_EASING}`
+    }
+
+    // Hide mobile projects container initially
+    if (this.projectsMobile) {
+      this.projectsMobile.classList.add('projects-mobile-loading')
+      this.projectsMobile.style.opacity = '0'
+      this.projectsMobile.style.transition = `opacity ${this.HEADER_FADE_DURATION}ms ${this.HEADER_FADE_EASING}`
     }
 
     // Hero title will be hidden by slideUpTextAnimation
@@ -115,6 +124,12 @@ class HomepageOrchestrator {
 
     if (this.scrollIndicator) {
       this.scrollIndicator.style.opacity = '1'
+    }
+
+    // Fade in mobile projects container
+    if (this.projectsMobile) {
+      this.projectsMobile.classList.remove('projects-mobile-loading')
+      this.projectsMobile.style.opacity = '1'
     }
   }
 

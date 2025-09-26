@@ -69,6 +69,11 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     width: 100%;
   }
 
+  /* Initial loading state - will be controlled by orchestrator */
+  .projects-container-mobile.projects-mobile-loading {
+    opacity: 0;
+  }
+
   .projects-slider-container {
     padding-block-start: 2rem;
   }
