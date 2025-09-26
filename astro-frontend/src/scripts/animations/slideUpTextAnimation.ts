@@ -34,7 +34,7 @@ class SlideUpTextAnimation {
     this.options = {
       duration: 1500,
       stagger: 200,
-      initialDelay: 750,
+      initialDelay: 0, // No delay - start immediately
       easing: 'cubic-bezier(0.19, 1, 0.22, 1)', // expo.out
       splitByLines: true,
       ...options,
@@ -268,12 +268,25 @@ class SlideUpTextAnimation {
         // Check if element should animate immediately (above the fold)
         // or wait for intersection observer
         const shouldAnimateImmediately = this.element.hasAttribute('data-animate-immediate')
+        const waitForTrigger = this.element.hasAttribute('data-wait-for-trigger')
 
         if (shouldAnimateImmediately) {
           // Small delay to ensure everything is rendered
           setTimeout(() => {
             this.animateLines()
           }, 100)
+        } else if (waitForTrigger) {
+          // Wait for external trigger (from orchestrator)
+          // Use MutationObserver to watch for attribute changes
+          const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.attributeName === 'data-animation-trigger') {
+                this.animateLines()
+                observer.disconnect()
+              }
+            })
+          })
+          observer.observe(this.element, { attributes: true })
         } else {
           // Use intersection observer for scroll-triggered animation
           this.setupIntersectionObserver()

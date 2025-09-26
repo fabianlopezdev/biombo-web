@@ -62,7 +62,7 @@ if (!isHomepage) return null
     --text-fade-duration-percentage: 60%; /* Fade completes at this % of diverge animation */
 
     /* Overall timing */
-    --loader-total-duration: 4500; /* Original duration */
+    --loader-total-duration: 4000; /* Original duration */
 
     /* Easing functions */
     --animation-easing: cubic-bezier(
@@ -331,8 +331,11 @@ if (!isHomepage) return null
 
     // Mark loader as complete after animation
     setTimeout(() => {
-      debugger
+      // debugger
       loader.setAttribute('data-loader-complete', '')
+
+      // Emit custom event for orchestrator
+      window.dispatchEvent(new CustomEvent('loader:complete'))
 
       // Remove loader from DOM after fade out
       setTimeout(() => {

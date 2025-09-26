@@ -43,9 +43,10 @@ const scrollPositionClass =
 
 <script src="@/scripts/pages/homepage/heroScroll.ts"></script>
 <script src="@/scripts/animations/slideUpTextAnimation.ts"></script>
+<script src="@/scripts/animations/homepageOrchestrator.ts"></script>
 
 <div class={`hero-wrapper ${textAlignment}-aligned mobile-${mobileTextAlignment}-aligned`}>
-  <h1 data-slide-up-animation data-animate-immediate class="hero-title">
+  <h1 data-slide-up-animation data-wait-for-trigger class="hero-title">
     {
       hasLineBreaks && parsedText ? (
         parsedText.lines.map((line, index) => (
