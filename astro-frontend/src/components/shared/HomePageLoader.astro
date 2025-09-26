@@ -1,0 +1,292 @@
+---
+import BiomboIntroSVG from '@/assets/biombo-intro-loading.svg?raw'
+
+interface Props {
+  isHomepage?: boolean
+}
+
+const { isHomepage = false } = Astro.props
+
+// Only show loader on homepage
+if (!isHomepage) return null
+---
+
+<script src="@/scripts/homePageLoader.ts"></script>
+
+<!-- Homepage Intro Loader keyboard skip only -->
+<div
+  id="page-loader"
+  class="page-loader"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="loader-title"
+  aria-describedby="loader-desc"
+>
+  <p id="loader-desc" class="sr-only">Site intro animation. Press Escape or the "S" key to skip.</p>
+
+  <!-- SVG Shape that scales (decorative) -->
+  <div class="loader-svg-container" aria-hidden="true">
+    <div class="loader-svg" set:html={BiomboIntroSVG} />
+  </div>
+
+  <!-- Brand text layers; only one is exposed to assistive technology -->
+  <div id="loader-title" class="loader-text" role="heading" aria-level="1" aria-live="polite">
+    <div class="text-base" aria-hidden="true">
+      <span class="text-biombo">Biombo</span>
+      <span class="text-studio">Studio</span>
+    </div>
+    <div class="text-fill">
+      <span class="text-biombo">Biombo</span>
+      <span class="text-studio">Studio</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ==========================================
+   * LOADER TOGGLE: Change 'flex' to 'none' to disable loader
+   * ========================================== */
+  :root {
+    --show-loader: flex;
+  }
+
+  .page-loader {
+    display: var(--show-loader); /* Controlled by toggle above */
+    /* SVG Animation Variables*/
+    --svg-scale-duration: 2s;
+    --svg-scale-delay: 3.2s;
+    --svg-initial-scale: 0.2416; /* Scale down 1213px to display as 530px (530/1213) */
+    --svg-final-scale: 2.6; /* Original revised scaling */
+
+    /* Text Reveal Animation Variables*/
+    --text-reveal-duration: 3s; /* Exact duration from Motto */
+    --text-reveal-delay: 0s; /* Start immediately like Motto */
+
+    /* Text Diverge Animation Variables*/
+    --text-diverge-duration: 1s;
+    --text-diverge-delay: 3.2s;
+    --text-diverge-distance: 100vw;
+    --text-diverge-opacity-start: 1;
+    --text-diverge-opacity-end: 0; /* Set to 1 for no fade, 0 for full fade */
+    --text-fade-duration-percentage: 60%; /* Fade completes at this % of diverge animation */
+
+    /* Overall timing */
+    --loader-total-duration: 4000;
+
+    /* Easing functions */
+    --animation-easing: cubic-bezier(0.19, 1, 0.22, 1);
+    --text-fill-easing: cubic-bezier(0.65, 0.01, 0.05, 0.99);
+
+    /* Component styles */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh; /* Fallback for older browsers */
+    height: -webkit-fill-available; /* iOS Safari fix for viewport height */
+    height: 100svh; /* Small viewport height */
+    background-color: var(--color-secondary, #191919);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    opacity: 1;
+    --loader-fade-duration: 600ms;
+    transition: opacity var(--loader-fade-duration) var(--animation-easing);
+  }
+
+  .page-loader[data-loader-complete] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @supports (height: 100dvh) {
+    .page-loader {
+      height: 100dvh;
+    }
+  }
+
+  /* iOS specific perf hint */
+  @supports (-webkit-touch-callout: none) {
+    .page-loader {
+      -webkit-overflow-scrolling: touch;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .loader-svg-container {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1213px; /* New larger SVG width */
+    height: 818px; /* New larger SVG height */
+    transform: scale(var(--svg-initial-scale));
+    animation: scaleUp var(--svg-scale-duration) var(--animation-easing) var(--svg-scale-delay)
+      forwards;
+  }
+
+  .loader-svg {
+    width: 100%;
+    height: 100%;
+  }
+  .loader-svg :global(svg) {
+    width: 100%;
+    height: 100%;
+    shape-rendering: geometricPrecision;
+  }
+
+  .loader-text {
+    position: absolute;
+    z-index: 2;
+    font-size: 1.875rem;
+    font-weight: var(--font-weight-bold);
+  }
+
+  .text-base,
+  .text-fill {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .text-base {
+    color: #8e8e8e; /* Gray base text */
+    animation: hideAfterFill 0.1s linear
+      calc(var(--text-reveal-duration) + var(--text-reveal-delay)) forwards;
+  }
+  @keyframes hideAfterFill {
+    to {
+      opacity: 0;
+    }
+  }
+
+  .text-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--color-secondary, #191919); /* Reverted to original brand/dark */
+    clip-path: inset(0 100% 0 0);
+    animation:
+      revealFromLeft var(--text-reveal-duration) var(--text-fill-easing) var(--text-reveal-delay)
+        forwards,
+      expandClipPath 0.1s linear calc(var(--text-reveal-duration) + var(--text-reveal-delay))
+        forwards;
+  }
+
+  @keyframes expandClipPath {
+    to {
+      clip-path: inset(0 -100vw 0 -100vw);
+    }
+  }
+
+  .text-biombo,
+  .text-studio {
+    display: inline-block;
+  }
+  .text-biombo {
+    animation: divergeLeft var(--text-diverge-duration) linear var(--text-diverge-delay) forwards;
+  }
+  .text-studio {
+    animation: divergeRight var(--text-diverge-duration) linear var(--text-diverge-delay) forwards;
+  }
+
+  @keyframes revealFromLeft {
+    0% {
+      clip-path: inset(0 100% 0 0);
+    }
+    100% {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes divergeLeft {
+    from {
+      transform: translateX(0);
+      opacity: var(--text-diverge-opacity-start);
+    }
+    70% {
+      transform: translateX(-70vw);
+      opacity: var(--text-diverge-opacity-start);
+    }
+    to {
+      transform: translateX(calc(var(--text-diverge-distance) * -1));
+      opacity: var(--text-diverge-opacity-end);
+    }
+  }
+  @keyframes divergeRight {
+    from {
+      transform: translateX(0);
+      opacity: var(--text-diverge-opacity-start);
+    }
+    70% {
+      transform: translateX(70vw);
+      opacity: var(--text-diverge-opacity-start);
+    }
+    to {
+      transform: translateX(var(--text-diverge-distance));
+      opacity: var(--text-diverge-opacity-end);
+    }
+  }
+  @keyframes scaleUp {
+    from {
+      transform: scale(var(--svg-initial-scale));
+    }
+    to {
+      transform: scale(var(--svg-final-scale));
+    }
+  }
+
+  /* Hide loader for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .page-loader {
+      display: none;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .page-loader {
+      --text-diverge-distance: 300px;
+      --svg-initial-scale: 0.241; /* 293/1213 */
+      --svg-final-scale: 1.7;
+      --svg-scale-duration: 2.5s; /* as in your original mobile tweak */
+    }
+
+    .loader-text {
+      font-size: 20px;
+      gap: 0.3rem;
+    }
+    .loader-svg-container {
+      width: 1213px;
+      height: 818px;
+    }
+  }
+
+  /* Aspect-ratio presets (original scaled set) */
+  @media (max-width: 1100px) and (max-aspect-ratio: 1/1) and (min-aspect-ratio: 3/4) {
+    .page-loader {
+      --svg-final-scale: 3.5;
+      --svg-scale-duration: 2.8s;
+    }
+  }
+  @media (max-width: 1100px) and (max-aspect-ratio: 3/4) and (min-aspect-ratio: 9/16) {
+    .page-loader {
+      --svg-final-scale: 3.8;
+      --text-diverge-distance: 120vw;
+      --svg-scale-duration: 3s;
+    }
+  }
+  @media (max-width: 1100px) and (max-aspect-ratio: 9/16) and (min-aspect-ratio: 9/20) {
+    .page-loader {
+      --svg-final-scale: 4;
+      --text-diverge-distance: 140vw;
+      --svg-scale-duration: 3.2s;
+    }
+  }
+  @media (max-width: 1100px) and (max-aspect-ratio: 9/20) {
+    .page-loader {
+      --svg-final-scale: 4.2;
+      --text-diverge-distance: 150vw;
+      --svg-scale-duration: 3.5s;
+    }
+  }
+</style>
