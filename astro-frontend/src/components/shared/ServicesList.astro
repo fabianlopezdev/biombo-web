@@ -11,31 +11,33 @@ interface Props {
 const { services, class: className = '' } = Astro.props
 ---
 
-<script src="@/scripts/animations/servicesListAnimation.ts"></script>
-<script src="@/scripts/animations/servicesMobileAnimation.ts"></script>
+<script src="@/scripts/animations/services-list-stagger.ts"></script>
+<script src="@/scripts/animations/services-mobile-interactions.ts"></script>
 
-{services && services.length > 0 && (
-  <div class={`services-list ${className}`}>
-    {services.map((service: Service) => (
-      <details data-service-item>
-        <summary>
-          <h3 class="text services__title">{service.title}</h3>
-          <div class="services-toggle" aria-hidden="true">
-            <span class="services-toggle-plus-text">+</span>
-            <span class="services-toggle-plus-svg">
-              <Fragment set:html={ServicesPlusSignRaw} />
-            </span>
-            <span class="services-toggle-circle">
-              <Fragment set:html={ServicesCircleSignRaw} />
-            </span>
-            <span class="services-toggle-minus">-</span>
-          </div>
-        </summary>
-        {service.description && <p>{service.description}</p>}
-      </details>
-    ))}
-  </div>
-)}
+{
+  services && services.length > 0 && (
+    <div class={`services-list ${className}`}>
+      {services.map((service: Service) => (
+        <details data-service-item>
+          <summary>
+            <h3 class="text services__title">{service.title}</h3>
+            <div class="services-toggle" aria-hidden="true">
+              <span class="services-toggle-plus-text">+</span>
+              <span class="services-toggle-plus-svg">
+                <Fragment set:html={ServicesPlusSignRaw} />
+              </span>
+              <span class="services-toggle-circle">
+                <Fragment set:html={ServicesCircleSignRaw} />
+              </span>
+              <span class="services-toggle-minus">-</span>
+            </div>
+          </summary>
+          {service.description && <p>{service.description}</p>}
+        </details>
+      ))}
+    </div>
+  )
+}
 
 <style>
   .text {

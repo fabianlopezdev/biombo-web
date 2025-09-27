@@ -29,9 +29,9 @@ const viewAllTextVal = projectsData?.viewAllText || ''
 const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProjects || []
 ---
 
-<script src="@/scripts/pages/homepage/projects-section/projectsScroll.ts"></script>
-<script src="@/scripts/pages/homepage/customCursor.ts"></script>
-<!-- Commented out project reveal animations - uncomment to re-enable --><!-- <script src="@/scripts/pages/homepage/projects-section/projectReveals.ts"></script> -->
+<script src="@/scripts/homepage/projects-scroll-button.ts"></script>
+<script src="@/scripts/magnetic-project-cursor.ts"></script>
+<!-- Commented out project reveal animations - uncomment to re-enable --><!-- <script src="@/scripts/homepage/projects-reveal-animation.ts"></script> -->
 <div class="projects-container" aria-labelledby="projects-heading">
   <ProjectsTitle {title} />
   <p class="bottom-left">{subtitle.toUpperCase()}</p>

@@ -1,4 +1,4 @@
-import type { SliderState } from '@/scripts/pages/homepage/about-section/sliderState'
+import type { SliderState } from '@/scripts/slider/slider-state-manager'
 
 /**
  * Enable click-and-drag or touch-swipe to scroll the slider.

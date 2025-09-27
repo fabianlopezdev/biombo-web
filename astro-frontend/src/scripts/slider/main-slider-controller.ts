@@ -1,9 +1,9 @@
 /* aboutSlider.ts */
 
-import { createState } from '@/scripts/pages/homepage/about-section/sliderState'
-import { initArrowNavigation } from '@/scripts/pages/homepage/about-section/sliderArrow'
-import { initProgressBar } from '@/scripts/pages/homepage/about-section/sliderProgressBar'
-import { initDragToScroll } from '@/scripts/pages/homepage/about-section/sliderDrag'
+import { createState } from '@/scripts/slider/slider-state-manager'
+import { initArrowNavigation } from '@/scripts/slider/slider-arrow-navigation'
+import { initProgressBar } from '@/scripts/slider/slider-progress-indicator'
+import { initDragToScroll } from '@/scripts/slider/slider-drag-handler'
 
 export type AboutSliderInstance = {
   destroy: () => void
@@ -17,12 +17,13 @@ export function initAboutSlider(about: HTMLElementWithSlider, count: number) {
   const state = createState(about, count)
   const destroyFns = [initArrowNavigation(state), initProgressBar(state), initDragToScroll(state)]
 
-  /* observe only the slider’s parent for removal ----------------- */
+  /* observe only the slider's parent for removal ----------------- */
   const parent = about.parentNode || document.body
   const mo = new MutationObserver((recs) => {
     const removed = recs.some((r) => Array.from(r.removedNodes).includes(about))
     if (!removed) return
     mo.disconnect()
+    state.destroy() // Clean up state
     destroyFns.forEach((fn) => fn())
   })
   mo.observe(parent, { childList: true })
@@ -30,6 +31,7 @@ export function initAboutSlider(about: HTMLElementWithSlider, count: number) {
   return {
     destroy() {
       mo.disconnect()
+      state.destroy() // Clean up state
       destroyFns.forEach((fn) => fn())
     },
   }

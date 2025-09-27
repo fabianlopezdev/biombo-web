@@ -38,7 +38,7 @@ export const prefersReducedMotion = (): boolean =>
 /*  Programmatic smooth-scroll helper                                 */
 /* ------------------------------------------------------------------ */
 
-import type { SliderState } from '@/scripts/pages/homepage/about-section/sliderState'
+import type { SliderState } from '@/scripts/slider/slider-state-manager'
 
 export function scrollToIndex(state: SliderState, index: number, smooth = true): void {
   const { slider, count, prevBtn, nextBtn } = state

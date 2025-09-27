@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 /* sliderProgressBar.ts */
 
-import type { SliderState } from '@/scripts/pages/homepage/about-section/sliderState'
-import { throttle, clamp, scrollToIndex } from '@/scripts/pages/homepage/about-section/sliderUtils'
+import type { SliderState } from '@/scripts/slider/slider-state-manager'
+import { throttle, clamp, scrollToIndex } from '@/scripts/slider/slider-utilities'
 
 export function initProgressBar(state: SliderState) {
   const { slider, progressBar, indicator, count, set } = state

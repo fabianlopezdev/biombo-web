@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 /* sliderArrow.ts */
 
-import type { SliderState } from '@/scripts/pages/homepage/about-section/sliderState'
-import { clamp, scrollToIndex } from '@/scripts/pages/homepage/about-section/sliderUtils'
+import type { SliderState } from '@/scripts/slider/slider-state-manager'
+import { clamp, scrollToIndex } from '@/scripts/slider/slider-utilities'
 
 export function initArrowNavigation(state: SliderState) {
   const { prevBtn, nextBtn, count, set } = state
