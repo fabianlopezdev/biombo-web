@@ -48,6 +48,8 @@ const getProjectUrl = (slug: any, locale: string) => {
 }
 ---
 
+<script src="@/scripts/pages/projects/projectsFilter.ts"></script>
+
 <section class="projects-list-container">
   <!-- Services Filter -->
   {
@@ -112,41 +114,6 @@ const getProjectUrl = (slug: any, locale: string) => {
     )
   }
 </section>
-
-<script>
-  // Service filtering functionality
-  const filterButtons = document.querySelectorAll('.filter-button')
-  const projectCards = document.querySelectorAll('.project-card')
-
-  filterButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      const filter = button.getAttribute('data-filter')
-
-      // Update active state
-      filterButtons.forEach((btn) => {
-        btn.classList.remove('active')
-        btn.setAttribute('aria-pressed', 'false')
-      })
-      button.classList.add('active')
-      button.setAttribute('aria-pressed', 'true')
-
-      // Filter projects
-      projectCards.forEach((card) => {
-        const cardElement = card as HTMLElement
-        if (filter === 'all') {
-          cardElement.style.display = 'block'
-        } else {
-          const cardServices = cardElement.getAttribute('data-services')?.split(',') || []
-          if (cardServices.includes(filter || '')) {
-            cardElement.style.display = 'block'
-          } else {
-            cardElement.style.display = 'none'
-          }
-        }
-      })
-    })
-  })
-</script>
 
 <style>
   .projects-list-container {

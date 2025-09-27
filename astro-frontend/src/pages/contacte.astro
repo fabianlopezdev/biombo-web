@@ -21,6 +21,8 @@ const phone = contactPageData?.phone || '+(34) 699 696 969'
 const formSection = contactPageData?.formSection
 ---
 
+<script src="@/scripts/pages/contact/autoExpandTextarea.ts"></script>
+
 <BaseLayout title={`${title} - Biombo Studio`}>
   <main>
     <TwoColumnLayout title={title}>
@@ -281,26 +283,3 @@ const formSection = contactPageData?.formSection
     }
   }
 </style>
-
-<script>
-  // Auto-expand textarea as user types
-  document.addEventListener('DOMContentLoaded', () => {
-    const autoExpandTextareas = document.querySelectorAll('textarea.auto-expand')
-
-    autoExpandTextareas.forEach((textarea) => {
-      // Function to adjust height
-      const adjustHeight = () => {
-        // Reset height to min-height to get accurate scrollHeight
-        textarea.style.height = 'auto'
-        // Set height to scrollHeight but respect max-height from CSS
-        textarea.style.height = textarea.scrollHeight + 'px'
-      }
-
-      // Adjust on input
-      textarea.addEventListener('input', adjustHeight)
-
-      // Initial adjustment in case there's pre-filled content
-      adjustHeight()
-    })
-  })
-</script>
