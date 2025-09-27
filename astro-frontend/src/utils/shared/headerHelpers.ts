@@ -42,19 +42,29 @@ const PAGE_ROUTES = {
  * Gets the title from the page reference or directly from the page object.
  * 'Missing Title' is returned as a fallback.
  */
-export function getPageName(page: NavigationPage): string {
-  // First check if we have a page reference and a title from it
-  if (page.pageReference && typeof page.pageReference === 'object' && page.pageReference?.title) {
-    const title = page.pageReference.title
-    return typeof title === 'string' ? title.trim() : 'Missing Title'
+export function getPageName(page: NavigationPage | null | undefined): string {
+  // Early return for invalid input
+  if (!page || typeof page !== 'object') {
+    return 'Missing Title'
   }
 
-  // Handle string title (non-internationalized)
-  if (typeof page.title === 'string') {
-    return page.title.trim() || 'Missing Title'
+  // Try to get title from page reference first
+  if (
+    page.pageReference &&
+    typeof page.pageReference === 'object' &&
+    'title' in page.pageReference
+  ) {
+    const refTitle = (page.pageReference as { title?: unknown }).title
+    if (typeof refTitle === 'string' && refTitle.trim()) {
+      return refTitle.trim()
+    }
   }
 
-  // Since we've removed localized fields from our schema, we no longer need the object checks
+  // Fall back to direct title property
+  if ('title' in page && typeof page.title === 'string' && page.title.trim()) {
+    return page.title.trim()
+  }
+
   // Default fallback
   return 'Missing Title'
 }
@@ -64,60 +74,71 @@ export function getPageName(page: NavigationPage): string {
  *  • External links are returned as-is.
  *  • Internal links use the locale-aware mapping to generate the correct path.
  */
-export function getPagePath(page: NavigationPage, locale: string): string {
+export function getPagePath(page: NavigationPage | null | undefined, locale: string): string {
+  // Early return for invalid input
+  if (!page || typeof page !== 'object') {
+    return '#'
+  }
+
+  // Validate locale
+  const validLocales = ['ca', 'es', 'en'] as const
+  type ValidLocale = (typeof validLocales)[number]
+  const safeLocale: ValidLocale = validLocales.includes(locale as ValidLocale)
+    ? (locale as ValidLocale)
+    : 'ca'
+
   try {
     // Handle external URLs
-    if (page.isExternal) {
+    if (page.isExternal === true) {
       // Return the URL if it exists and is a string
-      return page.externalUrl && typeof page.externalUrl === 'string' ? page.externalUrl : '#' // Fallback for missing URLs
+      return typeof page.externalUrl === 'string' && page.externalUrl.trim()
+        ? page.externalUrl.trim()
+        : '#'
     }
 
     // Determine locale prefix: empty for Catalan, "/es" or "/en" for others
-    const localePart = locale === 'ca' ? '' : `/${locale}`
+    const localePart = safeLocale === 'ca' ? '' : `/${safeLocale}`
 
     // Handle page references based on their type
-    if (page.pageReference && typeof page.pageReference === 'object') {
-      const pageType = page.pageReference._type
-
-      // Validate we have a known page type
-      if (!pageType) {
-        return '#'
-      }
-
-      // Check if this is one of our mapped types
-      if (
-        pageType === 'projectsPage' ||
-        pageType === 'servicesPage' ||
-        pageType === 'aboutUsPage' ||
-        pageType === 'contactPage'
-      ) {
-        // We verified this is a valid key with our if statement
-        // Use the page type to access the correct route map
-        const localizedPath = PAGE_ROUTES[pageType][locale as 'ca' | 'es' | 'en'] || ''
-
-        if (localizedPath) {
-          // Build the full path properly
-          if (localePart) {
-            // Non-default locale: /es/ruta or /en/path
-            // Avoid double slashes by checking for them directly
-            const fullPath = `${localePart}/${localizedPath}`
-            return fullPath.includes('//') ? fullPath.replace('//', '/') : fullPath
-          } else {
-            // Default locale (Catalan): /ruta
-            return `/${localizedPath}`
-          }
-        }
-      } else {
-        // Unknown page type, not in allowed list
-      }
-
-      // Unknown page type
+    if (!page.pageReference || typeof page.pageReference !== 'object') {
       return '#'
     }
 
-    // No valid reference found
-    return '#'
-  } catch {
+    const pageRef = page.pageReference as { _type?: string }
+    const pageType = pageRef._type
+
+    // Early return if no page type
+    if (!pageType || typeof pageType !== 'string') {
+      return '#'
+    }
+
+    // Type guard for known page types
+    const isKnownPageType = (type: string): type is keyof typeof PAGE_ROUTES => {
+      return type in PAGE_ROUTES
+    }
+
+    if (!isKnownPageType(pageType)) {
+      return '#'
+    }
+
+    // Get localized path
+    const routes = PAGE_ROUTES[pageType]
+    const localizedPath = routes[safeLocale]
+
+    if (!localizedPath) {
+      return '#'
+    }
+
+    // Build the full path
+    if (localePart) {
+      // Non-default locale: /es/ruta or /en/path
+      return `${localePart}/${localizedPath}`.replace('//', '/')
+    }
+
+    // Default locale (Catalan): /ruta
+    return `/${localizedPath}`
+  } catch (error) {
+    console.error('[getPagePath] Error building navigation path:', error)
     return '#'
   }
 }

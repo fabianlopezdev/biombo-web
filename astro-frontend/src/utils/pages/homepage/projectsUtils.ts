@@ -28,29 +28,37 @@ export interface TransformedProject {
 
 /**
  * Transforms a Sanity project to a standardized format for rendering in the homepage
- * @param project The Sanity project data or null for placeholder
- * @param index The index position of the project
- * @param currentLang The current language code
- * @param viewProjectTextValue The text to show for viewing projects
- * @returns Transformed project data ready for UI rendering
  */
 export function transformProject(
-  featuredItem: FeaturedProjectItem | null,
+  featuredItem: FeaturedProjectItem | null | undefined,
   index: number,
   currentLang: string,
   viewProjectTextValue: string,
 ): TransformedProject {
-  // If we don't have a featured item (or not enough projects), use placeholder data
-  if (!featuredItem || !featuredItem.project) {
+  // Early return for invalid index
+  if (typeof index !== 'number' || index < 0) {
+    console.warn('[transformProject] Invalid index provided:', index)
+    index = 0
+  }
+
+  // Validate language
+  const validLangs = ['ca', 'es', 'en'] as const
+  type ValidLang = (typeof validLangs)[number]
+  const safeLang: ValidLang = validLangs.includes(currentLang as ValidLang)
+    ? (currentLang as ValidLang)
+    : 'ca'
+
+  // Early return for missing or invalid featured item
+  if (!featuredItem || typeof featuredItem !== 'object' || !featuredItem.project) {
     return {
       index,
-      slug: ``, // Simple string slug for placeholders
+      slug: '', // Empty slug for placeholders
       image: '',
-      alt: ``,
-      title: ``, // No title for placeholder
+      alt: '',
+      title: '', // No title for placeholder
       viewProjectText: viewProjectTextValue || 'View project',
-      hoverColor: undefined, // No specific hover color for placeholder
-      textHoverColor: undefined, // No specific text hover color for placeholder
+      hoverColor: undefined,
+      textHoverColor: undefined,
     }
   }
 
@@ -93,19 +101,25 @@ export function transformProject(
     imageAltText = projectDoc.mainImage.alt
   }
 
-  // ENHANCE: Handle both localized and direct string values for alt text and title
+  // Helper: Handle both localized and direct string values
   const getLocalizedValue = (
-    field: Record<string, string> | string | undefined,
-    fallback: string = '',
-  ) => {
+    field: Record<string, string> | string | null | undefined,
+    fallback = '',
+  ): string => {
+    // Early returns for edge cases
     if (!field) return fallback
     if (typeof field === 'string') return field
-    return field[currentLang] || field.ca || Object.values(field)[0] || fallback
+    if (typeof field !== 'object') return fallback
+
+    // Try to get localized value
+    const localizedValue = field[safeLang] || field.ca || Object.values(field)[0]
+    return typeof localizedValue === 'string' ? localizedValue : fallback
   }
 
-  // ENHANCE: Handle both localized slug and simple slug structures
+  // Helper: Handle both localized slug and simple slug structures
   const getSlug = (): string => {
     try {
+      // Early return if no slug
       if (!projectDoc.slug) {
         return `project-${index}`
       }
@@ -122,11 +136,11 @@ export function transformProject(
         if (typeField._type === 'localeSlug') {
           const slugObj = projectDoc.slug as LocaleSlug
           const langSlug =
-            currentLang === 'ca'
+            safeLang === 'ca'
               ? slugObj.ca
-              : currentLang === 'es'
+              : safeLang === 'es'
                 ? slugObj.es
-                : currentLang === 'en'
+                : safeLang === 'en'
                   ? slugObj.en
                   : undefined
 
@@ -139,25 +153,30 @@ export function transformProject(
       }
 
       return `project-${index}`
-    } catch {
+    } catch (error) {
+      console.error('[transformProject] Error getting slug:', error)
       return `project-${index}`
     }
   }
 
-  // CRITICAL FIX: Directly use the resolved imageUrlToUse
+  // Helper: Get image URL
   const getImage = (): string | undefined => {
-    if (!imageUrlToUse) {
-      return undefined
-    }
-    // No need to call getSanityImageUrl if we have the direct URL
-    return imageUrlToUse
+    // Direct URL is already resolved above
+    return imageUrlToUse || undefined
   }
 
-  // Extract title based on its actual structure
+  // Helper: Extract title based on its actual structure
   const getTitle = (): string => {
-    if (!projectDoc.title) return '' // Handle cases where title might be undefined
-    if (typeof projectDoc.title === 'string') return projectDoc.title
-    return getLocalizedValue(projectDoc.title)
+    // Early return for missing title
+    if (!projectDoc.title) return ''
+
+    // Handle string title
+    if (typeof projectDoc.title === 'string') {
+      return projectDoc.title.trim()
+    }
+
+    // Handle localized title
+    return getLocalizedValue(projectDoc.title, '')
   }
 
   // Create the transformed project with detailed logging
@@ -166,10 +185,30 @@ export function transformProject(
   const image = getImage()
   const alt = imageAltText ? getLocalizedValue(imageAltText) : title // Use title as fallback for alt text
 
-  // Extract client names and join them
-  const clients = projectDoc.clients?.map((client: { name: string }) => client.name).join(', ')
+  // Extract client names safely
+  const getClients = (): string | undefined => {
+    if (!Array.isArray(projectDoc.clients) || projectDoc.clients.length === 0) {
+      return undefined
+    }
 
-  const result: TransformedProject = {
+    try {
+      const clientNames = projectDoc.clients
+        .filter((client): client is { name: string } => {
+          return client && typeof client === 'object' && typeof client.name === 'string'
+        })
+        .map((client) => client.name.trim())
+        .filter(Boolean)
+
+      return clientNames.length > 0 ? clientNames.join(', ') : undefined
+    } catch (error) {
+      console.error('[transformProject] Error extracting clients:', error)
+      return undefined
+    }
+  }
+
+  const clients = getClients()
+
+  return {
     _id: projectDoc._id,
     index,
     slug,
@@ -177,10 +216,8 @@ export function transformProject(
     alt,
     title,
     clients,
-    viewProjectText: viewProjectTextValue,
+    viewProjectText: viewProjectTextValue || 'View project',
     hoverColor: projectDoc.hoverColor?.hex,
     textHoverColor: projectDoc.textHoverColor?.hex,
   }
-
-  return result
 }

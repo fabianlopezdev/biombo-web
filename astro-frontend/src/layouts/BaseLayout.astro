@@ -44,7 +44,9 @@ const { primaryColor = '#f2f2f2', secondaryColor = '#191919' } = await fetchSite
     <PageLoader isHomepage={isHomepage} />
     <Fragment set:html={HeaderSVGHover} />
     <Header locale={locale} />
-    <slot />
+    <main>
+      <slot />
+    </main>
     <Footer />
   </body>
 </html>

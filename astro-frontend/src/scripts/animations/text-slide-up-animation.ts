@@ -4,6 +4,9 @@
  * Can be used on any element with data-slide-up-animation attribute
  */
 
+import { registerScript } from '@/scripts/core/initialization-manager'
+import { cleanupRegistry } from '@/scripts/core/cleanup-registry'
+
 interface AnimationOptions {
   duration?: number // Animation duration in ms
   stagger?: number // Delay between lines in ms
@@ -19,6 +22,7 @@ class SlideUpTextAnimation {
   private resizeTimeout?: number
   private hasAnimated: boolean = false
   private observer?: IntersectionObserver
+  private mutationObserver?: MutationObserver
 
   constructor(element: HTMLElement, options: AnimationOptions = {}) {
     this.element = element
@@ -97,10 +101,10 @@ class SlideUpTextAnimation {
     // Process all text nodes to wrap words for measurement
     const processTextNodes = (element: Element) => {
       const childNodes = [...element.childNodes]
-
       childNodes.forEach((node) => {
-        if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
-          const words = node.textContent.split(/(\s+)/)
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent || ''
+          const words = text.split(/(\s+)/)
           const fragment = document.createDocumentFragment()
 
           words.forEach((word) => {
@@ -108,9 +112,6 @@ class SlideUpTextAnimation {
               const span = document.createElement('span')
               span.className = 'word-measure'
               span.textContent = word
-              // Use inline for Safari to respect container width during layout
-              span.style.display = 'inline'
-              span.style.whiteSpace = 'nowrap' // Prevent word from wrapping internally
               fragment.appendChild(span)
             } else if (word) {
               // Preserve whitespace
@@ -120,62 +121,66 @@ class SlideUpTextAnimation {
 
           node.parentNode?.replaceChild(fragment, node)
         } else if (node.nodeType === Node.ELEMENT_NODE) {
-          // Recursively process child elements
-          processTextNodes(node as Element)
+          // Recursively process child elements (but not their text)
+          // Check for special elements that should be preserved
+          const element = node as Element
+          if (!element.classList.contains('highlight-wrapper')) {
+            processTextNodes(element)
+          }
         }
       })
     }
 
+    // Process the clone to wrap words
     processTextNodes(measureClone)
 
-    // Find all word spans and group by line
-    const wordSpans = measureClone.querySelectorAll('.word-measure')
-    const lines = new Map<number, { elements: Element[]; content: string }>()
+    // Force another reflow after wrapping words
+    void measureClone.offsetHeight
 
-    wordSpans.forEach((span) => {
-      const rect = span.getBoundingClientRect()
-      const lineY = Math.round(rect.top / 5) * 5 // Round to nearest 5px to group close elements
+    // Now measure line positions with refined approach for iOS
+    const words = measureClone.querySelectorAll('.word-measure')
+    const lineGroups = new Map<number, Element[]>()
 
-      if (!lines.has(lineY)) {
-        lines.set(lineY, { elements: [], content: '' })
+    words.forEach((word) => {
+      const rect = word.getBoundingClientRect()
+      // Use more precise rounding for iOS Safari
+      const lineTop = Math.round(rect.top * 2) / 2
+
+      if (!lineGroups.has(lineTop)) {
+        lineGroups.set(lineTop, [])
       }
-
-      const lineData = lines.get(lineY)!
-      lineData.elements.push(span)
-      lineData.content += span.textContent + ' '
+      lineGroups.get(lineTop)?.push(word)
     })
 
-    // Remove measurement clone from where we appended it
+    // Clean up measurement clone
     appendTarget.removeChild(measureClone)
 
-    // Sort lines by vertical position
-    const sortedLines = [...lines.entries()].sort(([a], [b]) => a - b).map(([, data]) => data)
-
-    // Clear original content
+    // Clear original element
     this.element.innerHTML = ''
 
-    // Create line wrappers with preserved HTML structure
-    sortedLines.forEach((lineData, index) => {
+    // Sort lines by vertical position
+    const sortedLines = Array.from(lineGroups.entries()).sort(([a], [b]) => a - b)
+
+    // Rebuild content with animated lines
+    sortedLines.forEach(([, wordsInLine], lineIndex) => {
       const lineWrapper = document.createElement('span')
       lineWrapper.className = 'slide-up-line'
 
       const lineInner = document.createElement('span')
       lineInner.className = 'slide-up-line-inner'
-      lineInner.style.setProperty('--line-index', index.toString())
+
+      // Calculate animation delay for this line
+      const delay = this.options.initialDelay + lineIndex * this.options.stagger
+      lineInner.style.setProperty('--animation-delay', `${delay}ms`)
       lineInner.style.setProperty('--animation-duration', `${this.options.duration}ms`)
-      lineInner.style.setProperty(
-        '--animation-delay',
-        `${this.options.initialDelay + index * this.options.stagger}ms`,
-      )
       lineInner.style.setProperty('--animation-easing', this.options.easing)
 
-      // Reconstruct the line content with original HTML structure
-      const lineContent = this.reconstructLineWithHTML(
-        this.originalContent,
-        lineData.content.trim(),
-      )
+      // Rebuild line content from original HTML
+      const lineText = Array.from(wordsInLine)
+        .map((el) => el.textContent)
+        .join(' ')
+      lineInner.innerHTML = this.reconstructLineContent(lineText)
 
-      lineInner.innerHTML = lineContent
       lineWrapper.appendChild(lineInner)
       this.element.appendChild(lineWrapper)
     })
@@ -183,36 +188,32 @@ class SlideUpTextAnimation {
     return sortedLines.length
   }
 
-  private reconstructLineWithHTML(originalHTML: string, lineText: string): string {
-    // Create a temporary element to parse the original HTML
-    const temp = document.createElement('div')
-    temp.innerHTML = originalHTML
+  private reconstructLineContent(lineText: string): string {
+    // Try to preserve any special HTML structure from original content
+    // This is a simplified approach - in production you might need more robust HTML parsing
 
-    // Check if this line contains any special elements (preserve them)
-    const specialElements = temp.querySelectorAll(
-      '.highlight-wrapper, .highlight-text, strong, em, a',
-    )
+    // Check if original content had special elements
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = this.originalContent
 
-    if (specialElements.length > 0) {
-      // For each special element, check if its text is in this line
-      for (const element of specialElements) {
-        const elementText = element.textContent || ''
-        if (lineText.includes(elementText)) {
-          // Get the parent wrapper if it exists
-          const wrapper = element.closest('.highlight-wrapper')
-          if (wrapper) {
-            const wrapperHTML = wrapper.outerHTML
-            const beforeText = lineText.substring(0, lineText.indexOf(elementText))
-            const afterText = lineText.substring(lineText.indexOf(elementText) + elementText.length)
-            return beforeText + wrapperHTML + afterText
-          } else if (element.tagName) {
-            // Recreate the element
-            const tag = element.tagName.toLowerCase()
-            const classes = element.className
-            const beforeText = lineText.substring(0, lineText.indexOf(elementText))
-            const afterText = lineText.substring(lineText.indexOf(elementText) + elementText.length)
-            return `${beforeText}<${tag}${classes ? ` class="${classes}"` : ''}>${elementText}</${tag}>${afterText}`
-          }
+    // Look for special elements like highlight wrappers
+    const specialElements = tempDiv.querySelectorAll('.highlight-wrapper, strong, em, a')
+
+    for (const element of specialElements) {
+      const elementText = element.textContent || ''
+      if (lineText.includes(elementText)) {
+        // Try to reconstruct the element
+        if (element.classList.contains('highlight-wrapper')) {
+          // Preserve the entire highlight wrapper structure
+          const wrapper = element.cloneNode(true) as HTMLElement
+          return lineText.replace(elementText, wrapper.outerHTML)
+        } else {
+          // Simple element reconstruction
+          const tag = element.tagName.toLowerCase()
+          const classes = element.className
+          const beforeText = lineText.substring(0, lineText.indexOf(elementText))
+          const afterText = lineText.substring(lineText.indexOf(elementText) + elementText.length)
+          return `${beforeText}<${tag}${classes ? ` class="${classes}"` : ''}>${elementText}</${tag}>${afterText}`
         }
       }
     }
@@ -230,10 +231,14 @@ class SlideUpTextAnimation {
         // Mark element as complete to prevent re-animation
         this.element.setAttribute('data-animation-complete', 'true')
 
-        // Disconnect observer after animation to free up resources
+        // Disconnect observers after animation to free up resources
         if (this.observer) {
           this.observer.disconnect()
           this.observer = undefined
+        }
+        if (this.mutationObserver) {
+          this.mutationObserver.disconnect()
+          this.mutationObserver = undefined
         }
       })
     })
@@ -278,15 +283,16 @@ class SlideUpTextAnimation {
         } else if (waitForTrigger) {
           // Wait for external trigger (from orchestrator)
           // Use MutationObserver to watch for attribute changes
-          const observer = new MutationObserver((mutations) => {
+          this.mutationObserver = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
               if (mutation.attributeName === 'data-animation-trigger') {
                 this.animateLines()
-                observer.disconnect()
+                this.mutationObserver?.disconnect()
+                this.mutationObserver = undefined
               }
             })
           })
-          observer.observe(this.element, { attributes: true })
+          this.mutationObserver.observe(this.element, { attributes: true })
         } else {
           // Use intersection observer for scroll-triggered animation
           this.setupIntersectionObserver()
@@ -335,12 +341,16 @@ class SlideUpTextAnimation {
   }
 
   public handleResize(): void {
-    // Don't handle resize if animation is complete
+    // Early return if animation is complete
     if (this.element.hasAttribute('data-animation-complete')) {
       return
     }
 
-    clearTimeout(this.resizeTimeout)
+    // Clear existing timeout
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout)
+    }
+
     this.resizeTimeout = window.setTimeout(() => {
       // Reset animation state
       this.element.setAttribute('data-animation', 'pending')
@@ -348,90 +358,158 @@ class SlideUpTextAnimation {
 
       // Recalculate and re-animate
       this.init()
+      this.resizeTimeout = undefined
     }, 250)
   }
 
   public destroy(): void {
-    // Restore original content
-    this.element.innerHTML = this.originalContent
-    this.element.removeAttribute('data-animation')
-    this.element.removeAttribute('data-animation-complete')
-    clearTimeout(this.resizeTimeout)
-    // Clean up observer if it exists
+    // Clean up timeout
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout)
+      this.resizeTimeout = undefined
+    }
+
+    // Clean up observers
     if (this.observer) {
       this.observer.disconnect()
       this.observer = undefined
     }
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect()
+      this.mutationObserver = undefined
+    }
+
+    // Restore original content
+    try {
+      this.element.innerHTML = this.originalContent
+      this.element.removeAttribute('data-animation')
+      this.element.removeAttribute('data-animation-complete')
+      this.element.removeAttribute('data-animation-trigger')
+      this.element.removeAttribute('data-wait-for-trigger')
+    } catch (error) {
+      console.error('[SlideUpTextAnimation] Error during cleanup:', error)
+    }
   }
 }
 
-// Auto-initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
+// Register with initialization manager
+registerScript('slideUpTextAnimation', () => {
   // Respect reduced motion preference
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (prefersReducedMotion) return
+  if (prefersReducedMotion) {
+    return () => {} // Return empty cleanup
+  }
 
-  // Wait for fonts to load before measuring text
+  const animations: SlideUpTextAnimation[] = []
+
+  // Initialize animations
   const initializeAnimations = () => {
     // Find all elements with the animation attribute
-    const elements = document.querySelectorAll('[data-slide-up-animation]')
-    const animations: SlideUpTextAnimation[] = []
+    const elements = document.querySelectorAll<HTMLElement>('[data-slide-up-animation]')
 
     elements.forEach((element) => {
-      const htmlElement = element as HTMLElement
-
       // Skip if already animated
-      if (htmlElement.hasAttribute('data-animation-complete')) {
+      if (element.hasAttribute('data-animation-complete')) {
         return
       }
 
       // Parse options from data attributes
       const options: AnimationOptions = {}
 
-      if (htmlElement.dataset.animationDuration) {
-        options.duration = parseInt(htmlElement.dataset.animationDuration, 10)
+      if (element.dataset.animationDuration) {
+        const duration = parseInt(element.dataset.animationDuration, 10)
+        if (!isNaN(duration)) options.duration = duration
       }
-      if (htmlElement.dataset.animationStagger) {
-        options.stagger = parseInt(htmlElement.dataset.animationStagger, 10)
+      if (element.dataset.animationStagger) {
+        const stagger = parseInt(element.dataset.animationStagger, 10)
+        if (!isNaN(stagger)) options.stagger = stagger
       }
-      if (htmlElement.dataset.animationDelay) {
-        options.initialDelay = parseInt(htmlElement.dataset.animationDelay, 10)
+      if (element.dataset.animationDelay) {
+        const delay = parseInt(element.dataset.animationDelay, 10)
+        if (!isNaN(delay)) options.initialDelay = delay
       }
-      if (htmlElement.dataset.animationEasing) {
-        options.easing = htmlElement.dataset.animationEasing
+      if (element.dataset.animationEasing) {
+        options.easing = element.dataset.animationEasing
       }
 
-      const animation = new SlideUpTextAnimation(htmlElement, options)
-      // Only add to animations array if the animation was actually created
-      if (animation && !htmlElement.hasAttribute('data-animation-complete')) {
-        animations.push(animation)
+      try {
+        const animation = new SlideUpTextAnimation(element, options)
+        // Only add to animations array if the animation was actually created
+        if (animation && !element.hasAttribute('data-animation-complete')) {
+          animations.push(animation)
+        }
+      } catch (error) {
+        console.error('[SlideUpTextAnimation] Error creating animation:', error)
       }
     })
-
-    // Handle resize for all animations
-    if (animations.length > 0) {
-      window.addEventListener(
-        'resize',
-        () => {
-          animations.forEach((animation) => animation.handleResize())
-        },
-        { passive: true },
-      )
-    }
   }
 
-  // Check if fonts are already loaded
-  if ('fonts' in document && document.fonts) {
-    void document.fonts.ready.then(() => {
-      // Small delay to ensure layout is stable
-      setTimeout(initializeAnimations, 100)
-    })
+  // Handle resize events
+  let resizeTimer: number | undefined
+  const handleResize = () => {
+    if (resizeTimer) clearTimeout(resizeTimer)
+    resizeTimer = window.setTimeout(() => {
+      animations.forEach((anim) => {
+        try {
+          anim.handleResize()
+        } catch (error) {
+          console.error('[SlideUpTextAnimation] Error handling resize:', error)
+        }
+      })
+      resizeTimer = undefined
+    }, 100)
+  }
+
+  // Initialize when fonts are ready
+  if (document.fonts && 'ready' in document.fonts) {
+    void document.fonts.ready
+      .then(() => {
+        // Small delay to ensure layout is stable
+        setTimeout(initializeAnimations, 100)
+      })
+      .catch((error) => {
+        console.error('[SlideUpTextAnimation] Font loading error:', error)
+        initializeAnimations() // Try anyway
+      })
   } else {
-    // Fallback for browsers without font loading API
-    // Wait a bit longer to ensure fonts are loaded
+    // Fallback for browsers that don't support font loading API
     setTimeout(initializeAnimations, 300)
   }
+
+  // Add resize listener
+  window.addEventListener('resize', handleResize, { passive: true })
+
+  // Cleanup function
+  const cleanup = () => {
+    // Clear resize timer
+    if (resizeTimer) {
+      clearTimeout(resizeTimer)
+      resizeTimer = undefined
+    }
+
+    // Remove resize listener
+    window.removeEventListener('resize', handleResize)
+
+    // Destroy all animations
+    animations.forEach((anim) => {
+      try {
+        anim.destroy()
+      } catch (error) {
+        console.error('[SlideUpTextAnimation] Error destroying animation:', error)
+      }
+    })
+    animations.length = 0
+  }
+
+  // Register with cleanup registry
+  cleanupRegistry.register({
+    id: 'slideUpTextAnimation',
+    cleanup,
+  })
+
+  return cleanup
 })
 
-// Export for manual initialization if needed
+// Export class for potential direct usage
+export { SlideUpTextAnimation }
 export default SlideUpTextAnimation

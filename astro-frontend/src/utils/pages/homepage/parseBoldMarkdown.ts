@@ -20,26 +20,38 @@ export interface LineWithBoldSegments {
  *
  * If no bold markers are present, `bold` and `after` will be empty.
  */
-export function splitBoldSegments(str: string | undefined): BoldSegments {
-  if (!str) {
+export function splitBoldSegments(str: string | null | undefined): BoldSegments {
+  // Early return for falsy input
+  if (!str || typeof str !== 'string') {
     return { before: '', bold: '', after: '' }
+  }
+
+  // Early return if no bold markers
+  if (!str.includes('**')) {
+    return { before: str, bold: '', after: '' }
   }
 
   const boldRegex = /\*\*(.*?)\*\*/
   const match = boldRegex.exec(str)
 
-  if (match && match[1]) {
-    const start = str.indexOf('**')
-    const end = str.indexOf('**', start + 2)
-
-    return {
-      before: str.substring(0, start),
-      bold: match[1],
-      after: str.substring(end + 2),
-    }
+  // Early return if no valid match
+  if (!match || !match[1]) {
+    return { before: str, bold: '', after: '' }
   }
 
-  return { before: str, bold: '', after: '' }
+  const start = str.indexOf('**')
+  const end = str.indexOf('**', start + 2)
+
+  // Validate positions
+  if (start === -1 || end === -1 || end <= start) {
+    return { before: str, bold: '', after: '' }
+  }
+
+  return {
+    before: str.substring(0, start),
+    bold: match[1],
+    after: str.substring(end + 2),
+  }
 }
 
 /**
@@ -49,9 +61,26 @@ export function splitBoldSegments(str: string | undefined): BoldSegments {
  * @param str - The input string with potential line breaks and bold markdown
  * @returns An object containing an array of lines with their bold segments parsed
  */
-export function splitBoldSegmentsByLine(str: string | undefined): LineWithBoldSegments {
-  if (!str) {
+export function splitBoldSegmentsByLine(str: string | null | undefined): LineWithBoldSegments {
+  // Early return for falsy input
+  if (!str || typeof str !== 'string') {
     return { lines: [], hasBold: false }
+  }
+
+  // Early return for single line without line breaks
+  if (!str.includes('\n')) {
+    const singleLineResult = splitBoldSegments(str)
+    return {
+      lines: [
+        {
+          before: singleLineResult.before,
+          bold: singleLineResult.bold,
+          after: singleLineResult.after,
+          fullLine: str.replace(/\*\*(.*?)\*\*/g, '$1'),
+        },
+      ],
+      hasBold: Boolean(singleLineResult.bold),
+    }
   }
 
   // Split by line breaks
@@ -59,6 +88,26 @@ export function splitBoldSegmentsByLine(str: string | undefined): LineWithBoldSe
   let hasBold = false
 
   const parsedLines = lines.map((line) => {
+    // Skip empty lines quickly
+    if (!line) {
+      return {
+        before: '',
+        bold: '',
+        after: '',
+        fullLine: '',
+      }
+    }
+
+    // Check for bold markers
+    if (!line.includes('**')) {
+      return {
+        before: line,
+        bold: '',
+        after: '',
+        fullLine: line,
+      }
+    }
+
     const boldRegex = /\*\*(.*?)\*\*/
     const match = boldRegex.exec(line)
 
@@ -71,7 +120,7 @@ export function splitBoldSegmentsByLine(str: string | undefined): LineWithBoldSe
         before: line.substring(0, start),
         bold: match[1],
         after: line.substring(end + 2),
-        fullLine: line.replace(/\*\*(.*?)\*\*/, '$1'),
+        fullLine: line.replace(/\*\*(.*?)\*\*/g, '$1'),
       }
     }
 
