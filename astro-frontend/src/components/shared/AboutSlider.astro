@@ -29,7 +29,7 @@ function portableTextToHtml(description: PortableTextBlock[] | undefined): strin
     },
   }
 
-  return toHTML(description as any, {
+  return toHTML(description, {
     components: customPortableTextComponents,
   })
 }

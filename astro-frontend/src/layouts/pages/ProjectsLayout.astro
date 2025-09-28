@@ -1,20 +1,23 @@
 ---
-import ProjectesLayout from '@/layouts/pages/ProjectesLayout.astro'
+import BaseLayout from '@/layouts/shared/BaseLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
 import { projectsTranslations, getProjectUrl, type Locale } from '@/shared/translations/projects'
+import type { Project } from '@/shared/schemas/sanity/projectSchema'
+import type { Service } from '@/shared/schemas/sanity/serviceSchema'
+import type { Client } from '@/shared/schemas/sanity/clientSchema'
 
 interface Props {
   locale: Locale
-  projects: any[] | null
-  services: any[] | null
+  projects: Project[] | null
+  services: Service[] | null
 }
 
 const { locale, projects, services } = Astro.props
 const t = projectsTranslations[locale]
 
 // Helper function to get image URL
-const getImageUrl = (project: any) => {
+const getImageUrl = (project: Project): string => {
   // Always prefer thumbnail if it exists, regardless of useSeparateThumbnail flag
   // The flag is only for Sanity UI, not for frontend display logic
   if (project.thumbnailImage?.asset?.url) {
@@ -24,89 +27,97 @@ const getImageUrl = (project: any) => {
 }
 
 // Helper function to get project slug
-const getProjectSlug = (slug: any) => {
+const getProjectSlug = (slug: { current: string } | string): string => {
   return typeof slug === 'string' ? slug : slug?.current || ''
 }
 ---
 
-<ProjectesLayout pageTitle={t.pageTitle}>
-  <section
-    class="projects-filter-container"
-    aria-labelledby="filter-heading"
-    data-locale={locale}
-    data-filters-active={t.screenReaderAnnouncements?.filtersActive
-      ? '{0} filters active, showing {1} projects'
-      : '{0} filters active, showing {1} projects'}
-    data-all-projects={t.screenReaderAnnouncements?.allProjectsShowing
-      ? 'Showing all {0} projects'
-      : 'Showing all {0} projects'}
-  >
-    <h2 id="filter-heading">{t.filterBy}</h2>
-    <nav class="projects-nav-filter" aria-label={t.filterAriaLabel}>
-      <div class="projects-filter-wrapper">
-        <ul class="projects-filter-list">
-          {
-            services &&
-              services.map((service) => (
-                <li>
-                  <PillButton
-                    text={service.title}
-                    data-service={service._id}
-                    data-slug={service.slug?.current}
-                    class="filter-pill"
-                  />
-                </li>
-              ))
-          }
-        </ul>
-      </div>
-      <button class="delete-filters" type="button" aria-label={t.clearFiltersAriaLabel}>
-        {t.clearFilters}
-      </button>
-    </nav>
-  </section>
-  <section class="projects-container" aria-label={t.projectListAriaLabel}>
-    <ul class="projects-grid-container">
-      {
-        projects && projects.length > 0 ? (
-          projects.map((project) => (
-            <li
-              class="project-item"
-              data-services={
-                (project.services || project.categories)
-                  ?.map((s: any) => {
-                    // Handle both dereferenced objects and reference objects
-                    return s?._id || s?._ref || ''
-                  })
-                  .filter(Boolean)
-                  .join(',') || ''
-              }
-            >
-              <ProjectCard
-                title={project.title}
-                imageUrl={getImageUrl(project)}
-                slug={getProjectUrl(getProjectSlug(project.slug), locale)}
-                hoverColor={project.hoverColor?.hex || '#63b2d5'}
-                textHoverColor={project.textHoverColor?.hex || '#ffffff'}
-                clients={project.clients?.map((c: any) => c.name).join(', ') || ''}
-                viewProjectText={t.viewProject}
-                projectId={project._id}
-              />
+<BaseLayout title={t.pageTitle}>
+  <main class="main-content">
+    <h1 class="hero-title-internal">{t.pageTitle}</h1>
+    <section
+      class="projects-filter-container"
+      aria-labelledby="filter-heading"
+      data-locale={locale}
+      data-filters-active={t.screenReaderAnnouncements?.filtersActive
+        ? '{0} filters active, showing {1} projects'
+        : '{0} filters active, showing {1} projects'}
+      data-all-projects={t.screenReaderAnnouncements?.allProjectsShowing
+        ? 'Showing all {0} projects'
+        : 'Showing all {0} projects'}
+    >
+      <h2 id="filter-heading">{t.filterBy}</h2>
+      <nav class="projects-nav-filter" aria-label={t.filterAriaLabel}>
+        <div class="projects-filter-wrapper">
+          <ul class="projects-filter-list">
+            {
+              services &&
+                services.map((service) => (
+                  <li>
+                    <PillButton
+                      text={service.title}
+                      data-service={service._id}
+                      data-slug={service.slug?.current}
+                      class="filter-pill"
+                    />
+                  </li>
+                ))
+            }
+          </ul>
+        </div>
+        <button class="delete-filters" type="button" aria-label={t.clearFiltersAriaLabel}>
+          {t.clearFilters}
+        </button>
+      </nav>
+    </section>
+    <section class="projects-container" aria-label={t.projectListAriaLabel}>
+      <ul class="projects-grid-container">
+        {
+          projects && projects.length > 0 ? (
+            projects.map((project) => (
+              <li
+                class="project-item"
+                data-services={
+                  (project.services || project.categories)
+                    ?.map((s) => {
+                      // Handle both dereferenced objects and reference objects
+                      return s?._id || ''
+                    })
+                    .filter(Boolean)
+                    .join(',') || ''
+                }
+              >
+                <ProjectCard
+                  title={project.title}
+                  imageUrl={getImageUrl(project)}
+                  slug={getProjectUrl(getProjectSlug(project.slug), locale)}
+                  hoverColor={project.hoverColor?.hex || '#63b2d5'}
+                  textHoverColor={project.textHoverColor?.hex || '#ffffff'}
+                  clients={project.clients?.map((c: Client) => c.name).join(', ') || ''}
+                  viewProjectText={t.viewProject}
+                  projectId={project._id}
+                />
+              </li>
+            ))
+          ) : (
+            <li class="no-projects-container">
+              <div role="status" aria-live="polite">
+                <p class="no-projects">{t.noProjects}</p>
+              </div>
             </li>
-          ))
-        ) : (
-          <li class="no-projects-container">
-            <div role="status" aria-live="polite">
-              <p class="no-projects">{t.noProjects}</p>
-            </div>
-          </li>
-        )
-      }
-    </ul>
-  </section>
-</ProjectesLayout>
+          )
+        }
+      </ul>
+    </section>
+  </main>
+</BaseLayout>
 
 <style>
+  .main-content {
+    margin-block-start: var(--header-height);
+    padding-inline: var(--padding-inline);
+    padding-block: var(--padding-block);
+  }
   #filter-heading {
     padding-inline-end: 0.2rem;
   }

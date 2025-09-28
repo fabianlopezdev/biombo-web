@@ -1,5 +1,5 @@
 ---
-import ProjectLayout from '@/layouts/pages/ProjectLayout.astro'
+import SingleProjectLayout from '@/layouts/pages/SingleProjectLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
 import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
@@ -8,6 +8,14 @@ import {
   fetchProjectBySlug,
   fetchProjectsByLocale,
 } from '@/shared/lib/sanity/queries/projectQueries'
+import {
+  getSimilarProjects,
+  getImageUrl,
+  getImageSectionLayout,
+} from '@/utils/pages/projects/projectHelpers'
+import type { Project, ImageWithResolvedAsset } from '@/shared/schemas/sanity/projectSchema'
+import type { Service } from '@/shared/schemas/sanity/serviceSchema'
+import type { Client } from '@/shared/schemas/sanity/clientSchema'
 
 export const prerender = true
 
@@ -34,73 +42,18 @@ if (!project) {
   return Astro.redirect('/404')
 }
 
-// Helper function to get similar projects based on shared services
-function getSimilarProjects(currentProject: any, allProjects: any[], limit: number = 4) {
-  // Create Set of current project's service IDs for O(1) lookup
-  const currentServiceIds = new Set(currentProject.services?.map((s: any) => s._id) || [])
-
-  if (currentServiceIds.size === 0) {
-    // No services to compare, return random projects
-    return allProjects.filter((p) => p._id !== currentProject._id).slice(0, limit)
-  }
-
-  // Calculate shared services for each project
-  const projectsWithScore = allProjects
-    .filter((p) => p._id !== currentProject._id) // Exclude current
-    .map((project) => {
-      const sharedCount =
-        project.services?.filter((service: any) => currentServiceIds.has(service._id)).length || 0
-
-      return { project, sharedCount }
-    })
-    .filter((item) => item.sharedCount > 0) // Only projects with shared services
-
-  // Sort by: 1) shared services (desc), 2) title (asc)
-  projectsWithScore.sort((a, b) => {
-    if (a.sharedCount !== b.sharedCount) {
-      return b.sharedCount - a.sharedCount // More services first
-    }
-    // Same service count, sort alphabetically
-    return a.project.title.localeCompare(b.project.title)
-  })
-
-  // Return just the projects (not the scores)
-  return projectsWithScore.slice(0, limit).map((item) => item.project)
-}
-
 // Fetch all projects in the same locale for similarity calculation
 const allProjects = await fetchProjectsByLocale(locale)
 
 // Calculate similar projects based on shared services
 const similarProjects = allProjects ? getSimilarProjects(project, allProjects, 4) : null
-
-// Use centralized portable text converter
-
-// Helper to get image URL
-const getImageUrl = (image: any) => {
-  if (!image?.asset) return ''
-  return image.asset.url || ''
-}
-
-// Helper to determine image section layout
-const getImageSectionLayout = (section: any) => {
-  const hasFeatured = section.featuredImage?.asset
-  const otherCount = section.otherImages?.length || 0
-  const totalImages = (hasFeatured ? 1 : 0) + otherCount
-
-  return {
-    totalImages,
-    hasFeatured,
-    otherImages: section.otherImages || [],
-  }
-}
 ---
 
-<ProjectLayout pageTitle={project.title}>
+<SingleProjectLayout pageTitle={project.title}>
   <aside class="client-info mobile" aria-label="Client information">
     <h2 class="section-titles service-clients-font-size">Client:</h2>
     <p class="service-clients-font-size">
-      {project.clients?.map((client: any) => client.name).join(', ') || 'N/A'}
+      {project.clients?.map((client: Client) => client.name).join(', ') || 'N/A'}
     </p>
   </aside>
 
@@ -116,14 +69,14 @@ const getImageSectionLayout = (section: any) => {
         <div class="client-section">
           <h2 class="section-titles service-clients-font-size">Client:</h2>
           <p class="padding-bottom service-clients-font-size">
-            {project.clients?.map((client: any) => client.name).join(', ') || 'N/A'}
+            {project.clients?.map((client: Client) => client.name).join(', ') || 'N/A'}
           </p>
         </div>
         <div class="services-section">
           <h2 class="section-titles service-clients-font-size">Services:</h2>
           <ul class="services-container">
             {
-              project.services?.map((service: any) => (
+              project.services?.map((service: Service) => (
                 <li>
                   <PillButton text={service.title} />
                 </li>
@@ -143,7 +96,7 @@ const getImageSectionLayout = (section: any) => {
 
     {/* Dynamic content sections */}
     {
-      project.contentSections?.map((section: any, index: number) => {
+      project.contentSections?.map((section, index: number) => {
         const isLastSection = index === project.contentSections.length - 1
         const nextSection = !isLastSection ? project.contentSections[index + 1] : null
         const isBeforeText = nextSection && nextSection._type === 'textBlock'
@@ -186,7 +139,7 @@ const getImageSectionLayout = (section: any) => {
               <div class={`content-section ${spacingClass}`}>
                 <div class="two-image-layout gallery">
                   <div class="two-columns">
-                    {layout.otherImages.map((img: any) => (
+                    {layout.otherImages.map((img: ImageWithResolvedAsset) => (
                       <figure class="red-background">
                         <img src={getImageUrl(img)} alt="Project" loading="lazy" />
                       </figure>
@@ -205,7 +158,7 @@ const getImageSectionLayout = (section: any) => {
                 <div class={`content-section ${spacingClass}`}>
                   <div class="two-image-layout gallery">
                     <div class="two-columns">
-                      {layout.otherImages.map((img: any) => (
+                      {layout.otherImages.map((img: ImageWithResolvedAsset) => (
                         <figure class="red-background">
                           <img src={getImageUrl(img)} alt="Project" loading="lazy" />
                         </figure>
@@ -228,7 +181,7 @@ const getImageSectionLayout = (section: any) => {
                 <div class={`content-section ${spacingClass}`}>
                   <div class="three-image-layout gallery">
                     <div class="three-columns">
-                      {layout.otherImages.map((img: any) => (
+                      {layout.otherImages.map((img: ImageWithResolvedAsset) => (
                         <figure class="blue-background">
                           <img src={getImageUrl(img)} alt="Project application" loading="lazy" />
                         </figure>
@@ -246,7 +199,7 @@ const getImageSectionLayout = (section: any) => {
               <div class={`content-section ${spacingClass}`}>
                 <div class="three-image-layout gallery">
                   <div class="three-columns">
-                    {layout.otherImages.map((img: any) => (
+                    {layout.otherImages.map((img: ImageWithResolvedAsset) => (
                       <figure class="blue-background">
                         <img src={getImageUrl(img)} alt="Project application" loading="lazy" />
                       </figure>
@@ -272,7 +225,7 @@ const getImageSectionLayout = (section: any) => {
     <h2 class="section-titles service-clients-font-size">Services:</h2>
     <ul class="services-list">
       {
-        project.services?.map((service: any, i: number) => {
+        project.services?.map((service: Service, i: number) => {
           const separator = i === project.services.length - 1 ? '' : ',\u00A0'
           return (
             <li class="list-item-mobile">
@@ -295,7 +248,7 @@ const getImageSectionLayout = (section: any) => {
           Similar projects
         </h2>
         <ul class="similar-projects-container">
-          {similarProjects.map((similarProject: any) => {
+          {similarProjects.map((similarProject: Project) => {
             const thumbnailImage =
               similarProject.useSeparateThumbnail && similarProject.thumbnailImage
                 ? similarProject.thumbnailImage
@@ -309,7 +262,7 @@ const getImageSectionLayout = (section: any) => {
                   hoverColor={similarProject.hoverColor?.hex || '#272727'}
                   textHoverColor={similarProject.textHoverColor?.hex || '#fff'}
                   viewProjectText="View project"
-                  clients={similarProject.clients?.map((client: any) => client.name).join(', ')}
+                  clients={similarProject.clients?.map((client: Client) => client.name).join(', ')}
                   projectId={similarProject._id}
                 />
               </li>
@@ -319,7 +272,7 @@ const getImageSectionLayout = (section: any) => {
       </section>
     )
   }
-</ProjectLayout>
+</SingleProjectLayout>
 
 <script src="@/scripts/magnetic-project-cursor.ts"></script>
 

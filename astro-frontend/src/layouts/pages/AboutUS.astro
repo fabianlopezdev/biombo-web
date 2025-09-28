@@ -7,7 +7,7 @@ import type { AboutUsPage } from '@/shared/schemas/sanity/aboutUsPageSchema'
 import { portableTextToHtmlForPageSection } from '@/shared/lib/sanity/utils/portableTextToHtml'
 import type { DisplayImage } from '@/components/shared/AboutSlider.astro'
 
-const locale = 'ca'
+const { locale } = Astro.props
 
 let aboutUsPageData: AboutUsPage | null = null
 
@@ -37,7 +37,7 @@ const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
 >
   {
     aboutUsPageData?.aboutSlider && (
-      <div class="about-slider-section">
+      <div class="g-negative-inline-padding">
         <AboutSlider
           title={aboutUsPageData.aboutSlider.title}
           description={aboutUsPageData.aboutSlider.description}
@@ -58,9 +58,3 @@ const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
     )
   }
 </InternalPageLayout>
-
-<style>
-  .about-slider-section {
-    margin-inline: calc(var(--padding-inline) * -1);
-  }
-</style>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/shared/BaseLayout.astro'
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
+import { fetchHomePageByLocale } from '@/shared/lib/sanity/queries/homePageQueries'
 import Projects, {
   type ResolvedProjectsSectionData,
 } from '@/components/pages/homepage/projects-section/Projects.astro'
@@ -14,11 +15,18 @@ import Clients from '@/components/shared/Clients.astro'
 
 interface Props {
   locale: 'ca' | 'es' | 'en'
-  homePageData: HomePage | null
 }
 
 const { locale } = Astro.props
-const { homePageData } = Astro.props
+
+// Fetch homepage data from Sanity
+let homePageData: HomePage | null = null
+
+try {
+  homePageData = await fetchHomePageByLocale(locale)
+} catch (error) {
+  console.error('Error fetching homepage data:', error)
+}
 
 const pageTitle = 'Biombo - Art, Events, Community'
 ---

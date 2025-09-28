@@ -1,5 +1,5 @@
 ---
-import ProjectLayout from '@/layouts/pages/ProjectLayout.astro'
+import SingleProjectLayout from '@/layouts/pages/SingleProjectLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
 import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 
@@ -11,7 +11,7 @@ const projectServices = [
 ]
 ---
 
-<ProjectLayout pageTitle="Obert x Vacances">
+<SingleProjectLayout pageTitle="Obert x Vacances">
   <aside class="client-info mobile" aria-label="Informació del client">
     <h2 class="section-titles service-clients-font-size">Client:</h2>
     <p class="service-clients-font-size">Roca Umbert. Fàbrica de les arts</p>
@@ -187,7 +187,7 @@ const projectServices = [
       </li>
     </ul>
   </section>
-</ProjectLayout>
+</SingleProjectLayout>
 
 <style>
   .mobile {

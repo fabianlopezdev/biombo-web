@@ -1,5 +1,5 @@
 ---
-import ProjectsPageLayout from '@/layouts/pages/ProjectsPageLayout.astro'
+import ProjectsLayout from '@/layouts/pages/ProjectsLayout.astro'
 import { fetchProjectsByLocale } from '@/shared/lib/sanity/queries/projectQueries'
 import { fetchServicesByLocale } from '@/shared/lib/sanity/queries/serviceQueries'
 
@@ -11,4 +11,4 @@ const projects = await fetchProjectsByLocale(locale)
 const services = await fetchServicesByLocale(locale)
 ---
 
-<ProjectsPageLayout locale={locale} projects={projects} services={services} />
+<ProjectsLayout locale={locale} projects={projects} services={services} />

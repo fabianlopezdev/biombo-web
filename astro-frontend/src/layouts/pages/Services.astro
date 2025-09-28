@@ -1,0 +1,28 @@
+---
+import InternalPageLayout from '@/layouts/shared/InternalPageLayout.astro'
+import ServicesList from '@/components/shared/ServicesList.astro'
+import { fetchServicesPageByLocale } from '@/shared/lib/sanity/queries/servicesPageQueries'
+import type { ServicesPage } from '@/shared/schemas/sanity/servicesPageSchema'
+import { portableTextToHtmlForPageSection } from '@/shared/lib/sanity/utils/portableTextToHtml'
+
+const { locale } = Astro.props
+
+let servicesPageData: ServicesPage | null = null
+
+try {
+  servicesPageData = await fetchServicesPageByLocale(locale)
+} catch (error) {
+  console.error('Error fetching services page data:', error)
+}
+
+const descriptionHtml = portableTextToHtmlForPageSection(servicesPageData?.description)
+---
+
+<InternalPageLayout
+  pageMetaTitle="Serveis - Biombo Studio"
+  pageMetaDescription={descriptionHtml ||
+    'Comptem amb una xarxa de col·laboradors, experts en diverses disciplines, que aporten el seu coneixement per garantir resultats de primer nivell.'}
+  pageTitle={servicesPageData?.title || 'Serveis'}
+>
+  <ServicesList services={servicesPageData?.selectedServices} class="g-negative-inline-padding" />
+</InternalPageLayout>

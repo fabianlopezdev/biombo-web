@@ -1,6 +1,7 @@
 ---
-import type { Projects } from '@/shared/schemas/sanity/projectSchema'
-import type { Services } from '@/shared/schemas/sanity/serviceSchema'
+import type { Project, Projects } from '@/shared/schemas/sanity/projectSchema'
+import type { Service, Services } from '@/shared/schemas/sanity/serviceSchema'
+import type { Client } from '@/shared/schemas/sanity/clientSchema'
 
 interface Props {
   projects: Projects | null
@@ -11,7 +12,7 @@ interface Props {
 const { projects, services, locale } = Astro.props
 
 // Helper function to get image URL
-const getImageUrl = (project: any) => {
+const getImageUrl = (project: Project): string => {
   if (project.useSeparateThumbnail && project.thumbnailImage?.asset?.url) {
     return project.thumbnailImage.asset.url
   }
@@ -19,7 +20,7 @@ const getImageUrl = (project: any) => {
 }
 
 // Helper function to get project URL
-const getProjectUrl = (slug: any, locale: string) => {
+const getProjectUrl = (slug: { current: string } | string, locale: string): string => {
   const slugString = typeof slug === 'string' ? slug : slug?.current || ''
 
   console.log('Raw slug:', slug)
@@ -74,7 +75,7 @@ const getProjectUrl = (slug: any, locale: string) => {
         {projects.map((project) => (
           <article
             class="project-card"
-            data-services={project.services?.map((s: any) => s._id).join(',') || ''}
+            data-services={project.services?.map((s: Service) => s._id).join(',') || ''}
           >
             <a href={getProjectUrl(project.slug, locale)}>
               <div class="project-image">
@@ -86,12 +87,12 @@ const getProjectUrl = (slug: any, locale: string) => {
                 <h2 class="project-title">{project.title}</h2>
                 {project.clients && project.clients.length > 0 && (
                   <p class="project-client">
-                    {project.clients.map((client: any) => client.name).join(', ')}
+                    {project.clients.map((client: Client) => client.name).join(', ')}
                   </p>
                 )}
                 {project.services && project.services.length > 0 && (
                   <ul class="project-services">
-                    {project.services.map((service: any) => (
+                    {project.services.map((service: Service) => (
                       <li class="service-tag">{service.title}</li>
                     ))}
                   </ul>
