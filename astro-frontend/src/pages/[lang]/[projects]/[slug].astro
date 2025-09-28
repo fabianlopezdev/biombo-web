@@ -1,0 +1,43 @@
+---
+import SingleProjectLayout from '@/layouts/pages/SingleProjectLayout.astro'
+import { fetchProjectsByLocale } from '@/shared/lib/sanity/queries/projectQueries'
+import type { SupportedLocale } from '@/shared/config/projectRoutes'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const paths = []
+
+  // English projects
+  const enProjects = await fetchProjectsByLocale('en')
+  enProjects.forEach((project) => {
+    paths.push({
+      params: {
+        lang: 'en',
+        projects: 'projects',
+        slug: project.slug.current,
+      },
+      props: { locale: 'en', slug: project.slug.current },
+    })
+  })
+
+  // Spanish projects
+  const esProjects = await fetchProjectsByLocale('es')
+  esProjects.forEach((project) => {
+    paths.push({
+      params: {
+        lang: 'es',
+        projects: 'proyectos',
+        slug: project.slug.current,
+      },
+      props: { locale: 'es', slug: project.slug.current },
+    })
+  })
+
+  return paths
+}
+
+const { locale, slug } = Astro.props as { locale: SupportedLocale; slug: string }
+---
+
+<SingleProjectLayout {slug} {locale} />
