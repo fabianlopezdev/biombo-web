@@ -1,0 +1,44 @@
+---
+interface Props {
+  email?: string
+  phone?: string
+}
+
+const { email, phone } = Astro.props
+---
+
+<address class="contact-info">
+  {
+    email && (
+      <a href={`mailto:${email}`} class="contact-link">
+        {email}
+      </a>
+    )
+  }
+  {
+    phone && (
+      <a href={`tel:${phone.replace(/[\s()]/g, '')}`} class="contact-link">
+        {phone}
+      </a>
+    )
+  }
+</address>
+
+<style>
+  address {
+    display: flex;
+    flex-direction: column;
+    font-style: normal;
+    margin-bottom: 3rem;
+  }
+
+  .contact-link {
+    color: var(--color-text);
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .contact-link:hover {
+    opacity: 0.7;
+  }
+</style>

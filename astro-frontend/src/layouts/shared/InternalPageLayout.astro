@@ -1,0 +1,38 @@
+---
+import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
+import BaseLayout from '@/layouts/shared/BaseLayout.astro'
+
+interface Props {
+  pageMetaTitle: string
+  pageTitle: string
+  pageMetaDescription: string
+}
+
+const { pageMetaTitle, pageTitle, pageMetaDescription } = Astro.props
+const hasTwoColumnContent = Astro.slots.has('two-column-content')
+---
+
+<BaseLayout pageMetaTitle={pageMetaTitle} pageMetaDescription={pageMetaDescription}>
+  <main class="main-content">
+    {
+      hasTwoColumnContent ? (
+        <TwoColumnLayout title={pageTitle}>
+          <Fragment slot="second-column">
+            <slot name="two-column-content" />
+          </Fragment>
+        </TwoColumnLayout>
+      ) : (
+        <TwoColumnLayout title={pageTitle} description={pageMetaDescription} />
+      )
+    }
+    <slot />
+  </main>
+</BaseLayout>
+
+<style>
+  .main-content {
+    margin-block-start: var(--header-height);
+    padding-inline: var(--padding-inline);
+    padding-block: var(--padding-block);
+  }
+</style>

@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
+import BaseLayout from '@/layouts/shared/BaseLayout.astro'
 import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
 import Projects, {
   type ResolvedProjectsSectionData,
@@ -8,7 +8,7 @@ import Hero from '@/components/pages/homepage/Hero.astro'
 import ProjectsMobile from '@/components/pages/homepage/projects-section/ProjectsMobile.astro'
 import About from '@/components/pages/homepage/about-section/About.astro'
 import Services from '@/components/shared/header/Services.astro'
-import Clients from '@/components/pages/homepage/clients-section/Clients.astro'
+import Clients from '@/components/shared/Clients.astro'
 
 // About component fetches its own data based on locale
 

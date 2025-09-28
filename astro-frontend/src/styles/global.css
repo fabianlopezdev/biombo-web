@@ -256,3 +256,8 @@ figure {
     display: none !important;
   }
 }
+
+/* Utility class for negative inline padding/margin */
+.g-negative-inline-padding {
+  margin-inline: calc(var(--padding-inline) * -1);
+}

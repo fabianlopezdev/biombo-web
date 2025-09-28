@@ -7,11 +7,11 @@ import Footer from '@/components/shared/Footer.astro'
 import PageLoader from '@/components/shared/HomePageLoader.astro'
 
 interface Props {
-  title: string
-  metaDescription?: string // Optional description prop
+  pageMetaTitle: string
+  pageMetaDescription?: string // Optional description prop
 }
 
-const { title, metaDescription } = Astro.props
+const { pageMetaTitle, pageMetaDescription } = Astro.props
 
 // Get the current locale from Astro's i18n middleware
 const locale = (Astro.currentLocale ?? 'ca') as 'ca' | 'es' | 'en'
@@ -34,19 +34,17 @@ const { primaryColor = '#f2f2f2', secondaryColor = '#191919' } = await fetchSite
 >
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content={metaDescription || 'Biombo - Art, Events, Community'} />
+    <meta name="description" content={pageMetaDescription || 'Biombo - Art, Events, Community'} />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <title>{pageMetaTitle}</title>
   </head>
   <body>
     <PageLoader isHomepage={isHomepage} />
     <Fragment set:html={HeaderSVGHover} />
     <Header locale={locale} />
-    <main>
-      <slot />
-    </main>
+    <slot />
     <Footer />
   </body>
 </html>

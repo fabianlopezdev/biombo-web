@@ -37,7 +37,7 @@ const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
 >
   {
     aboutUsPageData?.aboutSlider && (
-      <div class="g-negative-inline-padding">
+      <div class="about-slider-section">
         <AboutSlider
           title={aboutUsPageData.aboutSlider.title}
           description={aboutUsPageData.aboutSlider.description}
@@ -58,3 +58,9 @@ const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
     )
   }
 </InternalPageLayout>
+
+<style>
+  .about-slider-section {
+    margin-inline: calc(var(--padding-inline) * -1);
+  }
+</style>

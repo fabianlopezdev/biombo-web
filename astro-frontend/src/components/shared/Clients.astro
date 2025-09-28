@@ -1,0 +1,48 @@
+---
+import ClientLogosSlider from '@/components/shared/ClientLogosSlider.astro'
+
+interface Props {
+  clientsData?: {
+    title?: string
+  } | null
+  paddingBlock?: string
+  paddingBlockStart?: string
+  paddingBlockEnd?: string
+  paddingInline?: string
+}
+
+const { clientsData, paddingBlock, paddingBlockStart, paddingBlockEnd, paddingInline } = Astro.props
+const title = clientsData?.title || 'Clients destacats que han confiat en nosaltres'
+
+// If paddingBlock is provided, use it for both start and end
+const computedPaddingStart = paddingBlock || paddingBlockStart
+const computedPaddingEnd = paddingBlock || paddingBlockEnd
+---
+
+<section
+  class="clients"
+  style={`
+  ${computedPaddingStart ? `--padding-block-start: ${computedPaddingStart};` : ''}
+  ${computedPaddingEnd ? `--padding-block-end: ${computedPaddingEnd};` : ''}
+  ${paddingInline !== undefined ? `--clients-padding-inline: ${paddingInline};` : ''}
+`}
+>
+  <h2 class="hero-big-text-2" data-slide-up-animation>
+    {title}
+  </h2>
+
+  <ClientLogosSlider speed="normal" pauseOnHover={true} />
+</section>
+
+<style>
+  .clients {
+    padding-block-start: var(--padding-block-start, clamp(4.375rem, 2.639rem + 7.124vi, 9.375rem));
+    padding-block-end: var(--padding-block-end, clamp(4.375rem, 2.639rem + 7.124vi, 9.375rem));
+    padding-inline: var(--clients-padding-inline, var(--padding-inline));
+  }
+
+  .hero-big-text-2 {
+    text-wrap: unset;
+    padding-inline-end: 2rem;
+  }
+</style>
