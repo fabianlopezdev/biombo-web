@@ -23,7 +23,11 @@ export async function getStaticPaths() {
 
   // Spanish projects
   const esProjects = await fetchProjectsByLocale('es')
+  console.log('=== Spanish Projects Debug ===')
   esProjects.forEach((proj) => {
+    console.log('Project title:', proj.title)
+    console.log('Original slug from Sanity:', proj.slug.current)
+    console.log('---')
     paths.push({
       params: {
         lang: 'es',

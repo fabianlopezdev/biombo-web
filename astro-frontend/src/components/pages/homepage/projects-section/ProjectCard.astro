@@ -1,5 +1,6 @@
 ---
 import ProjectMobileInfo from '@/components/shared/ProjectMobileInfo.astro'
+import { getProjectUrl } from '@/config/i18n/projects'
 
 export interface ProjectCardProps {
   slug?: string
@@ -11,6 +12,7 @@ export interface ProjectCardProps {
   title?: string
   clients?: string
   loading?: 'eager' | 'lazy'
+  locale?: 'ca' | 'es' | 'en'
 }
 
 const {
@@ -23,13 +25,14 @@ const {
   title,
   clients,
   loading = 'lazy',
+  locale = 'ca',
 } = Astro.props as ProjectCardProps
 ---
 
 {
   image ? (
     <a
-      href={slug ? `/project/${slug}` : '#'}
+      href={slug ? getProjectUrl(slug, locale) : '#'}
       class={`project-mobile project-mobile-${projectNumber}`}
       style={`--hover-bg-color: ${hoverColor}; --hover-text-color: ${textHoverColor};`}
     >

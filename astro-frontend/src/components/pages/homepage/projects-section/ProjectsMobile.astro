@@ -50,6 +50,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
               title={project.title}
               clients={project.clients}
               loading={i < 2 ? 'eager' : 'lazy'}
+              locale={currentLang}
             />
           )
         })

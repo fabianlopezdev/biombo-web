@@ -141,16 +141,30 @@ export const projects = defineType({
       hidden: false, // Show slug field so users can regenerate it
       options: {
         source: 'title',
-        slugify: input => input
-          ? input
-              .normalize('NFD') // Decompose accented characters
-              .replace(/[\u0300-\u036f]/g, '') // Remove diacritical marks
-              .toLowerCase()
-              .replace(/\s+/g, '-')
-              .replace(/[^\w-]+/g, '')
-              .replace(/--+/g, '-')
-              .slice(0, 96)
-          : '', // Empty fallback
+        slugify: (input, _type, context) => {
+          // Get the language from the document
+          const language = context.parent?.language
+
+          // Generate base slug
+          const baseSlug = input
+            ? input
+                .normalize('NFD') // Decompose accented characters
+                .replace(/[\u0300-\u036f]/g, '') // Remove diacritical marks
+                .toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w-]+/g, '')
+                .replace(/--+/g, '-')
+                .slice(0, 90) // Leave room for language suffix
+            : ''
+
+          // For non-Catalan languages, append the language code
+          // This makes slugs unique: norma-comics (ca), norma-comics-es (es), norma-comics-en (en)
+          if (language && language !== 'ca') {
+            return `${baseSlug}-${language}`
+          }
+
+          return baseSlug
+        },
         maxLength: 96,
       },
       validation: Rule => Rule.required().error('A slug is required for the project URL'),

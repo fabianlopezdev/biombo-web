@@ -6,6 +6,7 @@ import type {
   FeaturedProjectItem,
 } from '@/lib/sanity/schemas/homePageSchema'
 import { transformProject } from '@/helpers/projects/projectsUtils'
+import { getProjectUrl } from '@/config/i18n/projects'
 import CustomCursor from '@/components/shared/CustomCursor.astro'
 import ProjectsTitle from './ProjectsTitle.astro'
 // This interface reflects that Sanity/astro-sanity likely resolves localeStrings to simple strings by the time they reach the component.
@@ -54,7 +55,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
           style={`--hover-bg-color: ${project.hoverColor || 'transparent'}; --hover-text-color: ${project.textHoverColor || 'inherit'};`}
         >
           {project.image && (
-            <a href={project.slug ? `/project/${project.slug}` : '#'} class="project-link">
+            <a href={project.slug ? getProjectUrl(project.slug, currentLang) : '#'} class="project-link">
               {/* TODO: Uncomment Image component when switching to SSG
 <Image
 src={project.image}
