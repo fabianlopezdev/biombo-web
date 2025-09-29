@@ -79,9 +79,16 @@ const layoutClasses = [
     flex: 1;
   }
 
+  :global(.content-wrapper) {
+    font-size: clamp(1.125rem, 0.691rem + 1.781vi, 2.375rem);
+    line-height: 1.2;
+    padding-block-start: 0.85rem;
+    letter-spacing: -0.04em;
+    margin-block-end: 0px !important;
+  }
   @media (width < 992px) {
     .two-column-layout {
-      padding-inline: var(--padding-inline);
+      /* padding-inline: var(--padding-inline); */
       flex-direction: column;
       align-items: flex-start;
       /* gap: 2rem; */
@@ -99,17 +106,6 @@ const layoutClasses = [
     .second-column {
       width: 100%;
     }
-  }
-
-  :global(.content-wrapper) {
-    font-size: clamp(1.125rem, 0.691rem + 1.781vi, 2.375rem);
-    line-height: 1.2;
-    padding-block-start: 0.85rem;
-    letter-spacing: -0.04em;
-    margin-block-end: 0px !important;
-  }
-
-  @media (width < 992px) {
     :global(.content-wrapper) {
       padding-block-start: 0rem;
     }
