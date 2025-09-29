@@ -53,7 +53,7 @@ export async function getStaticPaths() {
       },
       props: {
         locale: 'es',
-        slug: cleanSlug  // Use clean slug for querying (fetchProjectBySlug filters by locale)
+        slug: cleanSlug  // Pass clean slug, query will handle suffix internally
       },
     })
   })

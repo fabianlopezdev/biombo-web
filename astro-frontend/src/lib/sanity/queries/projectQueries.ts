@@ -31,9 +31,17 @@ export async function fetchProjectBySlug(
   slug: string,
   locale: 'ca' | 'es' | 'en' = 'ca',
 ): Promise<Project | null> {
+  console.log('=== fetchProjectBySlug Debug ===')
+  console.log('Input slug:', slug)
+  console.log('Input locale:', locale)
+
   try {
     // Query for a project with the matching slug and language
-    const query = `*[_type == "project" && slug.current == $slug && language == $locale][0] {
+    // For non-Catalan locales, try both with and without language suffix
+    const slugWithSuffix = locale !== 'ca' ? `${slug}-${locale}` : slug
+    console.log('Slug with suffix:', slugWithSuffix)
+
+    const query = `*[_type == "project" && (slug.current == $slug || slug.current == $slugWithSuffix) && language == $locale][0] {
       _id,
       _type,
       _createdAt,
@@ -109,7 +117,9 @@ export async function fetchProjectBySlug(
       },
       publishDate
     }`
-    const params = { slug, locale }
+    const params = { slug, slugWithSuffix, locale }
+    console.log('Query params:', params)
+    console.log('Query:', query)
 
     // Try fetching with schema validation
     const project = await fetchSanityQuery({
@@ -118,8 +128,11 @@ export async function fetchProjectBySlug(
       schema: projectSchema,
     })
 
+    console.log('Project found:', project ? project.title : 'NOT FOUND')
+    console.log('================================')
     return project
-  } catch {
+  } catch (error) {
+    console.error('Error fetching project:', error)
     return null
   }
 }

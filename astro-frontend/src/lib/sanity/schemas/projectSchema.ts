@@ -142,7 +142,7 @@ export const projectSchema = z.object({
       z.object({
         _id: z.string(),
         title: z.string(),
-        description: z.string().optional(),
+        description: z.string().nullable().optional(),
       }),
     )
     .nullable()

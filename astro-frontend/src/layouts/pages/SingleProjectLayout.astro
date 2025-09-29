@@ -313,13 +313,22 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                 similarProject.useSeparateThumbnail && similarProject.thumbnailImage
                   ? similarProject.thumbnailImage
                   : similarProject.mainImage
+
+              // Strip language suffix from slug for non-Catalan locales
+              let cleanSlug = similarProject.slug.current
+              if (locale === 'es' && cleanSlug.endsWith('-es')) {
+                cleanSlug = cleanSlug.slice(0, -3)
+              } else if (locale === 'en' && cleanSlug.endsWith('-en')) {
+                cleanSlug = cleanSlug.slice(0, -3)
+              }
+
               return (
                 <li class="similar-project-item">
                   <ProjectCard
                     title={similarProject.title}
                     imageUrl={getImageUrl(thumbnailImage)}
                     image={thumbnailImage}
-                    slug={`${projectsBaseUrl}/${similarProject.slug.current}`}
+                    slug={`${projectsBaseUrl}/${cleanSlug}`}
                     hoverColor={similarProject.hoverColor?.hex || '#272727'}
                     textHoverColor={similarProject.textHoverColor?.hex || '#fff'}
                     viewProjectText={translations.viewProject}
