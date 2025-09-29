@@ -87,6 +87,15 @@ const pathId = `mask-path-${uniqueId}`
     z-index: 10;
     transition: scale 0.3s ease;
     pointer-events: none;
+    /* Cross-browser rendering fixes (especially for Brave) */
+    display: block;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* Ensure SVG is visible */
+    visibility: visible;
+    opacity: 1;
   }
 
   .mask-path {

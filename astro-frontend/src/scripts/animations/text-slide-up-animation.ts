@@ -18,6 +18,7 @@ interface AnimationOptions {
 class SlideUpTextAnimation {
   private element: HTMLElement
   private originalContent: string
+  private originalElement: HTMLElement // Store reference to original element with SVGs
   private options: Required<AnimationOptions>
   private resizeTimeout?: number
   private hasAnimated: boolean = false
@@ -27,15 +28,25 @@ class SlideUpTextAnimation {
   constructor(element: HTMLElement, options: AnimationOptions = {}) {
     this.element = element
 
+    console.log('[SlideUpTextAnimation] Constructor - element:', element)
+    console.log('[SlideUpTextAnimation] Constructor - element.innerHTML length:', element.innerHTML.length)
+
+    // Store original element WITH SVGs for reconstruction
+    this.originalElement = element.cloneNode(true) as HTMLElement
+    console.log('[SlideUpTextAnimation] Constructor - originalElement stored, innerHTML length:', this.originalElement.innerHTML.length)
+
     // IMPORTANT: Clone the element and remove SVG elements before capturing content
     // This prevents the HighlightScribble SVG (8000+ chars) from corrupting the animation
     const contentClone = element.cloneNode(true) as HTMLElement
     const svgs = contentClone.querySelectorAll('svg')
+    console.log('[SlideUpTextAnimation] Constructor - SVGs found:', svgs.length)
     svgs.forEach(svg => svg.remove())
     this.originalContent = contentClone.innerHTML
+    console.log('[SlideUpTextAnimation] Constructor - originalContent (SVG-less) length:', this.originalContent.length)
 
     // Check if this element has already been animated
     if (this.element.hasAttribute('data-animation-complete')) {
+      console.log('[SlideUpTextAnimation] Constructor - Element already animated, skipping')
       // Element was already animated, don't re-initialize
       return
     }
@@ -127,12 +138,8 @@ class SlideUpTextAnimation {
 
           node.parentNode?.replaceChild(fragment, node)
         } else if (node.nodeType === Node.ELEMENT_NODE) {
-          // Recursively process child elements (but not their text)
-          // Check for special elements that should be preserved
-          const element = node as Element
-          if (!element.classList.contains('highlight-wrapper')) {
-            processTextNodes(element)
-          }
+          // Recursively process child elements
+          processTextNodes(node as Element)
         }
       })
     }
@@ -198,21 +205,44 @@ class SlideUpTextAnimation {
     // Try to preserve any special HTML structure from original content
     // This is a simplified approach - in production you might need more robust HTML parsing
 
-    // Check if original content had special elements
+    console.log('[reconstructLineContent] START - lineText:', `"${lineText}"`)
+    console.log('[reconstructLineContent] originalContent length:', this.originalContent.length)
+    console.log('[reconstructLineContent] originalElement.innerHTML length:', this.originalElement.innerHTML.length)
+
+    // Create tempDiv from SVG-less content for text matching
     const tempDiv = document.createElement('div')
     tempDiv.innerHTML = this.originalContent
 
+    // Create another div from original element (with SVGs) for cloning
+    const originalDiv = document.createElement('div')
+    originalDiv.innerHTML = this.originalElement.innerHTML
+
     // Look for special elements like highlight wrappers
     const specialElements = tempDiv.querySelectorAll('.highlight-wrapper, strong, em, a')
+    const originalSpecialElements = originalDiv.querySelectorAll('.highlight-wrapper, strong, em, a')
 
-    for (const element of specialElements) {
-      const elementText = element.textContent || ''
+    console.log('[reconstructLineContent] specialElements count:', specialElements.length)
+    console.log('[reconstructLineContent] originalSpecialElements count:', originalSpecialElements.length)
+
+    for (let i = 0; i < specialElements.length; i++) {
+      const element = specialElements[i]
+      const originalElement = originalSpecialElements[i] // Get corresponding element with SVG
+      const elementText = (element.textContent || '').trim()
+
+      console.log(`[reconstructLineContent] Element ${i} - text: "${elementText}", classes:`, element.className)
+      console.log(`[reconstructLineContent] Element ${i} - checking if lineText includes elementText:`, lineText.includes(elementText))
+
       if (lineText.includes(elementText)) {
+        console.log('[reconstructLineContent] MATCH FOUND!')
         // Try to reconstruct the element
         if (element.classList.contains('highlight-wrapper')) {
-          // Preserve the entire highlight wrapper structure
-          const wrapper = element.cloneNode(true) as HTMLElement
-          return lineText.replace(elementText, wrapper.outerHTML)
+          console.log('[reconstructLineContent] Is highlight-wrapper, cloning from original with SVG')
+          // Clone from ORIGINAL element (with SVG intact)
+          const wrapper = originalElement.cloneNode(true) as HTMLElement
+          console.log('[reconstructLineContent] wrapper cloned, outerHTML length:', wrapper.outerHTML.length)
+          const result = lineText.replace(elementText, wrapper.outerHTML)
+          console.log('[reconstructLineContent] Returning reconstructed HTML, length:', result.length)
+          return result
         } else {
           // Simple element reconstruction
           const tag = element.tagName.toLowerCase()
@@ -224,18 +254,25 @@ class SlideUpTextAnimation {
       }
     }
 
+    console.log('[reconstructLineContent] No matches, returning plain text')
     // No special formatting, return plain text
     return lineText
   }
 
   private animateLines(): void {
+    console.log('[SlideUpTextAnimation] animateLines() called')
+    console.log('[SlideUpTextAnimation] hasAnimated:', this.hasAnimated)
+
     // Simply activate the animation by changing the data attribute
     requestAnimationFrame(() => {
+      console.log('[SlideUpTextAnimation] First RAF executed')
       requestAnimationFrame(() => {
+        console.log('[SlideUpTextAnimation] Second RAF executed - setting data-animation="active"')
         this.element.setAttribute('data-animation', 'active')
         this.hasAnimated = true
         // Mark element as complete to prevent re-animation
         this.element.setAttribute('data-animation-complete', 'true')
+        console.log('[SlideUpTextAnimation] Animation attributes set - active & complete')
 
         // Disconnect observers after animation to free up resources
         if (this.observer) {
@@ -243,6 +280,7 @@ class SlideUpTextAnimation {
           this.observer = undefined
         }
         if (this.mutationObserver) {
+          console.log('[SlideUpTextAnimation] Disconnecting MutationObserver')
           this.mutationObserver.disconnect()
           this.mutationObserver = undefined
         }
@@ -251,12 +289,16 @@ class SlideUpTextAnimation {
   }
 
   private init(): void {
+    console.log('[SlideUpTextAnimation] init() called')
+
     // Double-check animation hasn't already completed
     if (this.element.hasAttribute('data-animation-complete')) {
+      console.log('[SlideUpTextAnimation] Element already has data-animation-complete, skipping')
       return
     }
 
     // Set initial state
+    console.log('[SlideUpTextAnimation] Setting data-animation="pending"')
     this.element.setAttribute('data-animation', 'pending')
 
     // Detect iOS for special handling
@@ -264,16 +306,22 @@ class SlideUpTextAnimation {
       /iPad|iPhone|iPod/.test(navigator.userAgent) &&
       !(window as unknown as { MSStream?: unknown }).MSStream
 
+    console.log('[SlideUpTextAnimation] isIOS:', isIOS)
+
     // iOS needs extra time for layout to stabilize
     const measurementDelay = isIOS ? 200 : 0
+    console.log('[SlideUpTextAnimation] measurementDelay:', measurementDelay)
 
     // Use requestAnimationFrame for better timing on iOS
     const performSplit = () => {
+      console.log('[SlideUpTextAnimation] performSplit() called')
       // Split text into lines
       const lineCount = this.splitIntoAnimatedLines()
+      console.log('[SlideUpTextAnimation] splitIntoAnimatedLines returned lineCount:', lineCount)
 
       if (lineCount > 0) {
         // Mark as ready (shows the text with lines hidden)
+        console.log('[SlideUpTextAnimation] Setting data-animation="ready"')
         this.element.setAttribute('data-animation', 'ready')
 
         // Check if element should animate immediately (above the fold)
@@ -281,17 +329,26 @@ class SlideUpTextAnimation {
         const shouldAnimateImmediately = this.element.hasAttribute('data-animate-immediate')
         const waitForTrigger = this.element.hasAttribute('data-wait-for-trigger')
 
+        console.log('[SlideUpTextAnimation] shouldAnimateImmediately:', shouldAnimateImmediately)
+        console.log('[SlideUpTextAnimation] waitForTrigger:', waitForTrigger)
+
         if (shouldAnimateImmediately) {
+          console.log('[SlideUpTextAnimation] Mode: animate immediately - scheduling animateLines in 100ms')
           // Small delay to ensure everything is rendered
           setTimeout(() => {
             this.animateLines()
           }, 100)
         } else if (waitForTrigger) {
+          console.log('[SlideUpTextAnimation] Mode: wait for trigger - setting up MutationObserver')
           // Wait for external trigger (from orchestrator)
           // Use MutationObserver to watch for attribute changes
           this.mutationObserver = new MutationObserver((mutations) => {
+            console.log('[SlideUpTextAnimation] MutationObserver detected mutations:', mutations.length)
             mutations.forEach((mutation) => {
+              console.log('[SlideUpTextAnimation] Mutation - attributeName:', mutation.attributeName)
               if (mutation.attributeName === 'data-animation-trigger') {
+                console.log('[SlideUpTextAnimation] data-animation-trigger detected! Value:', this.element.getAttribute('data-animation-trigger'))
+                console.log('[SlideUpTextAnimation] Calling animateLines()')
                 this.animateLines()
                 this.mutationObserver?.disconnect()
                 this.mutationObserver = undefined
@@ -299,10 +356,14 @@ class SlideUpTextAnimation {
             })
           })
           this.mutationObserver.observe(this.element, { attributes: true })
+          console.log('[SlideUpTextAnimation] MutationObserver set up successfully')
         } else {
+          console.log('[SlideUpTextAnimation] Mode: intersection observer - calling setupIntersectionObserver()')
           // Use intersection observer for scroll-triggered animation
           this.setupIntersectionObserver()
         }
+      } else {
+        console.error('[SlideUpTextAnimation] lineCount is 0 - no lines to animate!')
       }
     }
 

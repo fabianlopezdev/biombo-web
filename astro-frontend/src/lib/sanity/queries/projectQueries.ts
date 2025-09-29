@@ -344,8 +344,26 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
         _type,
         title,
         slug,
-        mainImage,
-        thumbnailImage,
+        mainImage {
+          ...,
+          asset-> {
+            ...,
+            metadata {
+              ...,
+              lqip
+            }
+          }
+        },
+        thumbnailImage {
+          ...,
+          asset-> {
+            ...,
+            metadata {
+              ...,
+              lqip
+            }
+          }
+        },
         useSeparateThumbnail,
         clients,
         services,

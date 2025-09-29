@@ -27,14 +27,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Finish routine
   const finish = (skipped = false) => {
+    console.log('[PageLoader] finish() called - skipped:', skipped)
     loader.setAttribute('data-loader-complete', '')
+    console.log('[PageLoader] Dispatching loader:complete event')
     window.dispatchEvent(new CustomEvent('loader:complete', { detail: { skipped } }))
+    console.log('[PageLoader] Event dispatched successfully')
     document.body.removeAttribute('aria-busy')
     if (main) {
       main.removeAttribute('inert')
       main.removeAttribute('aria-hidden')
     }
     setTimeout(() => {
+      console.log('[PageLoader] Removing loader element from DOM')
       window.removeEventListener('resize', setViewportHeight)
       window.removeEventListener('orientationchange', setViewportHeight)
       if (window.visualViewport) {
@@ -57,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auto-finish after the configured timeline (original 4000ms)
   const styles = getComputedStyle(loader)
   const ms = parseInt(styles.getPropertyValue('--loader-total-duration')) || 4000
+  console.log('[PageLoader] Will auto-finish after', ms, 'ms')
   const t = window.setTimeout(() => finish(false), ms)
   window.addEventListener('pagehide', () => {
     clearTimeout(t)

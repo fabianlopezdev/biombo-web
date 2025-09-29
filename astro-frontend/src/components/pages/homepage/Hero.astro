@@ -42,6 +42,48 @@ const scrollPositionClass =
 <script src="@/scripts/animations/text-slide-up-animation.ts"></script>
 <script src="@/scripts/homepage/homepage-animation-orchestrator.ts"></script>
 
+<script>
+  // Diagnostic script - check hero animation state after 5 seconds
+  setTimeout(() => {
+    console.log('=== HERO ANIMATION DIAGNOSTIC (5 seconds after load) ===')
+    const heroTitle = document.querySelector('[data-slide-up-animation]')
+
+    if (!heroTitle) {
+      console.error('[Diagnostic] Hero title element NOT FOUND!')
+      return
+    }
+
+    console.log('[Diagnostic] Hero title element found:', heroTitle)
+    console.log('[Diagnostic] Attributes:')
+    console.log('  - data-animation:', heroTitle.getAttribute('data-animation'))
+    console.log('  - data-animation-trigger:', heroTitle.getAttribute('data-animation-trigger'))
+    console.log('  - data-animation-complete:', heroTitle.getAttribute('data-animation-complete'))
+    console.log('  - data-wait-for-trigger:', heroTitle.getAttribute('data-wait-for-trigger'))
+
+    const computedStyle = window.getComputedStyle(heroTitle)
+    console.log('[Diagnostic] Computed styles:')
+    console.log('  - visibility:', computedStyle.visibility)
+    console.log('  - opacity:', computedStyle.opacity)
+    console.log('  - display:', computedStyle.display)
+
+    // Check inner lines
+    const lines = heroTitle.querySelectorAll('.slide-up-line')
+    console.log('[Diagnostic] Number of .slide-up-line elements:', lines.length)
+
+    if (lines.length > 0) {
+      const firstLine = lines[0]
+      const firstLineInner = firstLine.querySelector('.slide-up-line-inner')
+      if (firstLineInner) {
+        const lineStyle = window.getComputedStyle(firstLineInner)
+        console.log('[Diagnostic] First line inner transform:', lineStyle.transform)
+        console.log('[Diagnostic] First line inner visibility:', lineStyle.visibility)
+      }
+    }
+
+    console.log('=== END DIAGNOSTIC ===')
+  }, 5000)
+</script>
+
 <div class={`hero-wrapper ${textAlignment}-aligned mobile-${mobileTextAlignment}-aligned`}>
   <h1 data-slide-up-animation data-wait-for-trigger class="hero-title">
     {
@@ -207,6 +249,9 @@ const scrollPositionClass =
   .highlight-wrapper {
     position: relative;
     display: inline-block;
+    /* Ensure proper rendering context for nested SVG in Brave */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
 
   .scroll-indicator {
