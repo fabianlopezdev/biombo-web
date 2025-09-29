@@ -2,6 +2,31 @@
  * Utilities for handling blur hash (LQIP) from Sanity images
  */
 
+/**
+ * Sanity image asset interface
+ */
+interface SanityImageAsset {
+  asset?: {
+    metadata?: {
+      lqip?: string
+      dimensions?: {
+        width: number
+        height: number
+        aspectRatio?: number
+      }
+    }
+  }
+  metadata?: {
+    lqip?: string
+    dimensions?: {
+      width: number
+      height: number
+      aspectRatio?: number
+    }
+  }
+  lqip?: string
+}
+
 export interface BlurHashStyles {
   backgroundImage: string
   backgroundSize: string
@@ -14,7 +39,7 @@ export interface BlurHashStyles {
  * @param image - Sanity image object with asset metadata
  * @returns Blur hash background styles or null if no LQIP available
  */
-export function getBlurHashStyles(image: any): BlurHashStyles | null {
+export function getBlurHashStyles(image: SanityImageAsset): BlurHashStyles | null {
   // Check for LQIP in the asset metadata
   const lqip = image?.asset?.metadata?.lqip || image?.metadata?.lqip
 
@@ -52,14 +77,9 @@ export function getBlurHashStyleString(styles: BlurHashStyles | null): string {
  * @param image - Image object from Sanity
  * @returns LQIP string or null
  */
-export function getBlurHashFromImage(image: any): string | null {
+export function getBlurHashFromImage(image: SanityImageAsset): string | null {
   // Try multiple possible paths for LQIP
-  return (
-    image?.asset?.metadata?.lqip ||
-    image?.metadata?.lqip ||
-    image?.lqip ||
-    null
-  )
+  return image?.asset?.metadata?.lqip || image?.metadata?.lqip || image?.lqip || null
 }
 
 /**
@@ -67,7 +87,7 @@ export function getBlurHashFromImage(image: any): string | null {
  * @param image - Sanity image object
  * @returns boolean indicating if blur hash is available
  */
-export function hasBlurHash(image: any): boolean {
+export function hasBlurHash(image: SanityImageAsset): boolean {
   return getBlurHashFromImage(image) !== null
 }
 
@@ -76,15 +96,12 @@ export function hasBlurHash(image: any): boolean {
  * @param image - Sanity image object
  * @returns Object with width, height, and aspectRatio or null
  */
-export function getImageDimensions(image: any): {
+export function getImageDimensions(image: SanityImageAsset): {
   width: number
   height: number
   aspectRatio: number
 } | null {
-  const dimensions =
-    image?.asset?.metadata?.dimensions ||
-    image?.metadata?.dimensions ||
-    null
+  const dimensions = image?.asset?.metadata?.dimensions || image?.metadata?.dimensions || null
 
   if (!dimensions || !dimensions.width || !dimensions.height) {
     return null

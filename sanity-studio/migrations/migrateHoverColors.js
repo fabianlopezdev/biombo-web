@@ -1,3 +1,4 @@
+/* eslint-env node */
 // Migration script to move hover colors from homepage featuredProjects to project documents
 // Run this script using: npx sanity exec migrations/migrateHoverColors.js --with-user-token
 

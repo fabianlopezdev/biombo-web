@@ -47,7 +47,6 @@ export default defineConfig({
     locales: ['ca', 'es', 'en'],
     routing: {
       prefixDefaultLocale: false, // Catalan stays at root without /ca prefix
-      strategy: 'pathname'
     }
   },
   integrations: [

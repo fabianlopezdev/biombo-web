@@ -87,7 +87,7 @@ export const footer = defineType({
       language: 'language',
     },
     prepare(selection) {
-      const {slogan, language} = selection
+      const {language} = selection
       return {
         title: `Footer (${(language || '').toUpperCase()})`,
         subtitle: 'Footer content',

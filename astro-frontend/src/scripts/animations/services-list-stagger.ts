@@ -4,8 +4,8 @@
  */
 
 class ServicesListAnimation {
-  private container: HTMLElement
-  private items: NodeListOf<HTMLDetailsElement>
+  private container!: HTMLElement
+  private items!: NodeListOf<HTMLDetailsElement>
   private animatedItems: HTMLDetailsElement[] = []
   private observer?: IntersectionObserver
 
@@ -65,7 +65,7 @@ class ServicesListAnimation {
 
     // Observe EACH item individually
     this.items.forEach((item) => {
-      this.observer.observe(item)
+      this.observer?.observe(item)
     })
   }
 

@@ -96,9 +96,9 @@ export const contactPage = defineType({
                   label: 'label',
                   required: 'required',
                 },
-                prepare(selection) {
+                prepare(selection: { fieldType?: 'name' | 'email' | 'phone' | 'message'; label?: string; required?: boolean }) {
                   const { fieldType, label, required } = selection
-                  const typeLabels = {
+                  const typeLabels: Record<string, string> = {
                     name: '👤 Name',
                     email: '✉️ Email',
                     phone: '📞 Phone',
@@ -106,7 +106,7 @@ export const contactPage = defineType({
                   }
                   return {
                     title: label || 'Unnamed field',
-                    subtitle: `${typeLabels[fieldType] || fieldType}${required ? ' (Required)' : ' (Optional)'}`,
+                    subtitle: `${fieldType ? (typeLabels[fieldType] || fieldType) : 'Unknown'}${required ? ' (Required)' : ' (Optional)'}`,
                   }
                 },
               },
@@ -123,7 +123,7 @@ export const contactPage = defineType({
               }
 
               // Check for duplicate field types
-              const fieldTypes = fields.map(f => f?.fieldType).filter(Boolean)
+              const fieldTypes = (fields as Array<{ fieldType?: string }>).map(f => f?.fieldType).filter(Boolean)
               const uniqueTypes = new Set(fieldTypes)
 
               if (fieldTypes.length !== uniqueTypes.size) {

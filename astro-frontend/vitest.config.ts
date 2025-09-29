@@ -1,7 +1,7 @@
 // vitest.config.ts
-import { getViteConfig } from 'astro/config'
+import { defineConfig } from 'vitest/config'
 
-export default getViteConfig({
+export default defineConfig({
   envDir: './', // Load .env files from the project root
   test: {
     // Enable global test APIs (describe, test, expect, etc.)

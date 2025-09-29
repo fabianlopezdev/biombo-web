@@ -1,3 +1,4 @@
+/* eslint-env node */
 export default async function(client) {
   const doc = await client.fetch(`*[_type == "project" && defined(hoverColor)][0]`);
   if (doc) {

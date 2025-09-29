@@ -7,8 +7,8 @@ import { stateManager } from '@/scripts/core/state-manager'
 // Extend Window interface to include our global variables
 declare global {
   interface Window {
-    activeFilters: Set<string>
-    announceFilterResults: () => void
+    activeFilters?: Set<string>
+    announceFilterResults?: () => void
     isDragEvent?: boolean
   }
 }

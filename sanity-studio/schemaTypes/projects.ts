@@ -143,7 +143,7 @@ export const projects = defineType({
         source: 'title',
         slugify: (input, _type, context) => {
           // Get the language from the document
-          const language = context.parent?.language
+          const language = (context.parent as { language?: string } | undefined)?.language
 
           // Generate base slug
           const baseSlug = input

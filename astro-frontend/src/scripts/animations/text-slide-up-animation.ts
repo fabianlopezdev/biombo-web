@@ -19,7 +19,7 @@ class SlideUpTextAnimation {
   private element: HTMLElement
   private originalContent: string
   private originalElement: HTMLElement // Store reference to original element with SVGs
-  private options: Required<AnimationOptions>
+  private options!: Required<AnimationOptions>
   private resizeTimeout?: number
   private hasAnimated: boolean = false
   private observer?: IntersectionObserver
@@ -29,20 +29,29 @@ class SlideUpTextAnimation {
     this.element = element
 
     console.log('[SlideUpTextAnimation] Constructor - element:', element)
-    console.log('[SlideUpTextAnimation] Constructor - element.innerHTML length:', element.innerHTML.length)
+    console.log(
+      '[SlideUpTextAnimation] Constructor - element.innerHTML length:',
+      element.innerHTML.length,
+    )
 
     // Store original element WITH SVGs for reconstruction
     this.originalElement = element.cloneNode(true) as HTMLElement
-    console.log('[SlideUpTextAnimation] Constructor - originalElement stored, innerHTML length:', this.originalElement.innerHTML.length)
+    console.log(
+      '[SlideUpTextAnimation] Constructor - originalElement stored, innerHTML length:',
+      this.originalElement.innerHTML.length,
+    )
 
     // IMPORTANT: Clone the element and remove SVG elements before capturing content
     // This prevents the HighlightScribble SVG (8000+ chars) from corrupting the animation
     const contentClone = element.cloneNode(true) as HTMLElement
     const svgs = contentClone.querySelectorAll('svg')
     console.log('[SlideUpTextAnimation] Constructor - SVGs found:', svgs.length)
-    svgs.forEach(svg => svg.remove())
+    svgs.forEach((svg) => svg.remove())
     this.originalContent = contentClone.innerHTML
-    console.log('[SlideUpTextAnimation] Constructor - originalContent (SVG-less) length:', this.originalContent.length)
+    console.log(
+      '[SlideUpTextAnimation] Constructor - originalContent (SVG-less) length:',
+      this.originalContent.length,
+    )
 
     // Check if this element has already been animated
     if (this.element.hasAttribute('data-animation-complete')) {
@@ -207,7 +216,10 @@ class SlideUpTextAnimation {
 
     console.log('[reconstructLineContent] START - lineText:', `"${lineText}"`)
     console.log('[reconstructLineContent] originalContent length:', this.originalContent.length)
-    console.log('[reconstructLineContent] originalElement.innerHTML length:', this.originalElement.innerHTML.length)
+    console.log(
+      '[reconstructLineContent] originalElement.innerHTML length:',
+      this.originalElement.innerHTML.length,
+    )
 
     // Create tempDiv from SVG-less content for text matching
     const tempDiv = document.createElement('div')
@@ -219,29 +231,48 @@ class SlideUpTextAnimation {
 
     // Look for special elements like highlight wrappers
     const specialElements = tempDiv.querySelectorAll('.highlight-wrapper, strong, em, a')
-    const originalSpecialElements = originalDiv.querySelectorAll('.highlight-wrapper, strong, em, a')
+    const originalSpecialElements = originalDiv.querySelectorAll(
+      '.highlight-wrapper, strong, em, a',
+    )
 
     console.log('[reconstructLineContent] specialElements count:', specialElements.length)
-    console.log('[reconstructLineContent] originalSpecialElements count:', originalSpecialElements.length)
+    console.log(
+      '[reconstructLineContent] originalSpecialElements count:',
+      originalSpecialElements.length,
+    )
 
     for (let i = 0; i < specialElements.length; i++) {
       const element = specialElements[i]
       const originalElement = originalSpecialElements[i] // Get corresponding element with SVG
       const elementText = (element.textContent || '').trim()
 
-      console.log(`[reconstructLineContent] Element ${i} - text: "${elementText}", classes:`, element.className)
-      console.log(`[reconstructLineContent] Element ${i} - checking if lineText includes elementText:`, lineText.includes(elementText))
+      console.log(
+        `[reconstructLineContent] Element ${i} - text: "${elementText}", classes:`,
+        element.className,
+      )
+      console.log(
+        `[reconstructLineContent] Element ${i} - checking if lineText includes elementText:`,
+        lineText.includes(elementText),
+      )
 
       if (lineText.includes(elementText)) {
         console.log('[reconstructLineContent] MATCH FOUND!')
         // Try to reconstruct the element
         if (element.classList.contains('highlight-wrapper')) {
-          console.log('[reconstructLineContent] Is highlight-wrapper, cloning from original with SVG')
+          console.log(
+            '[reconstructLineContent] Is highlight-wrapper, cloning from original with SVG',
+          )
           // Clone from ORIGINAL element (with SVG intact)
           const wrapper = originalElement.cloneNode(true) as HTMLElement
-          console.log('[reconstructLineContent] wrapper cloned, outerHTML length:', wrapper.outerHTML.length)
+          console.log(
+            '[reconstructLineContent] wrapper cloned, outerHTML length:',
+            wrapper.outerHTML.length,
+          )
           const result = lineText.replace(elementText, wrapper.outerHTML)
-          console.log('[reconstructLineContent] Returning reconstructed HTML, length:', result.length)
+          console.log(
+            '[reconstructLineContent] Returning reconstructed HTML, length:',
+            result.length,
+          )
           return result
         } else {
           // Simple element reconstruction
@@ -333,7 +364,9 @@ class SlideUpTextAnimation {
         console.log('[SlideUpTextAnimation] waitForTrigger:', waitForTrigger)
 
         if (shouldAnimateImmediately) {
-          console.log('[SlideUpTextAnimation] Mode: animate immediately - scheduling animateLines in 100ms')
+          console.log(
+            '[SlideUpTextAnimation] Mode: animate immediately - scheduling animateLines in 100ms',
+          )
           // Small delay to ensure everything is rendered
           setTimeout(() => {
             this.animateLines()
@@ -343,11 +376,20 @@ class SlideUpTextAnimation {
           // Wait for external trigger (from orchestrator)
           // Use MutationObserver to watch for attribute changes
           this.mutationObserver = new MutationObserver((mutations) => {
-            console.log('[SlideUpTextAnimation] MutationObserver detected mutations:', mutations.length)
+            console.log(
+              '[SlideUpTextAnimation] MutationObserver detected mutations:',
+              mutations.length,
+            )
             mutations.forEach((mutation) => {
-              console.log('[SlideUpTextAnimation] Mutation - attributeName:', mutation.attributeName)
+              console.log(
+                '[SlideUpTextAnimation] Mutation - attributeName:',
+                mutation.attributeName,
+              )
               if (mutation.attributeName === 'data-animation-trigger') {
-                console.log('[SlideUpTextAnimation] data-animation-trigger detected! Value:', this.element.getAttribute('data-animation-trigger'))
+                console.log(
+                  '[SlideUpTextAnimation] data-animation-trigger detected! Value:',
+                  this.element.getAttribute('data-animation-trigger'),
+                )
                 console.log('[SlideUpTextAnimation] Calling animateLines()')
                 this.animateLines()
                 this.mutationObserver?.disconnect()
@@ -358,7 +400,9 @@ class SlideUpTextAnimation {
           this.mutationObserver.observe(this.element, { attributes: true })
           console.log('[SlideUpTextAnimation] MutationObserver set up successfully')
         } else {
-          console.log('[SlideUpTextAnimation] Mode: intersection observer - calling setupIntersectionObserver()')
+          console.log(
+            '[SlideUpTextAnimation] Mode: intersection observer - calling setupIntersectionObserver()',
+          )
           // Use intersection observer for scroll-triggered animation
           this.setupIntersectionObserver()
         }

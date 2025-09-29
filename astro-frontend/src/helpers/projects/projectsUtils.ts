@@ -193,8 +193,13 @@ export function transformProject(
 
     try {
       const clientNames = projectDoc.clients
-        .filter((client): client is { name: string } => {
-          return client && typeof client === 'object' && typeof client.name === 'string'
+        .filter((client): client is { _id: string; name: string } => {
+          return (
+            client &&
+            typeof client === 'object' &&
+            typeof client.name === 'string' &&
+            '_id' in client
+          )
         })
         .map((client) => client.name.trim())
         .filter(Boolean)

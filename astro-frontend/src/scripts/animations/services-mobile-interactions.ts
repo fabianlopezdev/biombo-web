@@ -69,7 +69,7 @@ class ServicesMobileAnimation {
 
     if (summary && toggle) {
       // Force a reflow to clear any stuck states
-      void toggle.offsetHeight
+      void (toggle as HTMLElement).offsetHeight
     }
   }
 

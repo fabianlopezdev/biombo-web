@@ -38,8 +38,8 @@ export const service = defineType({
               .replace(/[\u0300-\u036f]/g, '') // Remove diacritical marks
               .toLowerCase()
               .replace(/\s+/g, '-')
-              .replace(/[^\w\-]+/g, '') // Remove non-word chars
-              .replace(/\-\-+/g, '-') // Replace multiple dashes with single dash
+              .replace(/[^\w-]+/g, '') // Remove non-word chars
+              .replace(/--+/g, '-') // Replace multiple dashes with single dash
               .replace(/^-+/, '') // Trim dashes from start
               .replace(/-+$/, '') // Trim dashes from end
           : '',
