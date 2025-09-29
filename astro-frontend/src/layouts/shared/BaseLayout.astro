@@ -22,9 +22,15 @@ const { pageMetaTitle, pageMetaDescription } = Astro.props
 // Get the current locale from Astro's i18n middleware
 const locale = (Astro.currentLocale ?? 'ca') as 'ca' | 'es' | 'en'
 
-// Check if we're on the homepage
+// Check if we're on the homepage (with or without trailing slash)
 const isHomepage =
-  Astro.url.pathname === '/' || Astro.url.pathname === '/en/' || Astro.url.pathname === '/es/'
+  Astro.url.pathname === '/' ||
+  Astro.url.pathname === '/ca' ||
+  Astro.url.pathname === '/ca/' ||
+  Astro.url.pathname === '/en' ||
+  Astro.url.pathname === '/en/' ||
+  Astro.url.pathname === '/es' ||
+  Astro.url.pathname === '/es/'
 
 // Fetch site settings colors with destructuring and direct fallbacks
 const { primaryColor = '#f2f2f2', secondaryColor = '#191919' } = await fetchSiteSettings()

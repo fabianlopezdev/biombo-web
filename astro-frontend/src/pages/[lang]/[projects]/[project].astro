@@ -11,13 +11,22 @@ export async function getStaticPaths() {
   // English projects
   const enProjects = await fetchProjectsByLocale('en')
   enProjects.forEach((proj) => {
+    // Strip the -en suffix for the URL path
+    let cleanSlug = proj.slug.current
+    if (cleanSlug.endsWith('-en')) {
+      cleanSlug = cleanSlug.slice(0, -3)
+    }
+
     paths.push({
       params: {
         lang: 'en',
         projects: 'projects',
-        project: proj.slug.current,
+        project: cleanSlug,  // Use clean slug for URL path
       },
-      props: { locale: 'en', slug: proj.slug.current },
+      props: {
+        locale: 'en',
+        slug: proj.slug.current  // Keep original slug with suffix for querying
+      },
     })
   })
 
@@ -27,14 +36,25 @@ export async function getStaticPaths() {
   esProjects.forEach((proj) => {
     console.log('Project title:', proj.title)
     console.log('Original slug from Sanity:', proj.slug.current)
+
+    // Strip the -es suffix for the URL path
+    let cleanSlug = proj.slug.current
+    if (cleanSlug.endsWith('-es')) {
+      cleanSlug = cleanSlug.slice(0, -3)
+    }
+    console.log('Clean slug for URL:', cleanSlug)
     console.log('---')
+
     paths.push({
       params: {
         lang: 'es',
         projects: 'proyectos',
-        project: proj.slug.current,
+        project: cleanSlug,  // Use clean slug for URL path
       },
-      props: { locale: 'es', slug: proj.slug.current },
+      props: {
+        locale: 'es',
+        slug: proj.slug.current  // Keep original slug with suffix for querying
+      },
     })
   })
 

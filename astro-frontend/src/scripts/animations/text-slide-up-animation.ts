@@ -26,7 +26,13 @@ class SlideUpTextAnimation {
 
   constructor(element: HTMLElement, options: AnimationOptions = {}) {
     this.element = element
-    this.originalContent = element.innerHTML
+
+    // IMPORTANT: Clone the element and remove SVG elements before capturing content
+    // This prevents the HighlightScribble SVG (8000+ chars) from corrupting the animation
+    const contentClone = element.cloneNode(true) as HTMLElement
+    const svgs = contentClone.querySelectorAll('svg')
+    svgs.forEach(svg => svg.remove())
+    this.originalContent = contentClone.innerHTML
 
     // Check if this element has already been animated
     if (this.element.hasAttribute('data-animation-complete')) {
