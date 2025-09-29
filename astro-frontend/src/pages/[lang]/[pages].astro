@@ -1,0 +1,45 @@
+---
+// Dynamic route for all non-Catalan language pages
+import AboutUsLayout from '@/layouts/pages/AboutUS.astro'
+import ServicesLayout from '@/layouts/pages/Services.astro'
+import ContactLayout from '@/layouts/pages/Contact.astro'
+import ProjectsPageWrapper from '@/utils/pages/projects/ProjectsPageWrapper.astro'
+import { otherLanguageRoutes, getLayoutForOtherLanguagePage } from '@/shared/config/pageRoutes'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const paths = []
+
+  // Generate paths for each language and its pages
+  Object.entries(otherLanguageRoutes).forEach(([lang, pages]) => {
+    Object.keys(pages).forEach((page) => {
+      paths.push({
+        params: { lang, pages: page },
+        props: { lang, page, locale: lang },
+      })
+    })
+  })
+
+  return paths
+}
+
+const { lang, page, locale } = Astro.props
+const layout = getLayoutForOtherLanguagePage(lang, page)
+
+// Map layout names to actual components
+const layoutComponents = {
+  AboutUs: AboutUsLayout,
+  Services: ServicesLayout,
+  Contact: ContactLayout,
+  ProjectsPageWrapper: ProjectsPageWrapper,
+}
+
+const LayoutComponent = layout ? layoutComponents[layout] : null
+
+if (!LayoutComponent) {
+  return new Response(null, { status: 404, statusText: 'Not found' })
+}
+---
+
+<LayoutComponent {locale} />

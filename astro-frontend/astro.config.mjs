@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config'
 import sanity from '@sanity/astro'
 import netlify from '@astrojs/netlify'
+import sitemap from '@astrojs/sitemap'
 import dotenv from 'dotenv'
 
 // Load environment variables from .env files
@@ -32,7 +33,7 @@ if (typeof sanityDataset !== 'string') {
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.ASTRO_SITE || 'http://localhost:4321', // Added to resolve Invalid URL with astro-i18n
+  site: process.env.ASTRO_SITE || 'https://biombostudio.com', // Production URL for sitemap
   output: 'server', // Enable SSR
   adapter: netlify({
     // Optional: Enable edge middleware for faster response times
@@ -41,6 +42,14 @@ export default defineConfig({
     imageCDN: false,
   }),
   prefetch: true,
+  i18n: {
+    defaultLocale: 'ca',
+    locales: ['ca', 'es', 'en'],
+    routing: {
+      prefixDefaultLocale: false, // Catalan stays at root without /ca prefix
+      strategy: 'pathname'
+    }
+  },
   integrations: [
     sanity({
       projectId: sanityProjectId, // Use validated variable
@@ -48,6 +57,17 @@ export default defineConfig({
       apiVersion: sanityApiVersion,
       useCdn: process.env.PUBLIC_SANITY_USE_CDN === 'true', // Use CDN in production, false for development
       // studioBasePath: '/admin' // Add this if you plan to embed Sanity Studio later
+    }),
+    sitemap({
+      // i18n configuration for multilingual sitemap
+      i18n: {
+        defaultLocale: 'ca',
+        locales: {
+          ca: 'ca-ES',
+          en: 'en-US',
+          es: 'es-ES',
+        },
+      },
     }),
   ],
 })

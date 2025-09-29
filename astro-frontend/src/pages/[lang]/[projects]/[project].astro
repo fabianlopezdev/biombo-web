@@ -10,27 +10,27 @@ export async function getStaticPaths() {
 
   // English projects
   const enProjects = await fetchProjectsByLocale('en')
-  enProjects.forEach((project) => {
+  enProjects.forEach((proj) => {
     paths.push({
       params: {
         lang: 'en',
         projects: 'projects',
-        slug: project.slug.current,
+        project: proj.slug.current,
       },
-      props: { locale: 'en', slug: project.slug.current },
+      props: { locale: 'en', slug: proj.slug.current },
     })
   })
 
   // Spanish projects
   const esProjects = await fetchProjectsByLocale('es')
-  esProjects.forEach((project) => {
+  esProjects.forEach((proj) => {
     paths.push({
       params: {
         lang: 'es',
         projects: 'proyectos',
-        slug: project.slug.current,
+        project: proj.slug.current,
       },
-      props: { locale: 'es', slug: project.slug.current },
+      props: { locale: 'es', slug: proj.slug.current },
     })
   })
 

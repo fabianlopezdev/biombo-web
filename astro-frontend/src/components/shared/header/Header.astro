@@ -6,11 +6,12 @@ import LanguageSwitcher from '@/components/shared/header/LanguageSwitcher.astro'
 import HeaderLogo from './HeaderLogo.astro'
 import PagesNavigation from './PagesNavigation.astro'
 import MobileMenu from './MobileMenu.astro'
+import { getLanguageSwitcherData, type SupportedLanguage } from '@/utils/i18n/helpers'
 
 const { locale } = Astro.props
 
 /* ─ Helper ───────────────────────────────────────────────────────────────────
-   Provides the correct “skip to content” label for the given locale. */
+   Provides the correct "skip to content" label for the given locale. */
 function getSkipLabel(locale: string): string {
   const map: Record<string, string> = {
     ca: 'Ves al contingut',
@@ -20,12 +21,16 @@ function getSkipLabel(locale: string): string {
   return map[locale] ?? map.en
 }
 
-/* ─ Language data ─ */
-const languages = [
-  { code: 'ca', short: 'Cat', srSuffix: 'alan', fullName: 'Catalan', path: '/' },
-  { code: 'es', short: 'Esp', srSuffix: 'añol', fullName: 'Spanish', path: '/es' },
-  { code: 'en', short: 'Eng', srSuffix: 'lish', fullName: 'English', path: '/en' },
-] as const
+/* ─ Language data with dynamic URLs ─ */
+const currentPath = Astro.url.pathname
+const languageData = getLanguageSwitcherData(currentPath, locale as SupportedLanguage)
+const languages = languageData.map((lang) => ({
+  code: lang.code as 'ca' | 'es' | 'en',
+  short: lang.short,
+  srSuffix: lang.srSuffix.replace(/[()]/g, ''), // Remove parentheses
+  fullName: lang.fullName,
+  path: lang.path,
+}))
 
 /* ─ Fetch navigation ─ */
 let headerData: Header | null = null
@@ -50,7 +55,7 @@ const pages: NavigationPage[] = fetchError ? [] : headerData?.navigationPages ||
 
 <header class="site-header" role="banner">
   <div class="logo-wrapper">
-    <HeaderLogo />
+    <HeaderLogo locale={locale as SupportedLanguage} />
   </div>
 
   {

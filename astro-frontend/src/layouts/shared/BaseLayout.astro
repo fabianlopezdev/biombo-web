@@ -5,6 +5,12 @@ import { fetchSiteSettings } from '@/shared/lib/sanity/queries/siteSettingsQueri
 import Header from '@/components/shared/header/Header.astro'
 import Footer from '@/components/shared/Footer.astro'
 import PageLoader from '@/components/shared/HomePageLoader.astro'
+import {
+  generateHreflangData,
+  getCanonicalUrl,
+  getOpenGraphLocale,
+  type SupportedLanguage,
+} from '@/utils/i18n/helpers'
 
 interface Props {
   pageMetaTitle: string
@@ -18,13 +24,17 @@ const locale = (Astro.currentLocale ?? 'ca') as 'ca' | 'es' | 'en'
 
 // Check if we're on the homepage
 const isHomepage =
-  Astro.url.pathname === '/' ||
-  Astro.url.pathname === '/ca' ||
-  Astro.url.pathname === '/es' ||
-  Astro.url.pathname === '/en'
+  Astro.url.pathname === '/' || Astro.url.pathname === '/en/' || Astro.url.pathname === '/es/'
 
 // Fetch site settings colors with destructuring and direct fallbacks
 const { primaryColor = '#f2f2f2', secondaryColor = '#191919' } = await fetchSiteSettings()
+
+// Generate i18n meta data
+const siteUrl = Astro.site?.toString() || 'https://biombostudio.com'
+const currentPath = Astro.url.pathname
+const hreflangData = generateHreflangData(currentPath, siteUrl)
+const canonicalUrl = getCanonicalUrl(currentPath, locale as SupportedLanguage, siteUrl)
+const ogLocale = getOpenGraphLocale(locale as SupportedLanguage)
 ---
 
 <!doctype html>
@@ -39,6 +49,18 @@ const { primaryColor = '#f2f2f2', secondaryColor = '#191919' } = await fetchSite
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{pageMetaTitle}</title>
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Hreflang Tags for Multi-language Support -->
+    {hreflangData.map((item) => <link rel="alternate" hreflang={item.hreflang} href={item.href} />)}
+
+    <!-- Open Graph Locale -->
+    <meta property="og:locale" content={ogLocale} />
+    {locale !== 'ca' && <meta property="og:locale:alternate" content="ca_ES" />}
+    {locale !== 'en' && <meta property="og:locale:alternate" content="en_US" />}
+    {locale !== 'es' && <meta property="og:locale:alternate" content="es_ES" />}
   </head>
   <body>
     <PageLoader isHomepage={isHomepage} />

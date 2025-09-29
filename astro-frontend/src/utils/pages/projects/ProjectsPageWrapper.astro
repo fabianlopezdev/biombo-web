@@ -1,0 +1,25 @@
+---
+import ProjectsLayout from '@/layouts/pages/ProjectsLayout.astro'
+import { fetchProjectsByLocale } from '@/shared/lib/sanity/queries/projectQueries'
+import { fetchServicesByLocale } from '@/shared/lib/sanity/queries/serviceQueries'
+import type { Locale } from '@/shared/translations/projects'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+
+// Fetch all projects and services for the given locale
+let projects = null
+let services = null
+
+try {
+  projects = await fetchProjectsByLocale(locale)
+  services = await fetchServicesByLocale(locale)
+} catch (error) {
+  console.error(`Error fetching projects/services for locale ${locale}:`, error)
+}
+---
+
+<ProjectsLayout {locale} {projects} {services} />
