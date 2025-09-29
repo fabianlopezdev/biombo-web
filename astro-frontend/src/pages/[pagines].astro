@@ -1,17 +1,15 @@
 ---
-// Dynamic route for all Catalan pages (except homepage and projects)
-import AboutUsLayout from '@/layouts/pages/AboutUs.astro'
-import ServicesLayout from '@/layouts/pages/Services.astro'
-import ContactLayout from '@/layouts/pages/Contact.astro'
-import ProjectsPageWrapper from '@/utils/pages/projects/ProjectsPageWrapper.astro'
-import { getCatalanPageNames, getLayoutForCatalanPage } from '@/shared/config/pageRoutes'
+import PageLayoutRouter from '@/utils/pages/PageLayoutRouter.astro'
+import {
+  getCatalanPageNames,
+  getLayoutForCatalanPage,
+  type CatalanStaticPath,
+} from '@/shared/config/pageRoutes'
 
 export const prerender = true
 
-export async function getStaticPaths() {
-  const validPages = getCatalanPageNames()
-
-  return validPages.map((pagina) => ({
+export async function getStaticPaths(): Promise<CatalanStaticPath[]> {
+  return getCatalanPageNames().map((pagina) => ({
     params: { pagines: pagina },
     props: { pagina, locale: 'ca' },
   }))
@@ -19,20 +17,6 @@ export async function getStaticPaths() {
 
 const { pagina, locale } = Astro.props
 const layout = getLayoutForCatalanPage(pagina)
-
-// Map layout names to actual components
-const layoutComponents = {
-  AboutUs: AboutUsLayout,
-  Services: ServicesLayout,
-  Contact: ContactLayout,
-  ProjectsPageWrapper: ProjectsPageWrapper,
-}
-
-const LayoutComponent = layout ? layoutComponents[layout] : null
-
-if (!LayoutComponent) {
-  return new Response(null, { status: 404, statusText: 'Not found' })
-}
 ---
 
-<LayoutComponent {locale} />
+<PageLayoutRouter {layout} {locale} />

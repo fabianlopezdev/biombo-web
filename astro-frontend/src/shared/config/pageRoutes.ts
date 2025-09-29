@@ -63,3 +63,14 @@ export function getPageNamesForLanguage(lang: string): string[] {
   const langRoutes = otherLanguageRoutes[lang]
   return langRoutes ? Object.keys(langRoutes) : []
 }
+
+// TypeScript types for Astro static paths
+export interface CatalanStaticPath {
+  params: { pagines: string }
+  props: { pagina: string; locale: 'ca' }
+}
+
+export interface OtherLanguageStaticPath {
+  params: { lang: string; pages: string }
+  props: { lang: string; page: string; locale: string }
+}
