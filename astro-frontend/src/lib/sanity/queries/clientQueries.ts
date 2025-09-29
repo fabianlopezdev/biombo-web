@@ -11,14 +11,9 @@ const CLIENT_FIELDS = `
   logo {
     _type,
     asset-> {
-      _id,
-      url,
+      ...,
       metadata {
-        dimensions {
-          width,
-          height,
-          aspectRatio
-        },
+        ...,
         lqip
       }
     },

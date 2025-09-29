@@ -1,4 +1,5 @@
 ---
+import OptimizedImage from '@/components/shared/OptimizedImage.astro'
 import type { Project, Projects } from '@/lib/sanity/schemas/projectSchema'
 import type { Service, Services } from '@/lib/sanity/schemas/serviceSchema'
 import type { Client } from '@/lib/sanity/schemas/clientSchema'
@@ -17,6 +18,14 @@ const getImageUrl = (project: Project): string => {
     return project.thumbnailImage.asset.url
   }
   return project.mainImage?.asset?.url || ''
+}
+
+// Helper function to get image object for blur hash
+const getImageObject = (project: Project) => {
+  if (project.useSeparateThumbnail && project.thumbnailImage) {
+    return project.thumbnailImage
+  }
+  return project.mainImage
 }
 
 // Helper function to get project URL
@@ -80,7 +89,13 @@ const getProjectUrl = (slug: { current: string } | string, locale: string): stri
             <a href={getProjectUrl(project.slug, locale)}>
               <div class="project-image">
                 {getImageUrl(project) && (
-                  <img src={getImageUrl(project)} alt={project.title} loading="lazy" />
+                  <OptimizedImage
+                    src={getImageUrl(project)}
+                    alt={project.title}
+                    image={getImageObject(project)}
+                    loading="lazy"
+                    noWrapper
+                  />
                 )}
               </div>
               <div class="project-info">

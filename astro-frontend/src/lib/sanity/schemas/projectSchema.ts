@@ -69,6 +69,7 @@ const resolvedSanityAssetSchema = z.object({
           aspectRatio: z.number(),
         })
         .optional(),
+      lqip: z.string().optional(), // Add LQIP field
       // other metadata fields
     })
     .optional(),

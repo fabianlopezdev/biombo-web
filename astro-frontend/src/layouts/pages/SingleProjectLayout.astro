@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/shared/BaseLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
 import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
+import OptimizedImage from '@/components/shared/OptimizedImage.astro'
 import { portableTextToHtml } from '@/lib/sanity/utils/portableTextToHtml'
 import { fetchProjectBySlug, fetchProjectsByLocale } from '@/lib/sanity/queries/projectQueries'
 import {
@@ -52,7 +53,14 @@ const projectsBaseUrl = getProjectsListUrl(locale)
 
     <header class="project-header">
       <figure class="hero-figure">
-        <img class="hero-image" src={getImageUrl(project.mainImage)} alt={`${project.title}`} />
+        <OptimizedImage
+          class="hero-image"
+          src={getImageUrl(project.mainImage)}
+          alt={`${project.title}`}
+          image={project.mainImage}
+          loading="eager"
+          noWrapper
+        />
       </figure>
     </header>
 
@@ -129,12 +137,14 @@ const projectsBaseUrl = getProjectsListUrl(locale)
               return (
                 <div class={`content-section ${spacingClass}`}>
                   <figure class="red-background standalone-image">
-                    <img
+                    <OptimizedImage
                       src={getImageUrl(
                         layout.hasFeatured ? section.featuredImage : layout.otherImages[0],
                       )}
                       alt={project.title}
+                      image={layout.hasFeatured ? section.featuredImage : layout.otherImages[0]}
                       loading="lazy"
+                      noWrapper
                     />
                   </figure>
                 </div>
@@ -149,7 +159,13 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                     <div class="two-columns">
                       {layout.otherImages.map((img: ImageWithResolvedAsset) => (
                         <figure class="red-background">
-                          <img src={getImageUrl(img)} alt={project.title} loading="lazy" />
+                          <OptimizedImage
+                            src={getImageUrl(img)}
+                            alt={project.title}
+                            image={img}
+                            loading="lazy"
+                            noWrapper
+                          />
                         </figure>
                       ))}
                     </div>
@@ -168,15 +184,22 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                       <div class="two-columns">
                         {layout.otherImages.map((img: ImageWithResolvedAsset) => (
                           <figure class="red-background">
-                            <img src={getImageUrl(img)} alt={project.title} loading="lazy" />
+                            <OptimizedImage
+                              src={getImageUrl(img)}
+                              alt={project.title}
+                              image={img}
+                              loading="lazy"
+                            />
                           </figure>
                         ))}
                       </div>
                       <figure class="red-background standalone-image-within">
-                        <img
+                        <OptimizedImage
                           src={getImageUrl(section.featuredImage)}
                           alt={project.title}
+                          image={section.featuredImage}
                           loading="lazy"
+                          noWrapper
                         />
                       </figure>
                     </div>
@@ -191,7 +214,12 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                       <div class="three-columns">
                         {layout.otherImages.map((img: ImageWithResolvedAsset) => (
                           <figure class="blue-background">
-                            <img src={getImageUrl(img)} alt={project.title} loading="lazy" />
+                            <OptimizedImage
+                              src={getImageUrl(img)}
+                              alt={project.title}
+                              image={img}
+                              loading="lazy"
+                            />
                           </figure>
                         ))}
                       </div>
@@ -209,15 +237,23 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                     <div class="three-columns">
                       {layout.otherImages.map((img: ImageWithResolvedAsset) => (
                         <figure class="blue-background">
-                          <img src={getImageUrl(img)} alt={project.title} loading="lazy" />
+                          <OptimizedImage
+                            src={getImageUrl(img)}
+                            alt={project.title}
+                            image={img}
+                            loading="lazy"
+                            noWrapper
+                          />
                         </figure>
                       ))}
                     </div>
                     <figure class="red-background standalone-image-within">
-                      <img
+                      <OptimizedImage
                         src={getImageUrl(section.featuredImage)}
                         alt={project.title}
+                        image={section.featuredImage}
                         loading="lazy"
+                        noWrapper
                       />
                     </figure>
                   </div>
@@ -271,6 +307,7 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                   <ProjectCard
                     title={similarProject.title}
                     imageUrl={getImageUrl(thumbnailImage)}
+                    image={thumbnailImage}
                     slug={`${projectsBaseUrl}/${similarProject.slug.current}`}
                     hoverColor={similarProject.hoverColor?.hex || '#272727'}
                     textHoverColor={similarProject.textHoverColor?.hex || '#fff'}

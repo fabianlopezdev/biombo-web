@@ -4,6 +4,7 @@ import { createState } from '@/scripts/slider/slider-state-manager'
 import { initArrowNavigation } from '@/scripts/slider/slider-arrow-navigation'
 import { initProgressBar } from '@/scripts/slider/slider-progress-indicator'
 import { initDragToScroll } from '@/scripts/slider/slider-drag-handler'
+import { initKeyboardNavigation } from '@/scripts/slider/slider-keyboard-navigation'
 
 export type AboutSliderInstance = {
   destroy: () => void
@@ -15,7 +16,12 @@ interface HTMLElementWithSlider extends HTMLElement {
 
 export function initAboutSlider(about: HTMLElementWithSlider, count: number) {
   const state = createState(about, count)
-  const destroyFns = [initArrowNavigation(state), initProgressBar(state), initDragToScroll(state)]
+  const destroyFns = [
+    initArrowNavigation(state),
+    initProgressBar(state),
+    initDragToScroll(state),
+    initKeyboardNavigation(state)
+  ]
 
   /* observe only the slider's parent for removal ----------------- */
   const parent = about.parentNode || document.body

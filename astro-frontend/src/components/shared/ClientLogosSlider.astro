@@ -1,4 +1,5 @@
 ---
+import OptimizedImage from '@/components/shared/OptimizedImage.astro'
 import { fetchFeaturedClients } from '@/lib/sanity/queries/clientQueries'
 
 interface Props {
@@ -55,23 +56,23 @@ const mobileAnimationDuration = mobileSpeedMap[speed]
                   rel="noopener noreferrer"
                   aria-label={`Visit ${client.name} website`}
                 >
-                  <img
+                  <OptimizedImage
                     src={client.logo?.asset?.url}
                     alt={`${client.name} logo`}
+                    image={client.logo}
                     width={client.logo?.asset?.metadata?.dimensions?.width ?? 200}
                     height={client.logo?.asset?.metadata?.dimensions?.height ?? 100}
                     loading="lazy"
-                    decoding="async"
                   />
                 </a>
               ) : (
-                <img
+                <OptimizedImage
                   src={client.logo?.asset?.url}
                   alt={`${client.name} logo`}
+                  image={client.logo}
                   width={client.logo?.asset?.metadata?.dimensions?.width ?? 200}
                   height={client.logo?.asset?.metadata?.dimensions?.height ?? 100}
                   loading="lazy"
-                  decoding="async"
                 />
               )}
             </div>

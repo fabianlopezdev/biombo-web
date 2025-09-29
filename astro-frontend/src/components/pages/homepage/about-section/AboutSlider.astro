@@ -95,6 +95,26 @@ const imageWidth = 29.495
     cursor: grabbing;
   }
 
+  /* Keyboard focus styles */
+  .slider:focus {
+    outline: none;
+  }
+
+  .slider.keyboard-focused {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: 0.621875rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slider {
+      scroll-behavior: auto !important;
+    }
+    .slider__indicator {
+      transition: none !important;
+    }
+  }
+
   /* Add spacer for proper last image snap on scrollable sliders */
   .slider:not(.no-scroll)::after {
     content: '';

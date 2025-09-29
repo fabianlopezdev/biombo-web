@@ -1,10 +1,12 @@
 ---
 import CustomCursor from '@/components/shared/CustomCursor.astro'
+import OptimizedImage from '@/components/shared/OptimizedImage.astro'
 
 interface Props {
   title: string
   imageUrl: string
   imageAlt?: string
+  image?: any // Sanity image object with metadata for blur hash
   slug: string
   hoverColor?: string
   textHoverColor?: string
@@ -18,6 +20,7 @@ const {
   title,
   imageUrl,
   imageAlt = title,
+  image,
   slug,
   hoverColor = '#272727',
   textHoverColor = '#fff',
@@ -49,10 +52,11 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
     aria-label={`${title}${clients ? ` - ${clients}` : ''} - Veure detalls del projecte`}
   >
     <figure class="project-figure">
-      <img
+      <OptimizedImage
         id={imageId}
         src={imageUrl}
         alt={imageAlt}
+        image={image}
         class="project-image"
         loading="lazy"
         aria-describedby={mobileInfoId}

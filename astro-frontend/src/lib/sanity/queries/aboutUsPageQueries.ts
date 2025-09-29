@@ -38,15 +38,10 @@ const ABOUT_US_PAGE_FIELDS = `
       _type,
       hotspot { x, y, height, width },
       crop { top, bottom, left, right },
-      asset->{
-        _id,
-        url,
+      asset-> {
+        ...,
         metadata {
-          dimensions {
-            width,
-            height,
-            aspectRatio
-          },
+          ...,
           lqip
         }
       }

@@ -43,11 +43,23 @@ export async function fetchProjectBySlug(
       slug,
       mainImage {
         ...,
-        asset->
+        asset-> {
+          ...,
+          metadata {
+            ...,
+            lqip
+          }
+        }
       },
       thumbnailImage {
         ...,
-        asset->
+        asset-> {
+          ...,
+          metadata {
+            ...,
+            lqip
+          }
+        }
       },
       useSeparateThumbnail,
       hoverColor { hex },
@@ -76,11 +88,23 @@ export async function fetchProjectBySlug(
         // For imageSection
         featuredImage {
           ...,
-          asset->
+          asset-> {
+            ...,
+            metadata {
+              ...,
+              lqip
+            }
+          }
         },
         otherImages[] {
           ...,
-          asset->
+          asset-> {
+            ...,
+            metadata {
+              ...,
+              lqip
+            }
+          }
         }
       },
       publishDate
@@ -262,11 +286,23 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
       slug,
       mainImage {
         ...,
-        asset->
+        asset-> {
+          ...,
+          metadata {
+            ...,
+            lqip
+          }
+        }
       },
       thumbnailImage {
         ...,
-        asset->
+        asset-> {
+          ...,
+          metadata {
+            ...,
+            lqip
+          }
+        }
       },
       useSeparateThumbnail,
       hoverColor { hex },

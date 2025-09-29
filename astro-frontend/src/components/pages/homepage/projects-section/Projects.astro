@@ -1,5 +1,6 @@
 ---
 import ScrollPill from '@/components/shared/ScrollPill.astro'
+import OptimizedImage from '@/components/shared/OptimizedImage.astro'
 import type {
   ProjectsSection as SanityProjectsSectionType,
   FeaturedProjectItem,
@@ -41,6 +42,9 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
       const rawItem = rawFeaturedProjects[i] // rawItem is now FeaturedProjectItem | undefined
       const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
 
+      // Get the image object for blur hash (prefer thumbnail over main image)
+      const imageObject = rawItem?.project?.thumbnailImage || rawItem?.project?.mainImage
+
       // Add a class for odd/even styling if needed, or handle directly in CSS
       const projectNumber = i + 1
       const directionClass = projectNumber % 2 !== 0 ? 'reveal-from-top' : 'reveal-from-bottom'
@@ -59,12 +63,14 @@ class="project-image"
 loading={i === 0 || i === 1 ? 'eager' : 'lazy'}
 inferSize
 /> */}
-              {/* Temporary img tag for SSR - remove when switching to SSG */}
-              <img
+              {/* Using OptimizedImage with blur hash support - no wrapper for hover events */}
+              <OptimizedImage
                 src={project.image}
                 alt={project.alt || project.title || `Project ${projectNumber}`}
+                image={imageObject}
                 class="project-image"
                 loading={i === 0 || i === 1 ? 'eager' : 'lazy'}
+                noWrapper
               />
               <div class="project-caption">
                 <figcaption class="caption-text">

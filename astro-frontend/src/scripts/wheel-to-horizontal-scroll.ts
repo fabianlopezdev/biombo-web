@@ -94,6 +94,55 @@ registerScript('horizontalScroll', () => {
     }
   }
 
+  const handleKeydown = (e: KeyboardEvent): void => {
+    // Only handle vertical arrow keys
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+
+    // Early return for mobile viewports
+    if (window.innerWidth < MOBILE_BREAKPOINT) return
+
+    // Cache getBoundingClientRect calls for performance
+    const now = Date.now()
+    if (!cachedRect || now - rectCacheTime > RECT_CACHE_DURATION) {
+      cachedRect = container.getBoundingClientRect()
+      rectCacheTime = now
+    }
+    const rect = cachedRect
+
+    const { scrollLeft, clientWidth, scrollWidth } = container
+    const atLeftEdge = scrollLeft <= SCROLL_TOLERANCE
+    const atRightEdge = scrollLeft + clientWidth >= scrollWidth - SCROLL_TOLERANCE
+    const atNominalTop = Math.abs(rect.top - headerHeight) < NOMINAL_TOP_TOLERANCE
+
+    // Define scroll amount for arrow keys (similar to typical browser behavior)
+    const ARROW_SCROLL_AMOUNT = 100
+
+    // Handle ArrowDown - scroll right in horizontal container
+    if (e.key === 'ArrowDown') {
+      // Check if we should handle this event
+      if (rect.top > headerHeight + NOMINAL_TOP_TOLERANCE || atRightEdge) return
+
+      e.preventDefault()
+      container.scrollBy({
+        left: ARROW_SCROLL_AMOUNT,
+        behavior: 'smooth'
+      })
+      return
+    }
+
+    // Handle ArrowUp - scroll left in horizontal container
+    if (e.key === 'ArrowUp') {
+      // Check if we should handle this event
+      if (!atNominalTop || atLeftEdge) return
+
+      e.preventDefault()
+      container.scrollBy({
+        left: -ARROW_SCROLL_AMOUNT,
+        behavior: 'smooth'
+      })
+    }
+  }
+
   // Use throttle utility from domUtils
   const handleResize = throttle(() => {
     updateHeaderHeight()
@@ -103,14 +152,17 @@ registerScript('horizontalScroll', () => {
 
   // Event listeners with proper options
   const wheelOptions: AddEventListenerOptions = { passive: false, capture: false }
+  const keydownOptions: AddEventListenerOptions = { passive: false, capture: false }
   const resizeOptions: AddEventListenerOptions = { passive: true }
 
   container.addEventListener('wheel', handleWheel, wheelOptions)
+  document.addEventListener('keydown', handleKeydown, keydownOptions)
   window.addEventListener('resize', handleResize, resizeOptions)
 
   // Register cleanup
   const cleanup = () => {
     container.removeEventListener('wheel', handleWheel)
+    document.removeEventListener('keydown', handleKeydown)
     window.removeEventListener('resize', handleResize)
     // Clear cache
     cachedRect = null

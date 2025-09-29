@@ -1,4 +1,6 @@
 ---
+import OptimizedImage from '@/components/shared/OptimizedImage.astro'
+
 const { image } = Astro.props
 ---
 
@@ -17,12 +19,13 @@ const { image } = Astro.props
   loading="lazy"
 /> */
 }
-{/* Temporary img tag for SSR - remove when switching to SSG */}
-<img
+{/* Using OptimizedImage with blur hash support */}
+<OptimizedImage
   src={image.asset.url}
   alt=""
   style="border-start-start-radius: 0.621875rem; border-end-start-radius: 0.621875rem;"
   class="slider__img"
+  image={image}
   width={image.asset.metadata?.dimensions.width ?? 600}
   height={image.asset.metadata?.dimensions.height ?? 800}
   loading="lazy"
