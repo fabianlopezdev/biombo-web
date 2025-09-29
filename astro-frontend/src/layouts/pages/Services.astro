@@ -1,9 +1,9 @@
 ---
 import InternalPageLayout from '@/layouts/shared/InternalPageLayout.astro'
 import ServicesList from '@/components/shared/ServicesList.astro'
-import { fetchServicesPageByLocale } from '@/shared/lib/sanity/queries/servicesPageQueries'
-import type { ServicesPage } from '@/shared/schemas/sanity/servicesPageSchema'
-import { portableTextToHtmlForPageSection } from '@/shared/lib/sanity/utils/portableTextToHtml'
+import { fetchServicesPageByLocale } from '@/lib/sanity/queries/servicesPageQueries'
+import type { ServicesPage } from '@/lib/sanity/schemas/servicesPageSchema'
+import { portableTextToHtmlForPageSection } from '@/lib/sanity/utils/portableTextToHtml'
 
 const { locale } = Astro.props
 

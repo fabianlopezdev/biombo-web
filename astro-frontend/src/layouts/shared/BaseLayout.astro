@@ -1,7 +1,7 @@
 ---
 import '@/styles/global.css'
 import HeaderSVGHover from '@/assets/header-hover-page.svg?raw'
-import { fetchSiteSettings } from '@/shared/lib/sanity/queries/siteSettingsQueries'
+import { fetchSiteSettings } from '@/lib/sanity/queries/siteSettingsQueries'
 import Header from '@/components/shared/header/Header.astro'
 import Footer from '@/components/shared/Footer.astro'
 import PageLoader from '@/components/shared/HomePageLoader.astro'
@@ -10,7 +10,7 @@ import {
   getCanonicalUrl,
   getOpenGraphLocale,
   type SupportedLanguage,
-} from '@/utils/i18n/helpers'
+} from '@/helpers/i18n/helpers'
 
 interface Props {
   pageMetaTitle: string

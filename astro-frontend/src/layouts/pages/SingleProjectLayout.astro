@@ -3,19 +3,16 @@ import BaseLayout from '@/layouts/shared/BaseLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
 import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
-import { portableTextToHtml } from '@/shared/lib/sanity/utils/portableTextToHtml'
-import {
-  fetchProjectBySlug,
-  fetchProjectsByLocale,
-} from '@/shared/lib/sanity/queries/projectQueries'
+import { portableTextToHtml } from '@/lib/sanity/utils/portableTextToHtml'
+import { fetchProjectBySlug, fetchProjectsByLocale } from '@/lib/sanity/queries/projectQueries'
 import {
   getSimilarProjects,
   getImageUrl,
   getImageSectionLayout,
-} from '@/utils/pages/projects/projectHelpers'
-import { getProjectTranslations } from '@/shared/translations/projectDetail'
-import { getProjectsListUrl, type SupportedLocale } from '@/shared/config/projectRoutes'
-import type { Project, ImageWithResolvedAsset } from '@/shared/schemas/sanity/projectSchema'
+} from '@/helpers/projects/projectHelpers'
+import { getProjectTranslations } from '@/config/i18n/projectDetail'
+import { getProjectsListUrl, type SupportedLocale } from '@/config/routing/projectRoutes'
+import type { Project, ImageWithResolvedAsset } from '@/lib/sanity/schemas/projectSchema'
 
 interface Props {
   slug: string

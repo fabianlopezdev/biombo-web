@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@/layouts/shared/BaseLayout.astro'
-import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
-import { fetchHomePageByLocale } from '@/shared/lib/sanity/queries/homePageQueries'
+import type { HomePage } from '@/lib/sanity/schemas/homePageSchema'
+import { fetchHomePageByLocale } from '@/lib/sanity/queries/homePageQueries'
 import Projects, {
   type ResolvedProjectsSectionData,
 } from '@/components/pages/homepage/projects-section/Projects.astro'

@@ -2,10 +2,10 @@
 import BaseLayout from '@/layouts/shared/BaseLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
-import { projectsTranslations, getProjectUrl, type Locale } from '@/shared/translations/projects'
-import type { Project } from '@/shared/schemas/sanity/projectSchema'
-import type { Service } from '@/shared/schemas/sanity/serviceSchema'
-import type { Client } from '@/shared/schemas/sanity/clientSchema'
+import { projectsTranslations, getProjectUrl, type Locale } from '@/config/i18n/projects'
+import type { Project } from '@/lib/sanity/schemas/projectSchema'
+import type { Service } from '@/lib/sanity/schemas/serviceSchema'
+import type { Client } from '@/lib/sanity/schemas/clientSchema'
 
 interface Props {
   locale: Locale

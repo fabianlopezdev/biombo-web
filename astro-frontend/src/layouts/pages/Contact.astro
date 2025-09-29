@@ -2,8 +2,8 @@
 import InternalPageLayout from '@/layouts/shared/InternalPageLayout.astro'
 import ContactForm from '@/components/shared/ContactForm.astro'
 import ContactStudio from '@/components/shared/ContactStudio.astro'
-import { fetchContactPageByLocale } from '@/shared/lib/sanity/queries/contactPageQueries'
-import type { ContactPage } from '@/shared/schemas/sanity/contactPageSchema'
+import { fetchContactPageByLocale } from '@/lib/sanity/queries/contactPageQueries'
+import type { ContactPage } from '@/lib/sanity/schemas/contactPageSchema'
 
 const { locale } = Astro.props
 

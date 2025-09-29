@@ -13,7 +13,9 @@
       "@/features/*": ["src/features/*"],
       "@/layouts/*": ["src/layouts/*"],
       "@/pages/*": ["src/pages/*"],
-      "@/shared/*": ["src/shared/*"],
+      "@/lib/*": ["src/lib/*"],
+      "@/config/*": ["src/config/*"],
+      "@/helpers/*": ["src/helpers/*"],
       "@/utils/*": ["src/utils/*"],
       "@/styles/*": ["src/styles/*"],
       "@/scripts/*": ["src/scripts/*"]

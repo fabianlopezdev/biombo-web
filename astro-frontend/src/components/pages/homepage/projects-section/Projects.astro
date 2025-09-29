@@ -3,8 +3,8 @@ import ScrollPill from '@/assets/ScrollPill.astro'
 import type {
   ProjectsSection as SanityProjectsSectionType,
   FeaturedProjectItem,
-} from '@/shared/schemas/sanity/homePageSchema'
-import { transformProject } from '@/utils/pages/homepage/projectsUtils'
+} from '@/lib/sanity/schemas/homePageSchema'
+import { transformProject } from '@/helpers/projects/projectsUtils'
 import CustomCursor from '../CustomCursor.astro'
 import ProjectsTitle from './ProjectsTitle.astro'
 // This interface reflects that Sanity/astro-sanity likely resolves localeStrings to simple strings by the time they reach the component.

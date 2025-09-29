@@ -1,7 +1,7 @@
 ---
 import HighlightScribble from '@/assets/HighlightScribble.astro'
 import WhiteUpArrow from '@/assets/white-up-arrow.svg?raw'
-import { fetchFooter } from '@/shared/lib/sanity/queries/footerQueries'
+import { fetchFooter } from '@/lib/sanity/queries/footerQueries'
 
 const currentYear = new Date().getFullYear()
 const locale = (Astro.currentLocale as 'ca' | 'es' | 'en') || 'ca'

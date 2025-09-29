@@ -1,12 +1,12 @@
 ---
 // Imports ────────────────────────────────────────────────────────────────────
-import { fetchHeader } from '@/shared/lib/sanity/queries/headerQueries'
-import type { Header, NavigationPage } from '@/shared/schemas/sanity/headerSchema'
+import { fetchHeader } from '@/lib/sanity/queries/headerQueries'
+import type { Header, NavigationPage } from '@/lib/sanity/schemas/headerSchema'
 import LanguageSwitcher from '@/components/shared/header/LanguageSwitcher.astro'
 import HeaderLogo from './HeaderLogo.astro'
 import PagesNavigation from './PagesNavigation.astro'
 import MobileMenu from './MobileMenu.astro'
-import { getLanguageSwitcherData, type SupportedLanguage } from '@/utils/i18n/helpers'
+import { getLanguageSwitcherData, type SupportedLanguage } from '@/helpers/i18n/helpers'
 
 const { locale } = Astro.props
 

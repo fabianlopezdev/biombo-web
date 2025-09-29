@@ -1,11 +1,8 @@
 ---
 import HighlightScribble from '@/assets/HighlightScribble.astro'
 import ScrollPill from '@/assets/ScrollPill.astro'
-import {
-  splitBoldSegments,
-  splitBoldSegmentsByLine,
-} from '@/utils/pages/homepage/parseBoldMarkdown'
-import type { HomePage } from '@/shared/schemas/sanity/homePageSchema'
+import { splitBoldSegments, splitBoldSegmentsByLine } from '@/helpers/content/parseBoldMarkdown'
+import type { HomePage } from '@/lib/sanity/schemas/homePageSchema'
 
 interface Props {
   heroData: HomePage['hero'] | Record<string, never> // HomePage['hero'] is SanityHeroSectionType | null

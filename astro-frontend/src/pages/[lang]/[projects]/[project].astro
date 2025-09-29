@@ -1,7 +1,7 @@
 ---
 import SingleProjectLayout from '@/layouts/pages/SingleProjectLayout.astro'
-import { fetchProjectsByLocale } from '@/shared/lib/sanity/queries/projectQueries'
-import type { SupportedLocale } from '@/shared/config/projectRoutes'
+import { fetchProjectsByLocale } from '@/lib/sanity/queries/projectQueries'
+import type { SupportedLocale } from '@/config/routing/projectRoutes'
 
 export const prerender = true
 
