@@ -1,5 +1,6 @@
 ---
 import ProjectMobileInfo from '@/components/shared/ProjectMobileInfo.astro'
+import OptimizedImage from '@/components/shared/OptimizedImage.astro'
 import { getProjectUrl } from '@/config/i18n/projects'
 
 export interface ProjectCardProps {
@@ -8,6 +9,7 @@ export interface ProjectCardProps {
   hoverColor?: string
   textHoverColor?: string
   image?: string
+  imageObject?: any
   alt?: string
   title?: string
   clients?: string
@@ -21,6 +23,7 @@ const {
   hoverColor = 'transparent',
   textHoverColor = 'inherit',
   image,
+  imageObject,
   alt,
   title,
   clients,
@@ -37,17 +40,17 @@ const {
       style={`--hover-bg-color: ${hoverColor}; --hover-text-color: ${textHoverColor};`}
     >
       <div class="project-image-wrapper">
-        <img
+        <OptimizedImage
           src={image}
           alt={alt || title || `Project ${projectNumber}`}
+          image={imageObject}
           class="project-image"
           loading={loading}
+          noWrapper
+          skipDimensions
         />
       </div>
-      <ProjectMobileInfo
-        title={title || `Project ${projectNumber}`}
-        subtitle={clients}
-      />
+      <ProjectMobileInfo title={title || `Project ${projectNumber}`} subtitle={clients} />
     </a>
   ) : null
 }

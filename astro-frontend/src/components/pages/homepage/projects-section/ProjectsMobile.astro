@@ -39,6 +39,9 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
           const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
           const projectNumber = i + 1
 
+          // Get the image object for blur hash (prefer thumbnail over main image)
+          const imageObject = rawItem?.project?.thumbnailImage || rawItem?.project?.mainImage
+
           return (
             <ProjectCard
               slug={project.slug}
@@ -46,6 +49,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
               hoverColor={project.hoverColor}
               textHoverColor={project.textHoverColor}
               image={project.image}
+              imageObject={imageObject}
               alt={project.alt}
               title={project.title}
               clients={project.clients}
