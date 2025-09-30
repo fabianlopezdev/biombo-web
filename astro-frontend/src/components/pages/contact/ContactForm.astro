@@ -14,12 +14,28 @@ const { formSection } = Astro.props
 ---
 
 <script src="@/scripts/auto-expanding-textarea.ts"></script>
+<script src="@/scripts/contact-form-handler.ts"></script>
 
 {
   formSection && formSection.formFields && (
     <div class="contact-form-section">
       <h2 class="form-title">{formSection.formTitle}</h2>
-      <form class="contact-form" method="POST" action="/api/contact">
+      <form
+        class="contact-form"
+        method="POST"
+        name="contact"
+        action="/contact"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+      >
+        <input type="hidden" name="form-name" value="contact" />
+        <input type="hidden" name="bot-field" style="display:none" />
+        <input
+          type="hidden"
+          name="subject"
+          value="New contact from %{formName} - %{submissionId}"
+        />
+
         {formSection.formFields.map((field: FormField) => (
           <div class="form-group" key={field._key}>
             {field.fieldType === 'message' ? (
@@ -51,6 +67,8 @@ const { formSection } = Astro.props
           </div>
         ))}
 
+        <div data-netlify-recaptcha="true" />
+
         <PillButton
           text={formSection.submitButtonText}
           type="submit"
@@ -70,6 +88,26 @@ const { formSection } = Astro.props
     font-size: inherit;
     margin-bottom: 2.5rem;
     font-weight: inherit;
+  }
+
+  .form-message {
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    transition: opacity 0.3s ease;
+  }
+
+  .form-message--success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .form-message--error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
   }
 
   .contact-form {

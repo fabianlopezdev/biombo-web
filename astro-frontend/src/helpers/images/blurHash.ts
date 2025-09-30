@@ -92,29 +92,6 @@ export function hasBlurHash(image: SanityImageAsset): boolean {
 }
 
 /**
- * Get image dimensions from Sanity image object
- * @param image - Sanity image object
- * @returns Object with width, height, and aspectRatio or null
- */
-export function getImageDimensions(image: SanityImageAsset): {
-  width: number
-  height: number
-  aspectRatio: number
-} | null {
-  const dimensions = image?.asset?.metadata?.dimensions || image?.metadata?.dimensions || null
-
-  if (!dimensions || !dimensions.width || !dimensions.height) {
-    return null
-  }
-
-  return {
-    width: dimensions.width,
-    height: dimensions.height,
-    aspectRatio: dimensions.aspectRatio || dimensions.width / dimensions.height,
-  }
-}
-
-/**
  * Create a wrapper div style for blur placeholder
  * @param aspectRatio - Optional aspect ratio for the container
  * @returns Style object for the wrapper

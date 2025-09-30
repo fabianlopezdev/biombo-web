@@ -55,7 +55,10 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
           style={`--hover-bg-color: ${project.hoverColor || 'transparent'}; --hover-text-color: ${project.textHoverColor || 'inherit'};`}
         >
           {project.image && (
-            <a href={project.slug ? getProjectUrl(project.slug, currentLang) : '#'} class="project-link">
+            <a
+              href={project.slug ? getProjectUrl(project.slug, currentLang) : '#'}
+              class="project-link"
+            >
               {/* TODO: Uncomment Image component when switching to SSG
 <Image
 src={project.image}
@@ -64,14 +67,13 @@ class="project-image"
 loading={i === 0 || i === 1 ? 'eager' : 'lazy'}
 inferSize
 /> */}
-              {/* Using OptimizedImage with blur hash support - no wrapper for hover events */}
+              {/* Using OptimizedImage with blur hash support */}
               <OptimizedImage
                 src={project.image}
                 alt={project.alt || project.title || `Project ${projectNumber}`}
                 image={imageObject}
                 class="project-image"
                 loading={i === 0 || i === 1 ? 'eager' : 'lazy'}
-                noWrapper
               />
               <div class="project-caption">
                 <figcaption class="caption-text">

@@ -1,10 +1,5 @@
 ---
-import {
-  getBlurHashStyles,
-  getBlurHashStyleString,
-  hasBlurHash,
-  getImageDimensions
-} from '@/helpers/images/blurHash'
+import { getBlurHashFromImage, hasBlurHash } from '@/helpers/images/blurHash'
 
 interface Props {
   src: string
@@ -12,13 +7,9 @@ interface Props {
   image?: any // Sanity image object with metadata
   class?: string
   loading?: 'lazy' | 'eager'
-  width?: number | string
-  height?: number | string
   style?: string
   id?: string
   'aria-describedby'?: string
-  noWrapper?: boolean // When true, applies blur directly to img without wrapper
-  skipDimensions?: boolean // When true, doesn't add width/height attributes (for images that need to fill containers)
 }
 
 const {
@@ -27,178 +18,81 @@ const {
   image,
   class: className = '',
   loading = 'lazy',
-  width,
-  height,
   style = '',
   id,
   'aria-describedby': ariaDescribedBy,
-  noWrapper = false,
-  skipDimensions = false,
 } = Astro.props
 
-// Get blur hash styles if available
-const blurStyles = image ? getBlurHashStyles(image) : null
-const blurStyleString = getBlurHashStyleString(blurStyles)
+// Get LQIP and blur status
 const hasBlur = hasBlurHash(image)
-
-// Get dimensions from image metadata if not provided
-const dimensions = image ? getImageDimensions(image) : null
-const finalWidth = width || dimensions?.width
-const finalHeight = height || dimensions?.height
+const lqip = image ? getBlurHashFromImage(image) : null
 
 // Generate unique ID for this image instance
 const imageId = id || `optimized-image-${Math.random().toString(36).substr(2, 9)}`
 
-// For no-wrapper mode, we'll use a data attribute to apply blur via CSS
-const imgClass = noWrapper
-  ? `blur-image-nowrap ${className} ${hasBlur ? 'has-blur-direct' : ''}`
-  : `blur-image ${className}`
+// Build class list for wrapper (receives className from parent)
+const wrapperClass = `optimized-image-wrapper ${className}`
+
+// Build blur layer style
+const blurStyle = lqip
+  ? `background-image: url(${lqip}); background-size: cover; background-position: center;`
+  : ''
+
+// Image gets the style prop (for things like object-fit, etc)
+const imgStyle = style
 ---
 
-{noWrapper ? (
+<script src="@/scripts/optimized-image-loader.ts"></script>
+
+<div class={wrapperClass}>
+  {hasBlur && <div class="blur-layer" style={blurStyle} aria-hidden="true" />}
   <img
     id={id}
     src={src}
     alt={alt}
-    class={imgClass}
+    class="optimized-image"
     loading={loading}
-    width={skipDimensions ? undefined : finalWidth}
-    height={skipDimensions ? undefined : finalHeight}
-    style={style}
+    style={imgStyle}
     aria-describedby={ariaDescribedBy}
     data-blur-image={imageId}
-    data-blur-hash={hasBlur ? blurStyleString : undefined}
   />
-) : (
-  <div class={`blur-image-wrapper ${hasBlur ? 'has-blur' : ''}`} data-image-id={imageId}>
-    {hasBlur && (
-      <div
-        class="blur-placeholder"
-        style={blurStyleString}
-        aria-hidden="true"
-      />
-    )}
-    <img
-      id={id}
-      src={src}
-      alt={alt}
-      class={`blur-image ${className}`}
-      loading={loading}
-      width={skipDimensions ? undefined : finalWidth}
-      height={skipDimensions ? undefined : finalHeight}
-      style={style}
-      aria-describedby={ariaDescribedBy}
-      data-blur-image={imageId}
-    />
-  </div>
-)}
+</div>
 
-<script>
-  // Handle image loading for all optimized images
-  document.addEventListener('DOMContentLoaded', () => {
-    const images = document.querySelectorAll('.blur-image, .blur-image-nowrap') as NodeListOf<HTMLImageElement>
-
-    images.forEach((img) => {
-      // Check if already loaded (cached images)
-      if (img.complete && img.naturalHeight !== 0) {
-        img.classList.add('loaded')
-        img.closest('.blur-image-wrapper')?.classList.add('image-loaded')
-      } else {
-        // Add load listener for images still loading
-        img.addEventListener('load', function() {
-          this.classList.add('loaded')
-          this.closest('.blur-image-wrapper')?.classList.add('image-loaded')
-        }, { once: true })
-
-        // Handle error case
-        img.addEventListener('error', function() {
-          this.classList.add('loaded') // Still fade in even on error
-          this.closest('.blur-image-wrapper')?.classList.add('image-loaded')
-        }, { once: true })
-      }
-    })
-  })
-</script>
-
-<style>
-  .blur-image-wrapper {
-    position: relative;
-    overflow: hidden;
-    /* Inherit dimensions from parent or image */
-    display: inline-block;
+<style is:global>
+  /* Wrapper is layout-neutral - takes space exactly like img would */
+  .optimized-image-wrapper {
     width: 100%;
     height: 100%;
-    /* Allow pointer events to pass through to children */
-    pointer-events: none;
+    position: relative;
+    display: block;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    pointer-events: none; /* Don't block hover/click events */
   }
 
-  /* But ensure the image itself can receive events */
-  .blur-image-wrapper .blur-image {
-    pointer-events: auto;
-  }
-
-  .blur-placeholder {
+  /* Blur layer sits behind the image */
+  .optimized-image-wrapper .blur-layer {
     position: absolute;
     inset: 0;
-    z-index: 1;
-    transform: scale(1.1); /* Slightly scale up to avoid edges */
-    transition: opacity 0.4s ease-out;
-    will-change: opacity;
+    z-index: 0;
+    pointer-events: none; /* Don't block hover/click events */
   }
 
-  .blur-image {
-    position: relative;
-    z-index: 2;
-    display: block;
+  /* Image fills wrapper and starts transparent */
+  .optimized-image-wrapper .optimized-image {
     width: 100%;
     height: 100%;
-    opacity: 0;
-    transition: opacity 0.4s ease-in;
-    will-change: opacity;
-  }
-
-  /* When image is loaded */
-  .blur-image.loaded {
-    opacity: 1;
-  }
-
-  /* Styles for noWrapper mode - minimal styles to avoid breaking other functionality */
-  .blur-image-nowrap {
     display: block;
-    height: 100%; /* Needed for filling containers */
-    opacity: 0; /* For blur effect fade-in */
-    transition: opacity 0.4s ease-in;
-    will-change: opacity;
-  }
-
-  .blur-image-nowrap.loaded {
-    opacity: 1;
-  }
-
-  .image-loaded .blur-placeholder {
+    position: relative;
+    z-index: 1;
     opacity: 0;
-    pointer-events: none;
+    transition: opacity 400ms ease-in-out;
+    pointer-events: auto; /* Allow image to receive events */
   }
 
-  /* For images without blur hash, show immediately */
-  .blur-image-wrapper:not(.has-blur) .blur-image {
+  /* When loaded, fade in */
+  .optimized-image-wrapper .optimized-image[data-loaded='true'] {
     opacity: 1;
-  }
-
-  /* For noWrapper images without blur hash, show immediately */
-  .blur-image-nowrap:not(.has-blur-direct) {
-    opacity: 1;
-  }
-
-  /* Respect reduced motion preference */
-  @media (prefers-reduced-motion: reduce) {
-    .blur-placeholder,
-    .blur-image {
-      transition: none !important;
-    }
-
-    .blur-image {
-      opacity: 1 !important;
-    }
   }
 </style>

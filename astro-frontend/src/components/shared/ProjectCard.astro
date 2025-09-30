@@ -60,7 +60,6 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
         class="project-image"
         loading="lazy"
         aria-describedby={mobileInfoId}
-        noWrapper
       />
       <figcaption class="project-caption">
         <span class="caption-text" id={projectId ? `project-${projectId}-title` : undefined}>
@@ -118,7 +117,7 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
     height: 100%;
   }
 
-  .project-image {
+  :global(.project-image) {
     width: 100%;
     height: 100%;
     object-fit: cover;

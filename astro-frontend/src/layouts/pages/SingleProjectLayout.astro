@@ -58,13 +58,12 @@ const projectsBaseUrl = getProjectsListUrl(locale)
           alt={`${project.title}`}
           image={project.mainImage}
           loading="eager"
-          noWrapper
         />
       </figure>
     </header>
 
     <article class="project-content">
-      <TwoColumnLayout noTopMargin noPaddingHorizontal>
+      <TwoColumnLayout noPaddingHorizontal>
         <aside
           slot="first-column"
           class="project-metadata"
@@ -143,8 +142,6 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                       alt={project.title}
                       image={layout.hasFeatured ? section.featuredImage : layout.otherImages[0]}
                       loading="lazy"
-                      noWrapper
-                      skipDimensions
                     />
                   </figure>
                 </div>
@@ -164,7 +161,6 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                             alt={project.title}
                             image={img}
                             loading="lazy"
-                            noWrapper
                           />
                         </figure>
                       ))}
@@ -189,8 +185,7 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                               alt={project.title}
                               image={img}
                               loading="lazy"
-                              noWrapper
-                              skipDimensions
+                              class="blue-background"
                             />
                           </figure>
                         ))}
@@ -201,8 +196,7 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                           alt={project.title}
                           image={section.featuredImage}
                           loading="lazy"
-                          noWrapper
-                          skipDimensions
+                          class="red-background standalone-image-within"
                         />
                       </figure>
                     </div>
@@ -222,8 +216,7 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                               alt={project.title}
                               image={img}
                               loading="lazy"
-                              noWrapper
-                              skipDimensions
+                              class="blue-background"
                             />
                           </figure>
                         ))}
@@ -247,7 +240,7 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                             alt={project.title}
                             image={img}
                             loading="lazy"
-                            noWrapper
+                            class="blue-background"
                           />
                         </figure>
                       ))}
@@ -258,7 +251,7 @@ const projectsBaseUrl = getProjectsListUrl(locale)
                         alt={project.title}
                         image={section.featuredImage}
                         loading="lazy"
-                        noWrapper
+                        class="red-background standalone-image-within"
                       />
                     </figure>
                   </div>
@@ -352,6 +345,10 @@ const projectsBaseUrl = getProjectsListUrl(locale)
     display: none;
   }
 
+  .project-header {
+    margin-block-end: var(--padding-block);
+  }
+
   .section-titles {
     font-weight: var(--font-weight-semibold);
   }
@@ -367,7 +364,7 @@ const projectsBaseUrl = getProjectsListUrl(locale)
     object-fit: cover;
     aspect-ratio: 1513/722;
     margin-inline: calc(-1 * var(--padding-inline));
-    padding-block-start: var(--padding-block);
+    margin-block-start: var(--padding-block);
   }
 
   .padding-bottom {
@@ -414,9 +411,9 @@ const projectsBaseUrl = getProjectsListUrl(locale)
     aspect-ratio: 217/328;
   }
 
-  .red-background img,
-  .blue-background img,
-  .standalone-image img {
+  .red-background :global(img),
+  .blue-background :global(img),
+  .standalone-image :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;

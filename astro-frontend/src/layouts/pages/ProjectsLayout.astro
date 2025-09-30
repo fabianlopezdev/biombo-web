@@ -26,6 +26,14 @@ const getImageUrl = (project: Project): string => {
   return project.mainImage?.asset?.url || '/projects-mock.jpg'
 }
 
+// Helper function to get image object for blur hash
+const getImageObject = (project: Project) => {
+  if (project.thumbnailImage) {
+    return project.thumbnailImage
+  }
+  return project.mainImage
+}
+
 // Helper function to get project slug
 const getProjectSlug = (slug: { current: string } | string): string => {
   return typeof slug === 'string' ? slug : slug?.current || ''
@@ -90,6 +98,7 @@ const getProjectSlug = (slug: { current: string } | string): string => {
                 <ProjectCard
                   title={project.title}
                   imageUrl={getImageUrl(project)}
+                  image={getImageObject(project)}
                   slug={getProjectUrl(getProjectSlug(project.slug), locale)}
                   hoverColor={project.hoverColor?.hex || '#63b2d5'}
                   textHoverColor={project.textHoverColor?.hex || '#ffffff'}
@@ -210,7 +219,7 @@ const getProjectSlug = (slug: { current: string } | string): string => {
   .projects-grid-container {
     max-width: 85.3125rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), max-content));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     /* justify-content: center; */
     /* align-content: center; */
     /* margin-inline: auto; */

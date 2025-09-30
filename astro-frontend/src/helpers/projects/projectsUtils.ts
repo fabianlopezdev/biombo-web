@@ -1,4 +1,5 @@
 import type { FeaturedProjectItem } from '@/lib/sanity/schemas/homePageSchema'
+import { getImageUrlFromAsset } from '@/helpers/images/imageUrlBuilder'
 
 /**
  * Type definition for a localized slug in Sanity
@@ -64,30 +65,24 @@ export function transformProject(
 
   const projectDoc = featuredItem.project // Extract the actual project document
 
-  // CRITICAL FIX: Extract image URL directly from asset.url if available
-  let thumbnailUrl: string | undefined
-  let mainImageUrl: string | undefined
-  let chosenImageSource: 'thumbnail' | 'main' | undefined
-
-  // Extract thumbnail URL if it exists
-  if (projectDoc.thumbnailImage?.asset?.url) {
-    thumbnailUrl = projectDoc.thumbnailImage.asset.url
-  }
-
-  // Extract main image URL if it exists
-  if (projectDoc.mainImage?.asset?.url) {
-    mainImageUrl = projectDoc.mainImage.asset.url
-  }
-
   // IMAGE SELECTION FOR CARD DISPLAYS: Always prefer thumbnail if it exists
   // Thumbnail is for cards/grids, main image is for project detail pages
   // The useSeparateThumbnail flag is ONLY for Sanity UI, not for frontend display logic
-  const imageUrlToUse = thumbnailUrl || mainImageUrl
-  if (thumbnailUrl) {
+  let chosenImageSource: 'thumbnail' | 'main' | undefined
+  let imageToUse: { asset?: unknown } | null = null
+
+  // Check for thumbnail first
+  if (projectDoc.thumbnailImage?.asset) {
     chosenImageSource = 'thumbnail'
-  } else if (mainImageUrl) {
+    imageToUse = projectDoc.thumbnailImage
+  } else if (projectDoc.mainImage?.asset) {
     chosenImageSource = 'main'
+    imageToUse = projectDoc.mainImage
   }
+
+  // Generate optimized URL using Sanity image URL builder
+  // This automatically adds ?auto=format for WebP/AVIF and quality optimization
+  const imageUrlToUse = imageToUse ? getImageUrlFromAsset(imageToUse, 800) : undefined
 
   // For alt text, handle both localized and direct string values, prioritizing the chosen image source
   let imageAltText: Record<string, string> | string | undefined

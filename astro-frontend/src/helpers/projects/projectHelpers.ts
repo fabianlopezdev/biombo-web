@@ -1,4 +1,5 @@
 import type { Project, ImageWithResolvedAsset } from '@/lib/sanity/schemas/projectSchema'
+import { getImageUrlFromAsset } from '@/helpers/images/imageUrlBuilder'
 
 export interface ImageLayoutInfo {
   totalImages: number
@@ -48,11 +49,17 @@ export function getSimilarProjects(
 }
 
 /**
- * Get image URL from Sanity image object
+ * Get optimized image URL from Sanity image object
+ * Now uses Sanity's image URL builder for automatic optimization
+ * including WebP/AVIF format and quality settings
  */
-export function getImageUrl(image: ImageWithResolvedAsset | null | undefined): string {
+export function getImageUrl(
+  image: ImageWithResolvedAsset | null | undefined,
+  width?: number,
+  height?: number,
+): string {
   if (!image?.asset) return ''
-  return image.asset.url || ''
+  return getImageUrlFromAsset(image, width, height)
 }
 
 /**
