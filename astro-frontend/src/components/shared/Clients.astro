@@ -1,5 +1,6 @@
 ---
 import ClientLogosSlider from '@/components/shared/ClientLogosSlider.astro'
+import type { Client } from '@/lib/sanity/schemas/clientSchema'
 
 interface Props {
   clientsData?: {
@@ -9,14 +10,32 @@ interface Props {
   paddingBlockStart?: string
   paddingBlockEnd?: string
   paddingInline?: string
+  clients?: Client[] // Required prop for clients data passed from parent
 }
 
-const { clientsData, paddingBlock, paddingBlockStart, paddingBlockEnd, paddingInline } = Astro.props
+const {
+  clientsData,
+  paddingBlock,
+  paddingBlockStart,
+  paddingBlockEnd,
+  paddingInline,
+  clients: clientsProp,
+} = Astro.props
 const title = clientsData?.title || 'Clients destacats que han confiat en nosaltres'
 
 // If paddingBlock is provided, use it for both start and end
 const computedPaddingStart = paddingBlock || paddingBlockStart
 const computedPaddingEnd = paddingBlock || paddingBlockEnd
+
+// Only error if prop was not passed at all (undefined)
+// Allow null or empty array (will not render anything)
+if (clientsProp === undefined) {
+  throw new Error(
+    `Clients component: clients prop is required but was not provided. Parent component must fetch and pass clients data.`,
+  )
+}
+
+const clients: Client[] = clientsProp || []
 ---
 
 <section
@@ -31,7 +50,7 @@ const computedPaddingEnd = paddingBlock || paddingBlockEnd
     {title}
   </h2>
 
-  <ClientLogosSlider speed="normal" pauseOnHover={true} />
+  <ClientLogosSlider speed="normal" pauseOnHover={true} clients={clients} />
 </section>
 
 <style>

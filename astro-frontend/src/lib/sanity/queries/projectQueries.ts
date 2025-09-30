@@ -282,6 +282,118 @@ export async function fetchAllProjects(): Promise<Projects | null> {
 }
 
 /**
+ * Fetches similar projects based on shared services (optimized for single project page)
+ * @param serviceIds - Array of service IDs to match
+ * @param locale - The locale to fetch projects for
+ * @param excludeProjectId - Project ID to exclude from results
+ * @param limit - Maximum number of projects to return
+ * @returns Array of similar projects or null if none found
+ */
+export async function fetchSimilarProjects(
+  serviceIds: string[],
+  locale: 'ca' | 'es' | 'en',
+  excludeProjectId: string,
+  limit: number = 4,
+): Promise<Projects | null> {
+  if (!serviceIds || serviceIds.length === 0) {
+    // If no services, just return recent projects
+    const query = `*[_type == "project" && language == $locale && _id != $excludeProjectId] | order(_createdAt desc) [0...$limit] {
+      _id,
+      _type,
+      _createdAt,
+      _updatedAt,
+      language,
+      title,
+      slug,
+      mainImage {
+        ...,
+        asset-> {
+          ...,
+          metadata {
+            ...,
+            lqip
+          }
+        }
+      },
+      thumbnailImage {
+        ...,
+        asset-> {
+          ...,
+          metadata {
+            ...,
+            lqip
+          }
+        }
+      },
+      useSeparateThumbnail,
+      hoverColor { hex },
+      textHoverColor { hex },
+      clients[]-> {
+        _id,
+        name
+      }
+    }`
+    const params = { locale, excludeProjectId, limit }
+    try {
+      const projects = await fetchSanityQuery({ query, params, schema: projectsSchema })
+      return projects
+    } catch {
+      return null
+    }
+  }
+
+  // Fetch projects that share at least one service
+  const query = `*[_type == "project" && language == $locale && _id != $excludeProjectId && count((services[]->_id)[@ in $serviceIds]) > 0] | order(count((services[]->_id)[@ in $serviceIds]) desc) [0...$limit] {
+    _id,
+    _type,
+    _createdAt,
+    _updatedAt,
+    language,
+    title,
+    slug,
+    mainImage {
+      ...,
+      asset-> {
+        ...,
+        metadata {
+          ...,
+          lqip
+        }
+      }
+    },
+    thumbnailImage {
+      ...,
+      asset-> {
+        ...,
+        metadata {
+          ...,
+          lqip
+        }
+      }
+    },
+    useSeparateThumbnail,
+    hoverColor { hex },
+    textHoverColor { hex },
+    clients[]-> {
+      _id,
+      name
+    },
+    services[]-> {
+      _id
+    }
+  }`
+
+  const params = { locale, excludeProjectId, serviceIds, limit }
+
+  try {
+    const projects = await fetchSanityQuery({ query, params, schema: projectsSchema })
+    return projects
+  } catch {
+    return null
+  }
+}
+
+/**
  * Fetches all projects for a specific locale
  * @param locale - The locale to fetch projects for
  * @returns Array of projects for the specified locale or null if none found

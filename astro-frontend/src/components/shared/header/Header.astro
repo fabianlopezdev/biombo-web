@@ -1,6 +1,5 @@
 ---
 // Imports ────────────────────────────────────────────────────────────────────
-import { fetchHeader } from '@/lib/sanity/queries/headerQueries'
 import type { Header, NavigationPage } from '@/lib/sanity/schemas/headerSchema'
 import LanguageSwitcher from '@/components/shared/header/LanguageSwitcher.astro'
 import HeaderLogo from './HeaderLogo.astro'
@@ -8,7 +7,12 @@ import PagesNavigation from './PagesNavigation.astro'
 import MobileMenu from './MobileMenu.astro'
 import { getLanguageSwitcherData, type SupportedLanguage } from '@/helpers/i18n/helpers'
 
-const { locale } = Astro.props
+interface Props {
+  locale: string
+  headerData?: Header | null // Optional prop for data passed from parent
+}
+
+const { locale, headerData: headerDataProp } = Astro.props
 
 /* ─ Helper ───────────────────────────────────────────────────────────────────
    Provides the correct "skip to content" label for the given locale. */
@@ -32,19 +36,20 @@ const languages = languageData.map((lang) => ({
   path: lang.path,
 }))
 
-/* ─ Fetch navigation ─ */
-let headerData: Header | null = null
-let fetchError: string | null = null
-
-try {
-  // Pass the current locale to fetch the appropriate language version
-  headerData = await fetchHeader(locale)
-} catch {
-  fetchError = `Could not load navigation for ${locale}. Please try again later.`
+/* ─ Use header data from prop (must be provided by parent) ─ */
+// Only error if prop was not passed at all (undefined)
+// Allow null (means data missing in Sanity, will render conditionally)
+if (headerDataProp === undefined) {
+  throw new Error(
+    `Header component: headerData prop is required but was not provided. Parent component must fetch and pass header data.`,
+  )
 }
 
-// Get navigation pages from the header data
-const pages: NavigationPage[] = fetchError ? [] : headerData?.navigationPages || []
+const headerData: Header | null = headerDataProp
+const fetchError: string | null = null
+
+// Get navigation pages from the header data (empty array if no data)
+const pages: NavigationPage[] = headerData?.navigationPages || []
 ---
 
 <!-- Load hide-on-scroll header behavior -->

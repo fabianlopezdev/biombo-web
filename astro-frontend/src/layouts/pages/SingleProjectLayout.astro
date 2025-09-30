@@ -5,12 +5,8 @@ import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
 import OptimizedImage from '@/components/shared/OptimizedImage.astro'
 import { portableTextToHtml } from '@/lib/sanity/utils/portableTextToHtml'
-import { fetchProjectBySlug, fetchProjectsByLocale } from '@/lib/sanity/queries/projectQueries'
-import {
-  getSimilarProjects,
-  getImageUrl,
-  getImageSectionLayout,
-} from '@/helpers/projects/projectHelpers'
+import { fetchProjectBySlug, fetchSimilarProjects } from '@/lib/sanity/queries/projectQueries'
+import { getImageUrl, getImageSectionLayout } from '@/helpers/projects/projectHelpers'
 import { getProjectTranslations } from '@/config/i18n/projectDetail'
 import { getProjectsListUrl, type SupportedLocale } from '@/config/routing/projectRoutes'
 import type { Project, ImageWithResolvedAsset } from '@/lib/sanity/schemas/projectSchema'
@@ -35,11 +31,9 @@ if (!project) {
   return Astro.redirect('/404')
 }
 
-// Fetch all projects in the same locale for similarity calculation
-const allProjects = await fetchProjectsByLocale(locale)
-
-// Calculate similar projects based on shared services
-const similarProjects = allProjects ? getSimilarProjects(project, allProjects, 4) : null
+// Fetch similar projects directly from Sanity (optimized - no need to fetch all projects)
+const serviceIds = project.services?.map((s) => s._id) || []
+const similarProjects = await fetchSimilarProjects(serviceIds, locale, project._id, 4)
 
 // Get the base projects URL for this locale
 const projectsBaseUrl = getProjectsListUrl(locale)

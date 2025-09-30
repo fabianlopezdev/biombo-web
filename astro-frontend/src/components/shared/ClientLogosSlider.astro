@@ -1,18 +1,24 @@
 ---
 import OptimizedImage from '@/components/shared/OptimizedImage.astro'
-import { fetchFeaturedClients } from '@/lib/sanity/queries/clientQueries'
+import type { Client } from '@/lib/sanity/schemas/clientSchema'
 
 interface Props {
   speed?: 'slow' | 'normal' | 'fast'
   pauseOnHover?: boolean
+  clients?: Client[] // Required prop for data passed from parent
 }
 
-const { speed = 'normal', pauseOnHover = true } = Astro.props
+const { speed = 'normal', pauseOnHover = true, clients: clientsProp } = Astro.props
 
-// Fetch featured clients
-const clients = await fetchFeaturedClients()
-console.log('Featured Clients in ClientLogosSlider:', clients)
-console.log('Number of featured clients:', clients.length)
+// Only error if prop was not passed at all (undefined)
+// Allow null or empty array (will not render anything)
+if (clientsProp === undefined) {
+  throw new Error(
+    `ClientLogosSlider component: clients prop is required but was not provided. Parent component must fetch and pass clients data.`,
+  )
+}
+
+const clients: Client[] = clientsProp || []
 
 // Filter out clients without logos
 const clientsWithLogos = clients.filter((client) => client.logo?.asset?.url)

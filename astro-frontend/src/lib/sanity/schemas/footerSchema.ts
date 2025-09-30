@@ -15,13 +15,13 @@ export const footerSchema = z.object({
   _updatedAt: z.string(),
   _rev: z.string(),
   language: z.string(),
-  slogan: z.string().optional(),
-  backToTopText: z.string().optional(),
-  email: z.string().email().optional(),
-  phone: z.string().optional(),
-  socialLinks: z.array(socialLinkSchema).optional(),
-  legalLinkText: z.string().optional(),
-  legalLinkUrl: z.string().optional(),
+  slogan: z.string().optional().nullable(),
+  backToTopText: z.string().optional().nullable(),
+  email: z.string().email().optional().nullable(),
+  phone: z.string().optional().nullable(),
+  socialLinks: z.array(socialLinkSchema).optional().nullable(),
+  legalLinkText: z.string().optional().nullable(),
+  legalLinkUrl: z.string().optional().nullable(),
 })
 
 export type Footer = z.infer<typeof footerSchema>

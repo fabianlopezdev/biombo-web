@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/shared/BaseLayout.astro'
 import type { HomePage } from '@/lib/sanity/schemas/homePageSchema'
 import { fetchHomePageByLocale } from '@/lib/sanity/queries/homePageQueries'
+import { fetchFeaturedClients } from '@/lib/sanity/queries/clientQueries'
 import Projects, {
   type ResolvedProjectsSectionData,
 } from '@/components/pages/homepage/projects-section/Projects.astro'
@@ -11,19 +12,22 @@ import About from '@/components/pages/homepage/about-section/About.astro'
 import Services from '@/components/shared/header/Services.astro'
 import Clients from '@/components/shared/Clients.astro'
 
-// About component fetches its own data based on locale
-
 interface Props {
   locale: 'ca' | 'es' | 'en'
 }
 
 const { locale } = Astro.props
 
-// Fetch homepage data from Sanity
+// Fetch homepage data and clients ONCE at top level (Astro best practice)
 let homePageData: HomePage | null = null
+let clients = []
 
 try {
-  homePageData = await fetchHomePageByLocale(locale)
+  // Fetch both in parallel for better performance
+  ;[homePageData, clients] = await Promise.all([
+    fetchHomePageByLocale(locale),
+    fetchFeaturedClients(),
+  ])
 } catch (error) {
   console.error('Error fetching homepage data:', error)
 }
@@ -56,7 +60,7 @@ const pageTitle = 'Biombo - Art, Events, Community'
     </section>
     <About sectionData={homePageData?.about} />
     <Services servicesData={homePageData?.services} />
-    <Clients clientsData={homePageData?.clients} />
+    <Clients clientsData={homePageData?.clients} clients={clients} />
   </main>
 </BaseLayout>
 

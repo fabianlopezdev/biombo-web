@@ -2,6 +2,8 @@
 import '@/styles/global.css'
 import HeaderSVGHover from '@/assets/header-hover-page.svg?raw'
 import { fetchSiteSettings } from '@/lib/sanity/queries/siteSettingsQueries'
+import { fetchHeader } from '@/lib/sanity/queries/headerQueries'
+import { fetchFooter } from '@/lib/sanity/queries/footerQueries'
 import Header from '@/components/shared/header/Header.astro'
 import Footer from '@/components/shared/Footer.astro'
 import PageLoader from '@/components/pages/homepage/HomePageLoader.astro'
@@ -32,8 +34,15 @@ const isHomepage =
   Astro.url.pathname === '/es' ||
   Astro.url.pathname === '/es/'
 
-// Fetch site settings colors with destructuring and direct fallbacks
-const { primaryColor = '#f2f2f2', secondaryColor = '#191919' } = await fetchSiteSettings()
+// Fetch common data ONCE at the top level (Astro best practice)
+// This eliminates duplicate API calls across Header, Footer, and other components
+const [siteSettings, headerData, footerData] = await Promise.all([
+  fetchSiteSettings(),
+  fetchHeader(locale),
+  fetchFooter(locale),
+])
+
+const { primaryColor = '#f2f2f2', secondaryColor = '#191919' } = siteSettings
 
 // Generate i18n meta data
 const siteUrl = Astro.site?.toString() || 'https://biombostudio.com'
@@ -71,8 +80,8 @@ const ogLocale = getOpenGraphLocale(locale as SupportedLanguage)
   <body>
     <PageLoader isHomepage={isHomepage} />
     <Fragment set:html={HeaderSVGHover} />
-    <Header locale={locale} />
+    <Header locale={locale} headerData={headerData} />
     <slot />
-    <Footer />
+    <Footer footerData={footerData} locale={locale} />
   </body>
 </html>

@@ -58,7 +58,8 @@ export async function fetchFooter(locale: string = 'ca'): Promise<Footer | null>
     }
 
     return footer
-  } catch {
+  } catch (error) {
+    console.error('fetchFooter: Error fetching footer data:', error)
     return null
   }
 }

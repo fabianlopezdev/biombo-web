@@ -1,28 +1,37 @@
 ---
 import HighlightScribble from '@/components/shared/HighlightScribble.astro'
 import WhiteUpArrow from '@/assets/white-up-arrow.svg?raw'
-import { fetchFooter } from '@/lib/sanity/queries/footerQueries'
+import type { Footer } from '@/lib/sanity/schemas/footerSchema'
+
+interface Props {
+  footerData?: Footer | null // Required prop for data passed from parent
+  locale?: string
+}
 
 const currentYear = new Date().getFullYear()
-const locale = (Astro.currentLocale as 'ca' | 'es' | 'en') || 'ca'
+const { footerData: footerDataProp } = Astro.props
 
-// Fetch footer data from Sanity
-const footerData = await fetchFooter(locale)
+// Only error if prop was not passed at all (undefined)
+// Allow null (means data missing in Sanity, will render conditionally)
+if (footerDataProp === undefined) {
+  throw new Error(
+    `Footer component: footerData prop is required but was not provided. Parent component must fetch and pass footer data.`,
+  )
+}
 
-// Fallback values if no data from Sanity
-const slogan = footerData?.slogan || 'Transformem\nidees junts. **Parlem?**'
-const backToTopText = footerData?.backToTopText || "Tornar a l'inici"
-const email = footerData?.email || 'info@biombostudio.com'
-const phone = footerData?.phone || '+(34) 696 157 318'
-const socialLinks = footerData?.socialLinks || [
-  { platform: 'Instagram', url: 'https://www.instagram.com/biombostudio/' },
-  { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/biomb%C3%B6-studio-13090b99/' },
-]
-const legalLinkText = footerData?.legalLinkText || 'Avís Legal'
-const legalLinkUrl = footerData?.legalLinkUrl || '/avis-legal'
+const footerData: Footer | null = footerDataProp
 
-// Parse slogan to handle **bold** text
-const parsedSlogan = slogan.split('**').map((part, index) => ({
+// Extract data (no fallbacks - render conditionally instead)
+const slogan = footerData?.slogan
+const backToTopText = footerData?.backToTopText
+const email = footerData?.email
+const phone = footerData?.phone
+const socialLinks = footerData?.socialLinks
+const legalLinkText = footerData?.legalLinkText
+const legalLinkUrl = footerData?.legalLinkUrl
+
+// Parse slogan to handle **bold** text (only if slogan exists)
+const parsedSlogan = slogan?.split('**').map((part, index) => ({
   text: part,
   isBold: index % 2 === 1,
 }))
@@ -33,83 +42,114 @@ const parsedSlogan = slogan.split('**').map((part, index) => ({
 
 <footer class="picket-fence">
   <div class="footer-first-row">
-    <h2 class="footer-slogan">
-      {
-        parsedSlogan.map((part) => {
-          // Handle line breaks in the text
-          const lines = part.text.split('\n')
-          return lines.map((line, lineIndex) => (
-            <>
-              {lineIndex > 0 && <br />}
-              {part.isBold ? (
-                <span class="highlight-wrapper">
-                  <span class="highlight-text">{line}</span>
-                  <HighlightScribble
-                    color="var(--color-primary)"
-                    top="clamp(3.188rem, 2.558rem + 2.582vi, 5rem)"
-                    animateOnReveal={true}
-                  />
-                </span>
-              ) : (
-                line
-              )}
-            </>
-          ))
-        })
-      }
-    </h2>
-    <a href="#top" class="back-to-top-link desktop-only">
-      {backToTopText}
-      <div class="arrow-up">
-        <Fragment set:html={WhiteUpArrow} />
-      </div>
-    </a>
+    {
+      parsedSlogan && parsedSlogan.length > 0 && (
+        <h2 class="footer-slogan">
+          {parsedSlogan.map((part) => {
+            // Handle line breaks in the text
+            const lines = part.text.split('\n')
+            return lines.map((line, lineIndex) => (
+              <>
+                {lineIndex > 0 && <br />}
+                {part.isBold ? (
+                  <span class="highlight-wrapper">
+                    <span class="highlight-text">{line}</span>
+                    <HighlightScribble
+                      color="var(--color-primary)"
+                      top="clamp(3.188rem, 2.558rem + 2.582vi, 5rem)"
+                      animateOnReveal={true}
+                    />
+                  </span>
+                ) : (
+                  line
+                )}
+              </>
+            ))
+          })}
+        </h2>
+      )
+    }
+    {
+      backToTopText && (
+        <a href="#top" class="back-to-top-link desktop-only">
+          {backToTopText}
+          <div class="arrow-up">
+            <Fragment set:html={WhiteUpArrow} />
+          </div>
+        </a>
+      )
+    }
   </div>
 
   <div class="footer-second-row">
     <div class="contact-info">
       <address>
-        <a href={`mailto:${email}`}>
-          <div class="label-wrapper">
-            <span class="label-main">{email}</span>
-            <span aria-hidden="true" class="label-hover">{email}</span>
-          </div>
-        </a>
-        <a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>
-          <div class="label-wrapper">
-            <span class="label-main">{phone}</span>
-            <span aria-hidden="true" class="label-hover">{phone}</span>
-          </div>
-        </a>
-      </address>
-      <ul class="social-links">
         {
-          socialLinks.map((link) => (
-            <li>
-              <a href={link.url} target="_blank" rel="noopener noreferrer">
-                <div class="label-wrapper">
-                  <span class="label-main">{link.platform}</span>
-                  <span aria-hidden="true" class="label-hover">
-                    {link.platform}
-                  </span>
-                </div>
-              </a>
-            </li>
-          ))
+          email && (
+            <a href={`mailto:${email}`}>
+              <div class="label-wrapper">
+                <span class="label-main">{email}</span>
+                <span aria-hidden="true" class="label-hover">
+                  {email}
+                </span>
+              </div>
+            </a>
+          )
         }
-      </ul>
+        {
+          phone && (
+            <a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>
+              <div class="label-wrapper">
+                <span class="label-main">{phone}</span>
+                <span aria-hidden="true" class="label-hover">
+                  {phone}
+                </span>
+              </div>
+            </a>
+          )
+        }
+      </address>
+      {
+        socialLinks && socialLinks.length > 0 && (
+          <ul class="social-links">
+            {socialLinks.map((link) => (
+              <li>
+                <a href={link.url} target="_blank" rel="noopener noreferrer">
+                  <div class="label-wrapper">
+                    <span class="label-main">{link.platform}</span>
+                    <span aria-hidden="true" class="label-hover">
+                      {link.platform}
+                    </span>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
     </div>
-    <a href="#top" class="back-to-top-link mobile-only">
-      {backToTopText}
-      <div class="arrow-up">
-        <Fragment set:html={WhiteUpArrow} />
-      </div>
-    </a>
+    {
+      backToTopText && (
+        <a href="#top" class="back-to-top-link mobile-only">
+          {backToTopText}
+          <div class="arrow-up">
+            <Fragment set:html={WhiteUpArrow} />
+          </div>
+        </a>
+      )
+    }
     <small>
-      © {currentYear} Biombo Studio -
-      <a href={legalLinkUrl} class="legal-link">
-        {legalLinkText}
-      </a>
+      © {currentYear} Biombo Studio
+      {
+        legalLinkText && legalLinkUrl && (
+          <>
+            {' - '}
+            <a href={legalLinkUrl} class="legal-link">
+              {legalLinkText}
+            </a>
+          </>
+        )
+      }
     </small>
   </div>
 </footer>
