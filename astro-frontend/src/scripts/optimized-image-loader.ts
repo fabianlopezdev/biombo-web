@@ -2,6 +2,13 @@ const initialized = new WeakSet<Element>()
 
 function markLoaded(img: HTMLImageElement) {
   img.dataset.loaded = 'true'
+
+  // Fade out blur layer when image loads
+  const wrapper = img.closest('.optimized-image-wrapper')
+  const blurLayer = wrapper?.querySelector('.blur-layer')
+  if (blurLayer instanceof HTMLElement) {
+    blurLayer.style.opacity = '0'
+  }
 }
 
 function register(img: Element) {

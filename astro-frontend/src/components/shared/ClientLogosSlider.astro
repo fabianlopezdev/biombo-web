@@ -66,8 +66,13 @@ const mobileAnimationDuration = mobileSpeedMap[speed]
                     src={client.logo?.asset?.url}
                     alt={`${client.name} logo`}
                     image={client.logo}
-                    width={client.logo?.asset?.metadata?.dimensions?.width ?? 200}
-                    height={client.logo?.asset?.metadata?.dimensions?.height ?? 100}
+                    aspectRatio={
+                      client.logo?.asset?.metadata?.dimensions?.width &&
+                      client.logo?.asset?.metadata?.dimensions?.height
+                        ? client.logo.asset.metadata.dimensions.width /
+                          client.logo.asset.metadata.dimensions.height
+                        : undefined
+                    }
                     loading="lazy"
                   />
                 </a>
@@ -76,8 +81,13 @@ const mobileAnimationDuration = mobileSpeedMap[speed]
                   src={client.logo?.asset?.url}
                   alt={`${client.name} logo`}
                   image={client.logo}
-                  width={client.logo?.asset?.metadata?.dimensions?.width ?? 200}
-                  height={client.logo?.asset?.metadata?.dimensions?.height ?? 100}
+                  aspectRatio={
+                    client.logo?.asset?.metadata?.dimensions?.width &&
+                    client.logo?.asset?.metadata?.dimensions?.height
+                      ? client.logo.asset.metadata.dimensions.width /
+                        client.logo.asset.metadata.dimensions.height
+                      : undefined
+                  }
                   loading="lazy"
                 />
               )}

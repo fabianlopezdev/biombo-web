@@ -10,6 +10,7 @@ interface Props {
   style?: string
   id?: string
   'aria-describedby'?: string
+  aspectRatio?: number // Optional aspect ratio (width / height)
 }
 
 const {
@@ -21,6 +22,7 @@ const {
   style = '',
   id,
   'aria-describedby': ariaDescribedBy,
+  aspectRatio,
 } = Astro.props
 
 // Get LQIP and blur status
@@ -33,6 +35,9 @@ const imageId = id || `optimized-image-${Math.random().toString(36).substr(2, 9)
 // Build class list for wrapper (receives className from parent)
 const wrapperClass = `optimized-image-wrapper ${className}`
 
+// Build wrapper style with optional aspect ratio
+const wrapperStyle = aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''
+
 // Build blur layer style
 const blurStyle = lqip
   ? `background-image: url(${lqip}); background-size: cover; background-position: center;`
@@ -44,7 +49,7 @@ const imgStyle = style
 
 <script src="@/scripts/optimized-image-loader.ts"></script>
 
-<div class={wrapperClass}>
+<div class={wrapperClass} style={wrapperStyle}>
   {hasBlur && <div class="blur-layer" style={blurStyle} aria-hidden="true" />}
   <img
     id={id}
@@ -71,12 +76,19 @@ const imgStyle = style
     pointer-events: none; /* Don't block hover/click events */
   }
 
+  /* When aspect-ratio is set, use auto height to respect it */
+  .optimized-image-wrapper[style*='aspect-ratio'] {
+    height: auto;
+  }
+
   /* Blur layer sits behind the image */
   .optimized-image-wrapper .blur-layer {
     position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none; /* Don't block hover/click events */
+    opacity: 1;
+    transition: opacity 400ms ease-in-out;
   }
 
   /* Image fills wrapper and starts transparent */
@@ -91,7 +103,7 @@ const imgStyle = style
     pointer-events: auto; /* Allow image to receive events */
   }
 
-  /* When loaded, fade in */
+  /* When loaded, fade in image (blur fades via JS) */
   .optimized-image-wrapper .optimized-image[data-loaded='true'] {
     opacity: 1;
   }
