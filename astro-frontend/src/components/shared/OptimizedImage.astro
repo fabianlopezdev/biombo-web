@@ -1,5 +1,12 @@
 ---
 import { getBlurHashFromImage, hasBlurHash } from '@/helpers/images/blurHash'
+import {
+  getSrcSetString,
+  RESPONSIVE_WIDTHS,
+  SIZES_ATTRIBUTES,
+} from '@/helpers/images/imageUrlBuilder'
+
+type ImageContext = 'hero' | 'fullWidth' | 'card' | 'thumbnail' | 'default'
 
 interface Props {
   src: string
@@ -11,6 +18,7 @@ interface Props {
   id?: string
   'aria-describedby'?: string
   aspectRatio?: number // Optional aspect ratio (width / height)
+  imageContext?: ImageContext // Context for responsive image presets
 }
 
 const {
@@ -23,6 +31,7 @@ const {
   id,
   'aria-describedby': ariaDescribedBy,
   aspectRatio,
+  imageContext = 'default',
 } = Astro.props
 
 // Get LQIP and blur status
@@ -45,6 +54,10 @@ const blurStyle = lqip
 
 // Image gets the style prop (for things like object-fit, etc)
 const imgStyle = style
+
+// Generate responsive srcset and sizes automatically if Sanity image is provided
+const srcset = image ? getSrcSetString(image, RESPONSIVE_WIDTHS[imageContext]) : undefined
+const sizes = image ? SIZES_ATTRIBUTES[imageContext] : undefined
 ---
 
 <script src="@/scripts/optimized-image-loader.ts"></script>
@@ -54,6 +67,8 @@ const imgStyle = style
   <img
     id={id}
     src={src}
+    srcset={srcset}
+    sizes={sizes}
     alt={alt}
     class="optimized-image"
     loading={loading}

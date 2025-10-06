@@ -8,6 +8,33 @@ import imageUrlBuilder from '@sanity/image-url'
 import { sanityClient } from 'sanity:client'
 import type { SanityImageSource } from '@sanity/image-url/lib/types/types'
 
+// Type definitions for Sanity image metadata
+interface ImageDimensions {
+  width: number
+  height: number
+  aspectRatio: number
+}
+
+interface ImageMetadata {
+  dimensions: ImageDimensions
+  lqip?: string
+  palette?: unknown
+  hasAlpha?: boolean
+  isOpaque?: boolean
+}
+
+interface ImageAsset {
+  _ref?: string
+  _type?: string
+  metadata?: ImageMetadata
+}
+
+interface SanityImageWithMetadata {
+  asset: ImageAsset
+  hotspot?: unknown
+  crop?: unknown
+}
+
 // Initialize the builder with Sanity client
 const builder = imageUrlBuilder(sanityClient)
 
@@ -81,6 +108,8 @@ export function getResponsiveImageUrls(
 
 /**
  * Generate srcset string from responsive URLs
+ * Automatically filters out widths larger than the original image to prevent
+ * browser from selecting unnecessarily large sizes when Sanity returns the same file
  * @param source - Sanity image object
  * @param widths - Array of widths for responsive images
  * @param quality - Image quality (default: 80)
@@ -91,7 +120,31 @@ export function getSrcSetString(
   widths: number[] = [640, 1024, 1536, 2048, 2560],
   quality: number = 80,
 ): string {
-  const urls = getResponsiveImageUrls(source, widths, quality)
+  // Get original image width from metadata
+  let originalWidth: number | null = null
+
+  // Type guard to check if source has metadata structure
+  if (
+    typeof source === 'object' &&
+    source !== null &&
+    'asset' in source &&
+    source.asset &&
+    typeof source.asset === 'object' &&
+    'metadata' in source.asset
+  ) {
+    // Now we can safely cast to our interface
+    const imageWithMetadata = source as SanityImageWithMetadata
+    originalWidth = imageWithMetadata.asset.metadata?.dimensions?.width ?? null
+  }
+
+  // Filter out widths larger than original image
+  // This prevents browser from selecting larger sizes when Sanity returns the same file
+  const filteredWidths = originalWidth ? widths.filter((w) => w <= originalWidth) : widths
+
+  // Always include at least one width option
+  const finalWidths = filteredWidths.length > 0 ? filteredWidths : [widths[widths.length - 1]]
+
+  const urls = getResponsiveImageUrls(source, finalWidths, quality)
   return urls.map(({ url, width }) => `${url} ${width}w`).join(', ')
 }
 
