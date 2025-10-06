@@ -1,5 +1,5 @@
 ---
-import criticalCSS from '@/styles/critical.css?raw'
+import '@/styles/global.css'
 import HeaderSVGHover from '@/assets/header-hover-page.svg?raw'
 import { fetchSiteSettings } from '@/lib/sanity/queries/siteSettingsQueries'
 import { fetchHeader } from '@/lib/sanity/queries/headerQueries'
@@ -64,9 +64,6 @@ const ogLocale = getOpenGraphLocale(locale as SupportedLanguage)
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Inline critical CSS for faster First Contentful Paint -->
-    <style set:html={criticalCSS}></style>
-
     <!-- Preload critical fonts to prevent layout shift (CLS) -->
     <link
       rel="preload"
@@ -82,15 +79,6 @@ const ogLocale = getOpenGraphLocale(locale as SupportedLanguage)
       type="font/woff2"
       crossorigin
     />
-
-    <!-- Preload then async load full CSS -->
-    <link
-      rel="preload"
-      href="/_astro/global.css"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript><link rel="stylesheet" href="/_astro/global.css" /></noscript>
 
     <title>{pageMetaTitle}</title>
 
