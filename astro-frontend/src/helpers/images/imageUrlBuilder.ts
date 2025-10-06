@@ -180,8 +180,8 @@ export function getImageUrlFromAsset(
  * Predefined responsive widths for different image contexts
  */
 export const RESPONSIVE_WIDTHS = {
-  hero: [1024, 1536, 2048, 2560, 3840], // Large hero images
-  fullWidth: [1024, 1536, 2048, 2560], // Full-width content images
+  hero: [640, 828, 1024, 1536, 2048, 2560, 3840], // Large hero images (added mobile-first sizes)
+  fullWidth: [640, 1024, 1536, 2048, 2560], // Full-width content images
   card: [400, 640, 800, 1024, 1280], // Project cards, thumbnails
   thumbnail: [200, 300, 400], // Small thumbnails
   default: [640, 1024, 1536, 2048, 2560], // General purpose

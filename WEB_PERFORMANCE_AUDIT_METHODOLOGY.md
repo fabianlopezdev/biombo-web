@@ -5,6 +5,21 @@
 > **Target:** Biombo Studio Website Performance, SEO, Accessibility & Best Practices Audit
 > **Tools:** Chrome DevTools MCP, Performance Insights, Lighthouse
 
+> ⚠️ **CRITICAL REQUIREMENT:** All performance audits MUST be conducted with:
+> - **Cache disabled** (Chrome DevTools "Disable cache" checkbox or CDP `Network.setCacheDisabled`)
+> - **Incognito/private browsing mode** (recommended for clean environment)
+> - **Fresh page loads** (close/reopen incognito window between tests)
+>
+> Cached results will show artificially fast metrics and mask real-world first-visit performance issues.
+
+> 🎨 **DESIGN PRESERVATION REQUIREMENT:**
+> - **NO visual, layout, or design changes are allowed** during performance optimization
+> - All improvements must maintain exact brand appearance and user experience
+> - Font changes, color modifications, spacing adjustments, or any visual alterations are **PROHIBITED**
+> - If a performance fix requires design changes, document it as a recommendation only - DO NOT implement
+> - Brand consistency and visual integrity take precedence over performance metrics
+> - Example: Changing `font-display: swap` to `optional` risks not loading custom fonts - unacceptable
+
 ---
 
 ## Table of Contents
@@ -38,12 +53,15 @@ This methodology provides a **systematic, repeatable process** for auditing web 
 - **Conversion Rates:** 1-second delay can reduce conversions by 7%
 - **Accessibility:** Legal compliance (WCAG 2.2, EAA 2025) and inclusive design
 - **Competitive Advantage:** Performance differentiates premium experiences
+- **First Impressions:** New visitors experience cold cache - the most critical performance scenario
 
 ### Success Metrics (75th Percentile)
 Per Google's recommendations, measure at the **75th percentile** across mobile and desktop:
 - **LCP:** ≤ 2.5 seconds (Good) | 2.5–4.0s (Needs Improvement) | > 4.0s (Poor)
 - **INP:** ≤ 200ms (Good) | 200–500ms (Needs Improvement) | > 500ms (Poor)
 - **CLS:** < 0.1 (Good) | 0.1–0.25 (Needs Improvement) | > 0.25 (Poor)
+
+> **Note:** All metrics should be measured on **cold cache (first visit)** to represent real-world new user experience.
 
 ---
 
@@ -104,13 +122,39 @@ Per Google's recommendations, measure at the **75th percentile** across mobile a
    - Tool: `emulate_cpu` → 4× slowdown
    - Tool: `emulate_network` → Slow 4G
 
+4. **Use Incognito Mode + Disable Cache (CRITICAL for Accurate Metrics)**
+   - **Why:** Cache artificially improves LCP/TTFB and can hide CLS issues
+   - **Requirement:** All audits MUST be performed in clean environment
+   - **Method (Recommended):**
+     1. Open Chrome in **Incognito/Private mode** manually (Ctrl+Shift+N / Cmd+Shift+N)
+     2. Open DevTools (F12 or right-click → Inspect)
+     3. Go to **Network tab** → Check "**Disable cache**" checkbox
+     4. Keep DevTools open during entire audit session
+     5. Close and reopen incognito window between different page audits
+
+   - **Why This Works:**
+     - Incognito mode starts with no cached resources
+     - "Disable cache" prevents caching during session
+     - Fresh incognito window = guaranteed clean slate
+
+   - **Advanced Alternative:** Use CDP commands for programmatic control:
+     - `Target.createBrowserContext()` creates isolated incognito-like context
+     - `Network.setCacheDisabled({cacheDisabled: true})` disables cache
+
 #### Chrome DevTools MCP Commands:
 ```javascript
+// Standard navigation and setup
+// Note: Chrome DevTools MCP connects to your open Chrome window
+// Make sure you opened Chrome in incognito mode first!
 navigate_page({url: "https://biombo-studio.netlify.app/contacte"})
 resize_page({width: 1366, height: 900})
 emulate_cpu({throttlingRate: 4})
 emulate_network({throttlingOption: "Slow 4G"})
 ```
+
+#### Testing Scenarios:
+- **First Visit (Cold Cache):** Primary audit scenario - represents new users
+- **Return Visit (Warm Cache):** Optional secondary test - represents returning users with cached assets
 
 ---
 
