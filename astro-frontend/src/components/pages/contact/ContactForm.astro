@@ -62,12 +62,19 @@ const { formSection } = Astro.props
                 placeholder={field.placeholder || field.label}
                 aria-label={field.label}
                 required={field.required}
+                autocomplete={
+                  field.fieldType === 'email'
+                    ? 'email'
+                    : field.fieldType === 'phone'
+                      ? 'tel'
+                      : field.fieldType === 'name'
+                        ? 'name'
+                        : 'off'
+                }
               />
             )}
           </div>
         ))}
-
-        <div data-netlify-recaptcha="true" />
 
         <PillButton
           text={formSection.submitButtonText}
