@@ -245,6 +245,7 @@ const getProjectSlug = (slug: { current: string } | string): string => {
     }
 
     .project-item {
+      max-inline-size: none;
       aspect-ratio: none;
       height: auto; /* Reset height on mobile to prevent overlap */
     }
@@ -300,6 +301,7 @@ const getProjectSlug = (slug: { current: string } | string): string => {
     }
 
     .projects-grid-container {
+      grid-template-columns: minmax(0, 1fr);
       gap: clamp(2.25rem, 2.389rem + -0.57vi, 1.85rem);
     }
   }
