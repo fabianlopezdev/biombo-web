@@ -5,6 +5,7 @@ export interface Props {
   description?: string | null
   noTopMargin?: boolean
   noPaddingHorizontal?: boolean
+  noFirstColumnPaddingMobile?: boolean
 }
 
 const {
@@ -13,6 +14,7 @@ const {
   description,
   noTopMargin = false,
   noPaddingHorizontal = false,
+  noFirstColumnPaddingMobile = false,
 } = Astro.props
 const hasCustomSecondColumn = Astro.slots.has('second-column')
 
@@ -20,6 +22,7 @@ const layoutClasses = [
   'two-column-layout',
   noTopMargin && 'no-top-margin',
   noPaddingHorizontal && 'no-padding-horizontal',
+  noFirstColumnPaddingMobile && 'no-first-column-padding-mobile',
   className,
 ]
   .filter(Boolean)
@@ -101,6 +104,10 @@ const layoutClasses = [
     .first-column {
       width: 100%;
       padding-block-end: var(--padding-block);
+    }
+
+    .two-column-layout.no-first-column-padding-mobile .first-column {
+      padding-block-end: 0;
     }
 
     .second-column {
