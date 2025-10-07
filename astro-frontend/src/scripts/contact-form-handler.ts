@@ -47,8 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
           data[key] = typeof value === 'string' ? value : value.name
         })
 
-        // Submit to Netlify
-        const response = await fetch('/', {
+        // Submit to Netlify (using static form file for SSR compatibility)
+        const response = await fetch('/forms.html', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: encode(data),
@@ -98,10 +98,10 @@ function showMessage(type: 'success' | 'error', message: string) {
   messageEl.setAttribute('role', 'alert')
   messageEl.setAttribute('aria-live', 'polite')
 
-  // Insert before form
+  // Insert after submit button (append to form)
   const form = document.querySelector('.contact-form')
   if (form) {
-    form.parentElement?.insertBefore(messageEl, form)
+    form.appendChild(messageEl)
 
     // Auto-remove after 5 seconds
     setTimeout(() => {

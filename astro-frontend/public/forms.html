@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netlify Forms Detection</title>
+</head>
+<body>
+    <!--
+    This file is used by Netlify for form detection during build time.
+    It is not meant to be viewed by users.
+    The form fields here must match the fields in your actual contact form.
+    -->
+
+    <form
+        name="contact"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+    >
+        <!-- Hidden fields -->
+        <input type="hidden" name="form-name" value="contact" />
+        <input type="hidden" name="bot-field" />
+        <input type="hidden" name="subject" value="New contact from %{formName} - %{submissionId}" />
+
+        <!-- Actual form fields -->
+        <input type="text" name="name" />
+        <input type="email" name="email" />
+        <input type="tel" name="phone" />
+        <textarea name="message"></textarea>
+
+        <button type="submit">Send</button>
+    </form>
+</body>
+</html>

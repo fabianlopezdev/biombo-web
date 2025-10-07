@@ -97,21 +97,21 @@ const { formSection } = Astro.props
     font-weight: inherit;
   }
 
-  .form-message {
+  :global(.form-message) {
     padding: 1rem 1.5rem;
-    margin-bottom: 2rem;
+    margin-top: 1.875rem;
     border-radius: 0.25rem;
-    font-size: 1rem;
+    font-size: 0.875rem;
     transition: opacity 0.3s ease;
   }
 
-  .form-message--success {
+  :global(.form-message--success) {
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
   }
 
-  .form-message--error {
+  :global(.form-message--error) {
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
