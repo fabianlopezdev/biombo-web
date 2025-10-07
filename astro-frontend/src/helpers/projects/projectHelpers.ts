@@ -76,25 +76,3 @@ export function getImageSectionLayout(section: ImageSection): ImageLayoutInfo {
     otherImages: section.otherImages || [],
   }
 }
-
-/**
- * Get project URL based on slug and locale
- */
-export function getProjectUrl(slug: string, locale: string): string {
-  // Strip language suffix if present (for non-Catalan languages)
-  let cleanSlug = slug
-  if (locale !== 'ca' && slug.endsWith(`-${locale}`)) {
-    cleanSlug = slug.slice(0, -locale.length - 1) // Remove "-es" or "-en"
-  }
-
-  switch (locale) {
-    case 'ca':
-      return `/projectes/${cleanSlug}`
-    case 'en':
-      return `/en/projects/${cleanSlug}`
-    case 'es':
-      return `/es/proyectos/${cleanSlug}`
-    default:
-      return `/projectes/${cleanSlug}`
-  }
-}

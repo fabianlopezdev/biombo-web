@@ -1,6 +1,7 @@
 ---
 import type { FeaturedProjectItem } from '@/lib/sanity/schemas/homePageSchema'
 import { transformProject } from '@/helpers/projects/projectsUtils'
+import { getProjectsListUrl } from '@/config/routing/projectRoutes'
 import ProjectCard from './ProjectCard.astro'
 import MobileSlider from '@/components/shared/MobileSlider.astro'
 
@@ -62,7 +63,11 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     </MobileSlider>
   </div>
 
-  <a href="/projects" class="projects-view-all-mobile" aria-label={viewAllTextVal}>
+  <a
+    href={getProjectsListUrl(currentLang)}
+    class="projects-view-all-mobile"
+    aria-label={viewAllTextVal}
+  >
     {viewAllTextVal}
   </a>
 </div>

@@ -55,18 +55,11 @@ export function getProjectUrl(slug: string, locale: Locale): string {
     cleanSlug = slug.slice(0, -locale.length - 1) // Remove "-es" or "-en"
   }
 
-  console.log('[getProjectUrl in config/i18n/projects.ts]')
-  console.log('  Input slug:', slug)
-  console.log('  Locale:', locale)
-  console.log('  Clean slug:', cleanSlug)
-
   const baseUrls = {
     ca: '/projectes',
     es: '/es/proyectos',
     en: '/en/projects',
   }
 
-  const url = `${baseUrls[locale]}/${cleanSlug}`
-  console.log('  Final URL:', url)
-  return url
+  return `${baseUrls[locale]}/${cleanSlug}`
 }
