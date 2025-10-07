@@ -20,13 +20,8 @@ interface Props {
 const { slug, locale } = Astro.props
 const translations = getProjectTranslations(locale)
 
-console.log('=== SingleProjectLayout Debug ===')
-console.log('Received slug prop:', slug)
-console.log('Locale:', locale)
-
 // Fetch the project data
 const project = await fetchProjectBySlug(slug, locale)
-console.log('Project found:', project ? project.title : 'NOT FOUND')
 
 if (!project) {
   return Astro.redirect('/404')
@@ -294,48 +289,49 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
       </ul>
     </aside>
 
-    <hr class="divider-line mobile" aria-hidden="true" />
-
     {/* Similar projects section */}
     {
       similarProjects && similarProjects.length > 0 && (
-        <section class="similar-projects" aria-labelledby="similar-projects-title">
-          <h2 id="similar-projects-title" class="similar-title">
-            {translations.similarProjects}
-          </h2>
-          <ul class="similar-projects-container">
-            {similarProjects.map((similarProject: Project) => {
-              const thumbnailImage =
-                similarProject.useSeparateThumbnail && similarProject.thumbnailImage
-                  ? similarProject.thumbnailImage
-                  : similarProject.mainImage
+        <>
+          <hr class="divider-line mobile" aria-hidden="true" />
+          <section class="similar-projects" aria-labelledby="similar-projects-title">
+            <h2 id="similar-projects-title" class="similar-title">
+              {translations.similarProjects}
+            </h2>
+            <ul class="similar-projects-container">
+              {similarProjects.map((similarProject: Project) => {
+                const thumbnailImage =
+                  similarProject.useSeparateThumbnail && similarProject.thumbnailImage
+                    ? similarProject.thumbnailImage
+                    : similarProject.mainImage
 
-              // Strip language suffix from slug for non-Catalan locales
-              let cleanSlug = similarProject.slug.current
-              if (locale === 'es' && cleanSlug.endsWith('-es')) {
-                cleanSlug = cleanSlug.slice(0, -3)
-              } else if (locale === 'en' && cleanSlug.endsWith('-en')) {
-                cleanSlug = cleanSlug.slice(0, -3)
-              }
+                // Strip language suffix from slug for non-Catalan locales
+                let cleanSlug = similarProject.slug.current
+                if (locale === 'es' && cleanSlug.endsWith('-es')) {
+                  cleanSlug = cleanSlug.slice(0, -3)
+                } else if (locale === 'en' && cleanSlug.endsWith('-en')) {
+                  cleanSlug = cleanSlug.slice(0, -3)
+                }
 
-              return (
-                <li class="similar-project-item">
-                  <ProjectCard
-                    title={similarProject.title}
-                    imageUrl={getImageUrl(thumbnailImage)}
-                    image={thumbnailImage}
-                    slug={`${projectsBaseUrl}/${cleanSlug}`}
-                    hoverColor={similarProject.hoverColor?.hex || '#272727'}
-                    textHoverColor={similarProject.textHoverColor?.hex || '#fff'}
-                    viewProjectText={translations.viewProject}
-                    clients={similarProject.clients?.map((client) => client.name).join(', ')}
-                    projectId={similarProject._id}
-                  />
-                </li>
-              )
-            })}
-          </ul>
-        </section>
+                return (
+                  <li class="similar-project-item">
+                    <ProjectCard
+                      title={similarProject.title}
+                      imageUrl={getImageUrl(thumbnailImage)}
+                      image={thumbnailImage}
+                      slug={`${projectsBaseUrl}/${cleanSlug}`}
+                      hoverColor={similarProject.hoverColor?.hex || '#272727'}
+                      textHoverColor={similarProject.textHoverColor?.hex || '#fff'}
+                      viewProjectText={translations.viewProject}
+                      clients={similarProject.clients?.map((client) => client.name).join(', ')}
+                      projectId={similarProject._id}
+                    />
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+        </>
       )
     }
   </main>
