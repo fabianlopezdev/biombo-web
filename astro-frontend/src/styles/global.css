@@ -182,6 +182,18 @@ figure {
   border-width: 0;
 }
 
+/* Focus styling for skip link targets */
+/* Elements with tabindex="-1" should have visible focus when programmatically focused */
+[tabindex='-1']:focus {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 4px;
+}
+
+/* Ensure skip link targets don't show focus outline when clicked (mouse users) */
+[tabindex='-1']:focus:not(:focus-visible) {
+  outline: none;
+}
+
 .label-wrapper {
   display: inline-block;
   position: relative;

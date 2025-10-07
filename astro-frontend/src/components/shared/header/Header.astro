@@ -10,9 +10,10 @@ import { getLanguageSwitcherData, type SupportedLanguage } from '@/helpers/i18n/
 interface Props {
   locale: string
   headerData?: Header | null // Optional prop for data passed from parent
+  skipTarget?: string // Optional skip link target (default: #main)
 }
 
-const { locale, headerData: headerDataProp } = Astro.props
+const { locale, headerData: headerDataProp, skipTarget = '#main' } = Astro.props
 
 /* ─ Helper ───────────────────────────────────────────────────────────────────
    Provides the correct "skip to content" label for the given locale. */
@@ -54,9 +55,11 @@ const pages: NavigationPage[] = headerData?.navigationPages || []
 
 <!-- Load hide-on-scroll header behavior -->
 <script src="@/scripts/header/hide-header-on-scroll.ts"></script>
+<!-- Load accessible smooth scroll for skip link -->
+<script src="@/scripts/skip-link-accessible-scroll.ts"></script>
 
 <!-- Localised skip link -->
-<a href="#main" class="skip-to-main">{getSkipLabel(locale)}</a>
+<a href={skipTarget} class="skip-to-main">{getSkipLabel(locale)}</a>
 
 <header class="site-header" role="banner">
   <div class="logo-wrapper">

@@ -17,9 +17,10 @@ import {
 interface Props {
   pageMetaTitle: string
   pageMetaDescription?: string // Optional description prop
+  skipTarget?: string // Optional skip link target (default: #main)
 }
 
-const { pageMetaTitle, pageMetaDescription } = Astro.props
+const { pageMetaTitle, pageMetaDescription, skipTarget = '#main' } = Astro.props
 
 // Get the current locale from Astro's i18n middleware
 const locale = (Astro.currentLocale ?? 'ca') as 'ca' | 'es' | 'en'
@@ -105,7 +106,7 @@ const ogLocale = getOpenGraphLocale(locale as SupportedLanguage)
   <body>
     <PageLoader isHomepage={isHomepage} />
     <Fragment set:html={HeaderSVGHover} />
-    <Header locale={locale} headerData={headerData} />
+    <Header locale={locale} headerData={headerData} skipTarget={skipTarget} />
     <slot />
     <Footer footerData={footerData} locale={locale} />
   </body>

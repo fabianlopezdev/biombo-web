@@ -1,5 +1,4 @@
 ---
-import OptimizedImage from '@/components/shared/OptimizedImage.astro'
 import type { Client } from '@/lib/sanity/schemas/clientSchema'
 
 interface Props {
@@ -62,33 +61,23 @@ const mobileAnimationDuration = mobileSpeedMap[speed]
                   rel="noopener noreferrer"
                   aria-label={`Visit ${client.name} website`}
                 >
-                  <OptimizedImage
+                  <img
                     src={client.logo?.asset?.url}
                     alt={`${client.name} logo`}
-                    image={client.logo}
-                    aspectRatio={
-                      client.logo?.asset?.metadata?.dimensions?.width &&
-                      client.logo?.asset?.metadata?.dimensions?.height
-                        ? client.logo.asset.metadata.dimensions.width /
-                          client.logo.asset.metadata.dimensions.height
-                        : undefined
-                    }
+                    width={client.logo?.asset?.metadata?.dimensions?.width ?? 200}
+                    height={client.logo?.asset?.metadata?.dimensions?.height ?? 100}
                     loading="lazy"
+                    decoding="async"
                   />
                 </a>
               ) : (
-                <OptimizedImage
+                <img
                   src={client.logo?.asset?.url}
                   alt={`${client.name} logo`}
-                  image={client.logo}
-                  aspectRatio={
-                    client.logo?.asset?.metadata?.dimensions?.width &&
-                    client.logo?.asset?.metadata?.dimensions?.height
-                      ? client.logo.asset.metadata.dimensions.width /
-                        client.logo.asset.metadata.dimensions.height
-                      : undefined
-                  }
+                  width={client.logo?.asset?.metadata?.dimensions?.width ?? 200}
+                  height={client.logo?.asset?.metadata?.dimensions?.height ?? 100}
                   loading="lazy"
+                  decoding="async"
                 />
               )}
             </div>

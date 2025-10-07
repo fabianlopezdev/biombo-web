@@ -12,8 +12,12 @@ const { pageMetaTitle, pageTitle, pageMetaDescription } = Astro.props
 const hasTwoColumnContent = Astro.slots.has('two-column-content')
 ---
 
-<BaseLayout pageMetaTitle={pageMetaTitle} pageMetaDescription={pageMetaDescription}>
-  <main class="main-content">
+<BaseLayout
+  pageMetaTitle={pageMetaTitle}
+  pageMetaDescription={pageMetaDescription}
+  skipTarget="#main"
+>
+  <main id="main" class="main-content">
     {
       hasTwoColumnContent ? (
         <TwoColumnLayout title={pageTitle}>

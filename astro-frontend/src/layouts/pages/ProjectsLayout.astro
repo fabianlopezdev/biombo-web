@@ -40,8 +40,8 @@ const getProjectSlug = (slug: { current: string } | string): string => {
 }
 ---
 
-<BaseLayout title={t.pageTitle}>
-  <main class="main-content">
+<BaseLayout title={t.pageTitle} skipTarget="#main">
+  <main id="main" class="main-content">
     <h1 class="hero-title-internal">{t.pageTitle}</h1>
     <section
       class="projects-filter-container"

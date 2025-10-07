@@ -39,8 +39,8 @@ const similarProjects = await fetchSimilarProjects(serviceIds, locale, project._
 const projectsBaseUrl = getProjectsListUrl(locale)
 ---
 
-<BaseLayout pageMetaTitle={project.title}>
-  <main class="main-content">
+<BaseLayout pageMetaTitle={project.title} skipTarget="#project-content">
+  <main id="main" class="main-content">
     <h1 class="hero-title-internal">{project.title}</h1>
 
     <aside class="client-info mobile" aria-label={translations.clientInfoLabel}>
@@ -63,7 +63,7 @@ const projectsBaseUrl = getProjectsListUrl(locale)
       </figure>
     </header>
 
-    <article class="project-content">
+    <article id="project-content" class="project-content">
       <TwoColumnLayout noPaddingHorizontal>
         <aside
           slot="first-column"
