@@ -120,3 +120,33 @@ export function portableTextToHtml(content: PortableTextBlock[] | undefined): st
 
   return toHTML(content, { components })
 }
+
+/**
+ * Converts Portable Text to plain text (strips all HTML tags)
+ * Used for meta descriptions and other places where plain text is needed
+ * @param content - The Portable Text content
+ * @param maxLength - Optional maximum length (default: 160 for meta descriptions)
+ * @returns Plain text string
+ */
+export function portableTextToPlainText(
+  content: PortableTextBlock[] | undefined,
+  maxLength = 160,
+): string {
+  if (!content || content.length === 0) return ''
+
+  // Convert to HTML first
+  const html = portableTextToHtml(content)
+
+  // Strip all HTML tags
+  const plainText = html
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .trim()
+
+  // Truncate to maxLength if needed
+  if (plainText.length > maxLength) {
+    return plainText.substring(0, maxLength - 3) + '...'
+  }
+
+  return plainText
+}

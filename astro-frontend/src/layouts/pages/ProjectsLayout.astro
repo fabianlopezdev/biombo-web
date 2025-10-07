@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/shared/BaseLayout.astro'
 import PillButton from '@/components/shared/PillButton.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
 import { projectsTranslations, getProjectUrl, type Locale } from '@/config/i18n/projects'
+import { getPageMetadata } from '@/config/i18n/pageMetadata'
 import type { Project } from '@/lib/sanity/schemas/projectSchema'
 import type { Service } from '@/lib/sanity/schemas/serviceSchema'
 import type { Client } from '@/lib/sanity/schemas/clientSchema'
@@ -15,6 +16,7 @@ interface Props {
 
 const { locale, projects, services } = Astro.props
 const t = projectsTranslations[locale]
+const metadata = getPageMetadata('projects', locale)
 
 // Helper function to get image URL
 const getImageUrl = (project: Project): string => {
@@ -40,7 +42,11 @@ const getProjectSlug = (slug: { current: string } | string): string => {
 }
 ---
 
-<BaseLayout title={t.pageTitle} skipTarget="#main">
+<BaseLayout
+  pageMetaTitle={metadata.title}
+  pageMetaDescription={metadata.description}
+  skipTarget="#main"
+>
   <main id="main" class="main-content">
     <h1 class="hero-title-internal">{t.pageTitle}</h1>
     <section

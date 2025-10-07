@@ -5,7 +5,7 @@ import Clients from '@/components/shared/Clients.astro'
 import { fetchAboutUsPageByLocale } from '@/lib/sanity/queries/aboutUsPageQueries'
 import { fetchFeaturedClients } from '@/lib/sanity/queries/clientQueries'
 import type { AboutUsPage } from '@/lib/sanity/schemas/aboutUsPageSchema'
-import { portableTextToHtmlForPageSection } from '@/lib/sanity/utils/portableTextToHtml'
+import { getPageMetadata } from '@/config/i18n/pageMetadata'
 import type { DisplayImage } from '@/components/shared/AboutSlider.astro'
 
 const { locale } = Astro.props
@@ -25,7 +25,7 @@ try {
   console.error('Error fetching about us page data:', error)
 }
 
-const descriptionHtml = portableTextToHtmlForPageSection(aboutUsPageData?.description)
+const metadata = getPageMetadata('about', locale)
 
 // Transform images to the expected format for AboutSlider
 const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
@@ -37,8 +37,8 @@ const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
 ---
 
 <InternalPageLayout
-  pageMetaTitle={aboutUsPageData?.title || 'About Us'}
-  pageMetaDescription={descriptionHtml}
+  pageMetaTitle={metadata.title}
+  pageMetaDescription={metadata.description}
   pageTitle={aboutUsPageData?.title || 'About Us'}
 >
   {

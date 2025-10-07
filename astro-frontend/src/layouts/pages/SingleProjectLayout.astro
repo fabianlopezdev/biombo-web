@@ -4,11 +4,12 @@ import PillButton from '@/components/shared/PillButton.astro'
 import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
 import OptimizedImage from '@/components/shared/OptimizedImage.astro'
-import { portableTextToHtml } from '@/lib/sanity/utils/portableTextToHtml'
+import { portableTextToHtml, portableTextToPlainText } from '@/lib/sanity/utils/portableTextToHtml'
 import { fetchProjectBySlug, fetchSimilarProjects } from '@/lib/sanity/queries/projectQueries'
 import { getImageUrl, getImageSectionLayout } from '@/helpers/projects/projectHelpers'
 import { getProjectTranslations } from '@/config/i18n/projectDetail'
 import { getProjectsListUrl, type SupportedLocale } from '@/config/routing/projectRoutes'
+import { generateProjectMetadata } from '@/config/i18n/pageMetadata'
 import type { Project, ImageWithResolvedAsset } from '@/lib/sanity/schemas/projectSchema'
 
 interface Props {
@@ -37,9 +38,16 @@ const similarProjects = await fetchSimilarProjects(serviceIds, locale, project._
 
 // Get the base projects URL for this locale
 const projectsBaseUrl = getProjectsListUrl(locale)
+
+// Generate dynamic SEO metadata
+const metadata = generateProjectMetadata(project, locale, portableTextToPlainText)
 ---
 
-<BaseLayout pageMetaTitle={project.title} skipTarget="#project-content">
+<BaseLayout
+  pageMetaTitle={metadata.title}
+  pageMetaDescription={metadata.description}
+  skipTarget="#project-content"
+>
   <main id="main" class="main-content">
     <h1 class="hero-title-internal">{project.title}</h1>
 

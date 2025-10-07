@@ -11,6 +11,7 @@ import ProjectsMobile from '@/components/pages/homepage/projects-section/Project
 import About from '@/components/pages/homepage/about-section/About.astro'
 import Services from '@/components/shared/header/Services.astro'
 import Clients from '@/components/shared/Clients.astro'
+import { getPageMetadata } from '@/config/i18n/pageMetadata'
 
 interface Props {
   locale: 'ca' | 'es' | 'en'
@@ -32,12 +33,16 @@ try {
   console.error('Error fetching homepage data:', error)
 }
 
-const pageTitle = 'Biombo - Art, Events, Community'
+const metadata = getPageMetadata('homepage', locale)
 ---
 
 <script src="@/scripts/wheel-to-horizontal-scroll.ts"></script>
 
-<BaseLayout title={pageTitle} skipTarget="#projects">
+<BaseLayout
+  pageMetaTitle={metadata.title}
+  pageMetaDescription={metadata.description}
+  skipTarget="#projects"
+>
   <main id="main" class="main-content">
     <div class="horizontal-scroll-container" id="horizontal-container">
       <section class="hero">

@@ -4,6 +4,7 @@ import ContactForm from '@/components/pages/contact/ContactForm.astro'
 import ContactStudio from '@/components/pages/contact/ContactStudio.astro'
 import { fetchContactPageByLocale } from '@/lib/sanity/queries/contactPageQueries'
 import type { ContactPage } from '@/lib/sanity/schemas/contactPageSchema'
+import { getPageMetadata } from '@/config/i18n/pageMetadata'
 
 const { locale } = Astro.props
 
@@ -18,12 +19,13 @@ try {
 const title = contactPageData?.title || 'Contacte'
 const email = contactPageData?.email || 'info@biombo.cat'
 const phone = contactPageData?.phone || '+(34) 699 696 969'
+const metadata = getPageMetadata('contact', locale)
 ---
 
 <InternalPageLayout
-  pageMetaTitle={`${title} - Biombo Studio`}
+  pageMetaTitle={metadata.title}
+  pageMetaDescription={metadata.description}
   pageTitle={title}
-  pageMetaDescription=""
 >
   <div slot="two-column-content" class="contact-content">
     <ContactStudio email={email} phone={phone} />
