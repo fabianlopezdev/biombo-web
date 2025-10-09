@@ -3,7 +3,6 @@ import { defineConfig } from 'astro/config'
 import sanity from '@sanity/astro'
 import netlify from '@astrojs/netlify'
 import sitemap from '@astrojs/sitemap'
-import lenis from 'astro-lenis'
 import dotenv from 'dotenv'
 
 // Load environment variables from .env files
@@ -69,6 +68,5 @@ export default defineConfig({
         },
       },
     }),
-    lenis(),
   ],
 })

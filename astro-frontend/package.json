@@ -26,7 +26,6 @@
     "@sanity/client": "^7.2.2",
     "@sanity/image-url": "^1.2.0",
     "astro": "^5.13.3",
-    "astro-lenis": "^1.0.5",
     "lenis": "^1.3.11",
     "zod": "^3.25.7"
   },
