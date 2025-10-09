@@ -14,6 +14,7 @@ interface ScrollState {
 class HideOnScrollHeader {
   private header: HTMLElement | null
   private horizontalContainer: HTMLElement | null
+  private horizontalWrapper: HTMLElement | null
   private state: ScrollState
   private scrollThreshold = 5 // Minimum scroll distance to trigger hide/show
   private topThreshold = 100 // Distance from top where header always shows
@@ -21,6 +22,7 @@ class HideOnScrollHeader {
   constructor() {
     this.header = document.querySelector('.site-header')
     this.horizontalContainer = document.getElementById('horizontal-container')
+    this.horizontalWrapper = document.querySelector('.horizontal-scroll-wrapper')
 
     this.state = {
       lastScrollY: 0,
@@ -94,8 +96,9 @@ class HideOnScrollHeader {
             // Check if horizontal container is in viewport and at the top
             const rect = entry.boundingClientRect
             const isInView = entry.isIntersecting
-            // Container is at top when its top edge is near the top of viewport
-            const isAtTop = rect.top <= 5 && rect.top >= -5
+            // Container is sticky at header height, so check if it's positioned there
+            // Allow 5px tolerance for floating point precision
+            const isAtTop = Math.abs(rect.top - this.state.headerHeight) <= 5
 
             this.state.isHorizontalScrolling = isInView && isAtTop && window.innerWidth >= 1025
 
@@ -116,12 +119,40 @@ class HideOnScrollHeader {
   }
 
   private handleScroll() {
-    if (!this.state.ticking && !this.state.isHorizontalScrolling) {
+    if (!this.state.ticking) {
       window.requestAnimationFrame(() => {
-        this.updateHeaderVisibility()
+        // Update horizontal scroll state before checking visibility
+        this.updateHorizontalScrollState()
+
+        if (!this.state.isHorizontalScrolling) {
+          this.updateHeaderVisibility()
+        }
         this.state.ticking = false
       })
       this.state.ticking = true
+    }
+  }
+
+  private updateHorizontalScrollState() {
+    // Check if we're in the horizontal scroll zone based on wrapper position
+    if (!this.horizontalWrapper || window.innerWidth < 1025) {
+      this.state.isHorizontalScrolling = false
+      return
+    }
+
+    const wrapperRect = this.horizontalWrapper.getBoundingClientRect()
+    const viewportHeight = window.innerHeight
+
+    // We're in horizontal scroll mode when:
+    // - Wrapper top is at or above viewport (has entered)
+    // - Wrapper bottom is still below viewport (hasn't left)
+    const inHorizontalZone = wrapperRect.top <= 0 && wrapperRect.bottom > viewportHeight
+
+    this.state.isHorizontalScrolling = inHorizontalZone
+
+    // Always show header during horizontal scroll
+    if (this.state.isHorizontalScrolling) {
+      this.showHeader()
     }
   }
 
@@ -176,6 +207,9 @@ class HideOnScrollHeader {
     // Check initial position
     this.state.lastScrollY = window.scrollY
 
+    // Update horizontal scroll state
+    this.updateHorizontalScrollState()
+
     if (window.scrollY < this.topThreshold) {
       this.showHeader()
     }
@@ -184,10 +218,8 @@ class HideOnScrollHeader {
   private handleResize() {
     this.updateHeaderHeight()
 
-    // Check if we're still in horizontal scroll mode
-    if (window.innerWidth < 1025) {
-      this.state.isHorizontalScrolling = false
-    }
+    // Re-check horizontal scroll state
+    this.updateHorizontalScrollState()
 
     this.checkScrollPosition()
   }

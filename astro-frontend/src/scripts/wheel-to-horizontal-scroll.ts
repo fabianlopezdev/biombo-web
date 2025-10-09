@@ -1,6 +1,7 @@
 /**
- * Initializes horizontal scrolling functionality for the homepage layout.
- * Handles wheel events to enable horizontal scrolling with vertical mouse wheel.
+ * Initializes scroll-driven horizontal transform animation for the homepage layout.
+ * Converts vertical scroll progress into smooth horizontal movement using CSS transforms.
+ * Works seamlessly with Lenis smooth scroll.
  */
 
 import { registerScript } from '@/scripts/core/initialization-manager'
@@ -9,163 +10,111 @@ import { cleanupRegistry } from '@/scripts/core/cleanup-registry'
 
 // Register script with initialization manager
 registerScript('horizontalScroll', () => {
+  const wrapper = document.querySelector('.horizontal-scroll-wrapper') as HTMLElement
   const container = document.getElementById('horizontal-container')
-  if (!container) {
-    console.warn('[HorizontalScroll] Container element not found')
+  const inner = document.getElementById('horizontal-inner') as HTMLElement
+
+  if (!wrapper || !container || !inner) {
+    console.warn('[HorizontalScroll] Required elements not found')
     return () => {}
   }
 
-  // Constants - calculated once
-  const SCROLL_TOLERANCE = 0.5
-  const NOMINAL_TOP_TOLERANCE = 5
-  const MOBILE_BREAKPOINT = 992
+  const MOBILE_BREAKPOINT = 1025
 
-  let headerHeight = 0
-  let cachedRect: DOMRect | null = null
-  let rectCacheTime = 0
-  const RECT_CACHE_DURATION = 100 // Cache getBoundingClientRect for 100ms
+  let wrapperHeight = 0
+  let containerHeight = 0
+  let innerWidth = 0
+  let maxScroll = 0
 
-  // Simple, reliable header height calculation
-  const updateHeaderHeight = (): void => {
-    try {
-      const cssVar = getComputedStyle(document.documentElement).getPropertyValue('--header-height')
-
-      if (cssVar.endsWith('px')) {
-        headerHeight = parseFloat(cssVar)
-        return
-      }
-
-      if (cssVar.endsWith('rem')) {
-        const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize)
-        headerHeight = parseFloat(cssVar) * rootFontSize
-        return
-      }
-
-      // Fallback to actual header element
-      const header = document.querySelector('header')
-      headerHeight = header?.offsetHeight || 0
-    } catch (error) {
-      console.error('[HorizontalScroll] Error calculating header height:', error)
-      headerHeight = 0
-    }
-  }
-
-  updateHeaderHeight()
-
-  const handleWheel = (e: WheelEvent): void => {
-    // Early return for mobile viewports
+  // Calculate dimensions
+  const calculateDimensions = (): void => {
     if (window.innerWidth < MOBILE_BREAKPOINT) return
 
-    // Early return if no vertical scroll
-    if (Math.abs(e.deltaY) < 0.01) return
+    // Get the total width of the inner content
+    innerWidth = inner.scrollWidth
+    containerHeight = container.offsetHeight
 
-    // Cache getBoundingClientRect calls for performance
-    const now = Date.now()
-    if (!cachedRect || now - rectCacheTime > RECT_CACHE_DURATION) {
-      cachedRect = container.getBoundingClientRect()
-      rectCacheTime = now
-    }
-    const rect = cachedRect
+    // Calculate max horizontal scroll distance
+    maxScroll = innerWidth - window.innerWidth
 
-    // Early return if cursor outside container bounds
-    if (e.clientY < rect.top || e.clientY > rect.bottom) return
+    // Set wrapper height to create scroll space
+    // Height = max horizontal scroll distance + one viewport height
+    wrapperHeight = maxScroll + containerHeight
+    wrapper.style.height = `${wrapperHeight}px`
+  }
 
-    const { scrollLeft, clientWidth, scrollWidth } = container
-    const atLeftEdge = scrollLeft <= SCROLL_TOLERANCE
-    const atRightEdge = scrollLeft + clientWidth >= scrollWidth - SCROLL_TOLERANCE
-    const atNominalTop = Math.abs(rect.top - headerHeight) < NOMINAL_TOP_TOLERANCE
-
-    const scrollingDown = e.deltaY > 0
-    const scrollingUp = e.deltaY < 0
-
-    // Handle scroll down
-    if (scrollingDown) {
-      if (rect.top > headerHeight + NOMINAL_TOP_TOLERANCE || atRightEdge) return
-      e.preventDefault()
-      container.scrollLeft += e.deltaY
+  // Update horizontal position based on scroll
+  const updateHorizontalPosition = (): void => {
+    if (window.innerWidth < MOBILE_BREAKPOINT) {
+      inner.style.transform = ''
       return
     }
 
-    // Handle scroll up
-    if (scrollingUp) {
-      if (!atNominalTop || atLeftEdge) return
-      e.preventDefault()
-      container.scrollLeft += e.deltaY
-    }
+    // Get wrapper's position relative to viewport
+    const wrapperRect = wrapper.getBoundingClientRect()
+    const wrapperTop = wrapperRect.top
+
+    // Calculate scroll progress through the wrapper
+    // Progress goes from 0 (wrapper just entering viewport) to 1 (wrapper leaving viewport)
+    const scrollProgress = Math.max(0, Math.min(1, -wrapperTop / (wrapperHeight - containerHeight)))
+
+    // Calculate horizontal translation
+    const translateX = -scrollProgress * maxScroll
+
+    // Apply transform
+    inner.style.transform = `translate3d(${translateX}px, 0, 0)`
   }
 
-  const handleKeydown = (e: KeyboardEvent): void => {
-    // Only handle vertical arrow keys
-    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
-
-    // Early return for mobile viewports
-    if (window.innerWidth < MOBILE_BREAKPOINT) return
-
-    // Cache getBoundingClientRect calls for performance
-    const now = Date.now()
-    if (!cachedRect || now - rectCacheTime > RECT_CACHE_DURATION) {
-      cachedRect = container.getBoundingClientRect()
-      rectCacheTime = now
-    }
-    const rect = cachedRect
-
-    const { scrollLeft, clientWidth, scrollWidth } = container
-    const atLeftEdge = scrollLeft <= SCROLL_TOLERANCE
-    const atRightEdge = scrollLeft + clientWidth >= scrollWidth - SCROLL_TOLERANCE
-    const atNominalTop = Math.abs(rect.top - headerHeight) < NOMINAL_TOP_TOLERANCE
-
-    // Define scroll amount for arrow keys (similar to typical browser behavior)
-    const ARROW_SCROLL_AMOUNT = 100
-
-    // Handle ArrowDown - scroll right in horizontal container
-    if (e.key === 'ArrowDown') {
-      // Check if we should handle this event
-      if (rect.top > headerHeight + NOMINAL_TOP_TOLERANCE || atRightEdge) return
-
-      e.preventDefault()
-      container.scrollBy({
-        left: ARROW_SCROLL_AMOUNT,
-        behavior: 'smooth'
-      })
-      return
-    }
-
-    // Handle ArrowUp - scroll left in horizontal container
-    if (e.key === 'ArrowUp') {
-      // Check if we should handle this event
-      if (!atNominalTop || atLeftEdge) return
-
-      e.preventDefault()
-      container.scrollBy({
-        left: -ARROW_SCROLL_AMOUNT,
-        behavior: 'smooth'
-      })
-    }
+  // Initialize on load
+  const init = (): void => {
+    calculateDimensions()
+    updateHorizontalPosition()
   }
 
-  // Use throttle utility from domUtils
+  // Use Lenis scroll event if available, otherwise use window scroll
+  const handleScroll = (): void => {
+    updateHorizontalPosition()
+  }
+
+  // Handle resize with throttle
   const handleResize = throttle(() => {
-    updateHeaderHeight()
-    // Invalidate rect cache on resize
-    cachedRect = null
+    calculateDimensions()
+    updateHorizontalPosition()
   }, 100)
 
-  // Event listeners with proper options
-  const wheelOptions: AddEventListenerOptions = { passive: false, capture: false }
-  const keydownOptions: AddEventListenerOptions = { passive: false, capture: false }
-  const resizeOptions: AddEventListenerOptions = { passive: true }
+  // Listen to Lenis scroll event if available
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const lenis = window.lenis
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  if (lenis && typeof lenis.on === 'function') {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    lenis.on('scroll', handleScroll)
+  } else {
+    // Fallback to window scroll
+    window.addEventListener('scroll', handleScroll, { passive: true })
+  }
 
-  container.addEventListener('wheel', handleWheel, wheelOptions)
-  document.addEventListener('keydown', handleKeydown, keydownOptions)
-  window.addEventListener('resize', handleResize, resizeOptions)
+  window.addEventListener('resize', handleResize, { passive: true })
+
+  // Initialize after a small delay to ensure layout is ready
+  setTimeout(init, 100)
 
   // Register cleanup
   const cleanup = () => {
-    container.removeEventListener('wheel', handleWheel)
-    document.removeEventListener('keydown', handleKeydown)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const lenisInstance = window.lenis
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (lenisInstance && typeof lenisInstance.off === 'function') {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      lenisInstance.off('scroll', handleScroll)
+    } else {
+      window.removeEventListener('scroll', handleScroll)
+    }
     window.removeEventListener('resize', handleResize)
-    // Clear cache
-    cachedRect = null
+
+    // Reset styles
+    if (inner) inner.style.transform = ''
+    if (wrapper) wrapper.style.height = ''
   }
 
   cleanupRegistry.register({
