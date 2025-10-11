@@ -82,6 +82,11 @@ body {
   padding: 0;
 }
 
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
 *,
 *::before,
 *::after {

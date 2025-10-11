@@ -17,7 +17,7 @@ try {
 
 const title = legalPageData?.title || 'Legal'
 const content = legalPageData?.content
-const htmlContent = portableTextToHtmlForLegalPage(content)
+const htmlContent = portableTextToHtmlForLegalPage(content, locale)
 const metadata = getPageMetadata('legal', locale)
 ---
 

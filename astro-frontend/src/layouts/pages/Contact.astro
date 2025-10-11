@@ -29,7 +29,7 @@ const metadata = getPageMetadata('contact', locale)
 >
   <div slot="two-column-content" class="contact-content">
     <ContactStudio email={email} phone={phone} />
-    <ContactForm formSection={contactPageData?.formSection} />
+    <ContactForm formSection={contactPageData?.formSection} locale={locale} />
   </div>
 </InternalPageLayout>
 

@@ -126,13 +126,38 @@ export function portableTextToHtml(content: PortableTextBlock[] | undefined): st
  * Detects paragraphs containing only <strong> tags and converts them to headings:
  * - UPPERCASE text → <h2>
  * - lowercase/mixed text → <h3>
+ * Also auto-detects privacy policy sections and adds language-specific ID
  * Used specifically for legal pages where content is pasted with bold formatting
  */
-export function portableTextToHtmlForLegalPage(content: PortableTextBlock[] | undefined): string {
+export function portableTextToHtmlForLegalPage(
+  content: PortableTextBlock[] | undefined,
+  locale: 'ca' | 'es' | 'en' = 'ca',
+): string {
   if (!content || content.length === 0) return ''
 
   // First convert to HTML normally
   let html = portableTextToHtml(content)
+
+  // Privacy-related keywords in multiple languages
+  const privacyKeywords = [
+    'privacitat',
+    'privacidad',
+    'privacy',
+    'privadesa',
+    'dades personals',
+    'datos personales',
+    'personal data',
+    'data protection',
+    'protecció de dades',
+    'protección de datos',
+  ]
+
+  // Language-specific privacy IDs
+  const privacyIds = {
+    ca: 'privacitat',
+    es: 'privacidad',
+    en: 'privacy-policy',
+  }
 
   // Regex to find paragraphs containing ONLY a strong tag (with possible whitespace)
   // Pattern: <p> + optional whitespace + <strong>TEXT</strong> + optional whitespace + </p>
@@ -147,6 +172,14 @@ export function portableTextToHtmlForLegalPage(content: PortableTextBlock[] | un
     const isUppercase = lettersOnly === lettersOnly.toUpperCase() && lettersOnly.length > 0
 
     if (isUppercase) {
+      // Check if this H2 contains privacy-related keywords
+      const lowerText = trimmedText.toLowerCase()
+      const isPrivacySection = privacyKeywords.some((keyword) => lowerText.includes(keyword))
+
+      if (isPrivacySection) {
+        const privacyId = privacyIds[locale]
+        return `<h2 id="${privacyId}">${trimmedText}</h2>`
+      }
       return `<h2>${trimmedText}</h2>`
     } else {
       return `<h3>${trimmedText}</h3>`

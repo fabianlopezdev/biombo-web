@@ -1,6 +1,7 @@
 ---
 import PillButton from '@/components/shared/PillButton.astro'
 import type { FormField } from '@/lib/sanity/schemas/contactPageSchema'
+import { privacyPolicyText } from '@/config/i18n/contactForm'
 
 interface Props {
   formSection?: {
@@ -8,9 +9,11 @@ interface Props {
     formFields?: FormField[]
     submitButtonText?: string
   } | null
+  locale?: 'ca' | 'es' | 'en'
 }
 
-const { formSection } = Astro.props
+const { formSection, locale = 'ca' } = Astro.props
+const privacyText = privacyPolicyText[locale]
 ---
 
 <script src="@/scripts/auto-expanding-textarea.ts"></script>
@@ -75,6 +78,22 @@ const { formSection } = Astro.props
             )}
           </div>
         ))}
+
+        <div class="privacy-checkbox-group">
+          <input
+            type="checkbox"
+            id="privacy-policy"
+            name="privacy-policy"
+            required
+            class="privacy-checkbox"
+          />
+          <label for="privacy-policy" class="privacy-label">
+            {privacyText.text}
+            <a href={privacyText.linkUrl} target="_blank" class="privacy-link">
+              {privacyText.linkText}
+            </a>
+          </label>
+        </div>
 
         <PillButton
           text={formSection.submitButtonText}
@@ -220,6 +239,48 @@ const { formSection } = Astro.props
     }
   }
 
+  /* Privacy Checkbox Styling */
+  .privacy-checkbox-group {
+    margin-bottom: 1.875rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .privacy-checkbox {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.2rem;
+    cursor: pointer;
+    accent-color: var(--color-secondary);
+  }
+
+  .privacy-label {
+    font-size: clamp(0.875rem, 0.808rem + 0.267vi, 1.063rem);
+    line-height: 1.5;
+    cursor: pointer;
+    color: inherit;
+  }
+
+  .privacy-link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: opacity 0.2s ease;
+  }
+
+  .privacy-link:hover {
+    opacity: 0.7;
+  }
+
+  /* Form Validation - Disable button when form is invalid */
+  form:invalid button[type='submit'] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
   @media (max-width: 768px) {
     .contact-form-section {
       margin-top: 2rem;
@@ -227,6 +288,15 @@ const { formSection } = Astro.props
 
     .form-title {
       font-size: 1.5rem;
+    }
+
+    .privacy-checkbox-group {
+      gap: 0.625rem;
+    }
+
+    .privacy-checkbox {
+      width: 1.125rem;
+      height: 1.125rem;
     }
   }
 
