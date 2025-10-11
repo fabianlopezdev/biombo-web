@@ -142,6 +142,7 @@ const privacyText = privacyPolicyText[locale]
 
   .form-group {
     margin-bottom: 1.875rem;
+    overflow: visible; /* Ensure descenders aren't clipped */
   }
 
   .form-group input,
@@ -156,6 +157,9 @@ const privacyText = privacyPolicyText[locale]
     -moz-appearance: none;
     appearance: none;
     padding-bottom: 2.125rem;
+    padding-top: 0.25rem;
+    line-height: 1.5;
+    overflow: visible;
   }
 
   /* Remove default placeholder opacity and set color */
@@ -230,6 +234,7 @@ const privacyText = privacyPolicyText[locale]
     word-break: break-word; /* Alternative for better browser support */
     white-space: pre-wrap; /* Preserve whitespace but wrap text */
     field-sizing: content; /* Modern CSS for auto-sizing (Chrome 123+) */
+    line-height: 1.5; /* Ensure proper spacing for descenders */
   }
 
   /* Fallback for browsers without field-sizing support */
