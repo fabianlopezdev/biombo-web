@@ -71,7 +71,8 @@ export default defineConfig({
         'projectsPage',
         'servicesPage',
         'aboutUsPage',
-        'contactPage'
+        'contactPage',
+        'legalPage'
       ],
       // Field name that will store the language
       languageField: 'language',

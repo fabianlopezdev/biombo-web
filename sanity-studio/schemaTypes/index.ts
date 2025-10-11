@@ -10,6 +10,7 @@ import { projectsPage } from './projectsPage'
 import { servicesPage } from './servicesPage'
 import { aboutUsPage, aboutSlider } from './aboutUsPage'
 import { contactPage } from './contactPage'
+import { legalPage } from './legalPage'
 import { service } from './service'
 import { client } from './client'
 import { footer } from './footer'
@@ -27,6 +28,7 @@ export const schemaTypes = [
   servicesPage,
   aboutUsPage,
   contactPage,
+  legalPage,
 
   // Objects
   localeString,

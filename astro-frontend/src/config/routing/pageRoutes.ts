@@ -8,6 +8,7 @@ export type PageLayout =
   | 'Contact'
   | 'ProjectsLayout'
   | 'ProjectsPageWrapper'
+  | 'LegalPage'
 
 interface RouteConfig {
   layout: PageLayout
@@ -21,6 +22,7 @@ export const catalanPageRoutes: Record<string, RouteConfig> = {
   serveis: { layout: 'Services' },
   contacte: { layout: 'Contact' },
   projectes: { layout: 'ProjectsPageWrapper' },
+  'avis-legal': { layout: 'LegalPage' },
 }
 
 // Map other language routes to their layouts
@@ -31,12 +33,14 @@ export const otherLanguageRoutes: Record<string, Record<string, RouteConfig>> = 
     services: { layout: 'Services' },
     contact: { layout: 'Contact' },
     projects: { layout: 'ProjectsPageWrapper' },
+    'legal-notice': { layout: 'LegalPage' },
   },
   es: {
     nosotros: { layout: 'AboutUs' },
     servicios: { layout: 'Services' },
     contacto: { layout: 'Contact' },
     proyectos: { layout: 'ProjectsPageWrapper' },
+    'aviso-legal': { layout: 'LegalPage' },
   },
 }
 

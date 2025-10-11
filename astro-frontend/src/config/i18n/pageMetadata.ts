@@ -106,6 +106,24 @@ export const pageMetadata = {
         "Posa't en contacte amb Biombo Studio, la teva agència de disseny a Granollers (Barcelona), per parlar del teu projecte o sol·licitar un pressupost. Estem a punt per ajudar-te amb branding, disseny web, UX/UI i més.",
     },
   } as PageMetadataCollection,
+
+  legal: {
+    en: {
+      title: 'Legal Notice | Biombo Studio – Granollers (Barcelona)',
+      description:
+        'Legal notice and terms of use for Biombo Studio, a graphic design agency in Granollers, Barcelona. Information about privacy, cookies, and intellectual property.',
+    },
+    es: {
+      title: 'Aviso Legal | Biombo Studio – Granollers (Barcelona)',
+      description:
+        'Aviso legal y condiciones de uso de Biombo Studio, agencia de diseño gráfico en Granollers, Barcelona. Información sobre privacidad, cookies y propiedad intelectual.',
+    },
+    ca: {
+      title: 'Avís Legal | Biombo Studio – Granollers (Barcelona)',
+      description:
+        "Avís legal i condicions d'ús de Biombo Studio, agència de disseny gràfic a Granollers, Barcelona. Informació sobre privacitat, cookies i propietat intel·lectual.",
+    },
+  } as PageMetadataCollection,
 }
 
 export type PageKey = keyof typeof pageMetadata

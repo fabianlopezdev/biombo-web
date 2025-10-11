@@ -122,6 +122,41 @@ export function portableTextToHtml(content: PortableTextBlock[] | undefined): st
 }
 
 /**
+ * Converts Portable Text to HTML for legal pages with smart heading detection
+ * Detects paragraphs containing only <strong> tags and converts them to headings:
+ * - UPPERCASE text → <h2>
+ * - lowercase/mixed text → <h3>
+ * Used specifically for legal pages where content is pasted with bold formatting
+ */
+export function portableTextToHtmlForLegalPage(content: PortableTextBlock[] | undefined): string {
+  if (!content || content.length === 0) return ''
+
+  // First convert to HTML normally
+  let html = portableTextToHtml(content)
+
+  // Regex to find paragraphs containing ONLY a strong tag (with possible whitespace)
+  // Pattern: <p> + optional whitespace + <strong>TEXT</strong> + optional whitespace + </p>
+  const strongOnlyPattern = /<p>\s*<strong>([^<]+)<\/strong>\s*<\/p>/g
+
+  // Replace each match based on text case
+  html = html.replace(strongOnlyPattern, (match, textContent: string) => {
+    const trimmedText = textContent.trim()
+
+    // Check if text is all uppercase (ignoring numbers, punctuation, and spaces)
+    const lettersOnly = trimmedText.replace(/[^a-zA-ZÀ-ÿ]/g, '')
+    const isUppercase = lettersOnly === lettersOnly.toUpperCase() && lettersOnly.length > 0
+
+    if (isUppercase) {
+      return `<h2>${trimmedText}</h2>`
+    } else {
+      return `<h3>${trimmedText}</h3>`
+    }
+  })
+
+  return html
+}
+
+/**
  * Converts Portable Text to plain text (strips all HTML tags)
  * Used for meta descriptions and other places where plain text is needed
  * @param content - The Portable Text content

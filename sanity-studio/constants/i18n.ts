@@ -12,4 +12,5 @@ export const SINGLETONS = [
   {id: 'servicesPage', _type: 'servicesPage', title: 'Services Page'},
   {id: 'aboutUsPage', _type: 'aboutUsPage', title: 'About Us Page'},
   {id: 'contactPage', _type: 'contactPage', title: 'Contact Page'},
+  {id: 'legalPage', _type: 'legalPage', title: 'Legal Page'},
 ]

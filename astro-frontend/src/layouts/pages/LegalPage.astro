@@ -1,0 +1,98 @@
+---
+import BaseLayout from '@/layouts/shared/BaseLayout.astro'
+import { fetchLegalPageByLocale } from '@/lib/sanity/queries/legalPageQueries'
+import type { LegalPage } from '@/lib/sanity/schemas/legalPageSchema'
+import { getPageMetadata } from '@/config/i18n/pageMetadata'
+import { portableTextToHtmlForLegalPage } from '@/lib/sanity/utils/portableTextToHtml'
+
+const { locale } = Astro.props
+
+let legalPageData: LegalPage | null = null
+
+try {
+  legalPageData = await fetchLegalPageByLocale(locale)
+} catch (error) {
+  console.error('Error fetching legal page data:', error)
+}
+
+const title = legalPageData?.title || 'Legal'
+const content = legalPageData?.content
+const htmlContent = portableTextToHtmlForLegalPage(content)
+const metadata = getPageMetadata('legal', locale)
+---
+
+<BaseLayout
+  pageMetaTitle={metadata.title}
+  pageMetaDescription={metadata.description}
+  skipTarget="#main"
+>
+  <main id="main" class="main-content">
+    <h1 class="hero-title-internal">{title}</h1>
+    {htmlContent && <div class="legal-content" set:html={htmlContent} />}
+  </main>
+</BaseLayout>
+
+<style>
+  .main-content {
+    margin-block-start: var(--header-height);
+    padding-inline: var(--padding-inline);
+    padding-block: var(--padding-block);
+  }
+
+  .legal-content {
+    padding-block-start: var(--padding-block);
+    font-size: clamp(1.125rem, 0.995rem + 0.534vi, 1.5rem);
+    line-height: 1.6;
+    color: var(--color-secondary);
+  }
+
+  .legal-content :global(h2) {
+    /* font-size: clamp(1.5rem, 1.327rem + 0.712vi, 2rem); */
+    font-weight: var(--font-weight-semibold);
+    margin-block-start: 2.5rem;
+    margin-block-end: 1rem;
+    line-height: 1.3;
+  }
+
+  .legal-content :global(h3) {
+    /* font-size: clamp(1.313rem, 1.162rem + 0.623vi, 1.75rem); */
+    font-weight: var(--font-weight-regular);
+    margin-block-start: 2rem;
+    margin-block-end: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .legal-content :global(p) {
+    margin-block-end: 1.25rem;
+  }
+
+  .legal-content :global(ul),
+  .legal-content :global(ol) {
+    margin-block-end: 1.25rem;
+    padding-inline-start: 1.5rem;
+    list-style: disc;
+  }
+
+  .legal-content :global(ol) {
+    list-style: decimal;
+  }
+
+  .legal-content :global(li) {
+    margin-block-end: 0.5rem;
+  }
+
+  .legal-content :global(strong) {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .legal-content :global(a) {
+    color: var(--color-secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: opacity 0.2s ease;
+  }
+
+  .legal-content :global(a:hover) {
+    opacity: 0.7;
+  }
+</style>

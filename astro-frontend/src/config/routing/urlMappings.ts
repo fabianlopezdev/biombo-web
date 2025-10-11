@@ -46,6 +46,12 @@ export const staticUrlMappings: Record<string, UrlTranslations> = {
     en: '/en/contact',
     es: '/es/contacto',
   },
+  // Legal
+  '/avis-legal': {
+    ca: '/avis-legal',
+    en: '/en/legal-notice',
+    es: '/es/aviso-legal',
+  },
 }
 
 /**
