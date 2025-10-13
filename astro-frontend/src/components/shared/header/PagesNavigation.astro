@@ -12,6 +12,15 @@ interface Props {
 const { pages, locale } = Astro.props as Props
 // Current pathname to determine active link
 const currentPath = Astro.url.pathname
+
+/**
+ * Normalize path for comparison by removing trailing slashes
+ * This handles differences between link hrefs and actual URL paths
+ * E.g., "/contacte" and "/contacte/" should match
+ */
+function normalizePathForComparison(path: string): string {
+  return path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path
+}
 ---
 
 <nav class="navigation" aria-label="Primary">
@@ -20,7 +29,8 @@ const currentPath = Astro.url.pathname
       pages.map(function renderPage(page) {
         const pageName = getPageName(page)
         const pagePath = getPagePath(page, locale)
-        const isActive = pagePath === currentPath
+        const isActive =
+          normalizePathForComparison(pagePath) === normalizePathForComparison(currentPath)
 
         return (
           <li class="nav-page">
