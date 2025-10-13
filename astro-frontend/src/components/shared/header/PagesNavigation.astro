@@ -179,11 +179,10 @@ const currentPath = Astro.url.pathname
       width: 100%;
       mask-image: linear-gradient(to right, #000 0%, #000);
       -webkit-mask-image: linear-gradient(to right, #000 0%, #000);
-      mask-size: 0% 100%;
-      -webkit-mask-size: 0% 100%;
+      mask-size: 100% 100%;
+      -webkit-mask-size: 100% 100%;
       mask-repeat: no-repeat;
       -webkit-mask-repeat: no-repeat;
-      animation: reveal 0.5s cubic-bezier(0.33, 0, 0.67, 1) 0.5s forwards;
     }
   }
 
