@@ -32,7 +32,7 @@ const { services, class: className = '' } = Astro.props
               <span class="services-toggle-minus">-</span>
             </div>
           </summary>
-          {service.description && <p>{service.description}</p>}
+          {service.description && <p class="service-text">{service.description}</p>}
         </details>
       ))}
     </div>
@@ -45,6 +45,11 @@ const { services, class: className = '' } = Astro.props
     font-weight: var(--font-weight-light);
     max-width: 51rem;
     line-height: 1.184;
+  }
+
+  .service-text {
+    font-size: clamp(1.125rem, 0.908rem + 0.89vi, 1.75rem);
+    letter-spacing: -0.02em;
   }
 
   .services__title {
