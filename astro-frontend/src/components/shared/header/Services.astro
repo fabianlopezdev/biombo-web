@@ -37,8 +37,7 @@ const { servicesData } = Astro.props as Props
   }
 
   .services-hero {
-    height: 100dvh;
-    padding-block: var(--padding-block);
+    padding-block-start: var(--padding-block);
     padding-inline-start: var(--padding-inline);
     padding-inline-end: 7.25rem;
   }
@@ -58,13 +57,10 @@ const { servicesData } = Astro.props as Props
     margin-inline-end: 2rem;
   }
 
-  :global(.services-list) {
-    padding-block-start: var(--internal-padding-block);
-  }
-
   @media (width < 1025px) {
     .services-hero {
       height: auto;
+      padding-block: var(--padding-block);
       padding-inline-end: var(--padding-inline);
     }
 
