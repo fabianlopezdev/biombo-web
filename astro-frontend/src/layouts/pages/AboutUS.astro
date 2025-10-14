@@ -6,9 +6,12 @@ import { fetchAboutUsPageByLocale } from '@/lib/sanity/queries/aboutUsPageQuerie
 import { fetchFeaturedClients } from '@/lib/sanity/queries/clientQueries'
 import type { AboutUsPage } from '@/lib/sanity/schemas/aboutUsPageSchema'
 import { getPageMetadata } from '@/config/i18n/pageMetadata'
+import { portableTextToHtml } from '@/lib/sanity/utils/portableTextToHtml'
 import type { DisplayImage } from '@/components/shared/AboutSlider.astro'
 
 const { locale } = Astro.props
+
+console.log('🌐 [About Us Layout] Locale:', locale)
 
 let aboutUsPageData: AboutUsPage | null = null
 let clients = []
@@ -19,13 +22,28 @@ try {
     fetchAboutUsPageByLocale(locale),
     fetchFeaturedClients(),
   ])
-  console.log('About Us Page Data:', aboutUsPageData)
-  console.log('Clients Title:', aboutUsPageData?.clientsTitle)
+  console.log('📄 [About Us Layout] About Us Page Data:', aboutUsPageData)
+  console.log('📄 [About Us Layout] Page Title:', aboutUsPageData?.title)
+  console.log('📄 [About Us Layout] Description (raw):', aboutUsPageData?.description)
+  console.log('📄 [About Us Layout] About Slider:', aboutUsPageData?.aboutSlider)
+  console.log('📄 [About Us Layout] Slider Title:', aboutUsPageData?.aboutSlider?.title)
+  console.log(
+    '📄 [About Us Layout] Slider Images:',
+    aboutUsPageData?.aboutSlider?.images?.length || 0,
+  )
+  console.log('📄 [About Us Layout] Clients Title:', aboutUsPageData?.clientsTitle)
+  console.log('📄 [About Us Layout] Clients Data:', clients)
+  console.log('📄 [About Us Layout] Number of clients:', clients?.length || 0)
 } catch (error) {
-  console.error('Error fetching about us page data:', error)
+  console.error('❌ [About Us Layout] Error fetching about us page data:', error)
 }
 
 const metadata = getPageMetadata('about', locale)
+
+// Convert portable text description to HTML
+const descriptionHtml = aboutUsPageData?.description
+  ? portableTextToHtml(aboutUsPageData.description)
+  : null
 
 // Transform images to the expected format for AboutSlider
 const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
@@ -34,12 +52,15 @@ const sliderImages: DisplayImage[] = aboutUsPageData?.aboutSlider?.images
       asset: img.asset,
     }))
   : []
+
+console.log('📋 [About Us Layout] Description HTML:', descriptionHtml)
 ---
 
 <InternalPageLayout
   pageMetaTitle={metadata.title}
   pageMetaDescription={metadata.description}
   pageTitle={aboutUsPageData?.title || 'About Us'}
+  pageDescription={descriptionHtml}
 >
   {
     aboutUsPageData?.aboutSlider && (

@@ -9,6 +9,14 @@ interface Props {
 }
 
 const { services, class: className = '' } = Astro.props
+
+console.log('🎨 [ServicesList Component] Received services:', services)
+console.log('🎨 [ServicesList Component] Number of services:', services?.length || 0)
+console.log('🎨 [ServicesList Component] Class name:', className)
+
+if (services && services.length > 0) {
+  console.log('🎨 [ServicesList Component] First service:', services[0])
+}
 ---
 
 <script src="@/scripts/animations/services-list-stagger.ts"></script>

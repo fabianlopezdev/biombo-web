@@ -75,6 +75,10 @@ export async function fetchAboutUsPageByLocale(
   const query = `*[_id == $documentId][0]{ ${ABOUT_US_PAGE_FIELDS} }`
   const params = { documentId }
 
+  console.log('🔍 [About Us Query] Document ID:', documentId)
+  console.log('🔍 [About Us Query] Full query:', query)
+  console.log('🔍 [About Us Query] Params:', params)
+
   try {
     // Attempt to fetch and validate with Zod schema
     const aboutUsPage = await fetchSanityQuery({
@@ -82,8 +86,10 @@ export async function fetchAboutUsPageByLocale(
       params,
       schema: aboutUsPageSchema,
     })
+    console.log('✅ [About Us Query] Data fetched successfully:', aboutUsPage)
     return aboutUsPage
-  } catch {
+  } catch (error) {
+    console.error('❌ [About Us Query] Schema validation failed:', error)
     // Log schema validation failure and attempt to fetch raw data as a fallback
     // This can be useful during development if schema and data are temporarily misaligned
     try {
@@ -91,11 +97,14 @@ export async function fetchAboutUsPageByLocale(
         query,
         params,
       })
+      console.log('⚠️ [About Us Query] Raw data (schema validation failed):', rawData)
       if (!rawData) {
+        console.log('❌ [About Us Query] No raw data found')
         return null
       }
       return rawData as AboutUsPage // Cast to AboutUsPage, acknowledging potential mismatch
-    } catch {
+    } catch (fallbackError) {
+      console.error('❌ [About Us Query] Fallback also failed:', fallbackError)
       return null
     }
   }

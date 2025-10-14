@@ -4,24 +4,44 @@ import ServicesList from '@/components/shared/ServicesList.astro'
 import { fetchServicesPageByLocale } from '@/lib/sanity/queries/servicesPageQueries'
 import type { ServicesPage } from '@/lib/sanity/schemas/servicesPageSchema'
 import { getPageMetadata } from '@/config/i18n/pageMetadata'
+import { portableTextToHtml } from '@/lib/sanity/utils/portableTextToHtml'
 
 const { locale } = Astro.props
+
+console.log('🌐 [Services Layout] Locale:', locale)
 
 let servicesPageData: ServicesPage | null = null
 
 try {
   servicesPageData = await fetchServicesPageByLocale(locale)
+  console.log('📄 [Services Layout] Services Page Data:', servicesPageData)
+  console.log('📄 [Services Layout] Page Title:', servicesPageData?.title)
+  console.log('📄 [Services Layout] Description (raw):', servicesPageData?.description)
+  console.log('📄 [Services Layout] Selected Services:', servicesPageData?.selectedServices)
+  console.log(
+    '📄 [Services Layout] Number of services:',
+    servicesPageData?.selectedServices?.length || 0,
+  )
 } catch (error) {
-  console.error('Error fetching services page data:', error)
+  console.error('❌ [Services Layout] Error fetching services page data:', error)
 }
 
 const metadata = getPageMetadata('services', locale)
+
+// Convert portable text description to HTML
+const descriptionHtml = servicesPageData?.description
+  ? portableTextToHtml(servicesPageData.description)
+  : null
+
+console.log('📋 [Services Layout] Metadata:', metadata)
+console.log('📋 [Services Layout] Description HTML:', descriptionHtml)
 ---
 
 <InternalPageLayout
   pageMetaTitle={metadata.title}
   pageMetaDescription={metadata.description}
   pageTitle={servicesPageData?.title || 'Serveis'}
+  pageDescription={descriptionHtml}
 >
   <ServicesList services={servicesPageData?.selectedServices} class="g-negative-inline-padding" />
 </InternalPageLayout>

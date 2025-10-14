@@ -6,10 +6,16 @@ interface Props {
   pageMetaTitle: string
   pageTitle: string
   pageMetaDescription: string
+  pageDescription?: string | null // Actual page description from Sanity (can be HTML)
 }
 
-const { pageMetaTitle, pageTitle, pageMetaDescription } = Astro.props
+const { pageMetaTitle, pageTitle, pageMetaDescription, pageDescription = null } = Astro.props
 const hasTwoColumnContent = Astro.slots.has('two-column-content')
+
+console.log('📋 [InternalPageLayout] Page Title:', pageTitle)
+console.log('📋 [InternalPageLayout] Has two-column-content slot:', hasTwoColumnContent)
+console.log('📋 [InternalPageLayout] Page Description (Sanity):', pageDescription)
+console.log('📋 [InternalPageLayout] Meta Description (SEO):', pageMetaDescription)
 ---
 
 <BaseLayout
@@ -26,7 +32,7 @@ const hasTwoColumnContent = Astro.slots.has('two-column-content')
           </Fragment>
         </TwoColumnLayout>
       ) : (
-        <TwoColumnLayout title={pageTitle} description={pageMetaDescription} />
+        <TwoColumnLayout title={pageTitle} description={pageDescription || pageMetaDescription} />
       )
     }
     <slot />
