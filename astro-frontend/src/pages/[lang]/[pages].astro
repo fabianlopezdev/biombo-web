@@ -1,30 +1,17 @@
 ---
 import PageLayoutRouter from '@/helpers/routing/PageLayoutRouter.astro'
-import {
-  otherLanguageRoutes,
-  getLayoutForOtherLanguagePage,
-  type OtherLanguageStaticPath,
-} from '@/config/routing/pageRoutes'
+import { getLayoutForOtherLanguagePage } from '@/config/routing/pageRoutes'
 
-export const prerender = true
-
-export async function getStaticPaths(): Promise<OtherLanguageStaticPath[]> {
-  const paths: OtherLanguageStaticPath[] = []
-
-  Object.entries(otherLanguageRoutes).forEach(([lang, pages]) => {
-    Object.keys(pages).forEach((page) => {
-      paths.push({
-        params: { lang, pages: page },
-        props: { lang, page, locale: lang },
-      })
-    })
-  })
-
-  return paths
-}
-
-const { lang, page, locale } = Astro.props
+// SSR mode - no prerendering, fetches fresh data on each request
+const lang = Astro.params.lang as string
+const page = Astro.params.pages as string
+const locale = lang
 const layout = getLayoutForOtherLanguagePage(lang, page)
+
+// Handle invalid routes
+if (!layout) {
+  return Astro.redirect('/404')
+}
 ---
 
 <PageLayoutRouter {layout} {locale} />
