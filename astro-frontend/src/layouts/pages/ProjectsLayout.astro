@@ -7,16 +7,26 @@ import { getPageMetadata } from '@/config/i18n/pageMetadata'
 import type { Project } from '@/lib/sanity/schemas/projectSchema'
 import type { Service } from '@/lib/sanity/schemas/serviceSchema'
 import type { Client } from '@/lib/sanity/schemas/clientSchema'
+import type { ProjectsPage } from '@/lib/sanity/schemas/projectsPageSchema'
 
 interface Props {
   locale: Locale
   projects: Project[] | null
   services: Service[] | null
+  projectsPageData?: ProjectsPage | null
 }
 
-const { locale, projects, services } = Astro.props
+const { locale, projects, services, projectsPageData } = Astro.props
 const t = projectsTranslations[locale]
 const metadata = getPageMetadata('projects', locale)
+
+console.log('🌐 [Projects Layout] Locale:', locale)
+console.log('📄 [Projects Layout] Projects Page Data:', projectsPageData)
+console.log('📄 [Projects Layout] Page Title from Sanity:', projectsPageData?.title)
+console.log('📄 [Projects Layout] Fallback Title:', t.pageTitle)
+
+// Use Sanity title if available, otherwise fallback to translations
+const pageTitle = projectsPageData?.title || t.pageTitle
 
 // Helper function to get image URL
 const getImageUrl = (project: Project): string => {
@@ -48,7 +58,7 @@ const getProjectSlug = (slug: { current: string } | string): string => {
   skipTarget="#main"
 >
   <main id="main" class="main-content">
-    <h1 class="hero-title-internal">{t.pageTitle}</h1>
+    <h1 class="hero-title-internal">{pageTitle}</h1>
     <section
       class="projects-filter-container"
       aria-labelledby="filter-heading"

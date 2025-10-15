@@ -14,16 +14,10 @@ export const projectsPage = defineType({
     }),
     defineField({
       name: 'title',
-      title: 'Title',
+      title: 'Page Title',
       type: 'string', // Using regular string as the document is already internationalized
+      description: 'The main title displayed at the top of the projects page. Note: The projects displayed are automatically pulled from the Projects documents, and the filter options come from the Services documents. This page only controls the page title.',
       validation: (Rule) => Rule.required().error('A title is required'),
-    }),
-    defineField({
-      name: 'mainContent',
-      title: 'Main Content',
-      type: 'array',
-      of: [{type: 'block'}],
-      validation: (Rule) => Rule.required().error('Main content is required'),
     }),
   ],
   preview: {
@@ -35,7 +29,7 @@ export const projectsPage = defineType({
       const { title, language } = selection
       return {
         title: `${title || 'Projects Page'} (${(language || '').toUpperCase()})`,
-        subtitle: 'Projects listing and configuration',
+        subtitle: 'Projects listing page - controls page title only',
       }
     },
   },

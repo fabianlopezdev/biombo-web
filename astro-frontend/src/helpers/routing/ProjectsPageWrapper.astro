@@ -2,6 +2,7 @@
 import ProjectsLayout from '@/layouts/pages/ProjectsLayout.astro'
 import { fetchProjectsByLocale } from '@/lib/sanity/queries/projectQueries'
 import { fetchServicesByLocale } from '@/lib/sanity/queries/serviceQueries'
+import { fetchProjectsPageByLocale } from '@/lib/sanity/queries/projectsPageQueries'
 import type { Locale } from '@/config/i18n/projects'
 
 interface Props {
@@ -10,16 +11,22 @@ interface Props {
 
 const { locale } = Astro.props
 
-// Fetch all projects and services for the given locale
+console.log('🌐 [Projects Page Wrapper] Locale:', locale)
+
+// Fetch all projects, services, and page data for the given locale
 let projects = null
 let services = null
+let projectsPageData = null
 
 try {
   projects = await fetchProjectsByLocale(locale)
   services = await fetchServicesByLocale(locale)
+  projectsPageData = await fetchProjectsPageByLocale(locale)
+  console.log('📄 [Projects Page Wrapper] Projects Page Data:', projectsPageData)
+  console.log('📄 [Projects Page Wrapper] Page Title:', projectsPageData?.title)
 } catch (error) {
-  console.error(`Error fetching projects/services for locale ${locale}:`, error)
+  console.error(`❌ [Projects Page Wrapper] Error fetching data for locale ${locale}:`, error)
 }
 ---
 
-<ProjectsLayout {locale} {projects} {services} />
+<ProjectsLayout {locale} {projects} {services} {projectsPageData} />
