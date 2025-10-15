@@ -94,7 +94,7 @@
 [context.production.environment]
   NODE_ENV = "production"
   PUBLIC_ENV_MODE = "production"
-  PUBLIC_SANITY_USE_CDN = "true"
+  PUBLIC_SANITY_USE_CDN = "false"
 
 [context.deploy-preview.environment]
   NODE_ENV = "production"
