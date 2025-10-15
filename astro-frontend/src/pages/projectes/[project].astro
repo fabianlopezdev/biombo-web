@@ -1,19 +1,16 @@
 ---
 import SingleProjectLayout from '@/layouts/pages/SingleProjectLayout.astro'
-import { fetchProjectsByLocale } from '@/lib/sanity/queries/projectQueries'
 
-export const prerender = true
+// SSR mode - no prerendering, fetches fresh data on each request
+export const prerender = false
 
-export async function getStaticPaths() {
-  const projects = await fetchProjectsByLocale('ca')
-  return projects.map((proj) => ({
-    params: { project: proj.slug.current },
-    props: { slug: proj.slug.current },
-  }))
-}
-
-const { slug } = Astro.props
+const slug = Astro.params.project as string
 const locale = 'ca'
+
+// Handle invalid routes
+if (!slug) {
+  return Astro.redirect('/404')
+}
 ---
 
 <SingleProjectLayout {slug} {locale} />
