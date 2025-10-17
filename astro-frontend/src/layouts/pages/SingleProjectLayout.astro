@@ -114,6 +114,7 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
           const nextSection =
             !isLastSection && project.contentSections ? project.contentSections[index + 1] : null
           const isBeforeText = nextSection && nextSection._type === 'textBlock'
+          const isBeforeImage = nextSection && nextSection._type === 'imageSection'
 
           if (section._type === 'textBlock') {
             return (
@@ -131,7 +132,9 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
             const spacingClass = !isLastSection
               ? isBeforeText
                 ? 'before-text'
-                : 'with-spacing'
+                : isBeforeImage
+                  ? 'before-image'
+                  : 'with-spacing'
               : ''
 
             // 1 image layout - full width (like the standalone image)
@@ -434,6 +437,11 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
     margin-block-end: 0;
   }
 
+  /* Reduced margin when image section is before another image section */
+  .content-section.before-image {
+    margin-block-end: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);
+  }
+
   /* Special margin for standalone text sections */
   .content-section.standalone-text-section {
     margin-block: clamp(3.375rem, 1.291rem + 8.549vi, 9.375rem);
@@ -518,6 +526,10 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
   @media (width < 992px) {
     .content-section.with-spacing {
       margin-block-end: clamp(2rem, 1.5rem + 2vi, 3.5rem);
+    }
+
+    .content-section.before-image {
+      margin-block-end: clamp(1.25rem, 1.033rem + 0.89vi, 1.875rem);
     }
 
     .mobile {
