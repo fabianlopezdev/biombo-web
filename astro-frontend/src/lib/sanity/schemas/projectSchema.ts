@@ -111,6 +111,10 @@ const fileWithResolvedAssetSchema = z.object({
   asset: z.union([resolvedSanityAssetSchema, resolvedSanityFileAssetSchema]),
 })
 
+// Define a union schema for media items that can be EITHER image OR file type
+// This matches Sanity Studio's hybrid array type: of: [{type: 'image'}, {type: 'file'}]
+const mediaItemSchema = z.union([imageWithResolvedAssetSchema, fileWithResolvedAssetSchema])
+
 // Schema for text block content section
 const textBlockSchema = z.object({
   _type: z.literal('textBlock'),
@@ -122,9 +126,13 @@ const textBlockSchema = z.object({
 const imageSectionSchema = z.object({
   _type: z.literal('imageSection'),
   _key: z.string(),
-  // New media format - file type that can be image or video
-  featuredMedia: fileWithResolvedAssetSchema.nullable().optional(),
-  otherMedia: z.array(fileWithResolvedAssetSchema).nullable().optional(),
+  // New media format - can be EITHER image OR file (video)
+  // Accepts both single item (legacy) or array item from Sanity's hybrid array type
+  featuredMedia: z
+    .union([z.array(mediaItemSchema), mediaItemSchema])
+    .nullable()
+    .optional(),
+  otherMedia: z.array(mediaItemSchema).nullable().optional(),
   // Legacy image format (for backward compatibility)
   featuredImage: imageWithResolvedAssetSchema.nullable().optional(),
   otherImages: z.array(imageWithResolvedAssetSchema).nullable().optional(),
@@ -144,14 +152,14 @@ export const projectSchema = z.object({
   slug: z.object({ _type: z.literal('slug'), current: z.string() }), // Changed from localeSlugSchema
   mainImage: imageWithResolvedAssetSchema.nullable().optional(), // Use the schema with resolved asset (legacy)
   mainMedia: z
-    .union([z.array(fileWithResolvedAssetSchema), fileWithResolvedAssetSchema])
+    .union([z.array(mediaItemSchema), mediaItemSchema])
     .nullable()
-    .optional(), // New media field - array with max 1 item (or single for legacy)
+    .optional(), // New media field - can be image or file (video), array with max 1 item (or single for legacy)
   thumbnailImage: imageWithResolvedAssetSchema.nullable().optional(), // Added nullable (legacy)
   thumbnailMedia: z
-    .union([z.array(fileWithResolvedAssetSchema), fileWithResolvedAssetSchema])
+    .union([z.array(mediaItemSchema), mediaItemSchema])
     .nullable()
-    .optional(), // New thumbnail media field - array with max 1 item (or single for legacy)
+    .optional(), // New thumbnail media field - can be image or file (video), array with max 1 item (or single for legacy)
   useSeparateThumbnail: z.boolean().nullable().optional(), // Added useSeparateThumbnail field
   excerpt: z.array(z.any()).nullable().optional(), // Added nullable
   description: z.array(z.any()).nullable().optional(), // Added nullable
@@ -207,6 +215,7 @@ export type ResolvedSanityAsset = z.infer<typeof resolvedSanityAssetSchema>
 export type ResolvedSanityFileAsset = z.infer<typeof resolvedSanityFileAssetSchema>
 export type ImageWithResolvedAsset = z.infer<typeof imageWithResolvedAssetSchema>
 export type FileWithResolvedAsset = z.infer<typeof fileWithResolvedAssetSchema>
+export type MediaItem = z.infer<typeof mediaItemSchema> // Union type for media that can be image OR file
 export type ImageWithAlt = z.infer<typeof imageWithAltSchema> // Keeping for now, review if needed
 export type Project = z.infer<typeof projectSchema>
 export type Projects = z.infer<typeof projectsSchema>

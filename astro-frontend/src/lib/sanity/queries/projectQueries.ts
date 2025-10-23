@@ -54,7 +54,7 @@ export async function fetchProjectBySlug(
           }
         }
       },
-      mainMedia {
+      mainMedia[] {
         _type,
         asset-> {
           _id,
@@ -86,7 +86,7 @@ export async function fetchProjectBySlug(
           }
         }
       },
-      thumbnailMedia {
+      thumbnailMedia[] {
         _type,
         asset-> {
           _id,
@@ -133,7 +133,7 @@ export async function fetchProjectBySlug(
         // For textBlock
         text,
         // For imageSection - new media format (file type - can be image or video)
-        featuredMedia {
+        featuredMedia[] {
           _type,
           asset-> {
             _id,
@@ -395,7 +395,7 @@ export async function fetchSimilarProjects(
           }
         }
       },
-      mainMedia {
+      mainMedia[] {
         _type,
         asset-> {
           _id,
@@ -427,7 +427,7 @@ export async function fetchSimilarProjects(
           }
         }
       },
-      thumbnailMedia {
+      thumbnailMedia[] {
         _type,
         asset-> {
           _id,
@@ -590,7 +590,7 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
           }
         }
       },
-      mainMedia {
+      mainMedia[] {
         _type,
         asset-> {
           _id,
@@ -622,7 +622,7 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
           }
         }
       },
-      thumbnailMedia {
+      thumbnailMedia[] {
         _type,
         asset-> {
           _id,

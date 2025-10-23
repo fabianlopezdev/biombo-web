@@ -123,10 +123,28 @@ Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
       otherMedia: 'otherMedia',
     },
     prepare({ featuredImage, otherImages, featuredMedia, otherMedia }) {
-      // Check both legacy and new formats
-      const hasFeatured = !!(featuredImage || featuredMedia)
+      // Count ALL featured media items separately (sections can have BOTH during migration)
+      let featuredCount = 0
+
+      // Count legacy featured image
+      if (featuredImage) featuredCount++
+
+      // Count new featured media (array format or legacy single field)
+      if (Array.isArray(featuredMedia)) {
+        if (featuredMedia.length > 0) featuredCount++
+      } else if (featuredMedia) {
+        // Legacy single field format (backward compatibility)
+        featuredCount++
+      }
+
+      // Count ALL other media (both legacy and new)
       const otherCount = (otherImages?.length || 0) + (otherMedia?.length || 0)
-      const totalMedia = (hasFeatured ? 1 : 0) + otherCount
+
+      // Calculate total (sum of all items from all sources)
+      const totalMedia = featuredCount + otherCount
+
+      // For layout hints, check if we have at least one featured item
+      const hasFeatured = featuredCount > 0
 
       let title = ''
       let subtitle = ''
@@ -146,6 +164,10 @@ Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
       } else if (totalMedia === 4) {
         title = 'Media Section with 4 items'
         subtitle = '3 on top, featured below'
+      } else {
+        // 5 or more items (possible during migration with both legacy and new media)
+        title = `Media Section with ${totalMedia} items`
+        subtitle = 'Contains both legacy and new media'
       }
 
       return {
