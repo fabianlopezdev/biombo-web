@@ -75,6 +75,19 @@ const resolvedSanityAssetSchema = z.object({
     .optional(),
 })
 
+// Define Zod schema for a resolved Sanity video/file asset
+const resolvedSanityFileAssetSchema = z.object({
+  _id: z.string(),
+  _type: z.string(), // Typically 'sanity.fileAsset'
+  url: z.string().url(),
+  path: z.string().optional(),
+  assetId: z.string().optional(),
+  extension: z.string().optional(),
+  mimeType: z.string().optional(),
+  size: z.number().optional(),
+  originalFilename: z.string().optional(),
+})
+
 // Define Zod schema for an image object that contains a RESOLVED asset
 const imageWithResolvedAssetSchema = z.object({
   _type: z.literal('image'),
@@ -92,6 +105,12 @@ const imageWithResolvedAssetSchema = z.object({
     .optional(),
 })
 
+// Define Zod schema for a file object with resolved asset (can be image or video)
+const fileWithResolvedAssetSchema = z.object({
+  _type: z.literal('file'),
+  asset: z.union([resolvedSanityAssetSchema, resolvedSanityFileAssetSchema]),
+})
+
 // Schema for text block content section
 const textBlockSchema = z.object({
   _type: z.literal('textBlock'),
@@ -99,10 +118,14 @@ const textBlockSchema = z.object({
   text: z.array(z.any()).nullable().optional(), // Portable text blocks
 })
 
-// Schema for image section content
+// Schema for image/media section content (supports both new file format and legacy image format)
 const imageSectionSchema = z.object({
   _type: z.literal('imageSection'),
   _key: z.string(),
+  // New media format - file type that can be image or video
+  featuredMedia: fileWithResolvedAssetSchema.nullable().optional(),
+  otherMedia: z.array(fileWithResolvedAssetSchema).nullable().optional(),
+  // Legacy image format (for backward compatibility)
   featuredImage: imageWithResolvedAssetSchema.nullable().optional(),
   otherImages: z.array(imageWithResolvedAssetSchema).nullable().optional(),
 })
@@ -119,8 +142,16 @@ export const projectSchema = z.object({
   language: z.string().optional(), // Added language field
   title: z.string(), // Changed from localeStringSchema
   slug: z.object({ _type: z.literal('slug'), current: z.string() }), // Changed from localeSlugSchema
-  mainImage: imageWithResolvedAssetSchema, // Use the schema with resolved asset
-  thumbnailImage: imageWithResolvedAssetSchema.nullable().optional(), // Added nullable
+  mainImage: imageWithResolvedAssetSchema.nullable().optional(), // Use the schema with resolved asset (legacy)
+  mainMedia: z
+    .union([z.array(fileWithResolvedAssetSchema), fileWithResolvedAssetSchema])
+    .nullable()
+    .optional(), // New media field - array with max 1 item (or single for legacy)
+  thumbnailImage: imageWithResolvedAssetSchema.nullable().optional(), // Added nullable (legacy)
+  thumbnailMedia: z
+    .union([z.array(fileWithResolvedAssetSchema), fileWithResolvedAssetSchema])
+    .nullable()
+    .optional(), // New thumbnail media field - array with max 1 item (or single for legacy)
   useSeparateThumbnail: z.boolean().nullable().optional(), // Added useSeparateThumbnail field
   excerpt: z.array(z.any()).nullable().optional(), // Added nullable
   description: z.array(z.any()).nullable().optional(), // Added nullable
@@ -173,7 +204,9 @@ export const projectsSchema = z.array(projectSchema)
 // Export TypeScript types derived from the Zod schemas
 export type LocaleString = z.infer<typeof localeStringSchema>
 export type ResolvedSanityAsset = z.infer<typeof resolvedSanityAssetSchema>
+export type ResolvedSanityFileAsset = z.infer<typeof resolvedSanityFileAssetSchema>
 export type ImageWithResolvedAsset = z.infer<typeof imageWithResolvedAssetSchema>
+export type FileWithResolvedAsset = z.infer<typeof fileWithResolvedAssetSchema>
 export type ImageWithAlt = z.infer<typeof imageWithAltSchema> // Keeping for now, review if needed
 export type Project = z.infer<typeof projectSchema>
 export type Projects = z.infer<typeof projectsSchema>

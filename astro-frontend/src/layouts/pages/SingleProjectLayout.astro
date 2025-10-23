@@ -4,13 +4,27 @@ import PillButton from '@/components/shared/PillButton.astro'
 import TwoColumnLayout from '@/components/shared/TwoColumnLayout.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
 import OptimizedImage from '@/components/shared/OptimizedImage.astro'
+import OptimizedVideo from '@/components/shared/OptimizedVideo.astro'
 import { portableTextToHtml, portableTextToPlainText } from '@/lib/sanity/utils/portableTextToHtml'
 import { fetchProjectBySlug, fetchSimilarProjects } from '@/lib/sanity/queries/projectQueries'
-import { getImageUrl, getImageSectionLayout } from '@/helpers/projects/projectHelpers'
+import {
+  getImageUrl,
+  getMediaUrl,
+  getImageSectionLayout,
+  isImageFile,
+  isVideoFile,
+  getMainMedia,
+  getThumbnailMedia,
+  isMainMediaVideo,
+} from '@/helpers/projects/projectHelpers'
 import { getProjectTranslations } from '@/config/i18n/projectDetail'
 import { getProjectsListUrl, type SupportedLocale } from '@/config/routing/projectRoutes'
 import { generateProjectMetadata } from '@/config/i18n/pageMetadata'
-import type { Project, ImageWithResolvedAsset } from '@/lib/sanity/schemas/projectSchema'
+import type {
+  Project,
+  ImageWithResolvedAsset,
+  FileWithResolvedAsset,
+} from '@/lib/sanity/schemas/projectSchema'
 
 interface Props {
   slug: string
@@ -55,14 +69,24 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
 
     <header class="project-header">
       <figure class="hero-figure">
-        <OptimizedImage
-          class="hero-image"
-          src={getImageUrl(project.mainImage)}
-          alt={`${project.title}`}
-          image={project.mainImage}
-          imageContext="hero"
-          loading="eager"
-        />
+        {
+          isMainMediaVideo(project) ? (
+            <OptimizedVideo
+              video={getMainMedia(project) as FileWithResolvedAsset}
+              class="hero-image"
+              aspectRatio={1513 / 722}
+            />
+          ) : (
+            <OptimizedImage
+              class="hero-image"
+              src={getImageUrl(getMainMedia(project) as ImageWithResolvedAsset)}
+              alt={`${project.title}`}
+              image={getMainMedia(project) as ImageWithResolvedAsset}
+              imageContext="hero"
+              loading="eager"
+            />
+          )
+        }
       </figure>
     </header>
 
@@ -137,39 +161,85 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
                   : 'with-spacing'
               : ''
 
-            // 1 image layout - full width (like the standalone image)
-            if (layout.totalImages === 1) {
+            // Helper to render a single media item (image or video)
+            const renderMediaItem = (
+              media: FileWithResolvedAsset | ImageWithResolvedAsset | null | undefined,
+            ) => {
+              if (!media) return null
+
+              // Handle new file format (can be image or video)
+              if ('_type' in media && media._type === 'file') {
+                const file = media as FileWithResolvedAsset
+
+                // Check if it's an image by asset._type
+                if (isImageFile(file)) {
+                  // Convert file to image format for OptimizedImage component
+                  const imageData = {
+                    _type: 'image' as const,
+                    asset: file.asset,
+                  }
+                  return (
+                    <OptimizedImage
+                      src={getMediaUrl(file)}
+                      alt={project.title}
+                      image={imageData}
+                      loading="lazy"
+                    />
+                  )
+                }
+                // Check if it's a video by asset._type or mimeType
+                else if (isVideoFile(file)) {
+                  return <OptimizedVideo video={file} />
+                }
+              }
+              // Handle legacy image format
+              else if ('_type' in media && media._type === 'image') {
+                const image = media as ImageWithResolvedAsset
+                return (
+                  <OptimizedImage
+                    src={getImageUrl(image)}
+                    alt={project.title}
+                    image={image}
+                    loading="lazy"
+                  />
+                )
+              }
+              return null
+            }
+
+            // Get the featured media/image for rendering
+            // FeaturedMedia is now an array with max 1 item
+            const featuredMedia =
+              Array.isArray(section.featuredMedia) && section.featuredMedia.length > 0
+                ? section.featuredMedia[0]
+                : section.featuredMedia || section.featuredImage
+
+            // 1 media layout - full width
+            if (layout.totalMedia === 1) {
+              const singleMedia = layout.hasFeatured
+                ? featuredMedia
+                : layout.otherMedia[0] || layout.otherImages[0]
+
               return (
                 <div class={`content-section ${spacingClass}`}>
                   <figure class="red-background standalone-image">
-                    <OptimizedImage
-                      src={getImageUrl(
-                        layout.hasFeatured ? section.featuredImage : layout.otherImages[0],
-                      )}
-                      alt={project.title}
-                      image={layout.hasFeatured ? section.featuredImage : layout.otherImages[0]}
-                      loading="lazy"
-                    />
+                    {renderMediaItem(singleMedia)}
                   </figure>
                 </div>
               )
             }
 
-            // 2 images layout - side by side (two columns only)
-            if (layout.totalImages === 2) {
+            // 2 media layout - side by side (two columns only)
+            if (layout.totalMedia === 2) {
+              const mediaItems =
+                layout.otherMedia.length > 0 ? layout.otherMedia : layout.otherImages
+
               return (
                 <div class={`content-section ${spacingClass}`}>
                   <div class="two-image-layout gallery">
                     <div class="two-columns">
-                      {layout.otherImages.map((img: ImageWithResolvedAsset) => (
-                        <figure class="red-background">
-                          <OptimizedImage
-                            src={getImageUrl(img)}
-                            alt={project.title}
-                            image={img}
-                            loading="lazy"
-                          />
-                        </figure>
+                      {mediaItems.map((media: FileWithResolvedAsset | ImageWithResolvedAsset) => (
+                        <figure class="red-background">{renderMediaItem(media)}</figure>
                       ))}
                     </div>
                   </div>
@@ -177,55 +247,36 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
               )
             }
 
-            // 3 images layout - depends on whether there's a featured image
-            if (layout.totalImages === 3) {
-              // If there's a featured image: 2 on top, featured below
+            // 3 media layout - depends on whether there's a featured media
+            if (layout.totalMedia === 3) {
+              const mediaItems =
+                layout.otherMedia.length > 0 ? layout.otherMedia : layout.otherImages
+
+              // If there's a featured media: 2 on top, featured below
               if (layout.hasFeatured) {
                 return (
                   <div class={`content-section ${spacingClass}`}>
                     <div class="two-image-layout gallery">
                       <div class="two-columns">
-                        {layout.otherImages.map((img: ImageWithResolvedAsset) => (
-                          <figure class="red-background">
-                            <OptimizedImage
-                              src={getImageUrl(img)}
-                              alt={project.title}
-                              image={img}
-                              loading="lazy"
-                              class="blue-background"
-                            />
-                          </figure>
+                        {mediaItems.map((media: FileWithResolvedAsset | ImageWithResolvedAsset) => (
+                          <figure class="red-background">{renderMediaItem(media)}</figure>
                         ))}
                       </div>
                       <figure class="red-background standalone-image-within">
-                        <OptimizedImage
-                          src={getImageUrl(section.featuredImage)}
-                          alt={project.title}
-                          image={section.featuredImage}
-                          loading="lazy"
-                          class="red-background standalone-image-within"
-                        />
+                        {renderMediaItem(featuredMedia)}
                       </figure>
                     </div>
                   </div>
                 )
               }
-              // If no featured image: 3 in a row
+              // If no featured media: 3 in a row
               else {
                 return (
                   <div class={`content-section ${spacingClass}`}>
                     <div class="three-image-layout gallery">
                       <div class="three-columns">
-                        {layout.otherImages.map((img: ImageWithResolvedAsset) => (
-                          <figure class="blue-background">
-                            <OptimizedImage
-                              src={getImageUrl(img)}
-                              alt={project.title}
-                              image={img}
-                              loading="lazy"
-                              class="blue-background"
-                            />
-                          </figure>
+                        {mediaItems.map((media: FileWithResolvedAsset | ImageWithResolvedAsset) => (
+                          <figure class="blue-background">{renderMediaItem(media)}</figure>
                         ))}
                       </div>
                     </div>
@@ -234,32 +285,21 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
               }
             }
 
-            // 4 images layout - 3 on top, featured below
-            if (layout.totalImages === 4) {
+            // 4 media layout - 3 on top, featured below
+            if (layout.totalMedia === 4) {
+              const mediaItems =
+                layout.otherMedia.length > 0 ? layout.otherMedia : layout.otherImages
+
               return (
                 <div class={`content-section ${spacingClass}`}>
                   <div class="three-image-layout gallery">
                     <div class="three-columns">
-                      {layout.otherImages.map((img: ImageWithResolvedAsset) => (
-                        <figure class="blue-background">
-                          <OptimizedImage
-                            src={getImageUrl(img)}
-                            alt={project.title}
-                            image={img}
-                            loading="lazy"
-                            class="blue-background"
-                          />
-                        </figure>
+                      {mediaItems.map((media: FileWithResolvedAsset | ImageWithResolvedAsset) => (
+                        <figure class="blue-background">{renderMediaItem(media)}</figure>
                       ))}
                     </div>
                     <figure class="red-background standalone-image-within">
-                      <OptimizedImage
-                        src={getImageUrl(section.featuredImage)}
-                        alt={project.title}
-                        image={section.featuredImage}
-                        loading="lazy"
-                        class="red-background standalone-image-within"
-                      />
+                      {renderMediaItem(featuredMedia)}
                     </figure>
                   </div>
                 </div>
@@ -303,10 +343,7 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
             </h2>
             <ul class="similar-projects-container">
               {similarProjects.map((similarProject: Project) => {
-                const thumbnailImage =
-                  similarProject.useSeparateThumbnail && similarProject.thumbnailImage
-                    ? similarProject.thumbnailImage
-                    : similarProject.mainImage
+                const thumbnailMedia = getThumbnailMedia(similarProject)
 
                 // Strip language suffix from slug for non-Catalan locales
                 let cleanSlug = similarProject.slug.current
@@ -320,8 +357,7 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
                   <li class="similar-project-item">
                     <ProjectCard
                       title={similarProject.title}
-                      imageUrl={getImageUrl(thumbnailImage)}
-                      image={thumbnailImage}
+                      thumbnailMedia={thumbnailMedia}
                       slug={`${projectsBaseUrl}/${cleanSlug}`}
                       hoverColor={similarProject.hoverColor?.hex || '#272727'}
                       textHoverColor={similarProject.textHoverColor?.hex || '#fff'}
@@ -373,6 +409,21 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
     aspect-ratio: 1513/722;
     margin-inline: calc(-1 * var(--padding-inline));
     margin-block-start: var(--padding-block);
+  }
+
+  /* Support for video in hero section */
+  :global(.hero-image.optimized-video-wrapper) {
+    width: 100vw;
+    max-inline-size: none;
+    height: auto;
+    margin-inline: calc(-1 * var(--padding-inline));
+    margin-block-start: var(--padding-block);
+  }
+
+  :global(.hero-image.optimized-video-wrapper .optimized-video) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .padding-bottom {
@@ -541,6 +592,12 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
     }
 
     :global(.hero-image) {
+      aspect-ratio: 65/59;
+      margin-block-start: 2rem;
+      padding-block: 0rem;
+    }
+
+    :global(.hero-image.optimized-video-wrapper) {
       aspect-ratio: 65/59;
       margin-block-start: 2rem;
       padding-block: 0rem;

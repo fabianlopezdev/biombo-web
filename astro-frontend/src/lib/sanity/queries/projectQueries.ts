@@ -54,12 +54,56 @@ export async function fetchProjectBySlug(
           }
         }
       },
+      mainMedia {
+        _type,
+        asset-> {
+          _id,
+          _type,
+          url,
+          path,
+          assetId,
+          extension,
+          mimeType,
+          size,
+          originalFilename,
+          metadata {
+            dimensions {
+              width,
+              height,
+              aspectRatio
+            },
+            lqip
+          }
+        }
+      },
       thumbnailImage {
         ...,
         asset-> {
           ...,
           metadata {
             ...,
+            lqip
+          }
+        }
+      },
+      thumbnailMedia {
+        _type,
+        asset-> {
+          _id,
+          _type,
+          url,
+          path,
+          assetId,
+          extension,
+          mimeType,
+          size,
+          originalFilename,
+          metadata {
+            dimensions {
+              width,
+              height,
+              aspectRatio
+            },
             lqip
           }
         }
@@ -88,7 +132,52 @@ export async function fetchProjectBySlug(
         _key,
         // For textBlock
         text,
-        // For imageSection
+        // For imageSection - new media format (file type - can be image or video)
+        featuredMedia {
+          _type,
+          asset-> {
+            _id,
+            _type,
+            url,
+            path,
+            assetId,
+            extension,
+            mimeType,
+            size,
+            originalFilename,
+            metadata {
+              dimensions {
+                width,
+                height,
+                aspectRatio
+              },
+              lqip
+            }
+          }
+        },
+        otherMedia[] {
+          _type,
+          asset-> {
+            _id,
+            _type,
+            url,
+            path,
+            assetId,
+            extension,
+            mimeType,
+            size,
+            originalFilename,
+            metadata {
+              dimensions {
+                width,
+                height,
+                aspectRatio
+              },
+              lqip
+            }
+          }
+        },
+        // Legacy image format (for backward compatibility)
         featuredImage {
           ...,
           asset-> {
@@ -306,12 +395,56 @@ export async function fetchSimilarProjects(
           }
         }
       },
+      mainMedia {
+        _type,
+        asset-> {
+          _id,
+          _type,
+          url,
+          path,
+          assetId,
+          extension,
+          mimeType,
+          size,
+          originalFilename,
+          metadata {
+            dimensions {
+              width,
+              height,
+              aspectRatio
+            },
+            lqip
+          }
+        }
+      },
       thumbnailImage {
         ...,
         asset-> {
           ...,
           metadata {
             ...,
+            lqip
+          }
+        }
+      },
+      thumbnailMedia {
+        _type,
+        asset-> {
+          _id,
+          _type,
+          url,
+          path,
+          assetId,
+          extension,
+          mimeType,
+          size,
+          originalFilename,
+          metadata {
+            dimensions {
+              width,
+              height,
+              aspectRatio
+            },
             lqip
           }
         }
@@ -352,12 +485,56 @@ export async function fetchSimilarProjects(
         }
       }
     },
+    mainMedia {
+      _type,
+      asset-> {
+        _id,
+        _type,
+        url,
+        path,
+        assetId,
+        extension,
+        mimeType,
+        size,
+        originalFilename,
+        metadata {
+          dimensions {
+            width,
+            height,
+            aspectRatio
+          },
+          lqip
+        }
+      }
+    },
     thumbnailImage {
       ...,
       asset-> {
         ...,
         metadata {
           ...,
+          lqip
+        }
+      }
+    },
+    thumbnailMedia {
+      _type,
+      asset-> {
+        _id,
+        _type,
+        url,
+        path,
+        assetId,
+        extension,
+        mimeType,
+        size,
+        originalFilename,
+        metadata {
+          dimensions {
+            width,
+            height,
+            aspectRatio
+          },
           lqip
         }
       }
@@ -413,12 +590,56 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
           }
         }
       },
+      mainMedia {
+        _type,
+        asset-> {
+          _id,
+          _type,
+          url,
+          path,
+          assetId,
+          extension,
+          mimeType,
+          size,
+          originalFilename,
+          metadata {
+            dimensions {
+              width,
+              height,
+              aspectRatio
+            },
+            lqip
+          }
+        }
+      },
       thumbnailImage {
         ...,
         asset-> {
           ...,
           metadata {
             ...,
+            lqip
+          }
+        }
+      },
+      thumbnailMedia {
+        _type,
+        asset-> {
+          _id,
+          _type,
+          url,
+          path,
+          assetId,
+          extension,
+          mimeType,
+          size,
+          originalFilename,
+          metadata {
+            dimensions {
+              width,
+              height,
+              aspectRatio
+            },
             lqip
           }
         }

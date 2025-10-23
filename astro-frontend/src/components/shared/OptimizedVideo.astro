@@ -1,0 +1,81 @@
+---
+import type { FileWithResolvedAsset } from '@/lib/sanity/schemas/projectSchema'
+
+interface Props {
+  video: FileWithResolvedAsset
+  class?: string
+  style?: string
+  id?: string
+  aspectRatio?: number
+}
+
+const { video, class: className = '', style = '', id, aspectRatio } = Astro.props
+
+// Get video URL from Sanity asset
+const videoUrl = video?.asset?.url || ''
+const mimeType = video?.asset?.mimeType || 'video/mp4'
+
+// Generate unique ID for this video instance
+const videoId = id || `optimized-video-${Math.random().toString(36).substr(2, 9)}`
+
+// Build class list for wrapper
+const wrapperClass = `optimized-video-wrapper ${className}`
+
+// Build wrapper style with optional aspect ratio
+const wrapperStyle = aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''
+
+// Video element gets the style prop
+const videoStyle = style
+---
+
+<script src="@/scripts/optimized-video-loader.ts"></script>
+
+<div class={wrapperClass} style={wrapperStyle}>
+  <video
+    id={videoId}
+    class="optimized-video"
+    style={videoStyle}
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    data-video-autoplay
+  >
+    <source src={videoUrl} type={mimeType} />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+<style is:global>
+  /* Wrapper is layout-neutral - takes space exactly like video would */
+  .optimized-video-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: block;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #000; /* Black background while video loads */
+  }
+
+  /* When aspect-ratio is set, use auto height to respect it */
+  .optimized-video-wrapper[style*='aspect-ratio'] {
+    height: auto;
+  }
+
+  /* Video fills wrapper */
+  .optimized-video-wrapper .optimized-video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 400ms ease-in-out;
+  }
+
+  /* When loaded, fade in video */
+  .optimized-video-wrapper .optimized-video[data-loaded='true'] {
+    opacity: 1;
+  }
+</style>
