@@ -102,8 +102,11 @@ export function isImageFile(file: FileWithResolvedAsset | null | undefined): boo
 
 /**
  * Type guard to check if a file is a video (based on asset._type and mimeType)
+ * Handles both legacy 'file' type and new 'videoWithBackground' type
  */
 export function isVideoFile(file: FileWithResolvedAsset | null | undefined): boolean {
+  // Check if it's a videoWithBackground type or a file asset with video mimeType
+  if (file?._type === 'videoWithBackground') return true
   // Only file assets with video mimeType are videos
   return file?.asset?._type === 'sanity.fileAsset' && file?.asset?.mimeType?.startsWith('video/')
 }
@@ -187,7 +190,7 @@ export function getMainMedia(
   }
   // Handle legacy single field format
   if (project.mainMedia && !Array.isArray(project.mainMedia)) {
-    const legacyMedia = project.mainMedia as FileWithResolvedAsset | ImageWithResolvedAsset
+    const legacyMedia = project.mainMedia
     if (legacyMedia.asset) {
       return legacyMedia
     }
@@ -218,7 +221,7 @@ export function getThumbnailMedia(
     }
     // Handle legacy single field format
     if (project.thumbnailMedia && !Array.isArray(project.thumbnailMedia)) {
-      const legacyMedia = project.thumbnailMedia as FileWithResolvedAsset | ImageWithResolvedAsset
+      const legacyMedia = project.thumbnailMedia
       if (legacyMedia.asset) {
         return legacyMedia
       }
@@ -239,8 +242,11 @@ export function isMainMediaVideo(project: Project): boolean {
   const mainMedia = getMainMedia(project)
   if (!mainMedia) return false
 
-  // Check if it's a file type (new format)
-  if ('_type' in mainMedia && mainMedia._type === 'file') {
+  // Check if it's a file type (new format) or videoWithBackground type
+  if (
+    '_type' in mainMedia &&
+    (mainMedia._type === 'file' || mainMedia._type === 'videoWithBackground')
+  ) {
     return isVideoFile(mainMedia)
   }
   return false
@@ -253,8 +259,11 @@ export function isThumbnailMediaVideo(project: Project): boolean {
   const thumbnailMedia = getThumbnailMedia(project)
   if (!thumbnailMedia) return false
 
-  // Check if it's a file type (new format)
-  if ('_type' in thumbnailMedia && thumbnailMedia._type === 'file') {
+  // Check if it's a file type (new format) or videoWithBackground type
+  if (
+    '_type' in thumbnailMedia &&
+    (thumbnailMedia._type === 'file' || thumbnailMedia._type === 'videoWithBackground')
+  ) {
     return isVideoFile(thumbnailMedia)
   }
   return false

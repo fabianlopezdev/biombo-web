@@ -167,8 +167,11 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
             ) => {
               if (!media) return null
 
-              // Handle new file format (can be image or video)
-              if ('_type' in media && media._type === 'file') {
+              // Handle new file format (can be image or video) or videoWithBackground
+              if (
+                '_type' in media &&
+                (media._type === 'file' || media._type === 'videoWithBackground')
+              ) {
                 const file = media as FileWithResolvedAsset
 
                 // Check if it's an image by asset._type

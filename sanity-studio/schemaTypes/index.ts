@@ -4,7 +4,7 @@ import { localePortableText } from './localePortableText'
 import { localeSlug } from './localeSlug'
 import { header, navigationItemType } from './header'
 import { homePage, heroSection, projectsSection, aboutSection, servicesSection, clientsSection } from './homePage'
-import { projects, imageSection, textBlock } from './projects'
+import { projects, videoWithBackground, imageSection, textBlock } from './projects'
 import { siteSettings } from './siteSettings'
 import { projectsPage } from './projectsPage'
 import { servicesPage } from './servicesPage'
@@ -41,6 +41,7 @@ export const schemaTypes = [
   servicesSection,
   clientsSection,
   aboutSlider,
+  videoWithBackground,
   imageSection,
   textBlock,
 ]

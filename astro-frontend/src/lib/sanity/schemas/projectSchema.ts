@@ -72,6 +72,7 @@ const resolvedSanityAssetSchema = z.object({
       lqip: z.string().optional(), // Add LQIP field
       // other metadata fields
     })
+    .nullable()
     .optional(),
 })
 
@@ -106,9 +107,11 @@ const imageWithResolvedAssetSchema = z.object({
 })
 
 // Define Zod schema for a file object with resolved asset (can be image or video)
+// Supports both legacy 'file' type and new 'videoWithBackground' type
 const fileWithResolvedAssetSchema = z.object({
-  _type: z.literal('file'),
+  _type: z.union([z.literal('file'), z.literal('videoWithBackground')]),
   asset: z.union([resolvedSanityAssetSchema, resolvedSanityFileAssetSchema]),
+  backgroundColor: z.object({ hex: z.string() }).nullable().optional(), // Custom background color for loading state
 })
 
 // Define a union schema for media items that can be EITHER image OR file type

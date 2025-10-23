@@ -15,14 +15,19 @@ const { video, class: className = '', style = '', id, aspectRatio } = Astro.prop
 const videoUrl = video?.asset?.url || ''
 const mimeType = video?.asset?.mimeType || 'video/mp4'
 
+// Get custom background color or default to black
+const backgroundColor = video?.backgroundColor?.hex || '#000'
+
 // Generate unique ID for this video instance
 const videoId = id || `optimized-video-${Math.random().toString(36).substr(2, 9)}`
 
 // Build class list for wrapper
 const wrapperClass = `optimized-video-wrapper ${className}`
 
-// Build wrapper style with optional aspect ratio
-const wrapperStyle = aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''
+// Build wrapper style with optional aspect ratio and background color
+const wrapperStyle = aspectRatio
+  ? `aspect-ratio: ${aspectRatio}; background-color: ${backgroundColor};`
+  : `background-color: ${backgroundColor};`
 
 // Video element gets the style prop
 const videoStyle = style
@@ -56,7 +61,7 @@ const videoStyle = style
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #000; /* Black background while video loads */
+    /* Background color set via inline style (from Sanity or defaults to black) */
   }
 
   /* When aspect-ratio is set, use auto height to respect it */

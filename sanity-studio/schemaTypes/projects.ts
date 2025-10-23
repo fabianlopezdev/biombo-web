@@ -4,6 +4,52 @@ import { MediaFileInput } from '../components/MediaFileInput'
 import { SingleItemArrayInput } from '../components/SingleItemArrayInput'
 
 /**
+ * Video with custom background color for loading state
+ * @description Wraps a video file with an optional background color that displays while the video loads
+ */
+const videoWithBackground = defineType({
+  name: 'videoWithBackground',
+  title: 'Video',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'asset',
+      type: 'file',
+      title: 'Video File',
+      options: {
+        accept: 'video/*',
+      },
+      validation: (Rule) => Rule.required(),
+      components: {
+        input: MediaFileInput,
+      },
+    }),
+    defineField({
+      name: 'backgroundColor',
+      type: 'color',
+      title: 'Loading Background Color',
+      description:
+        'Background color shown while video loads and during fade-in transition. Choose a color that matches the video content for a smooth transition (defaults to black if not set).',
+      options: {
+        disableAlpha: true,
+      },
+    }),
+  ],
+  preview: {
+    select: {
+      asset: 'asset',
+      backgroundColor: 'backgroundColor',
+    },
+    prepare({ asset, backgroundColor }) {
+      return {
+        title: asset?.originalFilename || 'Video',
+        subtitle: backgroundColor?.hex ? `Background: ${backgroundColor.hex}` : 'No background color set',
+      }
+    },
+  },
+})
+
+/**
  * Embedded object type for image/media sections within projects
  * @description Dynamic image/video layout: 1 media (full width), 2 media (side by side), 3 media (row), 4 media (3 top, 1 bottom)
  * Supports both images and videos - editors can upload either directly
@@ -71,14 +117,7 @@ Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
           },
         }),
         defineArrayMember({
-          type: 'file',
-          title: 'Video',
-          options: {
-            accept: 'video/*',
-          },
-          components: {
-            input: MediaFileInput,
-          },
+          type: 'videoWithBackground',
         }),
       ],
       components: {
@@ -100,14 +139,7 @@ Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
           },
         }),
         defineArrayMember({
-          type: 'file',
-          title: 'Video',
-          options: {
-            accept: 'video/*',
-          },
-          components: {
-            input: MediaFileInput,
-          },
+          type: 'videoWithBackground',
         }),
       ],
       validation: Rule => Rule.max(3).warning('Maximum 3 additional media items allowed (4 total including featured media)')
@@ -207,7 +239,7 @@ const textBlock = defineType({
 
 
 // Export the content block types to use in other schemas if needed
-export { imageSection, textBlock }
+export { videoWithBackground, imageSection, textBlock }
 /**
  * Schema for project entries
  * @description Projects showcasing the company's work
@@ -292,14 +324,7 @@ export const projects = defineType({
           },
         }),
         defineArrayMember({
-          type: 'file',
-          title: 'Video',
-          options: {
-            accept: 'video/*',
-          },
-          components: {
-            input: MediaFileInput,
-          },
+          type: 'videoWithBackground',
         }),
       ],
       components: {
@@ -346,14 +371,7 @@ export const projects = defineType({
           },
         }),
         defineArrayMember({
-          type: 'file',
-          title: 'Video',
-          options: {
-            accept: 'video/*',
-          },
-          components: {
-            input: MediaFileInput,
-          },
+          type: 'videoWithBackground',
         }),
       ],
       components: {

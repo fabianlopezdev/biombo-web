@@ -56,7 +56,7 @@ export async function fetchProjectBySlug(
       },
       mainMedia[] {
         _type,
-        asset-> {
+        "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
           url,
@@ -74,7 +74,8 @@ export async function fetchProjectBySlug(
             },
             lqip
           }
-        }
+        },
+        backgroundColor { hex }
       },
       thumbnailImage {
         ...,
@@ -88,7 +89,7 @@ export async function fetchProjectBySlug(
       },
       thumbnailMedia[] {
         _type,
-        asset-> {
+        "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
           url,
@@ -106,7 +107,8 @@ export async function fetchProjectBySlug(
             },
             lqip
           }
-        }
+        },
+        backgroundColor { hex }
       },
       useSeparateThumbnail,
       hoverColor { hex },
@@ -135,7 +137,7 @@ export async function fetchProjectBySlug(
         // For imageSection - new media format (file type - can be image or video)
         featuredMedia[] {
           _type,
-          asset-> {
+          "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
             url,
@@ -153,11 +155,12 @@ export async function fetchProjectBySlug(
               },
               lqip
             }
-          }
+          },
+          backgroundColor { hex }
         },
         otherMedia[] {
           _type,
-          asset-> {
+          "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
             url,
@@ -175,7 +178,8 @@ export async function fetchProjectBySlug(
               },
               lqip
             }
-          }
+          },
+          backgroundColor { hex }
         },
         // Legacy image format (for backward compatibility)
         featuredImage {
@@ -397,7 +401,7 @@ export async function fetchSimilarProjects(
       },
       mainMedia[] {
         _type,
-        asset-> {
+        "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
           url,
@@ -415,7 +419,8 @@ export async function fetchSimilarProjects(
             },
             lqip
           }
-        }
+        },
+        backgroundColor { hex }
       },
       thumbnailImage {
         ...,
@@ -429,7 +434,7 @@ export async function fetchSimilarProjects(
       },
       thumbnailMedia[] {
         _type,
-        asset-> {
+        "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
           url,
@@ -447,7 +452,8 @@ export async function fetchSimilarProjects(
             },
             lqip
           }
-        }
+        },
+        backgroundColor { hex }
       },
       useSeparateThumbnail,
       hoverColor { hex },
@@ -592,7 +598,7 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
       },
       mainMedia[] {
         _type,
-        asset-> {
+        "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
           url,
@@ -610,7 +616,8 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
             },
             lqip
           }
-        }
+        },
+        backgroundColor { hex }
       },
       thumbnailImage {
         ...,
@@ -624,7 +631,7 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
       },
       thumbnailMedia[] {
         _type,
-        asset-> {
+        "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
           url,
@@ -642,7 +649,8 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
             },
             lqip
           }
-        }
+        },
+        backgroundColor { hex }
       },
       useSeparateThumbnail,
       hoverColor { hex },
