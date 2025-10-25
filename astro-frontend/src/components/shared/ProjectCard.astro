@@ -1,10 +1,19 @@
 ---
 import CustomCursor from '@/components/shared/CustomCursor.astro'
 import OptimizedImage from '@/components/shared/OptimizedImage.astro'
+import OptimizedVideo from '@/components/shared/OptimizedVideo.astro'
+import type {
+  FileWithResolvedAsset,
+  ImageWithResolvedAsset,
+} from '@/lib/sanity/schemas/projectSchema'
+import { isVideoFile, getImageUrl, getMediaUrl } from '@/helpers/projects/projectHelpers'
 
 interface Props {
   title: string
-  imageUrl: string
+  // New prop: thumbnailMedia (can be image or video)
+  thumbnailMedia?: FileWithResolvedAsset | ImageWithResolvedAsset | null
+  // Legacy props (kept for backward compatibility)
+  imageUrl?: string
   imageAlt?: string
   image?: any // Sanity image object with metadata for blur hash
   slug: string
@@ -18,6 +27,7 @@ interface Props {
 
 const {
   title,
+  thumbnailMedia,
   imageUrl,
   imageAlt = title,
   image,
@@ -29,6 +39,27 @@ const {
   class: className = '',
   projectId,
 } = Astro.props
+
+// Determine if we're rendering a video or image
+const isVideo =
+  thumbnailMedia &&
+  '_type' in thumbnailMedia &&
+  thumbnailMedia._type === 'file' &&
+  isVideoFile(thumbnailMedia as FileWithResolvedAsset)
+
+// Get the appropriate URL and object for rendering
+let mediaUrl = imageUrl || ''
+let mediaObject = image
+
+if (thumbnailMedia) {
+  if (isVideo) {
+    mediaUrl = getMediaUrl(thumbnailMedia as FileWithResolvedAsset)
+    mediaObject = thumbnailMedia
+  } else if ('_type' in thumbnailMedia && thumbnailMedia._type === 'image') {
+    mediaUrl = getImageUrl(thumbnailMedia as ImageWithResolvedAsset)
+    mediaObject = thumbnailMedia
+  }
+}
 
 // Create a simple project object for CustomCursor
 const project = {
@@ -52,16 +83,27 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
     aria-label={`${title}${clients ? ` - ${clients}` : ''} - Veure detalls del projecte`}
   >
     <figure class="project-figure">
-      <OptimizedImage
-        id={imageId}
-        src={imageUrl}
-        alt={imageAlt}
-        image={image}
-        class="project-image"
-        loading="lazy"
-        imageContext="card"
-        aria-describedby={mobileInfoId}
-      />
+      {
+        isVideo ? (
+          <OptimizedVideo
+            video={mediaObject as FileWithResolvedAsset}
+            class="project-image"
+            id={imageId}
+            aspectRatio={3 / 4}
+          />
+        ) : (
+          <OptimizedImage
+            id={imageId}
+            src={mediaUrl}
+            alt={imageAlt}
+            image={mediaObject}
+            class="project-image"
+            loading="lazy"
+            imageContext="card"
+            aria-describedby={mobileInfoId}
+          />
+        )
+      }
       <figcaption class="project-caption">
         <span class="caption-text" id={projectId ? `project-${projectId}-title` : undefined}>
           {title}
@@ -123,6 +165,17 @@ const imageId = projectId ? `project-${projectId}-image` : undefined
     height: 100%;
     object-fit: cover;
     display: block;
+    border-radius: 0.621875rem;
+  }
+
+  /* Support for video thumbnails */
+  :global(.project-image.optimized-video-wrapper) {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.621875rem;
+  }
+
+  :global(.project-image.optimized-video-wrapper .optimized-video) {
     border-radius: 0.621875rem;
   }
 

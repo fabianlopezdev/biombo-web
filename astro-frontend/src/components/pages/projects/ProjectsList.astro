@@ -1,8 +1,14 @@
 ---
 import OptimizedImage from '@/components/shared/OptimizedImage.astro'
-import type { Project, Projects } from '@/lib/sanity/schemas/projectSchema'
+import OptimizedVideo from '@/components/shared/OptimizedVideo.astro'
+import type {
+  Projects,
+  FileWithResolvedAsset,
+  ImageWithResolvedAsset,
+} from '@/lib/sanity/schemas/projectSchema'
 import type { Service, Services } from '@/lib/sanity/schemas/serviceSchema'
 import type { Client } from '@/lib/sanity/schemas/clientSchema'
+import { getThumbnailMedia, isThumbnailMediaVideo } from '@/helpers/projects/projectHelpers'
 
 interface Props {
   projects: Projects | null
@@ -11,22 +17,6 @@ interface Props {
 }
 
 const { projects, services, locale } = Astro.props
-
-// Helper function to get image URL
-const getImageUrl = (project: Project): string => {
-  if (project.useSeparateThumbnail && project.thumbnailImage?.asset?.url) {
-    return project.thumbnailImage.asset.url
-  }
-  return project.mainImage?.asset?.url || ''
-}
-
-// Helper function to get image object for blur hash
-const getImageObject = (project: Project) => {
-  if (project.useSeparateThumbnail && project.thumbnailImage) {
-    return project.thumbnailImage
-  }
-  return project.mainImage
-}
 
 // Helper function to get project URL
 const getProjectUrl = (slug: { current: string } | string, locale: string): string => {
@@ -81,40 +71,52 @@ const getProjectUrl = (slug: { current: string } | string, locale: string): stri
   {
     projects && projects.length > 0 ? (
       <div class="projects-grid">
-        {projects.map((project) => (
-          <article
-            class="project-card"
-            data-services={project.services?.map((s: Service) => s._id).join(',') || ''}
-          >
-            <a href={getProjectUrl(project.slug, locale)}>
-              <div class="project-image">
-                {getImageUrl(project) && (
-                  <OptimizedImage
-                    src={getImageUrl(project)}
-                    alt={project.title}
-                    image={getImageObject(project)}
-                    loading="lazy"
-                  />
-                )}
-              </div>
-              <div class="project-info">
-                <h2 class="project-title">{project.title}</h2>
-                {project.clients && project.clients.length > 0 && (
-                  <p class="project-client">
-                    {project.clients.map((client: Client) => client.name).join(', ')}
-                  </p>
-                )}
-                {project.services && project.services.length > 0 && (
-                  <ul class="project-services">
-                    {project.services.map((service: Service) => (
-                      <li class="service-tag">{service.title}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </a>
-          </article>
-        ))}
+        {projects.map((project) => {
+          const thumbnailMedia = getThumbnailMedia(project)
+          const isVideo = isThumbnailMediaVideo(project)
+
+          return (
+            <article
+              class="project-card"
+              data-services={project.services?.map((s: Service) => s._id).join(',') || ''}
+            >
+              <a href={getProjectUrl(project.slug, locale)}>
+                <div class="project-image">
+                  {isVideo ? (
+                    <OptimizedVideo
+                      video={thumbnailMedia as FileWithResolvedAsset}
+                      aspectRatio={16 / 9}
+                    />
+                  ) : (
+                    thumbnailMedia && (
+                      <OptimizedImage
+                        src={thumbnailMedia.asset?.url || ''}
+                        alt={project.title}
+                        image={thumbnailMedia as ImageWithResolvedAsset}
+                        loading="lazy"
+                      />
+                    )
+                  )}
+                </div>
+                <div class="project-info">
+                  <h2 class="project-title">{project.title}</h2>
+                  {project.clients && project.clients.length > 0 && (
+                    <p class="project-client">
+                      {project.clients.map((client: Client) => client.name).join(', ')}
+                    </p>
+                  )}
+                  {project.services && project.services.length > 0 && (
+                    <ul class="project-services">
+                      {project.services.map((service: Service) => (
+                        <li class="service-tag">{service.title}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </a>
+            </article>
+          )
+        })}
       </div>
     ) : (
       <div class="no-projects">
@@ -202,6 +204,18 @@ const getProjectUrl = (slug: { current: string } | string, locale: string): stri
 
   .project-card:hover .project-image img {
     transform: scale(1.05);
+  }
+
+  /* Support for video thumbnails */
+  .project-image :global(.optimized-video-wrapper) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .project-image :global(.optimized-video) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .project-info {
