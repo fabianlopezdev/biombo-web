@@ -21,26 +21,53 @@ const HOME_PAGE_FIELDS = `
         _updatedAt,
         title,
         slug,
-        mainImage {
-          ...,
-          asset-> {
-            ...,
+        mainMedia[] {
+          _type,
+          "asset": coalesce(asset.asset->, asset->) {
+            _id,
+            _type,
+            url,
+            path,
+            assetId,
+            extension,
+            mimeType,
+            size,
+            originalFilename,
             metadata {
-              ...,
+              dimensions {
+                width,
+                height,
+                aspectRatio
+              },
               lqip
             }
-          }
+          },
+          backgroundColor { hex }
         },
-        thumbnailImage {
-          ...,
-          asset-> {
-            ...,
+        thumbnailMedia[] {
+          _type,
+          "asset": coalesce(asset.asset->, asset->) {
+            _id,
+            _type,
+            url,
+            path,
+            assetId,
+            extension,
+            mimeType,
+            size,
+            originalFilename,
             metadata {
-              ...,
+              dimensions {
+                width,
+                height,
+                aspectRatio
+              },
               lqip
             }
-          }
+          },
+          backgroundColor { hex }
         },
+        useSeparateThumbnail,
         hoverColor { hex },
         textHoverColor { hex },
         excerpt,
