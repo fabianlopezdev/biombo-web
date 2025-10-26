@@ -179,32 +179,49 @@ export const projectsSection = defineType({
           ],
           preview: {
             select: {
-              // Root cause of previous title issue: 'project.title' is a string, not a localized object.
-              // Similarly, 'project.slug' is a standard slug object.
-              // Corrected paths to select the actual title and slug string.
               actualProjectTitle: 'project.title',
               projectSlugString: 'project.slug.current',
               projectHoverColor: 'project.hoverColor.hex',
               projectTextHoverColor: 'project.textHoverColor.hex',
-              media: 'project.mainImage', // This was working correctly
+              useSeparateThumbnail: 'project.useSeparateThumbnail',
+              thumbnailMedia: 'project.thumbnailMedia',
+              mainMedia: 'project.mainMedia',
             },
             prepare({
               actualProjectTitle,
               projectSlugString,
               projectHoverColor,
               projectTextHoverColor,
-              media,
+              useSeparateThumbnail,
+              thumbnailMedia,
+              mainMedia,
             }) {
-              // Rationale for fix: Use the directly selected project title, then slug string, then default text.
               const title = actualProjectTitle || projectSlugString || 'No project selected'
               let subtitles = []
               if (projectHoverColor) subtitles.push(`Hover: ${projectHoverColor}`)
               if (projectTextHoverColor) subtitles.push(`Text: ${projectTextHoverColor}`)
               const subtitle = subtitles.length > 0 ? subtitles.join(' | ') : 'Project selected'
+
+              // Extract media from arrays (same logic as project preview)
+              let previewMedia = null
+              if (useSeparateThumbnail) {
+                const thumbnail = Array.isArray(thumbnailMedia) && thumbnailMedia.length > 0
+                  ? thumbnailMedia[0]
+                  : thumbnailMedia
+                const main = Array.isArray(mainMedia) && mainMedia.length > 0
+                  ? mainMedia[0]
+                  : mainMedia
+                previewMedia = thumbnail || main
+              } else {
+                previewMedia = Array.isArray(mainMedia) && mainMedia.length > 0
+                  ? mainMedia[0]
+                  : mainMedia
+              }
+
               return {
                 title: title,
                 subtitle: subtitle,
-                media: media, // Display project's image in preview
+                media: previewMedia || null,
               }
             },
           },
