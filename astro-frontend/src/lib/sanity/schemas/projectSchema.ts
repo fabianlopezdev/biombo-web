@@ -125,20 +125,17 @@ const textBlockSchema = z.object({
   text: z.array(z.any()).nullable().optional(), // Portable text blocks
 })
 
-// Schema for image/media section content (supports both new file format and legacy image format)
+// Schema for image/media section content
 const imageSectionSchema = z.object({
   _type: z.literal('imageSection'),
   _key: z.string(),
-  // New media format - can be EITHER image OR file (video)
+  // Media format - can be EITHER image OR file (video)
   // Accepts both single item (legacy) or array item from Sanity's hybrid array type
   featuredMedia: z
     .union([z.array(mediaItemSchema), mediaItemSchema])
     .nullable()
     .optional(),
   otherMedia: z.array(mediaItemSchema).nullable().optional(),
-  // Legacy image format (for backward compatibility)
-  featuredImage: imageWithResolvedAssetSchema.nullable().optional(),
-  otherImages: z.array(imageWithResolvedAssetSchema).nullable().optional(),
 })
 
 // Combined content section schema
@@ -153,16 +150,14 @@ export const projectSchema = z.object({
   language: z.string().optional(), // Added language field
   title: z.string(), // Changed from localeStringSchema
   slug: z.object({ _type: z.literal('slug'), current: z.string() }), // Changed from localeSlugSchema
-  mainImage: imageWithResolvedAssetSchema.nullable().optional(), // Use the schema with resolved asset (legacy)
   mainMedia: z
     .union([z.array(mediaItemSchema), mediaItemSchema])
     .nullable()
-    .optional(), // New media field - can be image or file (video), array with max 1 item (or single for legacy)
-  thumbnailImage: imageWithResolvedAssetSchema.nullable().optional(), // Added nullable (legacy)
+    .optional(), // Media field - can be image or file (video), array with max 1 item (or single for legacy)
   thumbnailMedia: z
     .union([z.array(mediaItemSchema), mediaItemSchema])
     .nullable()
-    .optional(), // New thumbnail media field - can be image or file (video), array with max 1 item (or single for legacy)
+    .optional(), // Thumbnail media field - can be image or file (video), array with max 1 item (or single for legacy)
   useSeparateThumbnail: z.boolean().nullable().optional(), // Added useSeparateThumbnail field
   excerpt: z.array(z.any()).nullable().optional(), // Added nullable
   description: z.array(z.any()).nullable().optional(), // Added nullable

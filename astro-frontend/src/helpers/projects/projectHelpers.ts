@@ -16,13 +16,10 @@ export interface MediaLayoutInfo {
 interface MediaSection {
   _type: 'imageSection'
   _key: string
-  // New media format (file type - can be image or video)
+  // Media format (file type - can be image or video)
   // Note: featuredMedia is an array with max 1 item (Sanity hybrid type pattern)
   featuredMedia?: FileWithResolvedAsset[] | FileWithResolvedAsset | null
   otherMedia?: FileWithResolvedAsset[] | null
-  // Legacy image format
-  featuredImage?: ImageWithResolvedAsset | null
-  otherImages?: ImageWithResolvedAsset[] | null
 }
 
 // Type alias for backward compatibility
@@ -126,45 +123,30 @@ export function isVideoMimeType(file: FileWithResolvedAsset | null | undefined):
 }
 
 /**
- * Determine media section layout for rendering (supports both new file format and legacy image format)
+ * Determine media section layout for rendering
  */
 export function getImageSectionLayout(section: MediaSection): MediaLayoutInfo {
-  // Check for new media format first (file type)
-  if (section.featuredMedia || section.otherMedia) {
-    // FeaturedMedia is now an array with max 1 item
-    let hasFeatured = false
-    if (Array.isArray(section.featuredMedia)) {
-      hasFeatured = section.featuredMedia.length > 0 && !!section.featuredMedia[0]?.asset
-    } else {
-      // Handle legacy single field format
-      const legacyMedia = section.featuredMedia as
-        | FileWithResolvedAsset
-        | ImageWithResolvedAsset
-        | undefined
-      hasFeatured = !!legacyMedia?.asset
-    }
-
-    const otherCount = section.otherMedia?.length || 0
-    const totalMedia = (hasFeatured ? 1 : 0) + otherCount
-
-    return {
-      totalMedia,
-      hasFeatured,
-      otherMedia: section.otherMedia || [],
-      otherImages: [], // Empty for new format
-    }
+  // FeaturedMedia is now an array with max 1 item
+  let hasFeatured = false
+  if (Array.isArray(section.featuredMedia)) {
+    hasFeatured = section.featuredMedia.length > 0 && !!section.featuredMedia[0]?.asset
+  } else {
+    // Handle legacy single field format
+    const legacyMedia = section.featuredMedia as
+      | FileWithResolvedAsset
+      | ImageWithResolvedAsset
+      | undefined
+    hasFeatured = !!legacyMedia?.asset
   }
 
-  // Fall back to legacy image format
-  const hasFeatured = !!section.featuredImage?.asset
-  const otherCount = section.otherImages?.length || 0
+  const otherCount = section.otherMedia?.length || 0
   const totalMedia = (hasFeatured ? 1 : 0) + otherCount
 
   return {
     totalMedia,
     hasFeatured,
-    otherMedia: [], // Empty for legacy format
-    otherImages: section.otherImages || [],
+    otherMedia: section.otherMedia || [],
+    otherImages: [], // Empty - legacy format no longer supported
   }
 }
 
@@ -174,13 +156,12 @@ export function getImageSectionLayout(section: MediaSection): MediaLayoutInfo {
 export const getMediaSectionLayout = getImageSectionLayout
 
 /**
- * Get main media (new format) or fall back to main image (legacy)
- * Returns the media that should be displayed for the project hero
+ * Get main media for the project hero
  */
 export function getMainMedia(
   project: Project,
 ): FileWithResolvedAsset | ImageWithResolvedAsset | null {
-  // Check new mainMedia field first (now an array with max 1 item)
+  // Check mainMedia field (now an array with max 1 item)
   if (
     Array.isArray(project.mainMedia) &&
     project.mainMedia.length > 0 &&
@@ -195,23 +176,18 @@ export function getMainMedia(
       return legacyMedia
     }
   }
-  // Fall back to legacy mainImage
-  if (project.mainImage?.asset) {
-    return project.mainImage
-  }
   return null
 }
 
 /**
- * Get thumbnail media (new format) or fall back to thumbnail/main image (legacy)
- * Returns the media that should be displayed for project thumbnails
+ * Get thumbnail media for project cards and listings
  */
 export function getThumbnailMedia(
   project: Project,
 ): FileWithResolvedAsset | ImageWithResolvedAsset | null {
   // If using separate thumbnail
   if (project.useSeparateThumbnail) {
-    // Check new thumbnailMedia first (now an array with max 1 item)
+    // Check thumbnailMedia (now an array with max 1 item)
     if (
       Array.isArray(project.thumbnailMedia) &&
       project.thumbnailMedia.length > 0 &&
@@ -226,12 +202,8 @@ export function getThumbnailMedia(
         return legacyMedia
       }
     }
-    // Fall back to legacy thumbnailImage
-    if (project.thumbnailImage?.asset) {
-      return project.thumbnailImage
-    }
   }
-  // Fall back to main media/image
+  // Fall back to main media
   return getMainMedia(project)
 }
 

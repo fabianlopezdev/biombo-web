@@ -67,36 +67,10 @@ const imageSection = defineType({
 
 You can mix images and videos in the same section!`,
   fields: [
-    // Legacy image fields (kept for backward compatibility - shown as read-only reference)
-    defineField({
-      name: 'featuredImage',
-      title: '📦 Legacy Featured Image (View Only)',
-      type: 'image',
-      description: '⚠️ This field contains an OLD IMAGE. It will still display on your website. To update or add videos, use "Featured Media" field below.',
-      options: {
-        hotspot: true,
-      },
-      readOnly: true, // Can't edit, but can see what's there
-    }),
-    defineField({
-      name: 'otherImages',
-      title: '📦 Legacy Other Images (View Only)',
-      type: 'array',
-      description: '⚠️ This field contains OLD IMAGES. They will still display on your website. To update or add videos, use "Other Media" field below.',
-      of: [
-        defineArrayMember({
-          type: 'image',
-          options: {
-            hotspot: true,
-          },
-        }),
-      ],
-      readOnly: true, // Can't edit, but can see what's there
-    }),
-    // New media fields (support both images and videos)
+    // Media fields (support both images and videos)
     defineField({
       name: 'featuredMedia',
-      title: 'Featured Media (Image or Video) ✨ NEW',
+      title: 'Featured Media (Image or Video)',
       type: 'array',
       description: `Upload an IMAGE or VIDEO file for featured position.
 
@@ -127,7 +101,7 @@ Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
     }),
     defineField({
       name: 'otherMedia',
-      title: 'Other Media (Images or Videos) ✨ NEW',
+      title: 'Other Media (Images or Videos)',
       type: 'array',
       description: 'Upload IMAGE or VIDEO files. For 2 media: Add 2 here (side by side). For 3 media: Add 2 here with Featured (2+1 layout) OR add 3 here without Featured (row layout). For 4 media: Add 3 here with Featured. You can mix images and videos!',
       of: [
@@ -147,35 +121,25 @@ Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
   ],
   preview: {
     select: {
-      // Legacy fields
-      featuredImage: 'featuredImage',
-      otherImages: 'otherImages',
-      // New fields
       featuredMedia: 'featuredMedia',
       otherMedia: 'otherMedia',
     },
-    prepare({ featuredImage, otherImages, featuredMedia, otherMedia }) {
-      // Count ALL featured media items separately (sections can have BOTH during migration)
+    prepare({ featuredMedia, otherMedia }) {
+      // Count featured media items
       let featuredCount = 0
-
-      // Count legacy featured image
-      if (featuredImage) featuredCount++
-
-      // Count new featured media (array format or legacy single field)
       if (Array.isArray(featuredMedia)) {
         if (featuredMedia.length > 0) featuredCount++
       } else if (featuredMedia) {
-        // Legacy single field format (backward compatibility)
         featuredCount++
       }
 
-      // Count ALL other media (both legacy and new)
-      const otherCount = (otherImages?.length || 0) + (otherMedia?.length || 0)
+      // Count other media
+      const otherCount = otherMedia?.length || 0
 
-      // Calculate total (sum of all items from all sources)
+      // Calculate total
       const totalMedia = featuredCount + otherCount
 
-      // For layout hints, check if we have at least one featured item
+      // Check if we have at least one featured item
       const hasFeatured = featuredCount > 0
 
       let title = ''
@@ -197,9 +161,8 @@ Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
         title = 'Media Section with 4 items'
         subtitle = '3 on top, featured below'
       } else {
-        // 5 or more items (possible during migration with both legacy and new media)
         title = `Media Section with ${totalMedia} items`
-        subtitle = 'Contains both legacy and new media'
+        subtitle = 'Too many items'
       }
 
       return {
@@ -301,18 +264,8 @@ export const projects = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'mainImage',
-      title: '📦 Legacy Main Project Image (View Only)',
-      description: '⚠️ This field contains an OLD IMAGE. It will still display on your website. To update or add videos, use "Main Media" field below.',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-      readOnly: true, // Can't edit, but can see what's there
-    }),
-    defineField({
       name: 'mainMedia',
-      title: 'Main Media (Image or Video) ✨ NEW',
+      title: 'Main Media (Image or Video)',
       description: 'Upload an IMAGE or VIDEO file for the main project hero. This appears prominently on the project detail page. Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)',
       type: 'array',
       of: [
@@ -330,14 +283,7 @@ export const projects = defineType({
       components: {
         input: SingleItemArrayInput,
       },
-      validation: (Rule) => Rule.max(1).error('Only 1 image or video is allowed').custom((mainMedia, context) => {
-        const parent = context.parent as { mainImage?: unknown; mainMedia?: unknown[] } | undefined
-        // Either mainMedia or legacy mainImage must exist
-        if ((!mainMedia || mainMedia.length === 0) && !parent?.mainImage) {
-          return 'Either Main Media or Legacy Main Image is required'
-        }
-        return true
-      }),
+      validation: (Rule) => Rule.max(1).error('Only 1 image or video is allowed').required().min(1).error('Main Media is required'),
     }),
     defineField({
       name: 'useSeparateThumbnail',
@@ -347,19 +293,8 @@ export const projects = defineType({
       initialValue: false,
     }),
     defineField({
-      name: 'thumbnailImage',
-      title: '📦 Legacy Thumbnail Image (View Only)',
-      description: '⚠️ This field contains an OLD IMAGE. It will still display on your website. To update or add videos, use "Thumbnail Media" field below.',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-      hidden: ({parent}) => !parent?.useSeparateThumbnail,
-      readOnly: true, // Can't edit, but can see what's there
-    }),
-    defineField({
       name: 'thumbnailMedia',
-      title: 'Thumbnail Media (Image or Video) ✨ NEW',
+      title: 'Thumbnail Media (Image or Video)',
       description: 'Upload an IMAGE or VIDEO file for the project thumbnail. Used in project cards and listings (only used if "Use Separate Thumbnail" is enabled). Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)',
       type: 'array',
       of: [
@@ -516,16 +451,12 @@ export const projects = defineType({
     select: {
       title: 'title',
       useSeparateThumbnail: 'useSeparateThumbnail',
-      // New media fields
       thumbnailMedia: 'thumbnailMedia',
       mainMedia: 'mainMedia',
-      // Legacy image fields
-      thumbnailImage: 'thumbnailImage',
-      mainImage: 'mainImage',
       language: 'language',
     },
     prepare(selection) {
-      const { title, useSeparateThumbnail, thumbnailMedia, thumbnailImage, mainMedia, mainImage, language } = selection
+      const { title, useSeparateThumbnail, thumbnailMedia, mainMedia, language } = selection
 
       // Simplify title handling to avoid any potential issues
       let displayTitle = ''
@@ -536,12 +467,12 @@ export const projects = defineType({
         displayTitle = 'Untitled Project'
       }
 
-      // Determine which media to show: Check new fields first, then fall back to legacy
+      // Determine which media to show
       let previewMedia = null
       if (useSeparateThumbnail) {
-        previewMedia = thumbnailMedia || thumbnailImage || mainMedia || mainImage
+        previewMedia = thumbnailMedia || mainMedia
       } else {
-        previewMedia = mainMedia || mainImage
+        previewMedia = mainMedia
       }
 
       return {
