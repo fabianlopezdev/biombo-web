@@ -468,11 +468,23 @@ export const projects = defineType({
       }
 
       // Determine which media to show
+      // Need to extract first item from array since mainMedia/thumbnailMedia are arrays
       let previewMedia = null
       if (useSeparateThumbnail) {
-        previewMedia = thumbnailMedia || mainMedia
+        // Extract first item from thumbnail array
+        const thumbnail = Array.isArray(thumbnailMedia) && thumbnailMedia.length > 0
+          ? thumbnailMedia[0]
+          : thumbnailMedia
+        // Extract first item from main media array as fallback
+        const main = Array.isArray(mainMedia) && mainMedia.length > 0
+          ? mainMedia[0]
+          : mainMedia
+        previewMedia = thumbnail || main
       } else {
-        previewMedia = mainMedia
+        // Extract first item from main media array
+        previewMedia = Array.isArray(mainMedia) && mainMedia.length > 0
+          ? mainMedia[0]
+          : mainMedia
       }
 
       return {
