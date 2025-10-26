@@ -6,7 +6,12 @@ import type {
   FileWithResolvedAsset,
   ImageWithResolvedAsset,
 } from '@/lib/sanity/schemas/projectSchema'
-import { isVideoFile, getImageUrl, getMediaUrl } from '@/helpers/projects/projectHelpers'
+import {
+  isVideoFile,
+  isImageFile,
+  getImageUrl,
+  getMediaUrl,
+} from '@/helpers/projects/projectHelpers'
 
 interface Props {
   title: string
@@ -41,11 +46,9 @@ const {
 } = Astro.props
 
 // Determine if we're rendering a video or image
-const isVideo =
-  thumbnailMedia &&
-  '_type' in thumbnailMedia &&
-  thumbnailMedia._type === 'file' &&
-  isVideoFile(thumbnailMedia as FileWithResolvedAsset)
+// Check the actual media type, not just the wrapper type
+const isVideo = thumbnailMedia && isVideoFile(thumbnailMedia as FileWithResolvedAsset)
+const isImage = thumbnailMedia && isImageFile(thumbnailMedia as FileWithResolvedAsset)
 
 // Get the appropriate URL and object for rendering
 let mediaUrl = imageUrl || ''
@@ -55,7 +58,8 @@ if (thumbnailMedia) {
   if (isVideo) {
     mediaUrl = getMediaUrl(thumbnailMedia as FileWithResolvedAsset)
     mediaObject = thumbnailMedia
-  } else if ('_type' in thumbnailMedia && thumbnailMedia._type === 'image') {
+  } else if (isImage || ('_type' in thumbnailMedia && thumbnailMedia._type === 'image')) {
+    // Handle both new unified media format (checks asset type) and legacy image type
     mediaUrl = getImageUrl(thumbnailMedia as ImageWithResolvedAsset)
     mediaObject = thumbnailMedia
   }

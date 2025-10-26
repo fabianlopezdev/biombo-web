@@ -76,10 +76,23 @@ export function getImageUrl(
 
 /**
  * Get media URL from Sanity file object (works for both images and videos)
+ * For images in file format, use the image URL builder for optimization
  */
 export function getMediaUrl(media: FileWithResolvedAsset | null | undefined): string {
-  if (!media?.asset?.url) return ''
-  return media.asset.url
+  if (!media?.asset) return ''
+
+  // If it's an image file, use the image URL builder for optimization
+  if (isImageFile(media)) {
+    // Convert to image format and use image URL builder
+    const imageData = {
+      _type: 'image' as const,
+      asset: media.asset,
+    }
+    return getImageUrlFromAsset(imageData)
+  }
+
+  // For videos, return direct URL
+  return media.asset.url || ''
 }
 
 /**

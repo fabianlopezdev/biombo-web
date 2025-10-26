@@ -1,5 +1,14 @@
 import type { FeaturedProjectItem } from '@/lib/sanity/schemas/homePageSchema'
-import { getImageUrlFromAsset } from '@/helpers/images/imageUrlBuilder'
+import {
+  getThumbnailMedia,
+  isImageFile,
+  getMediaUrl,
+  getImageUrl,
+} from '@/helpers/projects/projectHelpers'
+import type {
+  FileWithResolvedAsset,
+  ImageWithResolvedAsset,
+} from '@/lib/sanity/schemas/projectSchema'
 
 /**
  * Type definition for a localized slug in Sanity
@@ -65,36 +74,24 @@ export function transformProject(
 
   const projectDoc = featuredItem.project // Extract the actual project document
 
-  // IMAGE SELECTION FOR CARD DISPLAYS: Always prefer thumbnail if it exists
-  // Thumbnail is for cards/grids, main image is for project detail pages
-  // The useSeparateThumbnail flag is ONLY for Sanity UI, not for frontend display logic
-  let chosenImageSource: 'thumbnail' | 'main' | undefined
-  let imageToUse: { asset?: unknown } | null = null
+  // IMAGE/VIDEO SELECTION FOR CARD DISPLAYS: Use getThumbnailMedia helper
+  const thumbnailMedia = getThumbnailMedia(projectDoc)
+  let imageUrlToUse: string | undefined
 
-  // Check for thumbnail first
-  if (projectDoc.thumbnailImage?.asset) {
-    chosenImageSource = 'thumbnail'
-    imageToUse = projectDoc.thumbnailImage
-  } else if (projectDoc.mainImage?.asset) {
-    chosenImageSource = 'main'
-    imageToUse = projectDoc.mainImage
+  if (thumbnailMedia) {
+    if (isImageFile(thumbnailMedia as FileWithResolvedAsset)) {
+      // It's an image - use optimized image URL
+      imageUrlToUse = getMediaUrl(thumbnailMedia as FileWithResolvedAsset)
+    } else if ('_type' in thumbnailMedia && thumbnailMedia._type === 'image') {
+      // Legacy image format - use type guard
+      const imageMedia = thumbnailMedia as unknown as ImageWithResolvedAsset
+      imageUrlToUse = getImageUrl(imageMedia)
+    }
+    // For videos, we don't generate a URL here (handled separately)
   }
 
-  // Generate optimized URL using Sanity image URL builder
-  // This automatically adds ?auto=format for WebP/AVIF and quality optimization
-  const imageUrlToUse = imageToUse ? getImageUrlFromAsset(imageToUse, 800) : undefined
-
-  // For alt text, handle both localized and direct string values, prioritizing the chosen image source
-  let imageAltText: Record<string, string> | string | undefined
-
-  if (chosenImageSource === 'thumbnail' && projectDoc.thumbnailImage?.alt) {
-    imageAltText = projectDoc.thumbnailImage.alt
-  } else if (chosenImageSource === 'main' && projectDoc.mainImage?.alt) {
-    imageAltText = projectDoc.mainImage.alt
-  } else if (projectDoc.mainImage?.alt) {
-    // Fallback to mainImage alt if thumbnail alt is missing but thumbnail URL was used
-    imageAltText = projectDoc.mainImage.alt
-  }
+  // For alt text, use the project title as fallback
+  const imageAltText = projectDoc.title
 
   // Helper: Handle both localized and direct string values
   const getLocalizedValue = (

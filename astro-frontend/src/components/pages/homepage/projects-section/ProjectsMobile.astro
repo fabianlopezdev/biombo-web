@@ -2,6 +2,7 @@
 import type { FeaturedProjectItem } from '@/lib/sanity/schemas/homePageSchema'
 import { transformProject } from '@/helpers/projects/projectsUtils'
 import { getProjectsListUrl } from '@/config/routing/projectRoutes'
+import { getThumbnailMedia } from '@/helpers/projects/projectHelpers'
 import ProjectCard from './ProjectCard.astro'
 import MobileSlider from '@/components/shared/MobileSlider.astro'
 
@@ -40,8 +41,8 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
           const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
           const projectNumber = i + 1
 
-          // Get the image object for blur hash (prefer thumbnail over main image)
-          const imageObject = rawItem?.project?.thumbnailImage || rawItem?.project?.mainImage
+          // Get the thumbnail media using the helper
+          const thumbnailMedia = rawItem?.project ? getThumbnailMedia(rawItem.project) : null
 
           return (
             <ProjectCard
@@ -50,7 +51,7 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
               hoverColor={project.hoverColor}
               textHoverColor={project.textHoverColor}
               image={project.image}
-              imageObject={imageObject}
+              imageObject={thumbnailMedia}
               alt={project.alt}
               title={project.title}
               clients={project.clients}

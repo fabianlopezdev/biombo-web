@@ -4,6 +4,7 @@ import PillButton from '@/components/shared/PillButton.astro'
 import ProjectCard from '@/components/shared/ProjectCard.astro'
 import { projectsTranslations, getProjectUrl, type Locale } from '@/config/i18n/projects'
 import { getPageMetadata } from '@/config/i18n/pageMetadata'
+import { getThumbnailMedia } from '@/helpers/projects/projectHelpers'
 import type { Project } from '@/lib/sanity/schemas/projectSchema'
 import type { Service } from '@/lib/sanity/schemas/serviceSchema'
 import type { Client } from '@/lib/sanity/schemas/clientSchema'
@@ -27,24 +28,6 @@ console.log('📄 [Projects Layout] Fallback Title:', t.pageTitle)
 
 // Use Sanity title if available, otherwise fallback to translations
 const pageTitle = projectsPageData?.title || t.pageTitle
-
-// Helper function to get image URL
-const getImageUrl = (project: Project): string => {
-  // Always prefer thumbnail if it exists, regardless of useSeparateThumbnail flag
-  // The flag is only for Sanity UI, not for frontend display logic
-  if (project.thumbnailImage?.asset?.url) {
-    return project.thumbnailImage.asset.url
-  }
-  return project.mainImage?.asset?.url || '/projects-mock.jpg'
-}
-
-// Helper function to get image object for blur hash
-const getImageObject = (project: Project) => {
-  if (project.thumbnailImage) {
-    return project.thumbnailImage
-  }
-  return project.mainImage
-}
 
 // Helper function to get project slug
 const getProjectSlug = (slug: { current: string } | string): string => {
@@ -113,8 +96,7 @@ const getProjectSlug = (slug: { current: string } | string): string => {
               >
                 <ProjectCard
                   title={project.title}
-                  imageUrl={getImageUrl(project)}
-                  image={getImageObject(project)}
+                  thumbnailMedia={getThumbnailMedia(project)}
                   slug={getProjectUrl(getProjectSlug(project.slug), locale)}
                   hoverColor={project.hoverColor?.hex || '#63b2d5'}
                   textHoverColor={project.textHoverColor?.hex || '#ffffff'}
