@@ -118,6 +118,47 @@ Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
       ],
       validation: Rule => Rule.max(3).warning('Maximum 3 additional media items allowed (4 total including featured media)')
     }),
+    defineField({
+      name: 'mobileFeaturedMedia',
+      title: 'Mobile Featured Media (Optional)',
+      description: 'Mobile-optimized version of featured media. Desktop aspect ratios change on mobile, potentially cropping important content. If not set, desktop media will be used.',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'image',
+          title: 'Image',
+          options: {
+            hotspot: true,
+          },
+        }),
+        defineArrayMember({
+          type: 'videoWithBackground',
+        }),
+      ],
+      components: {
+        input: SingleItemArrayInput,
+      },
+      validation: Rule => Rule.max(1).error('Only 1 image or video is allowed'),
+    }),
+    defineField({
+      name: 'mobileOtherMedia',
+      title: 'Mobile Other Media (Optional)',
+      description: 'Mobile-optimized versions of other media (max 3). If not set, desktop media will be cropped to fit mobile aspect ratios.',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'image',
+          title: 'Image',
+          options: {
+            hotspot: true,
+          },
+        }),
+        defineArrayMember({
+          type: 'videoWithBackground',
+        }),
+      ],
+      validation: Rule => Rule.max(3).error('Maximum of 3 items allowed'),
+    }),
   ],
   preview: {
     select: {
@@ -286,6 +327,36 @@ export const projects = defineType({
       validation: (Rule) => Rule.max(1).error('Only 1 image or video is allowed').required().min(1).error('Main Media is required'),
     }),
     defineField({
+      name: 'useMobileMainMedia',
+      title: 'Use Different Media for Mobile',
+      description: 'Mobile crops the desktop hero image from wide (1513/722) to nearly square (65/59). Enable this to upload a mobile-optimized image or video.',
+      type: 'boolean',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'mobileMainMedia',
+      title: 'Mobile Hero Media (Image or Video)',
+      description: 'Media optimized for mobile (aspect ratio 65/59 - nearly square). If not set, desktop media will be cropped using object-fit: cover.',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'image',
+          title: 'Image',
+          options: {
+            hotspot: true,
+          },
+        }),
+        defineArrayMember({
+          type: 'videoWithBackground',
+        }),
+      ],
+      components: {
+        input: SingleItemArrayInput,
+      },
+      validation: Rule => Rule.max(1).error('Only 1 image or video is allowed'),
+      hidden: ({parent}) => !parent?.useMobileMainMedia,
+    }),
+    defineField({
       name: 'useSeparateThumbnail',
       title: 'Use Separate Thumbnail',
       description: 'Use a different image as thumbnail instead of the main project image',
@@ -315,6 +386,29 @@ export const projects = defineType({
       validation: Rule => Rule.max(1).error('Only 1 image or video is allowed'),
       hidden: ({parent}) => !parent?.useSeparateThumbnail,
       // No validation - thumbnail is optional
+    }),
+    defineField({
+      name: 'homepageThumbnailMedia',
+      title: 'Homepage Thumbnail Media (Optional)',
+      description: 'Optional custom thumbnail specifically for the homepage featured projects section. Use this if you want a different image optimized for the homepage grid layout. If not set, falls back to the regular thumbnail or main image.',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'image',
+          title: 'Image',
+          options: {
+            hotspot: true,
+          },
+        }),
+        defineArrayMember({
+          type: 'videoWithBackground',
+        }),
+      ],
+      components: {
+        input: SingleItemArrayInput,
+      },
+      validation: Rule => Rule.max(1).error('Only 1 image or video is allowed'),
+      // No required validation - this field is optional
     }),
     defineField({
       name: 'hoverColor',
