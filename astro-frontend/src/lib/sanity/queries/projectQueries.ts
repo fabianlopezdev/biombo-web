@@ -67,6 +67,30 @@ export async function fetchProjectBySlug(
         },
         backgroundColor { hex }
       },
+      useMobileMainMedia,
+      mobileMainMedia[] {
+        _type,
+        "asset": coalesce(asset.asset->, asset->) {
+          _id,
+          _type,
+          url,
+          path,
+          assetId,
+          extension,
+          mimeType,
+          size,
+          originalFilename,
+          metadata {
+            dimensions {
+              width,
+              height,
+              aspectRatio
+            },
+            lqip
+          }
+        },
+        backgroundColor { hex }
+      },
       thumbnailMedia[] {
         _type,
         "asset": coalesce(asset.asset->, asset->) {
@@ -139,6 +163,52 @@ export async function fetchProjectBySlug(
           backgroundColor { hex }
         },
         otherMedia[] {
+          _type,
+          "asset": coalesce(asset.asset->, asset->) {
+            _id,
+            _type,
+            url,
+            path,
+            assetId,
+            extension,
+            mimeType,
+            size,
+            originalFilename,
+            metadata {
+              dimensions {
+                width,
+                height,
+                aspectRatio
+              },
+              lqip
+            }
+          },
+          backgroundColor { hex }
+        },
+        mobileFeaturedMedia[] {
+          _type,
+          "asset": coalesce(asset.asset->, asset->) {
+            _id,
+            _type,
+            url,
+            path,
+            assetId,
+            extension,
+            mimeType,
+            size,
+            originalFilename,
+            metadata {
+              dimensions {
+                width,
+                height,
+                aspectRatio
+              },
+              lqip
+            }
+          },
+          backgroundColor { hex }
+        },
+        mobileOtherMedia[] {
           _type,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
@@ -371,6 +441,30 @@ export async function fetchSimilarProjects(
         },
         backgroundColor { hex }
       },
+      useMobileMainMedia,
+      mobileMainMedia[] {
+        _type,
+        "asset": coalesce(asset.asset->, asset->) {
+          _id,
+          _type,
+          url,
+          path,
+          assetId,
+          extension,
+          mimeType,
+          size,
+          originalFilename,
+          metadata {
+            dimensions {
+              width,
+              height,
+              aspectRatio
+            },
+            lqip
+          }
+        },
+        backgroundColor { hex }
+      },
       thumbnailMedia[] {
         _type,
         "asset": coalesce(asset.asset->, asset->) {
@@ -508,6 +602,30 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
       title,
       slug,
       mainMedia[] {
+        _type,
+        "asset": coalesce(asset.asset->, asset->) {
+          _id,
+          _type,
+          url,
+          path,
+          assetId,
+          extension,
+          mimeType,
+          size,
+          originalFilename,
+          metadata {
+            dimensions {
+              width,
+              height,
+              aspectRatio
+            },
+            lqip
+          }
+        },
+        backgroundColor { hex }
+      },
+      useMobileMainMedia,
+      mobileMainMedia[] {
         _type,
         "asset": coalesce(asset.asset->, asset->) {
           _id,

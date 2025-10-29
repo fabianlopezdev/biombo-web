@@ -136,6 +136,11 @@ const imageSectionSchema = z.object({
     .nullable()
     .optional(),
   otherMedia: z.array(mediaItemSchema).nullable().optional(),
+  mobileFeaturedMedia: z
+    .union([z.array(mediaItemSchema), mediaItemSchema])
+    .nullable()
+    .optional(),
+  mobileOtherMedia: z.array(mediaItemSchema).nullable().optional(),
 })
 
 // Combined content section schema
@@ -154,11 +159,20 @@ export const projectSchema = z.object({
     .union([z.array(mediaItemSchema), mediaItemSchema])
     .nullable()
     .optional(), // Media field - can be image or file (video), array with max 1 item (or single for legacy)
+  useMobileMainMedia: z.boolean().nullable().optional(), // Toggle for mobile main media
+  mobileMainMedia: z
+    .union([z.array(mediaItemSchema), mediaItemSchema])
+    .nullable()
+    .optional(), // Mobile hero media field - optional custom media for mobile single project layout
   thumbnailMedia: z
     .union([z.array(mediaItemSchema), mediaItemSchema])
     .nullable()
     .optional(), // Thumbnail media field - can be image or file (video), array with max 1 item (or single for legacy)
   useSeparateThumbnail: z.boolean().nullable().optional(), // Added useSeparateThumbnail field
+  homepageThumbnailMedia: z
+    .union([z.array(mediaItemSchema), mediaItemSchema])
+    .nullable()
+    .optional(), // Homepage thumbnail media field - optional custom thumbnail for homepage featured projects
   excerpt: z.array(z.any()).nullable().optional(), // Added nullable
   description: z.array(z.any()).nullable().optional(), // Added nullable
   mainText: z.array(z.any()).nullable().optional(), // Added mainText field

@@ -221,6 +221,73 @@ export function getThumbnailMedia(
 }
 
 /**
+ * Get homepage-specific thumbnail media for homepage featured projects
+ * Falls back to regular thumbnail logic if homepageThumbnailMedia is not set
+ */
+export function getHomepageThumbnailMedia(
+  project: Project,
+): FileWithResolvedAsset | ImageWithResolvedAsset | null {
+  // 1. Check homepageThumbnailMedia first (array with max 1 item)
+  if (
+    Array.isArray(project.homepageThumbnailMedia) &&
+    project.homepageThumbnailMedia.length > 0 &&
+    project.homepageThumbnailMedia[0]?.asset
+  ) {
+    return project.homepageThumbnailMedia[0]
+  }
+  // Handle legacy single field format (if applicable)
+  if (project.homepageThumbnailMedia && !Array.isArray(project.homepageThumbnailMedia)) {
+    const legacyMedia = project.homepageThumbnailMedia
+    if (legacyMedia.asset) {
+      return legacyMedia
+    }
+  }
+  // 2. Fall back to existing thumbnail logic (thumbnailMedia -> mainMedia)
+  return getThumbnailMedia(project)
+}
+
+/**
+ * Get mobile-specific main media for single project layout hero
+ * Falls back to desktop mainMedia if mobile variant not set
+ */
+export function getMobileMainMedia(
+  project: Project,
+): FileWithResolvedAsset | ImageWithResolvedAsset | null {
+  // Check if mobile media is enabled and set
+  if (project.useMobileMainMedia) {
+    // Check mobileMainMedia (array with max 1 item)
+    if (
+      Array.isArray(project.mobileMainMedia) &&
+      project.mobileMainMedia.length > 0 &&
+      project.mobileMainMedia[0]?.asset
+    ) {
+      return project.mobileMainMedia[0]
+    }
+    // Handle legacy single field format
+    if (project.mobileMainMedia && !Array.isArray(project.mobileMainMedia)) {
+      const legacyMedia = project.mobileMainMedia
+      if (legacyMedia.asset) {
+        return legacyMedia
+      }
+    }
+  }
+  // Fall back to desktop main media
+  return getMainMedia(project)
+}
+
+/**
+ * Get responsive main media based on viewport
+ * @param project - The project containing media
+ * @param isMobile - Whether to use mobile variant
+ */
+export function getResponsiveMainMedia(
+  project: Project,
+  isMobile: boolean,
+): FileWithResolvedAsset | ImageWithResolvedAsset | null {
+  return isMobile ? getMobileMainMedia(project) : getMainMedia(project)
+}
+
+/**
  * Check if main media is a video
  */
 export function isMainMediaVideo(project: Project): boolean {
