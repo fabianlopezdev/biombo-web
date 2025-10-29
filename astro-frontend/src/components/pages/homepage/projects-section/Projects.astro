@@ -6,7 +6,7 @@ import type {
   FeaturedProjectItem,
 } from '@/lib/sanity/schemas/homePageSchema'
 import { transformProject } from '@/helpers/projects/projectsUtils'
-import { getThumbnailMedia } from '@/helpers/projects/projectHelpers'
+import { getHomepageThumbnailMedia } from '@/helpers/projects/projectHelpers'
 import { getProjectUrl } from '@/config/i18n/projects'
 import { getProjectsListUrl } from '@/config/routing/projectRoutes'
 import CustomCursor from '@/components/shared/CustomCursor.astro'
@@ -45,8 +45,8 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
       const rawItem = rawFeaturedProjects[i] // rawItem is now FeaturedProjectItem | undefined
       const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
 
-      // Get the thumbnail media using the helper
-      const thumbnailMedia = rawItem?.project ? getThumbnailMedia(rawItem.project) : null
+      // Get the homepage thumbnail media using the helper
+      const thumbnailMedia = rawItem?.project ? getHomepageThumbnailMedia(rawItem.project) : null
 
       // Add a class for odd/even styling if needed, or handle directly in CSS
       const projectNumber = i + 1
@@ -230,6 +230,7 @@ inferSize
         color: var(--hover-text-color);
         transform: translateY(50%);
         transition: transform 0.5s ease;
+        line-height: 1.1;
       }
     }
     &:hover .caption-text {
