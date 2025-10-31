@@ -68,6 +68,29 @@ const HOME_PAGE_FIELDS = `
           backgroundColor { hex }
         },
         useSeparateThumbnail,
+        homepageThumbnailMedia[] {
+          _type,
+          "asset": coalesce(asset.asset->, asset->) {
+            _id,
+            _type,
+            url,
+            path,
+            assetId,
+            extension,
+            mimeType,
+            size,
+            originalFilename,
+            metadata {
+              dimensions {
+                width,
+                height,
+                aspectRatio
+              },
+              lqip
+            }
+          },
+          backgroundColor { hex }
+        },
         hoverColor { hex },
         textHoverColor { hex },
         excerpt,

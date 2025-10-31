@@ -149,6 +149,8 @@ h4 {
 p,
 li {
   text-wrap: pretty;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 ul,
