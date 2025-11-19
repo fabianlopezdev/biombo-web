@@ -547,10 +547,22 @@ export const projects = defineType({
       useSeparateThumbnail: 'useSeparateThumbnail',
       thumbnailMedia: 'thumbnailMedia',
       mainMedia: 'mainMedia',
+      homepageThumbnailMedia: 'homepageThumbnailMedia',
+      mobileMainMedia: 'mobileMainMedia',
+      contentSections: 'contentSections',
       language: 'language',
     },
     prepare(selection) {
-      const { title, useSeparateThumbnail, thumbnailMedia, mainMedia, language } = selection
+      const {
+        title,
+        useSeparateThumbnail,
+        thumbnailMedia,
+        mainMedia,
+        homepageThumbnailMedia,
+        mobileMainMedia,
+        contentSections,
+        language
+      } = selection
 
       // Simplify title handling to avoid any potential issues
       let displayTitle = ''
@@ -561,24 +573,84 @@ export const projects = defineType({
         displayTitle = 'Untitled Project'
       }
 
-      // Determine which media to show
-      // Need to extract first item from array since mainMedia/thumbnailMedia are arrays
+      // Helper function to check if media is an image (not a video object)
+      const isImage = (media: any) => {
+        if (!media) return false
+        // Sanity images have _type: 'image', videos have _type: 'videoWithBackground'
+        return media._type === 'image'
+      }
+
+      // Helper function to find first image in an array or single media item
+      const findFirstImage = (media: any): any => {
+        if (!media) return null
+
+        // If it's an array, search through it
+        if (Array.isArray(media)) {
+          for (const item of media) {
+            if (isImage(item)) {
+              return item
+            }
+          }
+          return null
+        }
+
+        // If it's a single item, check if it's an image
+        return isImage(media) ? media : null
+      }
+
+      // Helper to search content sections for images
+      const findImageInContentSections = (sections: any): any => {
+        if (!Array.isArray(sections)) return null
+
+        for (const section of sections) {
+          // Check if this is an imageSection type
+          if (section._type === 'imageSection') {
+            // Try featured media first
+            const featuredImage = findFirstImage(section.featuredMedia)
+            if (featuredImage) return featuredImage
+
+            // Then try other media
+            const otherImage = findFirstImage(section.otherMedia)
+            if (otherImage) return otherImage
+
+            // Try mobile variants as last resort
+            const mobileFeaturedImage = findFirstImage(section.mobileFeaturedMedia)
+            if (mobileFeaturedImage) return mobileFeaturedImage
+
+            const mobileOtherImage = findFirstImage(section.mobileOtherMedia)
+            if (mobileOtherImage) return mobileOtherImage
+          }
+        }
+
+        return null
+      }
+
+      // Search for first available image in priority order
       let previewMedia = null
+
       if (useSeparateThumbnail) {
-        // Extract first item from thumbnail array
-        const thumbnail = Array.isArray(thumbnailMedia) && thumbnailMedia.length > 0
-          ? thumbnailMedia[0]
-          : thumbnailMedia
-        // Extract first item from main media array as fallback
-        const main = Array.isArray(mainMedia) && mainMedia.length > 0
-          ? mainMedia[0]
-          : mainMedia
-        previewMedia = thumbnail || main
-      } else {
-        // Extract first item from main media array
-        previewMedia = Array.isArray(mainMedia) && mainMedia.length > 0
-          ? mainMedia[0]
-          : mainMedia
+        // Priority 1: thumbnailMedia (if separate thumbnail is enabled)
+        previewMedia = findFirstImage(thumbnailMedia)
+      }
+
+      if (!previewMedia) {
+        // Priority 2: mainMedia
+        previewMedia = findFirstImage(mainMedia)
+      }
+
+      if (!previewMedia) {
+        // Priority 3: homepageThumbnailMedia
+        previewMedia = findFirstImage(homepageThumbnailMedia)
+      }
+
+      if (!previewMedia) {
+        // Priority 4: mobileMainMedia
+        previewMedia = findFirstImage(mobileMainMedia)
+      }
+
+      if (!previewMedia) {
+        // Priority 5: contentSections (search for images in media sections)
+        previewMedia = findImageInContentSections(contentSections)
       }
 
       return {
