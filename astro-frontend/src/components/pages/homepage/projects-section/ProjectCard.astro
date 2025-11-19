@@ -1,6 +1,9 @@
 ---
 import ProjectMobileInfo from '@/components/shared/ProjectMobileInfo.astro'
 import OptimizedImage from '@/components/shared/OptimizedImage.astro'
+import OptimizedVideo from '@/components/shared/OptimizedVideo.astro'
+import type { FileWithResolvedAsset } from '@/lib/sanity/schemas/projectSchema'
+import { isVideoFile } from '@/helpers/projects/projectHelpers'
 import { getProjectUrl } from '@/config/i18n/projects'
 
 export interface ProjectCardProps {
@@ -30,6 +33,9 @@ const {
   loading = 'lazy',
   locale = 'ca',
 } = Astro.props as ProjectCardProps
+
+// Detect if the media is a video
+const isVideo = imageObject && isVideoFile(imageObject as FileWithResolvedAsset)
 ---
 
 {
@@ -40,14 +46,18 @@ const {
       style={`--hover-bg-color: ${hoverColor}; --hover-text-color: ${textHoverColor};`}
     >
       <div class="project-image-wrapper">
-        <OptimizedImage
-          src={image}
-          alt={alt || title || `Project ${projectNumber}`}
-          image={imageObject}
-          class="project-image"
-          loading={loading}
-          skipDimensions
-        />
+        {isVideo ? (
+          <OptimizedVideo video={imageObject as FileWithResolvedAsset} class="project-image" />
+        ) : (
+          <OptimizedImage
+            src={image}
+            alt={alt || title || `Project ${projectNumber}`}
+            image={imageObject}
+            class="project-image"
+            loading={loading}
+            skipDimensions
+          />
+        )}
       </div>
       <ProjectMobileInfo title={title || `Project ${projectNumber}`} subtitle={clients} />
     </a>

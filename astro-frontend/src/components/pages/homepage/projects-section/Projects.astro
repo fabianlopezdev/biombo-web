@@ -1,12 +1,14 @@
 ---
 import ScrollPill from '@/components/shared/ScrollPill.astro'
 import OptimizedImage from '@/components/shared/OptimizedImage.astro'
+import OptimizedVideo from '@/components/shared/OptimizedVideo.astro'
 import type {
   ProjectsSection as SanityProjectsSectionType,
   FeaturedProjectItem,
 } from '@/lib/sanity/schemas/homePageSchema'
+import type { FileWithResolvedAsset } from '@/lib/sanity/schemas/projectSchema'
 import { transformProject } from '@/helpers/projects/projectsUtils'
-import { getHomepageThumbnailMedia } from '@/helpers/projects/projectHelpers'
+import { getHomepageThumbnailMedia, isVideoFile } from '@/helpers/projects/projectHelpers'
 import { getProjectUrl } from '@/config/i18n/projects'
 import { getProjectsListUrl } from '@/config/routing/projectRoutes'
 import CustomCursor from '@/components/shared/CustomCursor.astro'
@@ -43,10 +45,14 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     [...Array(6)].map((_, i) => {
       // Debug log before transformation
       const rawItem = rawFeaturedProjects[i] // rawItem is now FeaturedProjectItem | undefined
-      const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
+      // Pass true for useHomepageThumbnail to ensure homepage-specific media is used
+      const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal, true)
 
       // Get the homepage thumbnail media using the helper
       const thumbnailMedia = rawItem?.project ? getHomepageThumbnailMedia(rawItem.project) : null
+
+      // Detect if the thumbnail is a video or image
+      const isVideo = thumbnailMedia && isVideoFile(thumbnailMedia as FileWithResolvedAsset)
 
       // Add a class for odd/even styling if needed, or handle directly in CSS
       const projectNumber = i + 1
@@ -61,22 +67,21 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
               href={project.slug ? getProjectUrl(project.slug, currentLang) : '#'}
               class="project-link"
             >
-              {/* TODO: Uncomment Image component when switching to SSG
-<Image
-src={project.image}
-alt={project.alt || project.title || `Project ${projectNumber}`}
-class="project-image"
-loading={i === 0 || i === 1 ? 'eager' : 'lazy'}
-inferSize
-/> */}
-              {/* Using OptimizedImage with blur hash support */}
-              <OptimizedImage
-                src={project.image}
-                alt={project.alt || project.title || `Project ${projectNumber}`}
-                image={thumbnailMedia}
-                class="project-image"
-                loading={i === 0 || i === 1 ? 'eager' : 'lazy'}
-              />
+              {/* Conditionally render video or image based on thumbnailMedia type */}
+              {isVideo ? (
+                <OptimizedVideo
+                  video={thumbnailMedia as FileWithResolvedAsset}
+                  class="project-image"
+                />
+              ) : (
+                <OptimizedImage
+                  src={project.image}
+                  alt={project.alt || project.title || `Project ${projectNumber}`}
+                  image={thumbnailMedia}
+                  class="project-image"
+                  loading={i === 0 || i === 1 ? 'eager' : 'lazy'}
+                />
+              )}
               <div class="project-caption">
                 <figcaption class="caption-text">
                   {project.title || `Project ${projectNumber}`}

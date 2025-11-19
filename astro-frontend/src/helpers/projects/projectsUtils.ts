@@ -1,7 +1,9 @@
 import type { FeaturedProjectItem } from '@/lib/sanity/schemas/homePageSchema'
 import {
   getThumbnailMedia,
+  getHomepageThumbnailMedia,
   isImageFile,
+  isVideoFile,
   getMediaUrl,
   getImageUrl,
 } from '@/helpers/projects/projectHelpers'
@@ -44,6 +46,7 @@ export function transformProject(
   index: number,
   currentLang: string,
   viewProjectTextValue: string,
+  useHomepageThumbnail?: boolean,
 ): TransformedProject {
   // Early return for invalid index
   if (typeof index !== 'number' || index < 0) {
@@ -74,8 +77,11 @@ export function transformProject(
 
   const projectDoc = featuredItem.project // Extract the actual project document
 
-  // IMAGE/VIDEO SELECTION FOR CARD DISPLAYS: Use getThumbnailMedia helper
-  const thumbnailMedia = getThumbnailMedia(projectDoc)
+  // IMAGE/VIDEO SELECTION FOR CARD DISPLAYS: Use appropriate thumbnail media helper
+  // If useHomepageThumbnail is true, use homepage-specific thumbnail (which may differ from regular thumbnail)
+  const thumbnailMedia = useHomepageThumbnail
+    ? getHomepageThumbnailMedia(projectDoc)
+    : getThumbnailMedia(projectDoc)
   let imageUrlToUse: string | undefined
 
   if (thumbnailMedia) {
@@ -86,8 +92,10 @@ export function transformProject(
       // Legacy image format - use type guard
       const imageMedia = thumbnailMedia as unknown as ImageWithResolvedAsset
       imageUrlToUse = getImageUrl(imageMedia)
+    } else if (isVideoFile(thumbnailMedia)) {
+      // For videos, generate URL using getMediaUrl
+      imageUrlToUse = getMediaUrl(thumbnailMedia)
     }
-    // For videos, we don't generate a URL here (handled separately)
   }
 
   // For alt text, use the project title as fallback

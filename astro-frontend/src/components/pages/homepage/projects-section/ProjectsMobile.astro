@@ -2,7 +2,7 @@
 import type { FeaturedProjectItem } from '@/lib/sanity/schemas/homePageSchema'
 import { transformProject } from '@/helpers/projects/projectsUtils'
 import { getProjectsListUrl } from '@/config/routing/projectRoutes'
-import { getThumbnailMedia } from '@/helpers/projects/projectHelpers'
+import { getHomepageThumbnailMedia } from '@/helpers/projects/projectHelpers'
 import ProjectCard from './ProjectCard.astro'
 import MobileSlider from '@/components/shared/MobileSlider.astro'
 
@@ -38,11 +38,20 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
     <MobileSlider>
       {
         rawFeaturedProjects.slice(0, 6).map((rawItem, i) => {
-          const project = transformProject(rawItem || null, i, currentLang, viewProjectTextVal)
+          // Pass true for useHomepageThumbnail to ensure homepage-specific media is used
+          const project = transformProject(
+            rawItem || null,
+            i,
+            currentLang,
+            viewProjectTextVal,
+            true,
+          )
           const projectNumber = i + 1
 
-          // Get the thumbnail media using the helper
-          const thumbnailMedia = rawItem?.project ? getThumbnailMedia(rawItem.project) : null
+          // Get the homepage thumbnail media using the helper
+          const thumbnailMedia = rawItem?.project
+            ? getHomepageThumbnailMedia(rawItem.project)
+            : null
 
           return (
             <ProjectCard
