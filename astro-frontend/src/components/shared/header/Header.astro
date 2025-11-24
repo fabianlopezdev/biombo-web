@@ -78,9 +78,13 @@ const pages: NavigationPage[] = headerData?.navigationPages || []
     )
   }
 
-  <div class="desktop">
-    <LanguageSwitcher locale={locale} languages={languages} />
-  </div>
+  {
+    languages.length > 1 && (
+      <div class="desktop">
+        <LanguageSwitcher locale={locale} languages={languages} />
+      </div>
+    )
+  }
 
   <button class="mobile-menu">
     <p>Menú</p>

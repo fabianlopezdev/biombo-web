@@ -67,25 +67,27 @@ const currentPath = Astro.url.pathname
       </ul>
     </nav>
 
-    <div class="mobile-language-section">
-      <div class="language-options">
-        {
-          languages.map(function renderLang(lang) {
-            const isActive = lang.code === locale
-            return (
-              <a
-                href={lang.path}
-                class={`language-btn ${isActive ? 'active' : ''}`}
-                aria-current={isActive ? 'true' : undefined}
-                data-astro-prefetch
-              >
-                {lang.code === 'ca' ? 'Cat' : lang.code === 'es' ? 'Esp' : 'Eng'}
-              </a>
-            )
-          })
-        }
-      </div>
-    </div>
+    {
+      languages.length > 1 && (
+        <div class="mobile-language-section">
+          <div class="language-options">
+            {languages.map(function renderLang(lang) {
+              const isActive = lang.code === locale
+              return (
+                <a
+                  href={lang.path}
+                  class={`language-btn ${isActive ? 'active' : ''}`}
+                  aria-current={isActive ? 'true' : undefined}
+                  data-astro-prefetch
+                >
+                  {lang.code === 'ca' ? 'Cat' : lang.code === 'es' ? 'Esp' : 'Eng'}
+                </a>
+              )
+            })}
+          </div>
+        </div>
+      )
+    }
   </div>
 </div>
 
