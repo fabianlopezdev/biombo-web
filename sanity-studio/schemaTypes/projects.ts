@@ -285,7 +285,7 @@ export const projects = defineType({
     defineField({
       name: 'slug',
       title: 'Slug',
-      description: 'This will be used for the project URL. Note: Accented characters (á, é, ñ, etc.) will be converted to their base forms (a, e, n). Please review and edit if needed after generation.',
+      description: 'This will be used for the project URL. Click "Generate" to create a URL-friendly slug from the title, or enter one manually (lowercase letters, numbers, and hyphens only).',
       type: 'slug',
       hidden: false, // Show slug field so users can regenerate it
       options: {
@@ -303,6 +303,7 @@ export const projects = defineType({
                 .replace(/\s+/g, '-')
                 .replace(/[^\w-]+/g, '')
                 .replace(/--+/g, '-')
+                .replace(/^-+|-+$/g, '') // Trim leading/trailing dashes
                 .slice(0, 90) // Leave room for language suffix
             : ''
 
@@ -316,7 +317,54 @@ export const projects = defineType({
         },
         maxLength: 96,
       },
-      validation: Rule => Rule.required().error('A slug is required for the project URL'),
+      validation: (Rule) =>
+        Rule.required()
+          .error('A slug is required for the project URL')
+          .custom((slug, context) => {
+            if (!slug?.current) {
+              return true // Let required() handle empty slugs
+            }
+
+            const slugValue = slug.current
+
+            // Check for uppercase letters
+            if (/[A-Z]/.test(slugValue)) {
+              const corrected = slugValue.toLowerCase()
+              return `Slug cannot contain uppercase letters. Try: "${corrected}"`
+            }
+
+            // Check for spaces
+            if (/\s/.test(slugValue)) {
+              const corrected = slugValue.replace(/\s+/g, '-')
+              return `Slug cannot contain spaces. Try: "${corrected}"`
+            }
+
+            // Check for special characters (allow only lowercase, numbers, hyphens)
+            if (!/^[a-z0-9-]+$/.test(slugValue)) {
+              const corrected = slugValue
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Remove accents
+                .toLowerCase()
+                .replace(/[^\w-]+/g, '-')
+                .replace(/--+/g, '-')
+                .replace(/^-+|-+$/g, '')
+              return `Slug contains invalid characters. Only lowercase letters, numbers, and hyphens are allowed. Try: "${corrected}"`
+            }
+
+            // Check for leading/trailing dashes
+            if (/^-|-$/.test(slugValue)) {
+              const corrected = slugValue.replace(/^-+|-+$/g, '')
+              return `Slug cannot start or end with a dash. Try: "${corrected}"`
+            }
+
+            // Check for consecutive dashes
+            if (/--/.test(slugValue)) {
+              const corrected = slugValue.replace(/--+/g, '-')
+              return `Slug cannot contain consecutive dashes. Try: "${corrected}"`
+            }
+
+            return true
+          }),
     }),
     defineField({
       name: 'title',
