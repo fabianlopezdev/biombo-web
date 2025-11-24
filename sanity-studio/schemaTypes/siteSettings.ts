@@ -19,6 +19,27 @@ export const siteSettings = defineType({
       options: { disableAlpha: true },
       validation: (Rule) => Rule.required().error('Secondary color is required'),
     }),
+    defineField({
+      name: 'catalaVisible',
+      title: 'Català Language Ready',
+      type: 'boolean',
+      initialValue: true,
+      description: 'Show Catalan language option in the language switcher. Recommended to keep enabled as it is the default language.',
+    }),
+    defineField({
+      name: 'spanishVisible',
+      title: 'Spanish Language Ready',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Show Spanish language option in the language switcher. Enable when Spanish translations are complete.',
+    }),
+    defineField({
+      name: 'englishVisible',
+      title: 'English Language Ready',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Show English language option in the language switcher. Enable when English translations are complete.',
+    }),
   ],
   preview: {
     prepare() {

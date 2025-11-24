@@ -106,7 +106,12 @@ const ogLocale = getOpenGraphLocale(locale as SupportedLanguage)
   <body>
     <PageLoader isHomepage={isHomepage} />
     <Fragment set:html={HeaderSVGHover} />
-    <Header locale={locale} headerData={headerData} skipTarget={skipTarget} />
+    <Header
+      locale={locale}
+      headerData={headerData}
+      siteSettings={siteSettings.rawSettings}
+      skipTarget={skipTarget}
+    />
     <slot />
     <Footer footerData={footerData} locale={locale} />
   </body>

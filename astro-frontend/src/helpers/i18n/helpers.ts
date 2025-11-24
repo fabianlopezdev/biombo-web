@@ -139,6 +139,44 @@ export function getLanguageSwitcherData(currentPath: string, currentLang: Suppor
 }
 
 /**
+ * Get visible languages based on site settings
+ * Filters language switcher data to only show languages marked as ready in Sanity
+ * Always includes the current language to prevent users from being trapped
+ * @param currentPath - The current page path
+ * @param currentLang - The current language
+ * @param siteSettings - The site settings with language visibility toggles
+ * @returns Array of visible language switcher data
+ */
+export function getVisibleLanguages(
+  currentPath: string,
+  currentLang: SupportedLanguage,
+  siteSettings?: {
+    catalaVisible?: boolean
+    spanishVisible?: boolean
+    englishVisible?: boolean
+  } | null,
+) {
+  const allLanguages = getLanguageSwitcherData(currentPath, currentLang)
+
+  // If no site settings, show all languages (backward compatible)
+  if (!siteSettings) {
+    return allLanguages
+  }
+
+  return allLanguages.filter((lang) => {
+    // Always show the current language (prevents users from being trapped)
+    if (lang.code === currentLang) return true
+
+    // Filter based on visibility settings (default to true for backward compatibility)
+    if (lang.code === 'ca') return siteSettings.catalaVisible !== false
+    if (lang.code === 'es') return siteSettings.spanishVisible !== false
+    if (lang.code === 'en') return siteSettings.englishVisible !== false
+
+    return true
+  })
+}
+
+/**
  * Get Open Graph locale format
  * @param lang - The language code
  * @returns The Open Graph locale string

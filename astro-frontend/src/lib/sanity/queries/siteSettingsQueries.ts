@@ -24,7 +24,10 @@ export async function fetchSiteSettings(): Promise<SiteColors> {
       _createdAt,
       _updatedAt,
       primaryColor,
-      secondaryColor
+      secondaryColor,
+      catalaVisible,
+      spanishVisible,
+      englishVisible
     }`
 
     // Try fetching without schema validation first as a fallback

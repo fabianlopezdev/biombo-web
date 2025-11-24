@@ -1,19 +1,21 @@
 ---
 // Imports ────────────────────────────────────────────────────────────────────
 import type { Header, NavigationPage } from '@/lib/sanity/schemas/headerSchema'
+import type { SiteSettings } from '@/lib/sanity/schemas/siteSettingsSchema'
 import LanguageSwitcher from '@/components/shared/header/LanguageSwitcher.astro'
 import HeaderLogo from './HeaderLogo.astro'
 import PagesNavigation from './PagesNavigation.astro'
 import MobileMenu from './MobileMenu.astro'
-import { getLanguageSwitcherData, type SupportedLanguage } from '@/helpers/i18n/helpers'
+import { getVisibleLanguages, type SupportedLanguage } from '@/helpers/i18n/helpers'
 
 interface Props {
   locale: string
   headerData?: Header | null // Optional prop for data passed from parent
+  siteSettings?: SiteSettings | null // Optional site settings for language visibility
   skipTarget?: string // Optional skip link target (default: #main)
 }
 
-const { locale, headerData: headerDataProp, skipTarget = '#main' } = Astro.props
+const { locale, headerData: headerDataProp, siteSettings, skipTarget = '#main' } = Astro.props
 
 /* ─ Helper ───────────────────────────────────────────────────────────────────
    Provides the correct "skip to content" label for the given locale. */
@@ -26,9 +28,9 @@ function getSkipLabel(locale: string): string {
   return map[locale] ?? map.en
 }
 
-/* ─ Language data with dynamic URLs ─ */
+/* ─ Language data with dynamic URLs and visibility filtering ─ */
 const currentPath = Astro.url.pathname
-const languageData = getLanguageSwitcherData(currentPath, locale as SupportedLanguage)
+const languageData = getVisibleLanguages(currentPath, locale as SupportedLanguage, siteSettings)
 const languages = languageData.map((lang) => ({
   code: lang.code as 'ca' | 'es' | 'en',
   short: lang.short,

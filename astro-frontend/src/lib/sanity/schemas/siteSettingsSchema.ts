@@ -41,6 +41,9 @@ export const siteSettingsSchema = z.object({
   _updatedAt: z.string(),
   primaryColor: colorSchema,
   secondaryColor: colorSchema,
+  catalaVisible: z.boolean().optional(),
+  spanishVisible: z.boolean().optional(),
+  englishVisible: z.boolean().optional(),
 })
 
 // Export TypeScript types derived from the Zod schemas
