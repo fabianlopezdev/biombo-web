@@ -16,7 +16,6 @@ import {
   getMainMedia,
   getMobileMainMedia,
   getThumbnailMedia,
-  isMainMediaVideo,
 } from '@/helpers/projects/projectHelpers'
 import { getProjectTranslations } from '@/config/i18n/projectDetail'
 import { getProjectsListUrl, type SupportedLocale } from '@/config/routing/projectRoutes'
@@ -71,47 +70,99 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
     <header class="project-header">
       <figure class="hero-figure">
         {
-          isMainMediaVideo(project) ? (
-            // Video handling - use desktop video only for now (videos stay desktop)
-            <OptimizedVideo
-              video={getMainMedia(project) as FileWithResolvedAsset}
-              class="hero-image"
-              aspectRatio={1513 / 722}
-            />
-          ) : (
-            // Image handling with mobile variant support
-            (() => {
-              const desktopMedia = getMainMedia(project) as ImageWithResolvedAsset
-              const mobileMedia = getMobileMainMedia(project) as ImageWithResolvedAsset | null
-              const hasMobileVariant = mobileMedia && mobileMedia !== desktopMedia
+          (() => {
+            const desktopMedia = getMainMedia(project)
+            const mobileMedia = getMobileMainMedia(project)
+            const hasMobileVariant = mobileMedia && mobileMedia !== desktopMedia
 
-              return hasMobileVariant ? (
-                // Use picture element for responsive images
-                <picture>
-                  <source media="(min-width: 992px)" srcset={getImageUrl(desktopMedia)} />
-                  <source media="(max-width: 991px)" srcset={getImageUrl(mobileMedia)} />
+            // Check if either desktop or mobile is a video
+            const isDesktopVideo =
+              desktopMedia && isVideoFile(desktopMedia as FileWithResolvedAsset)
+            const isMobileVideo = mobileMedia && isVideoFile(mobileMedia as FileWithResolvedAsset)
+
+            // Case 1: Both are videos - show appropriate video per viewport
+            if (isDesktopVideo && isMobileVideo && hasMobileVariant) {
+              return (
+                <>
+                  <OptimizedVideo
+                    video={desktopMedia as FileWithResolvedAsset}
+                    class="hero-image desktop-only-hero"
+                    aspectRatio={1513 / 722}
+                  />
+                  <OptimizedVideo
+                    video={mobileMedia as FileWithResolvedAsset}
+                    class="hero-image mobile-only-hero"
+                    aspectRatio={65 / 59}
+                  />
+                </>
+              )
+            }
+
+            // Case 2: Desktop is video, mobile is image or no mobile variant - use desktop video everywhere
+            if (isDesktopVideo) {
+              return (
+                <OptimizedVideo
+                  video={desktopMedia as FileWithResolvedAsset}
+                  class="hero-image"
+                  aspectRatio={1513 / 722}
+                />
+              )
+            }
+
+            // Case 3: Desktop is image, mobile is video - show image on desktop, video on mobile
+            if (!isDesktopVideo && isMobileVideo && hasMobileVariant) {
+              const desktopImage = desktopMedia as ImageWithResolvedAsset
+              const mobileVideo = mobileMedia as FileWithResolvedAsset
+
+              return (
+                <>
                   <OptimizedImage
-                    class="hero-image"
-                    src={getImageUrl(desktopMedia)}
+                    class="hero-image desktop-only-hero"
+                    src={getImageUrl(desktopImage)}
                     alt={`${project.title}`}
-                    image={desktopMedia}
+                    image={desktopImage}
                     imageContext="hero"
                     loading="eager"
                   />
-                </picture>
-              ) : (
-                // No mobile variant, use desktop only
+                  <OptimizedVideo
+                    video={mobileVideo}
+                    class="hero-image mobile-only-hero"
+                    aspectRatio={65 / 59}
+                  />
+                </>
+              )
+            }
+
+            // Case 4: Both are images - handle image rendering with responsive variants
+            const desktopImage = desktopMedia as ImageWithResolvedAsset
+            const mobileImage = mobileMedia as ImageWithResolvedAsset | null
+
+            return hasMobileVariant ? (
+              // Use picture element for responsive images
+              <picture>
+                <source media="(min-width: 992px)" srcset={getImageUrl(desktopImage)} />
+                <source media="(max-width: 991px)" srcset={getImageUrl(mobileImage)} />
                 <OptimizedImage
                   class="hero-image"
-                  src={getImageUrl(desktopMedia)}
+                  src={getImageUrl(desktopImage)}
                   alt={`${project.title}`}
-                  image={desktopMedia}
+                  image={desktopImage}
                   imageContext="hero"
                   loading="eager"
                 />
-              )
-            })()
-          )
+              </picture>
+            ) : (
+              // No mobile variant, use desktop only
+              <OptimizedImage
+                class="hero-image"
+                src={getImageUrl(desktopImage)}
+                alt={`${project.title}`}
+                image={desktopImage}
+                imageContext="hero"
+                loading="eager"
+              />
+            )
+          })()
         }
       </figure>
     </header>
@@ -682,6 +733,11 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
     margin: 0rem;
   }
 
+  /* Responsive video display - hide mobile videos on desktop */
+  :global(.mobile-only-hero) {
+    display: none;
+  }
+
   @media (width < 992px) {
     .content-section.with-spacing {
       margin-block-end: clamp(2rem, 1.5rem + 2vi, 3.5rem);
@@ -709,6 +765,15 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
       aspect-ratio: 65/59;
       margin-block-start: 2rem;
       padding-block: 0rem;
+    }
+
+    /* Show mobile videos, hide desktop videos on mobile */
+    :global(.desktop-only-hero) {
+      display: none;
+    }
+
+    :global(.mobile-only-hero) {
+      display: block;
     }
 
     .project-metadata {
