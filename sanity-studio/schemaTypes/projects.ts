@@ -252,6 +252,26 @@ export const projects = defineType({
   name: 'project', // This ID remains 'project' to maintain compatibility with existing data
   title: 'Projects',
   type: 'document',
+  fieldsets: [
+    {
+      name: 'heroMedia',
+      title: 'Project Hero Media',
+      description: 'Main hero image/video shown on the project detail page',
+      options: { collapsible: true, collapsed: false }
+    },
+    {
+      name: 'thumbnails',
+      title: 'Project Thumbnails',
+      description: 'Thumbnails for project cards and listings',
+      options: { collapsible: true, collapsed: true }
+    },
+    {
+      name: 'homepageThumbnails',
+      title: 'Homepage Featured Projects',
+      description: 'Custom thumbnails specifically for homepage featured projects section',
+      options: { collapsible: true, collapsed: true }
+    }
+  ],
   fields: [
     // Language field required for document internationalization
     defineField({
@@ -306,9 +326,10 @@ export const projects = defineType({
     }),
     defineField({
       name: 'mainMedia',
-      title: 'Main Media (Image or Video)',
+      title: 'Desktop Hero Media',
       description: 'Upload an IMAGE or VIDEO file for the main project hero. This appears prominently on the project detail page. Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)',
       type: 'array',
+      fieldset: 'heroMedia',
       of: [
         defineArrayMember({
           type: 'image',
@@ -331,13 +352,15 @@ export const projects = defineType({
       title: 'Use Different Media for Mobile',
       description: 'Mobile crops the desktop hero image from wide (1513/722) to nearly square (65/59). Enable this to upload a mobile-optimized image or video.',
       type: 'boolean',
+      fieldset: 'heroMedia',
       initialValue: false,
     }),
     defineField({
       name: 'mobileMainMedia',
-      title: 'Mobile Hero Media (Image or Video)',
+      title: 'Mobile Hero Media',
       description: 'Media optimized for mobile (aspect ratio 65/59 - nearly square). If not set, desktop media will be cropped using object-fit: cover.',
       type: 'array',
+      fieldset: 'heroMedia',
       of: [
         defineArrayMember({
           type: 'image',
@@ -361,13 +384,15 @@ export const projects = defineType({
       title: 'Use Separate Thumbnail',
       description: 'Use a different image as thumbnail instead of the main project image',
       type: 'boolean',
+      fieldset: 'thumbnails',
       initialValue: false,
     }),
     defineField({
       name: 'thumbnailMedia',
-      title: 'Thumbnail Media (Image or Video)',
+      title: 'Thumbnail Media',
       description: 'Upload an IMAGE or VIDEO file for the project thumbnail. Used in project cards and listings (only used if "Use Separate Thumbnail" is enabled). Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)',
       type: 'array',
+      fieldset: 'thumbnails',
       of: [
         defineArrayMember({
           type: 'image',
@@ -389,9 +414,10 @@ export const projects = defineType({
     }),
     defineField({
       name: 'homepageThumbnailMedia',
-      title: 'Homepage Thumbnail Media (Optional)',
+      title: 'Desktop Homepage Thumbnail',
       description: 'Optional custom thumbnail specifically for the homepage featured projects section. Use this if you want a different image optimized for the homepage grid layout. If not set, falls back to the regular thumbnail or main image.',
       type: 'array',
+      fieldset: 'homepageThumbnails',
       of: [
         defineArrayMember({
           type: 'image',
@@ -409,6 +435,38 @@ export const projects = defineType({
       },
       validation: Rule => Rule.max(1).error('Only 1 image or video is allowed'),
       // No required validation - this field is optional
+    }),
+    defineField({
+      name: 'useMobileHomepageThumbnail',
+      title: 'Use Different Thumbnail for Mobile',
+      description: 'Mobile homepage thumbnails may appear differently cropped. Enable this to upload a mobile-optimized thumbnail for the homepage featured projects section.',
+      type: 'boolean',
+      fieldset: 'homepageThumbnails',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'mobileHomepageThumbnailMedia',
+      title: 'Mobile Homepage Thumbnail',
+      description: 'Media optimized for mobile homepage featured projects. If not set, desktop homepage thumbnail will be used.',
+      type: 'array',
+      fieldset: 'homepageThumbnails',
+      of: [
+        defineArrayMember({
+          type: 'image',
+          title: 'Image',
+          options: {
+            hotspot: true,
+          },
+        }),
+        defineArrayMember({
+          type: 'videoWithBackground',
+        }),
+      ],
+      components: {
+        input: SingleItemArrayInput,
+      },
+      validation: Rule => Rule.max(1).error('Only 1 image or video is allowed'),
+      hidden: ({parent}) => !parent?.useMobileHomepageThumbnail,
     }),
     defineField({
       name: 'hoverColor',
