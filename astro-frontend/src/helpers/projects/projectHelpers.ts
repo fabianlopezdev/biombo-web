@@ -247,6 +247,23 @@ export function getHomepageThumbnailMedia(
 }
 
 /**
+ * Get mobile-specific homepage thumbnail media if toggle enabled.
+ * Returns null if toggle disabled or no mobile media set.
+ */
+export function getMobileHomepageThumbnailMedia(
+  project: Project,
+): FileWithResolvedAsset | ImageWithResolvedAsset | null {
+  if (
+    project.useMobileHomepageThumbnail &&
+    Array.isArray(project.mobileHomepageThumbnailMedia) &&
+    project.mobileHomepageThumbnailMedia.length > 0
+  ) {
+    return project.mobileHomepageThumbnailMedia[0]
+  }
+  return null
+}
+
+/**
  * Get mobile-specific main media for single project layout hero
  * Falls back to desktop mainMedia if mobile variant not set
  */
