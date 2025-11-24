@@ -1,0 +1,35 @@
+---
+import HomepageLayout from '@/layouts/pages/HomepageLayout.astro'
+import PageLayoutRouter from '@/helpers/routing/PageLayoutRouter.astro'
+import { getLayoutForCatalanPage } from '@/config/routing/pageRoutes'
+
+// SSR mode - no prerendering
+const { slug } = Astro.params
+
+if (!slug) {
+  return Astro.redirect('/404')
+}
+
+// Determine which component to render
+let ComponentToRender = null
+let props = {}
+
+// 1. Check if it's a language homepage (en/es)
+if (slug === 'en' || slug === 'es') {
+  ComponentToRender = HomepageLayout
+  props = { locale: slug }
+} else {
+  // 2. Check if it's a Catalan page
+  const layout = getLayoutForCatalanPage(slug)
+
+  if (layout) {
+    ComponentToRender = PageLayoutRouter
+    props = { layout, locale: 'ca' }
+  } else {
+    // 3. If neither, 404
+    return Astro.redirect('/404')
+  }
+}
+---
+
+<ComponentToRender {...props} />
