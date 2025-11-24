@@ -2,7 +2,10 @@
 import type { FeaturedProjectItem } from '@/lib/sanity/schemas/homePageSchema'
 import { transformProject } from '@/helpers/projects/projectsUtils'
 import { getProjectsListUrl } from '@/config/routing/projectRoutes'
-import { getHomepageThumbnailMedia } from '@/helpers/projects/projectHelpers'
+import {
+  getHomepageThumbnailMedia,
+  getMobileHomepageThumbnailMedia,
+} from '@/helpers/projects/projectHelpers'
 import ProjectCard from './ProjectCard.astro'
 import MobileSlider from '@/components/shared/MobileSlider.astro'
 
@@ -48,9 +51,10 @@ const rawFeaturedProjects: FeaturedProjectItem[] = projectsData?.featuredProject
           )
           const projectNumber = i + 1
 
-          // Get the homepage thumbnail media using the helper
+          // Get the mobile homepage thumbnail media with fallback to desktop
           const thumbnailMedia = rawItem?.project
-            ? getHomepageThumbnailMedia(rawItem.project)
+            ? getMobileHomepageThumbnailMedia(rawItem.project) ||
+              getHomepageThumbnailMedia(rawItem.project)
             : null
 
           return (

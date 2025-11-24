@@ -173,6 +173,11 @@ export const projectSchema = z.object({
     .union([z.array(mediaItemSchema), mediaItemSchema])
     .nullable()
     .optional(), // Homepage thumbnail media field - optional custom thumbnail for homepage featured projects
+  useMobileHomepageThumbnail: z.boolean().nullable().optional(), // Toggle for mobile homepage thumbnail
+  mobileHomepageThumbnailMedia: z
+    .union([z.array(mediaItemSchema), mediaItemSchema])
+    .nullable()
+    .optional(), // Mobile homepage thumbnail media field - optional custom thumbnail for mobile homepage featured projects
   excerpt: z.array(z.any()).nullable().optional(), // Added nullable
   description: z.array(z.any()).nullable().optional(), // Added nullable
   mainText: z.array(z.any()).nullable().optional(), // Added mainText field
