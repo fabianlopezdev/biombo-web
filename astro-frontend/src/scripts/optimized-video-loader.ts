@@ -12,6 +12,11 @@
 const INTERSECTION_THRESHOLD = 0.5 // Play when 50% visible
 const ROOT_MARGIN = '50px' // Start loading 50px before entering viewport
 
+function markVideoLoaded(video: HTMLVideoElement): void {
+  if (video.dataset.loaded === 'true') return
+  video.dataset.loaded = 'true'
+}
+
 // Track initialized videos to avoid duplicate observers
 const initializedVideos = new WeakSet<HTMLVideoElement>()
 
@@ -32,9 +37,6 @@ function initializeVideo(video: HTMLVideoElement): void {
 
         // Video is entering viewport and is sufficiently visible
         if (entry.isIntersecting && entry.intersectionRatio >= INTERSECTION_THRESHOLD) {
-          // Mark as loaded for fade-in effect
-          videoElement.setAttribute('data-loaded', 'true')
-
           // Play the video
           const playPromise = videoElement.play()
 
@@ -62,7 +64,20 @@ function initializeVideo(video: HTMLVideoElement): void {
   // Start observing
   observer.observe(video)
 
-  // Handle video loaded metadata event
+  // Reveal first frame as soon as it's ready so carousels can show the next slide preview
+  if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+    markVideoLoaded(video)
+  } else {
+    video.addEventListener(
+      'loadeddata',
+      () => {
+        markVideoLoaded(video)
+      },
+      { once: true },
+    )
+  }
+
+  // Handle video loaded metadata event (still useful for debugging/perf tracking)
   video.addEventListener('loadedmetadata', () => {
     // Video metadata is loaded (first frame available for poster)
     video.setAttribute('data-metadata-loaded', 'true')
