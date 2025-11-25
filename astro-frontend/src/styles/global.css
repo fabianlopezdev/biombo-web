@@ -280,3 +280,68 @@ figure {
 .g-negative-inline-padding {
   margin-inline: calc(var(--padding-inline) * -1);
 }
+
+/* =================================================
+   Slide-up Text Animation - Global Styles
+   Used by data-slide-up-animation attribute
+   ================================================= */
+
+/* Hide animation elements initially to prevent FOUC */
+/* Using opacity: 0.1 instead of visibility: hidden for LCP */
+[data-slide-up-animation]:not([data-animation-complete]) {
+  opacity: 0.1;
+}
+
+/* Animation state opacity controls - use same specificity as above */
+[data-slide-up-animation][data-animation='pending'] {
+  opacity: 0.1;
+}
+
+[data-slide-up-animation][data-animation='ready'],
+[data-slide-up-animation][data-animation='active'],
+[data-slide-up-animation][data-animation-complete] {
+  opacity: 1;
+}
+
+/* Line animation styles */
+.slide-up-line {
+  display: block !important;
+  overflow: hidden !important;
+  position: relative !important;
+  margin-bottom: -0.14em !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+}
+
+.slide-up-line-inner {
+  display: inline-block !important;
+  transform: translate3d(0, 105%, 0) !important;
+  will-change: transform !important;
+  padding-bottom: 0.2em !important;
+}
+
+/* Animation triggered state */
+[data-animation='active'] .slide-up-line-inner,
+[data-animation-complete] .slide-up-line-inner {
+  transform: translate3d(0, 0, 0) !important;
+  transition: transform var(--animation-duration, 1.5s)
+    var(--animation-easing, cubic-bezier(0.19, 1, 0.22, 1)) !important;
+  transition-delay: var(--animation-delay, 750ms) !important;
+}
+
+/* Ensure special elements maintain proper sizing within animated lines */
+.slide-up-line .highlight-wrapper,
+.slide-up-line strong,
+.slide-up-line em,
+.slide-up-line a {
+  display: inline !important;
+  position: relative !important;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .slide-up-line-inner {
+    transform: translate3d(0, 0, 0) !important;
+    transition: none !important;
+  }
+}
