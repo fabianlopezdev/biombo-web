@@ -23,6 +23,7 @@ const HOME_PAGE_FIELDS = `
         slug,
         mainMedia[] {
           _type,
+          alt,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -46,6 +47,7 @@ const HOME_PAGE_FIELDS = `
         },
         thumbnailMedia[] {
           _type,
+          alt,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -70,6 +72,7 @@ const HOME_PAGE_FIELDS = `
         useSeparateThumbnail,
         homepageThumbnailMedia[] {
           _type,
+          alt,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -94,6 +97,7 @@ const HOME_PAGE_FIELDS = `
         useMobileHomepageThumbnail,
         mobileHomepageThumbnailMedia[] {
           _type,
+          alt,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -141,6 +145,7 @@ const HOME_PAGE_FIELDS = `
     images[]{
       _key,
       _type,
+      alt,
       hotspot { x, y, height, width },
       crop { top, bottom, left, right },
       asset-> {

@@ -30,9 +30,15 @@ export const aboutSlider = defineType({
       of: [
         {
           type: 'image',
-          options: {
-            hotspot: true,
-          },
+          options: { hotspot: true },
+          fields: [
+            {
+              name: 'alt',
+              title: 'Alt Text',
+              type: 'localeStringOptional',
+              description: 'Describes the image for search engines and screen readers (SEO & accessibility)',
+            },
+          ],
         },
       ],
       validation: (Rule) =>
@@ -44,7 +50,7 @@ export const aboutSlider = defineType({
   preview: {
     select: {
       title: 'title',
-      media: 'images.0.asset',
+      media: 'images.0',
     },
     prepare({title, media}) {
       return {

@@ -1,5 +1,6 @@
 // Removed page import as this schema has been deleted
 import { localeString } from './localeString'
+import { localeStringOptional } from './localeStringOptional'
 import { localePortableText } from './localePortableText'
 import { localeSlug } from './localeSlug'
 import { header, navigationItemType } from './header'
@@ -32,6 +33,7 @@ export const schemaTypes = [
 
   // Objects
   localeString,
+  localeStringOptional,
   localePortableText,
   localeSlug,
   navigationItemType,

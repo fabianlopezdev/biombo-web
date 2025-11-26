@@ -79,11 +79,21 @@ const imageCropSchema = z.object({
   right: z.number(),
 })
 
+// Zod schema for localized string (optional - for alt text)
+const localeStringOptionalSchema = z
+  .object({
+    ca: z.string().optional(),
+    es: z.string().optional(),
+    en: z.string().optional(),
+  })
+  .optional()
+
 // Zod schema for a Sanity image
 export const sanityImageSchema = z.object({
   _key: z.string().optional(), // _key might not be present if it's a direct image field, not in an array
   _type: z.literal('image'),
   asset: imageAssetSchema, // Reference to the image asset
+  alt: localeStringOptionalSchema, // Multilingual alt text
   hotspot: imageHotspotSchema.nullable().optional(),
   crop: imageCropSchema.nullable().optional(),
 })

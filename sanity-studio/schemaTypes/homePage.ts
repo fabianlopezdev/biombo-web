@@ -278,10 +278,15 @@ export const aboutSection = defineType({
       of: [
         {
           type: 'image',
-          options: {
-            hotspot: true, // Enables image hotspot for better cropping
-          },
-          // No custom fields needed for image meta-information as Sanity Media Plugin is in use.
+          options: { hotspot: true },
+          fields: [
+            {
+              name: 'alt',
+              title: 'Alt Text',
+              type: 'localeStringOptional',
+              description: 'Describes the image for search engines and screen readers (SEO & accessibility)',
+            },
+          ],
         },
       ],
       validation: (Rule) =>
@@ -293,7 +298,7 @@ export const aboutSection = defineType({
   preview: {
     select: {
       title: 'title',
-      media: 'images.0.asset', // Show the first image as media preview
+      media: 'images.0', // Show the first image as media preview
     },
     prepare({title, media}) {
       return {

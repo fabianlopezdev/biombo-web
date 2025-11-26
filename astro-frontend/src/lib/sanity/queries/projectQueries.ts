@@ -46,6 +46,7 @@ export async function fetchProjectBySlug(
       slug,
       mainMedia[] {
         _type,
+        alt,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -70,6 +71,7 @@ export async function fetchProjectBySlug(
       useMobileMainMedia,
       mobileMainMedia[] {
         _type,
+        alt,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -93,6 +95,7 @@ export async function fetchProjectBySlug(
       },
       thumbnailMedia[] {
         _type,
+        alt,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -141,6 +144,7 @@ export async function fetchProjectBySlug(
         // For imageSection - new media format (file type - can be image or video)
         featuredMedia[] {
           _type,
+          alt,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -164,6 +168,7 @@ export async function fetchProjectBySlug(
         },
         otherMedia[] {
           _type,
+          alt,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -187,6 +192,7 @@ export async function fetchProjectBySlug(
         },
         mobileFeaturedMedia[] {
           _type,
+          alt,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -210,6 +216,7 @@ export async function fetchProjectBySlug(
         },
         mobileOtherMedia[] {
           _type,
+          alt,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -420,6 +427,7 @@ export async function fetchSimilarProjects(
       slug,
       mainMedia[] {
         _type,
+        alt,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -444,6 +452,7 @@ export async function fetchSimilarProjects(
       useMobileMainMedia,
       mobileMainMedia[] {
         _type,
+        alt,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -467,6 +476,7 @@ export async function fetchSimilarProjects(
       },
       thumbnailMedia[] {
         _type,
+        alt,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -516,6 +526,7 @@ export async function fetchSimilarProjects(
     slug,
     mainMedia[] {
       _type,
+      alt,
       "asset": coalesce(asset.asset->, asset->) {
         _id,
         _type,
@@ -539,6 +550,7 @@ export async function fetchSimilarProjects(
     },
     thumbnailMedia[] {
       _type,
+      alt,
       "asset": coalesce(asset.asset->, asset->) {
         _id,
         _type,
@@ -603,6 +615,7 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
       slug,
       mainMedia[] {
         _type,
+        alt,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -627,6 +640,7 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
       useMobileMainMedia,
       mobileMainMedia[] {
         _type,
+        alt,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -650,6 +664,7 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
       },
       thumbnailMedia[] {
         _type,
+        alt,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -713,6 +728,7 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
         slug,
         mainMedia[] {
           _type,
+          alt,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -736,6 +752,7 @@ export async function fetchProjectsByLocale(locale: 'ca' | 'es' | 'en'): Promise
         },
         thumbnailMedia[] {
           _type,
+          alt,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,

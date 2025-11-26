@@ -9,6 +9,7 @@ import type {
 import type { Service, Services } from '@/lib/sanity/schemas/serviceSchema'
 import type { Client } from '@/lib/sanity/schemas/clientSchema'
 import { getThumbnailMedia, isThumbnailMediaVideo } from '@/helpers/projects/projectHelpers'
+import { getLocalizedAlt } from '@/helpers/i18n/helpers'
 
 interface Props {
   projects: Projects | null
@@ -91,7 +92,7 @@ const getProjectUrl = (slug: { current: string } | string, locale: string): stri
                     thumbnailMedia && (
                       <OptimizedImage
                         src={thumbnailMedia.asset?.url || ''}
-                        alt={project.title}
+                        alt={getLocalizedAlt(thumbnailMedia as any, locale, project.title)}
                         image={thumbnailMedia as ImageWithResolvedAsset}
                         loading="lazy"
                       />

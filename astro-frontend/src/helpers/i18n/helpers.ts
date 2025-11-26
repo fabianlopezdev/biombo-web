@@ -185,3 +185,56 @@ export function getOpenGraphLocale(lang: SupportedLanguage): string {
   const config = getLanguageConfig(lang)
   return config?.locale || 'ca_ES'
 }
+
+/**
+ * Type for localized string object (alt text, etc.)
+ */
+export interface LocalizedString {
+  ca?: string
+  es?: string
+  en?: string
+}
+
+/**
+ * Get localized text from a multilingual object
+ * Falls back to other languages if the requested language is not available
+ * @param localizedObj - Object with ca, es, en properties
+ * @param lang - The target language code
+ * @param fallback - Default fallback string if no translation found
+ * @returns The localized string or fallback
+ */
+export function getLocalizedText(
+  localizedObj: LocalizedString | null | undefined,
+  lang: SupportedLanguage,
+  fallback: string = '',
+): string {
+  if (!localizedObj) return fallback
+
+  // Try the requested language first
+  if (localizedObj[lang]) return localizedObj[lang]
+
+  // Fall back to Catalan (default language)
+  if (localizedObj.ca) return localizedObj.ca
+
+  // Fall back to any available language
+  if (localizedObj.es) return localizedObj.es
+  if (localizedObj.en) return localizedObj.en
+
+  return fallback
+}
+
+/**
+ * Get localized alt text from an image object
+ * Convenience wrapper around getLocalizedText for image alt fields
+ * @param image - Image object with optional alt field
+ * @param lang - The target language code
+ * @param fallback - Default fallback string if no alt text found
+ * @returns The localized alt text or fallback
+ */
+export function getLocalizedAlt(
+  image: { alt?: LocalizedString | null } | null | undefined,
+  lang: SupportedLanguage,
+  fallback: string = '',
+): string {
+  return getLocalizedText(image?.alt, lang, fallback)
+}

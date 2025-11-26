@@ -4,6 +4,24 @@ import { MediaFileInput } from '../components/MediaFileInput'
 import { SingleItemArrayInput } from '../components/SingleItemArrayInput'
 
 /**
+ * Reusable image array member with multilingual alt text fields
+ * Used across all media arrays in projects
+ */
+const imageWithAltFields = defineArrayMember({
+  type: 'image',
+  title: 'Image',
+  options: { hotspot: true },
+  fields: [
+    {
+      name: 'alt',
+      title: 'Alt Text',
+      type: 'localeStringOptional',
+      description: 'Describes the image for search engines and screen readers (SEO & accessibility)',
+    },
+  ],
+})
+
+/**
  * Video with custom background color for loading state
  * @description Wraps a video file with an optional background color that displays while the video loads
  */
@@ -83,13 +101,7 @@ LAYOUT GUIDE:
 
 Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
       of: [
-        defineArrayMember({
-          type: 'image',
-          title: 'Image',
-          options: {
-            hotspot: true,
-          },
-        }),
+        imageWithAltFields,
         defineArrayMember({
           type: 'videoWithBackground',
         }),
@@ -105,13 +117,7 @@ Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
       type: 'array',
       description: 'Upload IMAGE or VIDEO files. For 2 media: Add 2 here (side by side). For 3 media: Add 2 here with Featured (2+1 layout) OR add 3 here without Featured (row layout). For 4 media: Add 3 here with Featured. You can mix images and videos!',
       of: [
-        defineArrayMember({
-          type: 'image',
-          title: 'Image',
-          options: {
-            hotspot: true,
-          },
-        }),
+        imageWithAltFields,
         defineArrayMember({
           type: 'videoWithBackground',
         }),
@@ -124,13 +130,7 @@ Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
       description: 'Mobile-optimized version of featured media. Desktop aspect ratios change on mobile, potentially cropping important content. If not set, desktop media will be used.',
       type: 'array',
       of: [
-        defineArrayMember({
-          type: 'image',
-          title: 'Image',
-          options: {
-            hotspot: true,
-          },
-        }),
+        imageWithAltFields,
         defineArrayMember({
           type: 'videoWithBackground',
         }),
@@ -146,13 +146,7 @@ Accepts: Images (JPG, PNG, WebP, etc.) and Videos (MP4, WebM, etc.)`,
       description: 'Mobile-optimized versions of other media (max 3). If not set, desktop media will be cropped to fit mobile aspect ratios.',
       type: 'array',
       of: [
-        defineArrayMember({
-          type: 'image',
-          title: 'Image',
-          options: {
-            hotspot: true,
-          },
-        }),
+        imageWithAltFields,
         defineArrayMember({
           type: 'videoWithBackground',
         }),
@@ -379,13 +373,7 @@ export const projects = defineType({
       type: 'array',
       fieldset: 'heroMedia',
       of: [
-        defineArrayMember({
-          type: 'image',
-          title: 'Image',
-          options: {
-            hotspot: true,
-          },
-        }),
+        imageWithAltFields,
         defineArrayMember({
           type: 'videoWithBackground',
         }),
@@ -410,13 +398,7 @@ export const projects = defineType({
       type: 'array',
       fieldset: 'heroMedia',
       of: [
-        defineArrayMember({
-          type: 'image',
-          title: 'Image',
-          options: {
-            hotspot: true,
-          },
-        }),
+        imageWithAltFields,
         defineArrayMember({
           type: 'videoWithBackground',
         }),
@@ -442,13 +424,7 @@ export const projects = defineType({
       type: 'array',
       fieldset: 'thumbnails',
       of: [
-        defineArrayMember({
-          type: 'image',
-          title: 'Image',
-          options: {
-            hotspot: true,
-          },
-        }),
+        imageWithAltFields,
         defineArrayMember({
           type: 'videoWithBackground',
         }),
@@ -467,13 +443,7 @@ export const projects = defineType({
       type: 'array',
       fieldset: 'homepageThumbnails',
       of: [
-        defineArrayMember({
-          type: 'image',
-          title: 'Image',
-          options: {
-            hotspot: true,
-          },
-        }),
+        imageWithAltFields,
         defineArrayMember({
           type: 'videoWithBackground',
         }),
@@ -499,13 +469,7 @@ export const projects = defineType({
       type: 'array',
       fieldset: 'homepageThumbnails',
       of: [
-        defineArrayMember({
-          type: 'image',
-          title: 'Image',
-          options: {
-            hotspot: true,
-          },
-        }),
+        imageWithAltFields,
         defineArrayMember({
           type: 'videoWithBackground',
         }),
@@ -682,7 +646,6 @@ export const projects = defineType({
       // Helper function to check if media is an image (not a video object)
       const isImage = (media: any) => {
         if (!media) return false
-        // Sanity images have _type: 'image', videos have _type: 'videoWithBackground'
         return media._type === 'image'
       }
 

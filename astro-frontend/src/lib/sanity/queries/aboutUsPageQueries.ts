@@ -36,6 +36,7 @@ const ABOUT_US_PAGE_FIELDS = `
     images[]{
       _key,
       _type,
+      alt,
       hotspot { x, y, height, width },
       crop { top, bottom, left, right },
       asset-> {

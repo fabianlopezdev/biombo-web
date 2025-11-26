@@ -1,15 +1,17 @@
 // src/shared/schemas/sanity/projectSchema.ts
 import { z } from 'zod'
 
-// Define Zod schema for localized strings (consistent with other schemas)
+// Define Zod schema for localized strings (optional alt text)
+// Note: Sanity's localeStringOptional type returns plain objects without _type
+// and can be null when no alt text is set
 const localeStringSchema = z
   .object({
-    _type: z.literal('localeString'),
     ca: z.string().optional(),
     es: z.string().optional(),
     en: z.string().optional(),
   })
-  .partial()
+  .nullable()
+  .optional()
 
 // Import PortableTextBlock type from homePageSchema
 import type { PortableTextBlock } from './homePageSchema'
@@ -37,8 +39,8 @@ const imageWithAltSchema = z.object({
     _ref: z.string(), // This is for an unresolved reference
     _type: z.literal('reference'),
   }),
-  alt: localeStringSchema.optional(),
-  caption: localeStringSchema.optional(),
+  alt: localeStringSchema, // Already handles null/optional
+  caption: localeStringSchema, // Already handles null/optional
   hotspot: z
     .object({
       x: z.number(),
@@ -93,8 +95,8 @@ const resolvedSanityFileAssetSchema = z.object({
 const imageWithResolvedAssetSchema = z.object({
   _type: z.literal('image'),
   asset: resolvedSanityAssetSchema, // Use the resolved asset schema here
-  alt: localeStringSchema.optional(),
-  caption: localeStringSchema.optional(),
+  alt: localeStringSchema, // Already handles null/optional
+  caption: localeStringSchema, // Already handles null/optional
   hotspot: z
     .object({
       x: z.number(),

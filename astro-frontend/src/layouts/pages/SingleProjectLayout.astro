@@ -18,6 +18,7 @@ import {
   getThumbnailMedia,
 } from '@/helpers/projects/projectHelpers'
 import { getProjectTranslations } from '@/config/i18n/projectDetail'
+import { getLocalizedAlt } from '@/helpers/i18n/helpers'
 import { getProjectsListUrl, type SupportedLocale } from '@/config/routing/projectRoutes'
 import { generateProjectMetadata } from '@/config/i18n/pageMetadata'
 import type {
@@ -119,7 +120,7 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
                   <OptimizedImage
                     class="hero-image desktop-only-hero"
                     src={getImageUrl(desktopImage)}
-                    alt={`${project.title}`}
+                    alt={getLocalizedAlt(desktopMedia as any, locale, project.title)}
                     image={desktopImage}
                     imageContext="hero"
                     loading="eager"
@@ -145,7 +146,7 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
                 <OptimizedImage
                   class="hero-image"
                   src={getImageUrl(desktopImage)}
-                  alt={`${project.title}`}
+                  alt={getLocalizedAlt(desktopMedia as any, locale, project.title)}
                   image={desktopImage}
                   imageContext="hero"
                   loading="eager"
@@ -156,7 +157,7 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
               <OptimizedImage
                 class="hero-image"
                 src={getImageUrl(desktopImage)}
-                alt={`${project.title}`}
+                alt={getLocalizedAlt(desktopMedia as any, locale, project.title)}
                 image={desktopImage}
                 imageContext="hero"
                 loading="eager"
@@ -271,7 +272,7 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
                         <source media="(max-width: 991px)" srcset={getMediaUrl(mobileFile)} />
                         <OptimizedImage
                           src={getMediaUrl(file)}
-                          alt={project.title}
+                          alt={getLocalizedAlt(media as any, locale, project.title)}
                           image={imageData}
                           loading="lazy"
                         />
@@ -282,7 +283,7 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
                   return (
                     <OptimizedImage
                       src={getMediaUrl(file)}
-                      alt={project.title}
+                      alt={getLocalizedAlt(media as any, locale, project.title)}
                       image={imageData}
                       loading="lazy"
                     />
@@ -310,7 +311,7 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
                       <source media="(max-width: 991px)" srcset={getImageUrl(mobileImage)} />
                       <OptimizedImage
                         src={getImageUrl(image)}
-                        alt={project.title}
+                        alt={getLocalizedAlt(image as any, locale, project.title)}
                         image={image}
                         loading="lazy"
                       />
@@ -321,7 +322,7 @@ const metadata = generateProjectMetadata(project, locale, portableTextToPlainTex
                 return (
                   <OptimizedImage
                     src={getImageUrl(image)}
-                    alt={project.title}
+                    alt={getLocalizedAlt(image as any, locale, project.title)}
                     image={image}
                     loading="lazy"
                   />

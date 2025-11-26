@@ -11,6 +11,8 @@ import type {
   FileWithResolvedAsset,
   ImageWithResolvedAsset,
 } from '@/lib/sanity/schemas/projectSchema'
+import { getLocalizedAlt } from '@/helpers/i18n/helpers'
+import type { SupportedLanguage } from '@/config/routing/urlMappings'
 
 /**
  * Type definition for a localized slug in Sanity
@@ -98,8 +100,15 @@ export function transformProject(
     }
   }
 
-  // For alt text, use the project title as fallback
-  const imageAltText = projectDoc.title
+  // For alt text, try to get from media's alt field first, then fall back to project title
+  // The thumbnailMedia may have an alt field with localized strings
+  const mediaAltText = thumbnailMedia
+    ? getLocalizedAlt(
+        thumbnailMedia as { alt?: { ca?: string; es?: string; en?: string } },
+        safeLang as SupportedLanguage,
+        '',
+      )
+    : ''
 
   // Helper: Handle both localized and direct string values
   const getLocalizedValue = (
@@ -183,7 +192,7 @@ export function transformProject(
   const title = getTitle()
   const slug = getSlug()
   const image = getImage()
-  const alt = imageAltText ? getLocalizedValue(imageAltText) : title // Use title as fallback for alt text
+  const alt = mediaAltText || projectDoc.title // Use media alt text if available, otherwise project title
 
   // Extract client names safely
   const getClients = (): string | undefined => {
