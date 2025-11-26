@@ -239,7 +239,9 @@ export async function fetchProjectBySlug(
           backgroundColor { hex }
         }
       },
-      publishDate
+      publishDate,
+      metaTitle,
+      metaDescription
     }`
     const params = { slug, slugWithSuffix, locale }
 

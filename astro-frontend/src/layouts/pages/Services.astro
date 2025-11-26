@@ -28,6 +28,10 @@ try {
 
 const metadata = getPageMetadata('services', locale)
 
+// Use Sanity SEO fields with fallback to static metadata
+const pageMetaTitle = servicesPageData?.metaTitle || metadata.title
+const pageMetaDescription = servicesPageData?.metaDescription || metadata.description
+
 // Convert portable text description to HTML
 const descriptionHtml = servicesPageData?.description
   ? portableTextToHtml(servicesPageData.description)
@@ -38,8 +42,8 @@ console.log('📋 [Services Layout] Description HTML:', descriptionHtml)
 ---
 
 <InternalPageLayout
-  pageMetaTitle={metadata.title}
-  pageMetaDescription={metadata.description}
+  pageMetaTitle={pageMetaTitle}
+  pageMetaDescription={pageMetaDescription}
   pageTitle={servicesPageData?.title || 'Serveis'}
   pageDescription={descriptionHtml}
 >

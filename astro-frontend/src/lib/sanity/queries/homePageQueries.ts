@@ -173,7 +173,9 @@ const HOME_PAGE_FIELDS = `
   clients {
     _type,
     title
-  }
+  },
+  metaTitle,
+  metaDescription
 `
 
 /**

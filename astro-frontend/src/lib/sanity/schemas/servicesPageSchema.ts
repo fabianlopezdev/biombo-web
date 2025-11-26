@@ -11,6 +11,8 @@ export const servicesPageSchema = z.object({
   title: z.string(),
   description: z.array(portableTextBlockSchema),
   selectedServices: z.array(serviceSchema).optional(),
+  metaTitle: z.string().nullable().optional(), // SEO: Custom meta title
+  metaDescription: z.string().nullable().optional(), // SEO: Custom meta description
 })
 
 export type ServicesPage = z.infer<typeof servicesPageSchema>

@@ -28,6 +28,8 @@ export const contactPageSchema = z.object({
   email: z.string().email().nullable().optional(),
   phone: z.string().nullable().optional(),
   formSection: formSectionSchema.nullable().optional(),
+  metaTitle: z.string().nullable().optional(), // SEO: Custom meta title
+  metaDescription: z.string().nullable().optional(), // SEO: Custom meta description
 })
 
 // Export the TypeScript types derived from the Zod schemas

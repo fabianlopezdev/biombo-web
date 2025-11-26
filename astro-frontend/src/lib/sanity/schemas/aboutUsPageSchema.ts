@@ -73,6 +73,8 @@ export const aboutUsPageSchema = z.object({
   description: z.array(portableTextBlockSchema),
   aboutSlider: aboutSliderSchema.optional(),
   clientsTitle: z.string().optional(),
+  metaTitle: z.string().nullable().optional(), // SEO: Custom meta title
+  metaDescription: z.string().nullable().optional(), // SEO: Custom meta description
 })
 
 // Type exports

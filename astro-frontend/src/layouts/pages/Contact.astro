@@ -20,11 +20,15 @@ const title = contactPageData?.title || 'Contacte'
 const email = contactPageData?.email || 'info@biombo.cat'
 const phone = contactPageData?.phone || '+(34) 699 696 969'
 const metadata = getPageMetadata('contact', locale)
+
+// Use Sanity SEO fields with fallback to static metadata
+const pageMetaTitle = contactPageData?.metaTitle || metadata.title
+const pageMetaDescription = contactPageData?.metaDescription || metadata.description
 ---
 
 <InternalPageLayout
-  pageMetaTitle={metadata.title}
-  pageMetaDescription={metadata.description}
+  pageMetaTitle={pageMetaTitle}
+  pageMetaDescription={pageMetaDescription}
   pageTitle={title}
 >
   <div slot="two-column-content" class="contact-content">

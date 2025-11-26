@@ -48,7 +48,9 @@ const ABOUT_US_PAGE_FIELDS = `
       }
     }
   },
-  clientsTitle
+  clientsTitle,
+  metaTitle,
+  metaDescription
 `
 
 /**

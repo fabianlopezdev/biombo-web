@@ -22,7 +22,9 @@ const CONTACT_PAGE_FIELDS = `
       required
     },
     submitButtonText
-  }
+  },
+  metaTitle,
+  metaDescription
 `
 
 /**

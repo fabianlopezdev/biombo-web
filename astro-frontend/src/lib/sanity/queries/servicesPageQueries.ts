@@ -17,7 +17,9 @@ const SERVICES_PAGE_FIELDS = `
     title,
     slug,
     description
-  }
+  },
+  metaTitle,
+  metaDescription
 `
 
 /**

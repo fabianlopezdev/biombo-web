@@ -10,6 +10,8 @@ export const legalPageSchema = z.object({
   language: z.union([z.literal('ca'), z.literal('es'), z.literal('en')]).optional(),
   title: z.string(),
   content: z.array(portableTextBlockSchema),
+  metaTitle: z.string().nullable().optional(), // SEO: Custom meta title
+  metaDescription: z.string().nullable().optional(), // SEO: Custom meta description
 })
 
 // Type exports

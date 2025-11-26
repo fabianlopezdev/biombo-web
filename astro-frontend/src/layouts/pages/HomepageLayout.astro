@@ -34,13 +34,17 @@ try {
 }
 
 const metadata = getPageMetadata('homepage', locale)
+
+// Use Sanity SEO fields with fallback to static metadata
+const pageMetaTitle = homePageData?.metaTitle || metadata.title
+const pageMetaDescription = homePageData?.metaDescription || metadata.description
 ---
 
 <script src="@/scripts/wheel-to-horizontal-scroll.ts"></script>
 
 <BaseLayout
-  pageMetaTitle={metadata.title}
-  pageMetaDescription={metadata.description}
+  pageMetaTitle={pageMetaTitle}
+  pageMetaDescription={pageMetaDescription}
   skipTarget="#projects"
 >
   <main id="main" class="main-content">

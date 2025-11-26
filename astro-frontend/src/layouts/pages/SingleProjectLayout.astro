@@ -49,13 +49,17 @@ const similarProjects = await fetchSimilarProjects(serviceIds, locale, project._
 // Get the base projects URL for this locale
 const projectsBaseUrl = getProjectsListUrl(locale)
 
-// Generate dynamic SEO metadata
-const metadata = generateProjectMetadata(project, locale, portableTextToPlainText)
+// Generate dynamic SEO metadata as fallback
+const generatedMetadata = generateProjectMetadata(project, locale, portableTextToPlainText)
+
+// Use Sanity SEO fields with fallback to auto-generated metadata
+const pageMetaTitle = project?.metaTitle || generatedMetadata.title
+const pageMetaDescription = project?.metaDescription || generatedMetadata.description
 ---
 
 <BaseLayout
-  pageMetaTitle={metadata.title}
-  pageMetaDescription={metadata.description}
+  pageMetaTitle={pageMetaTitle}
+  pageMetaDescription={pageMetaDescription}
   skipTarget="#project-content"
 >
   <main id="main" class="main-content">

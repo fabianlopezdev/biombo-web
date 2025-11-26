@@ -223,6 +223,8 @@ export const projectSchema = z.object({
   projectDate: z.string().nullable().optional(), // Added nullable
   publishDate: z.string().nullable().optional(), // Added publishDate field
   gallery: z.array(imageWithResolvedAssetSchema).optional(), // Gallery images also use resolved assets
+  metaTitle: z.string().nullable().optional(), // SEO: Custom meta title
+  metaDescription: z.string().nullable().optional(), // SEO: Custom meta description
 })
 
 // Schema for a list of projects

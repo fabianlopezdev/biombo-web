@@ -8,7 +8,9 @@ const PROJECTS_PAGE_FIELDS = `
   _createdAt,
   _updatedAt,
   language,
-  title
+  title,
+  metaTitle,
+  metaDescription
 `
 
 /**

@@ -18,7 +18,9 @@ const LEGAL_PAGE_FIELDS = `
         "blank": @.blank
       }
     }
-  }
+  },
+  metaTitle,
+  metaDescription
 `
 
 /**

@@ -29,6 +29,10 @@ console.log('📄 [Projects Layout] Fallback Title:', t.pageTitle)
 // Use Sanity title if available, otherwise fallback to translations
 const pageTitle = projectsPageData?.title || t.pageTitle
 
+// Use Sanity SEO fields with fallback to static metadata
+const pageMetaTitle = projectsPageData?.metaTitle || metadata.title
+const pageMetaDescription = projectsPageData?.metaDescription || metadata.description
+
 // Helper function to get project slug
 const getProjectSlug = (slug: { current: string } | string): string => {
   return typeof slug === 'string' ? slug : slug?.current || ''
@@ -36,8 +40,8 @@ const getProjectSlug = (slug: { current: string } | string): string => {
 ---
 
 <BaseLayout
-  pageMetaTitle={metadata.title}
-  pageMetaDescription={metadata.description}
+  pageMetaTitle={pageMetaTitle}
+  pageMetaDescription={pageMetaDescription}
   skipTarget="#main"
 >
   <main id="main" class="main-content">

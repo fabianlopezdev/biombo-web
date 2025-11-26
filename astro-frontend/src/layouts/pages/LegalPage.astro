@@ -19,11 +19,15 @@ const title = legalPageData?.title || 'Legal'
 const content = legalPageData?.content
 const htmlContent = portableTextToHtmlForLegalPage(content, locale)
 const metadata = getPageMetadata('legal', locale)
+
+// Use Sanity SEO fields with fallback to static metadata
+const pageMetaTitle = legalPageData?.metaTitle || metadata.title
+const pageMetaDescription = legalPageData?.metaDescription || metadata.description
 ---
 
 <BaseLayout
-  pageMetaTitle={metadata.title}
-  pageMetaDescription={metadata.description}
+  pageMetaTitle={pageMetaTitle}
+  pageMetaDescription={pageMetaDescription}
   skipTarget="#main"
 >
   <main id="main" class="main-content">

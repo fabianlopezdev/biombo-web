@@ -161,6 +161,8 @@ export const homePageSchema = z.object({
   about: aboutSectionSchema.nullable().optional(), // Allow null or undefined
   services: servicesSectionSchema.nullable().optional(), // Allow null or undefined
   clients: clientsSectionSchema.nullable().optional(), // Allow null or undefined
+  metaTitle: z.string().nullable().optional(), // SEO: Custom meta title
+  metaDescription: z.string().nullable().optional(), // SEO: Custom meta description
 })
 
 // Export the TypeScript types derived from the Zod schemas
@@ -186,6 +188,8 @@ export type HomePage = Omit<
   about?: AboutSection | null
   services?: ServicesSection | null
   clients?: ClientsSection | null
+  metaTitle?: string | null
+  metaDescription?: string | null
 }
 
 // Schema for an array of home pages (likely won't be needed, but included for consistency)
