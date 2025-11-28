@@ -1,288 +1,127 @@
 ---
-// Removed external SVG import to simplify implementation
 interface Props {
   title: string
 }
 
 const { title } = Astro.props
 
-/** Split "word, word, word!" into three chunks. */
-function splitHeadlineIntoChunks(raw: string): [string, string, string] | null {
-  const match = raw.match(/^([^,]+),\s*([^,]+),\s*([^!]+)!?$/)
-  return match ? [match[1].trim(), match[2].trim(), match[3].trim()] : null
+/**
+ * Parse title with **highlighted** syntax.
+ * Returns an array of segments: { text: string, highlighted: boolean }
+ * Example: "Hello **world**!" -> [{ text: "Hello ", highlighted: false }, { text: "world", highlighted: true }, { text: "!", highlighted: false }]
+ */
+function parseHighlightedTitle(raw: string): Array<{ text: string; highlighted: boolean }> {
+  const segments: Array<{ text: string; highlighted: boolean }> = []
+  const regex = /\*\*([^*]+)\*\*/g
+  let lastIndex = 0
+  let match
+
+  while ((match = regex.exec(raw)) !== null) {
+    // Add text before the match (if any)
+    if (match.index > lastIndex) {
+      segments.push({ text: raw.slice(lastIndex, match.index), highlighted: false })
+    }
+    // Add the highlighted text (without the **)
+    segments.push({ text: match[1], highlighted: true })
+    lastIndex = regex.lastIndex
+  }
+
+  // Add remaining text after last match (if any)
+  if (lastIndex < raw.length) {
+    segments.push({ text: raw.slice(lastIndex), highlighted: false })
+  }
+
+  // If no segments were created (no ** found), return the whole title as non-highlighted
+  if (segments.length === 0) {
+    segments.push({ text: raw, highlighted: false })
+  }
+
+  return segments
 }
 
-const [firstWord, secondWord, thirdWord] = splitHeadlineIntoChunks(title) ?? [title, '', '']
-
-const chunkOne = `${firstWord},`
-const chunkTwo = `${secondWord},`
-const chunkThree = `${thirdWord}!`
+const segments = parseHighlightedTitle(title)
+// Plain text version for screen readers (without the **)
+const plainTitle = title.replace(/\*\*([^*]+)\*\*/g, '$1')
 ---
 
-<!-- Re-enabled script for SVG animation only -->
-<script src="@/scripts/homepage/projects-title-animation.ts"></script>
-<h2 id="projects-heading" class="hero-big-text projects-heading" data-has-played="false">
-  <!-- ─── Chunk 1 · Slinky Pop-In ───────────────────────────────────── -->
-  <span class="chunk chunk-slinky" aria-label={chunkOne}>
-    {
-      Array.from(chunkOne).map(function (char, index) {
-        return (
-          <span class="character slinky-letter" aria-hidden="true" style={`--char-index:${index}`}>
-            {char === ' ' ? '\u00A0' : char}
-          </span>
-        )
-      })
-    }
-  </span>&nbsp;
+<h2 id="projects-heading" class="hero-big-text projects-heading">
+  {
+    segments.map((segment) =>
+      segment.highlighted ? (
+        <span class="highlighted-word">
+          {segment.text}
+          <div class="highlight-underline">
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 120 8"
+              xmlns="http://www.w3.org/2000/svg"
+              class="highlight-svg"
+              preserveAspectRatio="none"
+            >
+              <path
+                class="highlight-path"
+                d="M118.044 3.70327C103.584 1.84112 89.0612 0.68815 74.5157 0.263129C59.9721 -0.161867 45.4117 0.136598 30.8825 1.15457C23.9959 1.63755 17.1188 2.28731 10.2531 3.09245L10.2533 3.08332C8.51527 3.24381 6.75534 3.46565 5.03074 3.78155C4.26961 3.92024 1.57329 4.30594 1.16902 4.95369C0.768678 5.59465 0.995679 6.48787 1.62693 6.73562C2.0382 6.89609 3.80961 7.13097 4.24439 7.10683C4.66379 7.0825 4.90003 6.79786 4.92379 6.29136C4.93703 6.00617 4.68599 5.64228 5.01245 5.51859L8.97367 4.98692C22.5534 3.35417 36.1828 2.34756 49.8252 1.98033C64.3714 1.58809 78.9316 1.9197 93.4498 2.97216C101.657 3.56755 109.849 4.3956 118.022 5.4494C118.962 5.57096 118.978 3.82248 118.044 3.70099L118.044 3.70327Z"
+              />
+            </svg>
+          </div>
+        </span>
+      ) : (
+        <span>{segment.text}</span>
+      ),
+    )
+  }
 
-  <!-- ─── Chunk 2 · Ping-Pong Wave ──────────────────────────────────── -->
-  <span class="chunk chunk-wave" aria-label={chunkTwo}>
-    {
-      Array.from(chunkTwo).map(function (char, index) {
-        return (
-          <span class="character wave-letter" aria-hidden="true" style={`--char-index:${index}`}>
-            {char === ' ' ? '\u00A0' : char}
-          </span>
-        )
-      })
-    }
-  </span>&nbsp;
-
-  <!-- ─── Chunk 3 · Card-Flip Reveal ────────────────────────────────── -->
-  <span class="chunk chunk-flip" aria-label={chunkThree}>
-    {
-      Array.from(chunkThree).map(function (char, index) {
-        return (
-          <span class="character flip-letter" aria-hidden="true" style={`--char-index:${index}`}>
-            {char === ' ' ? '\u00A0' : char}
-          </span>
-        )
-      })
-    }
-
-    <!-- Highlight for the last chunk - using inline SVG for reliability -->
-    <div class="highlight-word">
-      <svg
-        width="100%"
-        height="8"
-        viewBox="0 0 240 8"
-        xmlns="http://www.w3.org/2000/svg"
-        class="highlight-svg"
-      >
-        <path
-          class="highlight-path"
-          d="M118.044 3.70327C103.584 1.84112 89.0612 0.68815 74.5157 0.263129C59.9721 -0.161867 45.4117 0.136598 30.8825 1.15457C23.9959 1.63755 17.1188 2.28731 10.2531 3.09245L10.2533 3.08332C8.51527 3.24381 6.75534 3.46565 5.03074 3.78155C4.26961 3.92024 1.57329 4.30594 1.16902 4.95369C0.768678 5.59465 0.995679 6.48787 1.62693 6.73562C2.0382 6.89609 3.80961 7.13097 4.24439 7.10683C4.66379 7.0825 4.90003 6.79786 4.92379 6.29136C4.93703 6.00617 4.68599 5.64228 5.01245 5.51859L8.97367 4.98692C22.5534 3.35417 36.1828 2.34756 49.8252 1.98033C64.3714 1.58809 78.9316 1.9197 93.4498 2.97216C101.657 3.56755 109.849 4.3956 118.022 5.4494C118.962 5.57096 118.978 3.82248 118.044 3.70099L118.044 3.70327Z"
-        ></path>
-      </svg>
-    </div>
-  </span>
-
-  <!-- Screen-reader full sentence -->
-  <span class="sr-only">{title}</span>
+  <!-- Screen-reader full sentence (without ** markers) -->
+  <span class="sr-only">{plainTitle}</span>
 </h2>
 
 <style>
   h2 {
-    --slinky-letter-duration: 600ms;
-    --wave-letter-duration: 800ms;
-    --flip-letter-duration: 600ms;
-    --highlight-animation-duration: 800ms;
     grid-column: 55 / span 59;
     grid-row: 15 / span 10;
     padding-inline-start: 0.3125rem;
-
-    /* Hover effect - COMMENTED OUT
-    &:hover .chunk-flip {
-      transform: scale(1.05);
-    } */
   }
 
   .hero-big-text {
     font-size: clamp(3.375rem, 0.281rem + 4.99vi, 5rem);
   }
 
-  .chunk-flip {
-    transition: transform 0.2s ease-in-out;
-  }
-
   .projects-heading {
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    perspective: 800px;
-
-    & .chunk {
-      display: inline-flex;
-      white-space: nowrap;
-      position: relative;
-    }
+    display: block;
+    white-space: pre-wrap; /* Preserve spaces */
   }
 
-  .character {
+  .highlighted-word {
+    position: relative;
     display: inline-block;
-    /* animation-play-state: paused; - COMMENTED OUT */
-
-    &.slinky-letter {
-      /* Animation properties - COMMENTED OUT
-      animation-name: slinky-pop-in;
-      animation-duration: var(--slinky-letter-duration);
-      animation-timing-function: cubic-bezier(0.25, 0.9, 0.35, 1.15);
-      animation-fill-mode: forwards;
-      animation-delay: calc(var(--char-index) * 45ms);
-      opacity: 0;
-      transform: translateY(-120%) rotateX(35deg); */
-      opacity: 1; /* Show immediately */
-      transform: none; /* No transform */
-    }
-
-    &.wave-letter {
-      /* Animation properties - COMMENTED OUT
-      animation-name: ping-pong-wave;
-      animation-duration: var(--wave-letter-duration);
-      animation-timing-function: ease-in-out;
-      animation-fill-mode: forwards;
-      animation-delay: calc(var(--char-index) * 40ms);
-      opacity: 0; */
-      opacity: 1; /* Show immediately */
-    }
-
-    &.flip-letter {
-      transform-origin: 50% 50%;
-      backface-visibility: hidden;
-      /* Animation properties - COMMENTED OUT
-      animation-name: card-flip-reveal;
-      animation-duration: var(--flip-letter-duration);
-      animation-timing-function: cubic-bezier(0.4, 0.2, 0.2, 1);
-      animation-fill-mode: forwards;
-      animation-delay: calc(var(--char-index) * 35ms);
-      opacity: 0;
-      transform: rotateY(-90deg); */
-      opacity: 1; /* Show immediately */
-      transform: none; /* No transform */
-    }
+    white-space: normal;
   }
 
-  /* ──────────── Keyframes - COMMENTED OUT ────────────────────────── */
-  /* @keyframes slinky-pop-in {
-    0% {
-      transform: translateY(-120%) rotateX(35deg);
-      opacity: 0;
-    }
-    60% {
-      transform: translateY(10%) rotateX(0deg) scale(1.25);
-      opacity: 1;
-    }
-    80% {
-      transform: translateY(-4%) scale(0.9);
-    }
-    100% {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
-  }
-
-  @keyframes ping-pong-wave {
-    0% {
-      transform: translateY(0);
-      opacity: 0;
-    }
-    10% {
-      opacity: 1;
-    }
-    20% {
-      transform: translateY(-0.4rem);
-    }
-    40% {
-      transform: translateY(0.4rem);
-    }
-    60% {
-      transform: translateY(-0.25rem);
-    }
-    80% {
-      transform: translateY(0.25rem);
-    }
-    100% {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes card-flip-reveal {
-    0% {
-      transform: rotateY(-90deg);
-      opacity: 0;
-    }
-    50% {
-      transform: rotateY(20deg);
-      opacity: 1;
-    }
-    100% {
-      transform: rotateY(0deg);
-      opacity: 1;
-    }
-  } */
-
-  .highlight-word {
+  .highlight-underline {
     position: absolute;
     inset-block-end: -0.6rem;
-    inset-inline-start: 0; /* More generous extension to the left */
-    width: 203%; /* Significantly wider than the text */
-    height: 1.2rem; /* Increased height for more visual impact */
+    inset-inline-start: 0;
+    width: 100%;
+    height: 1.2rem;
     z-index: 1;
-    opacity: 1; /* Show immediately without animation */
-    transform: translateY(2px); /* Slight adjustment to position */
+    pointer-events: none;
   }
 
-  /* Style the SVG directly */
   .highlight-svg {
     display: block;
     width: 100%;
     height: 100%;
-    /* transform: scaleX(1.3); */
   }
 
-  /* Style the SVG path - no animation, fully visible */
   .highlight-path {
     fill: var(--color-secondary);
-    /* stroke: var(--color-secondary);
-    stroke-width: 1; */
     transform-origin: left center;
-    transform: scaleX(1); /* Fully visible without animation */
   }
 
-  /* Keyframes for SVG animation */
-  @keyframes indicator-reveal {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes svg-path-reveal {
-    0% {
-      transform: scaleX(0);
-    }
-    100% {
-      transform: scaleX(1);
-    }
-  }
-
-  /* ──────────── Reduced-Motion Fallback ─────────── */
   @media (prefers-reduced-motion: reduce) {
-    .character {
-      animation: none !important;
-      transform: none !important;
-    }
-
-    .highlight-word {
+    .highlight-underline {
       opacity: 1;
-    }
-
-    .highlight-path {
-      animation: none !important;
-      transform: scaleX(1);
     }
   }
 </style>

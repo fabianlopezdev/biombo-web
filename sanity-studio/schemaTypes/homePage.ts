@@ -76,8 +76,8 @@ export const projectsSection = defineType({
     defineField({
       name: 'title',
       title: 'Section Title',
-      description: 'The main heading for the projects section (e.g. "Tria, remena, fes clic!")',
-      type: 'string', // Changed from localeString to string
+      description: 'The main heading for the projects section. Wrap words with **double asterisks** to highlight them with an underline (e.g., "Hello **world**" or "Tria, **remena, fes** clic!").',
+      type: 'string',
       validation: (Rule) => Rule.required().error('Section title is required'),
     }),
     defineField({
