@@ -59,6 +59,13 @@ const videoWithBackground = defineType({
         disableAlpha: true,
       },
     }),
+    defineField({
+      name: 'showFullOnMobile',
+      type: 'boolean',
+      title: 'Show full video on mobile',
+      description: 'When enabled, shows the entire video on mobile without cropping',
+      initialValue: false,
+    }),
   ],
   preview: {
     select: {

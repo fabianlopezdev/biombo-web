@@ -886,6 +886,17 @@ const pageMetaDescription = project?.metaDescription || generatedMetadata.descri
       object-fit: contain;
     }
 
+    /* Content section videos with full-on-mobile */
+    .full-on-mobile :global(.optimized-video-wrapper) {
+      aspect-ratio: unset;
+      height: auto;
+    }
+
+    .full-on-mobile :global(.optimized-video) {
+      height: auto;
+      object-fit: contain;
+    }
+
     .standalone-text {
       padding-inline: 0rem;
       margin-inline: 0rem;
