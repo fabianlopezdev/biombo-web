@@ -33,8 +33,8 @@ export async function fetchProjectBySlug(
 ): Promise<Project | null> {
   try {
     // Query for a project with the matching slug and language
-    // For non-Catalan locales, try both with and without language suffix
-    const slugWithSuffix = locale !== 'ca' ? `${slug}-${locale}` : slug
+    // Try both plain slug and slug with language suffix (e.g., slug-cat, slug-es, slug-en)
+    const slugWithSuffix = `${slug}-${locale === 'ca' ? 'cat' : locale}`
 
     const query = `*[_type == "project" && (slug.current == $slug || slug.current == $slugWithSuffix) && language == $locale][0] {
       _id,
@@ -47,6 +47,7 @@ export async function fetchProjectBySlug(
       mainMedia[] {
         _type,
         alt,
+        showFullOnMobile,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -72,6 +73,7 @@ export async function fetchProjectBySlug(
       mobileMainMedia[] {
         _type,
         alt,
+        showFullOnMobile,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -96,6 +98,7 @@ export async function fetchProjectBySlug(
       thumbnailMedia[] {
         _type,
         alt,
+        showFullOnMobile,
         "asset": coalesce(asset.asset->, asset->) {
           _id,
           _type,
@@ -145,6 +148,7 @@ export async function fetchProjectBySlug(
         featuredMedia[] {
           _type,
           alt,
+          showFullOnMobile,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -169,6 +173,7 @@ export async function fetchProjectBySlug(
         otherMedia[] {
           _type,
           alt,
+          showFullOnMobile,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -193,6 +198,7 @@ export async function fetchProjectBySlug(
         mobileFeaturedMedia[] {
           _type,
           alt,
+          showFullOnMobile,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,
@@ -217,6 +223,7 @@ export async function fetchProjectBySlug(
         mobileOtherMedia[] {
           _type,
           alt,
+          showFullOnMobile,
           "asset": coalesce(asset.asset->, asset->) {
             _id,
             _type,

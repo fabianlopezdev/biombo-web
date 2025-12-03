@@ -97,6 +97,7 @@ const imageWithResolvedAssetSchema = z.object({
   asset: resolvedSanityAssetSchema, // Use the resolved asset schema here
   alt: localeStringSchema, // Already handles null/optional
   caption: localeStringSchema, // Already handles null/optional
+  showFullOnMobile: z.boolean().nullable().optional(), // When true, show full image on mobile without cropping
   hotspot: z
     .object({
       x: z.number(),
@@ -114,6 +115,7 @@ const fileWithResolvedAssetSchema = z.object({
   _type: z.union([z.literal('file'), z.literal('videoWithBackground')]),
   asset: z.union([resolvedSanityAssetSchema, resolvedSanityFileAssetSchema]),
   backgroundColor: z.object({ hex: z.string() }).nullable().optional(), // Custom background color for loading state
+  showFullOnMobile: z.boolean().nullable().optional(), // When true, show full media on mobile without cropping
 })
 
 // Define a union schema for media items that can be EITHER image OR file type

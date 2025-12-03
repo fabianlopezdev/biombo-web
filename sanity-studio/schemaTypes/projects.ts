@@ -18,6 +18,13 @@ const imageWithAltFields = defineArrayMember({
       type: 'localeStringOptional',
       description: 'Describes the image for search engines and screen readers (SEO & accessibility)',
     },
+    {
+      name: 'showFullOnMobile',
+      title: 'Show full image on mobile',
+      type: 'boolean',
+      description: 'When enabled, shows the entire image on mobile without cropping',
+      initialValue: false,
+    },
   ],
 })
 

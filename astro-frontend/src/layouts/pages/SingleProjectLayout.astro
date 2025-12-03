@@ -73,103 +73,113 @@ const pageMetaDescription = project?.metaDescription || generatedMetadata.descri
     </aside>
 
     <header class="project-header">
-      <figure class="hero-figure">
-        {
-          (() => {
-            const desktopMedia = getMainMedia(project)
-            const mobileMedia = getMobileMainMedia(project)
-            const hasMobileVariant = mobileMedia && mobileMedia !== desktopMedia
+      {
+        (() => {
+          const desktopMedia = getMainMedia(project)
+          const mobileMedia = getMobileMainMedia(project)
+          const hasMobileVariant = mobileMedia && mobileMedia !== desktopMedia
+          // Check if the media should show full on mobile (use mobile variant's setting if available, else desktop's)
+          const showFullOnMobile = hasMobileVariant
+            ? (mobileMedia as any)?.showFullOnMobile
+            : (desktopMedia as any)?.showFullOnMobile
+          const heroFigureClass = `hero-figure${showFullOnMobile ? ' full-on-mobile' : ''}`
 
-            // Check if either desktop or mobile is a video
-            const isDesktopVideo =
-              desktopMedia && isVideoFile(desktopMedia as FileWithResolvedAsset)
-            const isMobileVideo = mobileMedia && isVideoFile(mobileMedia as FileWithResolvedAsset)
+          return (
+            <figure class={heroFigureClass}>
+              {(() => {
+                // Check if either desktop or mobile is a video
+                const isDesktopVideo =
+                  desktopMedia && isVideoFile(desktopMedia as FileWithResolvedAsset)
+                const isMobileVideo =
+                  mobileMedia && isVideoFile(mobileMedia as FileWithResolvedAsset)
 
-            // Case 1: Both are videos - show appropriate video per viewport
-            if (isDesktopVideo && isMobileVideo && hasMobileVariant) {
-              return (
-                <>
-                  <OptimizedVideo
-                    video={desktopMedia as FileWithResolvedAsset}
-                    class="hero-image desktop-only-hero"
-                    aspectRatio={1513 / 722}
-                  />
-                  <OptimizedVideo
-                    video={mobileMedia as FileWithResolvedAsset}
-                    class="hero-image mobile-only-hero"
-                    aspectRatio={65 / 59}
-                  />
-                </>
-              )
-            }
+                // Case 1: Both are videos - show appropriate video per viewport
+                if (isDesktopVideo && isMobileVideo && hasMobileVariant) {
+                  return (
+                    <>
+                      <OptimizedVideo
+                        video={desktopMedia as FileWithResolvedAsset}
+                        class="hero-image desktop-only-hero"
+                        aspectRatio={1513 / 722}
+                      />
+                      <OptimizedVideo
+                        video={mobileMedia as FileWithResolvedAsset}
+                        class="hero-image mobile-only-hero"
+                        aspectRatio={65 / 59}
+                      />
+                    </>
+                  )
+                }
 
-            // Case 2: Desktop is video, mobile is image or no mobile variant - use desktop video everywhere
-            if (isDesktopVideo) {
-              return (
-                <OptimizedVideo
-                  video={desktopMedia as FileWithResolvedAsset}
-                  class="hero-image"
-                  aspectRatio={1513 / 722}
-                />
-              )
-            }
+                // Case 2: Desktop is video, mobile is image or no mobile variant - use desktop video everywhere
+                if (isDesktopVideo) {
+                  return (
+                    <OptimizedVideo
+                      video={desktopMedia as FileWithResolvedAsset}
+                      class="hero-image"
+                      aspectRatio={1513 / 722}
+                    />
+                  )
+                }
 
-            // Case 3: Desktop is image, mobile is video - show image on desktop, video on mobile
-            if (!isDesktopVideo && isMobileVideo && hasMobileVariant) {
-              const desktopImage = desktopMedia as ImageWithResolvedAsset
-              const mobileVideo = mobileMedia as FileWithResolvedAsset
+                // Case 3: Desktop is image, mobile is video - show image on desktop, video on mobile
+                if (!isDesktopVideo && isMobileVideo && hasMobileVariant) {
+                  const desktopImage = desktopMedia as ImageWithResolvedAsset
+                  const mobileVideo = mobileMedia as FileWithResolvedAsset
 
-              return (
-                <>
+                  return (
+                    <>
+                      <OptimizedImage
+                        class="hero-image desktop-only-hero"
+                        src={getImageUrl(desktopImage)}
+                        alt={getLocalizedAlt(desktopMedia as any, locale, project.title)}
+                        image={desktopImage}
+                        imageContext="hero"
+                        loading="eager"
+                      />
+                      <OptimizedVideo
+                        video={mobileVideo}
+                        class="hero-image mobile-only-hero"
+                        aspectRatio={65 / 59}
+                      />
+                    </>
+                  )
+                }
+
+                // Case 4: Both are images - handle image rendering with responsive variants
+                const desktopImage = desktopMedia as ImageWithResolvedAsset
+                const mobileImage = mobileMedia as ImageWithResolvedAsset | null
+
+                return hasMobileVariant ? (
+                  // Use picture element for responsive images
+                  <picture>
+                    <source media="(min-width: 992px)" srcset={getImageUrl(desktopImage)} />
+                    <source media="(max-width: 991px)" srcset={getImageUrl(mobileImage)} />
+                    <OptimizedImage
+                      class="hero-image"
+                      src={getImageUrl(desktopImage)}
+                      alt={getLocalizedAlt(desktopMedia as any, locale, project.title)}
+                      image={desktopImage}
+                      imageContext="hero"
+                      loading="eager"
+                    />
+                  </picture>
+                ) : (
+                  // No mobile variant, use desktop only
                   <OptimizedImage
-                    class="hero-image desktop-only-hero"
+                    class="hero-image"
                     src={getImageUrl(desktopImage)}
                     alt={getLocalizedAlt(desktopMedia as any, locale, project.title)}
                     image={desktopImage}
                     imageContext="hero"
                     loading="eager"
                   />
-                  <OptimizedVideo
-                    video={mobileVideo}
-                    class="hero-image mobile-only-hero"
-                    aspectRatio={65 / 59}
-                  />
-                </>
-              )
-            }
-
-            // Case 4: Both are images - handle image rendering with responsive variants
-            const desktopImage = desktopMedia as ImageWithResolvedAsset
-            const mobileImage = mobileMedia as ImageWithResolvedAsset | null
-
-            return hasMobileVariant ? (
-              // Use picture element for responsive images
-              <picture>
-                <source media="(min-width: 992px)" srcset={getImageUrl(desktopImage)} />
-                <source media="(max-width: 991px)" srcset={getImageUrl(mobileImage)} />
-                <OptimizedImage
-                  class="hero-image"
-                  src={getImageUrl(desktopImage)}
-                  alt={getLocalizedAlt(desktopMedia as any, locale, project.title)}
-                  image={desktopImage}
-                  imageContext="hero"
-                  loading="eager"
-                />
-              </picture>
-            ) : (
-              // No mobile variant, use desktop only
-              <OptimizedImage
-                class="hero-image"
-                src={getImageUrl(desktopImage)}
-                alt={getLocalizedAlt(desktopMedia as any, locale, project.title)}
-                image={desktopImage}
-                imageContext="hero"
-                loading="eager"
-              />
-            )
-          })()
-        }
-      </figure>
+                )
+              })()}
+            </figure>
+          )
+        })()
+      }
     </header>
 
     <article id="project-content" class="project-content">
@@ -360,9 +370,16 @@ const pageMetaDescription = project?.metaDescription || generatedMetadata.descri
                 ? mobileFeaturedMedia
                 : mobileOtherMedia[0]
 
+              // Check if media should show full on mobile
+              const mediaShowFull = mobileSingleMedia
+                ? (mobileSingleMedia as any)?.showFullOnMobile
+                : (singleMedia as any)?.showFullOnMobile
+
               return (
                 <div class={`content-section ${spacingClass}`}>
-                  <figure class="red-background standalone-image">
+                  <figure
+                    class={`red-background standalone-image${mediaShowFull ? ' full-on-mobile' : ''}`}
+                  >
                     {renderMediaItem(singleMedia, mobileSingleMedia)}
                   </figure>
                 </div>
@@ -379,11 +396,19 @@ const pageMetaDescription = project?.metaDescription || generatedMetadata.descri
                   <div class="two-image-layout gallery">
                     <div class="two-columns">
                       {mediaItems.map(
-                        (media: FileWithResolvedAsset | ImageWithResolvedAsset, index: number) => (
-                          <figure class="red-background">
-                            {renderMediaItem(media, mobileOtherMedia[index])}
-                          </figure>
-                        ),
+                        (media: FileWithResolvedAsset | ImageWithResolvedAsset, index: number) => {
+                          const mobileMedia = mobileOtherMedia[index]
+                          const mediaShowFull = mobileMedia
+                            ? (mobileMedia as any)?.showFullOnMobile
+                            : (media as any)?.showFullOnMobile
+                          return (
+                            <figure
+                              class={`red-background${mediaShowFull ? ' full-on-mobile' : ''}`}
+                            >
+                              {renderMediaItem(media, mobileMedia)}
+                            </figure>
+                          )
+                        },
                       )}
                     </div>
                   </div>
@@ -398,6 +423,11 @@ const pageMetaDescription = project?.metaDescription || generatedMetadata.descri
 
               // If there's a featured media: 2 on top, featured below
               if (layout.hasFeatured) {
+                // Check if featured media should show full on mobile
+                const featuredShowFull = mobileFeaturedMedia
+                  ? (mobileFeaturedMedia as any)?.showFullOnMobile
+                  : (featuredMedia as any)?.showFullOnMobile
+
                 return (
                   <div class={`content-section ${spacingClass}`}>
                     <div class="two-image-layout gallery">
@@ -406,14 +436,24 @@ const pageMetaDescription = project?.metaDescription || generatedMetadata.descri
                           (
                             media: FileWithResolvedAsset | ImageWithResolvedAsset,
                             index: number,
-                          ) => (
-                            <figure class="red-background">
-                              {renderMediaItem(media, mobileOtherMedia[index])}
-                            </figure>
-                          ),
+                          ) => {
+                            const mobileMedia = mobileOtherMedia[index]
+                            const mediaShowFull = mobileMedia
+                              ? (mobileMedia as any)?.showFullOnMobile
+                              : (media as any)?.showFullOnMobile
+                            return (
+                              <figure
+                                class={`red-background${mediaShowFull ? ' full-on-mobile' : ''}`}
+                              >
+                                {renderMediaItem(media, mobileMedia)}
+                              </figure>
+                            )
+                          },
                         )}
                       </div>
-                      <figure class="red-background standalone-image-within">
+                      <figure
+                        class={`red-background standalone-image-within${featuredShowFull ? ' full-on-mobile' : ''}`}
+                      >
                         {renderMediaItem(featuredMedia, mobileFeaturedMedia)}
                       </figure>
                     </div>
@@ -430,11 +470,19 @@ const pageMetaDescription = project?.metaDescription || generatedMetadata.descri
                           (
                             media: FileWithResolvedAsset | ImageWithResolvedAsset,
                             index: number,
-                          ) => (
-                            <figure class="blue-background">
-                              {renderMediaItem(media, mobileOtherMedia[index])}
-                            </figure>
-                          ),
+                          ) => {
+                            const mobileMedia = mobileOtherMedia[index]
+                            const mediaShowFull = mobileMedia
+                              ? (mobileMedia as any)?.showFullOnMobile
+                              : (media as any)?.showFullOnMobile
+                            return (
+                              <figure
+                                class={`blue-background${mediaShowFull ? ' full-on-mobile' : ''}`}
+                              >
+                                {renderMediaItem(media, mobileMedia)}
+                              </figure>
+                            )
+                          },
                         )}
                       </div>
                     </div>
@@ -448,19 +496,34 @@ const pageMetaDescription = project?.metaDescription || generatedMetadata.descri
               const mediaItems =
                 layout.otherMedia.length > 0 ? layout.otherMedia : layout.otherImages
 
+              // Check if featured media should show full on mobile
+              const featuredShowFull = mobileFeaturedMedia
+                ? (mobileFeaturedMedia as any)?.showFullOnMobile
+                : (featuredMedia as any)?.showFullOnMobile
+
               return (
                 <div class={`content-section ${spacingClass}`}>
                   <div class="three-image-layout gallery">
                     <div class="three-columns">
                       {mediaItems.map(
-                        (media: FileWithResolvedAsset | ImageWithResolvedAsset, index: number) => (
-                          <figure class="blue-background">
-                            {renderMediaItem(media, mobileOtherMedia[index])}
-                          </figure>
-                        ),
+                        (media: FileWithResolvedAsset | ImageWithResolvedAsset, index: number) => {
+                          const mobileMedia = mobileOtherMedia[index]
+                          const mediaShowFull = mobileMedia
+                            ? (mobileMedia as any)?.showFullOnMobile
+                            : (media as any)?.showFullOnMobile
+                          return (
+                            <figure
+                              class={`blue-background${mediaShowFull ? ' full-on-mobile' : ''}`}
+                            >
+                              {renderMediaItem(media, mobileMedia)}
+                            </figure>
+                          )
+                        },
                       )}
                     </div>
-                    <figure class="red-background standalone-image-within">
+                    <figure
+                      class={`red-background standalone-image-within${featuredShowFull ? ' full-on-mobile' : ''}`}
+                    >
                       {renderMediaItem(featuredMedia, mobileFeaturedMedia)}
                     </figure>
                   </div>
@@ -794,6 +857,33 @@ const pageMetaDescription = project?.metaDescription || generatedMetadata.descri
     .blue-background {
       aspect-ratio: 362 / 315;
       margin-inline: calc(0.875rem - var(--padding-inline));
+    }
+
+    /* When showFullOnMobile is enabled on an image */
+    .full-on-mobile {
+      aspect-ratio: unset;
+      background-color: transparent;
+    }
+
+    .full-on-mobile :global(img),
+    .full-on-mobile :global(.optimized-image) {
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* Hero image full-on-mobile support */
+    .hero-figure.full-on-mobile :global(.hero-image) {
+      aspect-ratio: unset;
+      height: auto;
+    }
+
+    .hero-figure.full-on-mobile :global(.hero-image .optimized-image) {
+      height: auto;
+      object-fit: contain;
+    }
+
+    .hero-figure.full-on-mobile :global(.hero-image.optimized-video-wrapper .optimized-video) {
+      object-fit: contain;
     }
 
     .standalone-text {
