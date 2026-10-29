@@ -39,9 +39,11 @@ function parseHighlightedTitle(raw: string): Array<{ text: string; highlighted: 
   return segments
 }
 
-const segments = parseHighlightedTitle(title)
+// Keep a word space when highlighted text follows a comma directly in the CMS.
+const spacedTitle = title.replace(/,(?=\*\*)/g, ', ')
+const segments = parseHighlightedTitle(spacedTitle)
 // Plain text version for screen readers (without the **)
-const plainTitle = title.replace(/\*\*([^*]+)\*\*/g, '$1')
+const plainTitle = spacedTitle.replace(/\*\*([^*]+)\*\*/g, '$1')
 ---
 
 <h2 id="projects-heading" class="hero-big-text projects-heading">
@@ -84,18 +86,22 @@ const plainTitle = title.replace(/\*\*([^*]+)\*\*/g, '$1')
   }
 
   .hero-big-text {
-    font-size: clamp(3.375rem, 0.281rem + 4.99vi, 5rem);
+    /* 59 / 200 tracks in the 183.3vw projects section = 54.0735vi.
+       Poppins Semibold renders the Catalan title at approximately 9.9em wide.
+       Subtract the heading padding before fitting, then cap at 5rem.
+       https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/clamp */
+    font-size: clamp(1rem, (54.0735vi - 0.3125rem) / 9.9, 5rem);
   }
 
   .projects-heading {
     display: block;
-    white-space: pre-wrap; /* Preserve spaces */
+    white-space: nowrap;
   }
 
   .highlighted-word {
     position: relative;
     display: inline-block;
-    white-space: normal;
+    white-space: inherit;
   }
 
   .highlight-underline {
